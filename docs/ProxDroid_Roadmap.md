@@ -18,7 +18,7 @@
 | **Phase 4** | Resource monitoring charts | Full real-time charts for CPU, RAM, network, disk I/O |
 | **Phase 5** | Storage & backup management | Can browse storage and trigger/view backups |
 | **Phase 6** | Polish & release prep | App is stable, polished, and ready for Play Store |
-| **Post-MVP** | Extended features | iOS, console, push notifications, homescreen widget |
+| **Post-MVP** | Extended features | Console, push notifications, homescreen widget |
 
 ---
 
@@ -339,12 +339,6 @@
 ## Post-MVP – Extended Features
 
 These are tracked here for planning purposes but are not in scope for v1.0.
-
-### iOS Support
-- [ ] Test Flutter app on iOS simulator
-- [ ] Fix any platform-specific issues (SSL handling differs on iOS)
-- [ ] Set up Apple Developer account
-- [ ] Submit to App Store
 
 ### Console Access
 - [ ] Research noVNC WebSocket token flow via Proxmox API

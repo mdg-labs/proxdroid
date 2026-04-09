@@ -27,7 +27,7 @@ This document defines the technical architecture of ProxDroid. All decisions fol
 
 | Decision | Choice | Rationale |
 |---|---|---|
-| Framework | Flutter (Dart) | Cross-platform, modern UI, iOS-ready |
+| Framework | Flutter (Dart) | Android-native UI, Material 3, performant |
 | State Management | **Riverpod** | Modern, minimal boilerplate, ideal for solo dev |
 | Navigation | **go_router** | Official Flutter standard, deep link support |
 | HTTP Client | **Dio** | SSL override for self-signed certs, interceptors |
@@ -356,7 +356,7 @@ dev_dependencies:
 | **Phase 4** | Charts (CPU, RAM, network, disk I/O) | Monitoring complete |
 | **Phase 5** | Storage, backup list & manual trigger | MVP feature-complete |
 | **Phase 6** | Polish, error handling, UX details | MVP release-ready |
-| **Post-MVP** | iOS, console, push notifications, widget | v2.0 |
+| **Post-MVP** | Console, push notifications, homescreen widget | v2.0 |
 
 ---
 

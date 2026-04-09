@@ -42,7 +42,6 @@ Proxmox VE is a widely used virtualization platform, especially in the homelab s
 
 ### 3.2 Secondary Goals (Post-MVP)
 
-- iOS support (Flutter makes this possible with minimal extra effort)
 - Console access (noVNC for QEMU VMs / xterm.js for LXC containers via WebView)
 - Push notifications for critical events
 - Homescreen widget & quick actions
@@ -58,8 +57,7 @@ Proxmox VE is a widely used virtualization platform, especially in the homelab s
 | | |
 |---|---|
 | **Framework** | Flutter (Dart) |
-| **MVP Target Platform** | Android (API 26+, Android 8.0+) |
-| **Future Platforms** | iOS (Post-MVP) |
+| **Target Platform** | Android (API 26+, Android 8.0+) |
 | **State Management** | Riverpod (finalized) |
 | **Navigation** | go_router (finalized) |
 | **HTTP Client** | Dio (with SSL override for self-signed certs) |
@@ -105,7 +103,6 @@ Multi-server support is built into the architecture from day one. Users can add 
 | Dark theme | P0 | MVP |
 | Console access (noVNC / xterm.js) | P2 | Post-MVP |
 | Push notifications | P2 | Post-MVP |
-| iOS support | P2 | Post-MVP |
 | Homescreen widget | P3 | Post-MVP |
 | Snapshot management | P2 | Post-MVP |
 | Suspend / Resume (QEMU) | P3 | Post-MVP |
