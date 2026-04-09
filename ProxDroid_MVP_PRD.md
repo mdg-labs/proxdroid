@@ -12,10 +12,10 @@ ProxDroid is a modern, open-source Android client for Proxmox Virtual Environmen
 |---|---|
 | **Project Name** | ProxDroid |
 | **Platform** | Android (Flutter) |
-| **License** | Open Source (TBD – GPL v3 or MIT) |
+| **License** | Open Source (MIT) |
 | **Monetization** | Free, donation model (GitHub Sponsors, Ko-fi) |
 | **Target Audience** | Homelab enthusiasts, hobbyist admins, IT professionals |
-| **Repository** | TBD (GitHub) |
+| **Repository** | [github.com/mdg-labs/proxdroid](https://github.com/mdg-labs/proxdroid) |
 
 ---
 
@@ -43,10 +43,11 @@ Proxmox VE is a widely used virtualization platform, especially in the homelab s
 ### 3.2 Secondary Goals (Post-MVP)
 
 - iOS support (Flutter makes this possible with minimal extra effort)
-- Console access (noVNC / xterm.js WebView)
+- Console access (noVNC for QEMU VMs / xterm.js for LXC containers via WebView)
 - Push notifications for critical events
 - Homescreen widget & quick actions
 - Snapshot management
+- Suspend / Resume for QEMU VMs
 
 ---
 
@@ -93,6 +94,7 @@ Multi-server support is built into the architecture from day one. Users can add 
 | VM list & status display | P0 | MVP |
 | Container (LXC) list & status | P0 | MVP |
 | VM/container start / stop / reboot | P0 | MVP |
+| VM/container force stop | P1 | MVP |
 | CPU / RAM monitoring (charts) | P0 | MVP |
 | Network I/O charts | P1 | MVP |
 | Disk I/O charts | P1 | MVP |
@@ -101,11 +103,12 @@ Multi-server support is built into the architecture from day one. Users can add 
 | Manual backup trigger | P1 | MVP |
 | Task viewer (running & past tasks) | P1 | MVP |
 | Dark theme | P0 | MVP |
-| Console access (noVNC) | P2 | Post-MVP |
+| Console access (noVNC / xterm.js) | P2 | Post-MVP |
 | Push notifications | P2 | Post-MVP |
 | iOS support | P2 | Post-MVP |
 | Homescreen widget | P3 | Post-MVP |
 | Snapshot management | P2 | Post-MVP |
+| Suspend / Resume (QEMU) | P3 | Post-MVP |
 
 ---
 
@@ -125,7 +128,7 @@ Multi-server support is built into the architecture from day one. Users can add 
 ### 7.1 Open Source
 
 - Fully open-source on GitHub
-- License: TBD (GPL v3 recommended or MIT)
+- License: **MIT** – permissive, maximizes contribution friendliness
 - Contributions via pull requests
 - Issues & feature requests via GitHub Issues
 - Semantic versioning (SemVer)
@@ -162,6 +165,7 @@ No ads. Free. Exclusively voluntary donations:
 | Risk | Self-signed SSL handling can be complex on older Android versions |
 | Risk | Flutter ecosystem may be limited for certain native Android features |
 | Risk | Credentials (API tokens, passwords) must be stored securely on-device – plain Hive storage is not sufficient; requires `flutter_secure_storage` |
+| Risk | Google Play Store requires a Privacy Policy URL for apps that handle credentials and network configuration |
 | Assumption | Users have direct network access to the PVE server (LAN or VPN) |
 | Assumption | Proxmox VE 7.x and 8.x are supported |
 | Assumption | Community interest is sufficient for active continued development |
@@ -172,7 +176,7 @@ No ads. Free. Exclusively voluntary donations:
 
 - [x] Tech stack decided (Flutter, Riverpod, Freezed, go_router, Hive + flutter_secure_storage, Dio)
 - [x] App architecture defined → see `ProxDroid_Architecture.md`
-- [ ] Finalize license (GPL v3 vs MIT)
+- [x] License finalized: MIT
 - [ ] Create GitHub repository and set up initial Flutter project
 - [ ] Set up CI/CD with GitHub Actions (build + test)
 - [ ] Implement Proxmox API wrapper module (Phase 1)

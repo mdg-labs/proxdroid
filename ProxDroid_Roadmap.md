@@ -37,7 +37,7 @@
 - [ ] Initialize Flutter project (`flutter create proxdroid`)
 - [ ] Remove default counter app boilerplate (`lib/main.dart` content, `test/widget_test.dart`)
 - [ ] Set minimum SDK to Android API 26 in `android/app/build.gradle`
-- [ ] Add all dependencies to `pubspec.yaml` (Riverpod, Dio, Freezed, go_router, Hive, fl_chart, flutter_secure_storage)
+- [ ] Add all dependencies to `pubspec.yaml` (Riverpod, Dio, Freezed, go_router, Hive, fl_chart, flutter_secure_storage, connectivity_plus, package_info_plus, url_launcher, intl)
 - [ ] Run `flutter pub get` and confirm no version conflicts
 - [ ] Set up `build_runner` and confirm code generation works (`dart run build_runner build`)
 
@@ -57,6 +57,7 @@
 ### 0.5 CI/CD (GitHub Actions)
 - [ ] Add workflow: `ci.yml` – runs on every push/PR to `main`
   - `flutter pub get`
+  - `dart format --output=none --set-exit-if-changed .` (fail if code is not formatted)
   - `dart run build_runner build --delete-conflicting-outputs`
   - `flutter analyze`
   - `flutter test`
@@ -90,10 +91,11 @@
 ### 1.3 Proxmox API Client
 - [ ] Implement `ProxmoxApiClient` with Dio
 - [ ] Add `BaseOptions`: base URL (`https://$host:$port/api2/json`), timeouts (connect: 10s, receive: 30s)
-- [ ] Implement SSL override (`DefaultHttpClientAdapter` + `onHttpClientCreate`) for self-signed certs
+- [ ] Implement SSL override using `IOHttpClientAdapter` + `createHttpClient` (Dio v5 API) for self-signed certs
+  - **Do not use** `DefaultHttpClientAdapter` – that is the Dio v4 API and was removed in v5
 - [ ] Implement `ApiInterceptor` for:
   - Attaching auth headers on every request (API token or ticket cookie)
-  - Catching Dio errors and converting to typed `ProxmoxException`
+  - Catching Dio errors and converting to typed `ProxmoxException` (`AuthException`, `NetworkException`, `TimeoutException`, `ServerException`, `PermissionException`)
 - [ ] Implement API Token auth: attach `Authorization: PVEAPIToken=...` header
 - [ ] Implement Username/Password auth: POST `/access/ticket` → store ticket + CSRFPreventionToken, refresh on expiry
 - [ ] Expose `ProxmoxApiClient` as a Riverpod provider (scoped to selected server)
@@ -108,7 +110,7 @@
 ### 1.5 Add Server UI
 - [ ] Build `ServerListScreen` – shows all saved servers, empty state with CTA
 - [ ] Build `AddServerScreen` – form with fields: name, host, port (default 8006), auth type toggle, credentials, allow self-signed toggle
-- [ ] Add connection test button – calls `GET /version` and shows success/error feedback
+- [ ] Add connection test button – calls `GET /version` (returns PVE version info) and shows success/error feedback
 - [ ] Add server to list on success, show typed error message on failure
 - [ ] Add swipe-to-delete on server list items
 - [ ] Wire up go_router: `/servers` → `ServerListScreen`, `/servers/add` → `AddServerScreen`
@@ -125,7 +127,7 @@
 - [ ] Implement `GET /nodes/{node}/status` → node resource details
 - [ ] Implement `GET /nodes/{node}/qemu` → list of VMs
 - [ ] Implement `GET /nodes/{node}/lxc` → list of containers
-- [ ] Add all relevant API endpoint constants to `shared/constants/api_endpoints.dart`
+- [ ] Add all relevant API endpoint constants to `shared/constants/api_endpoints.dart` (including `GET /version` for connection test)
 
 ### 2.2 Data Models
 - [ ] Extend `Node` model with all relevant fields from API response
@@ -172,10 +174,10 @@
 
 ### 3.1 API Methods
 - [ ] Implement `POST /nodes/{node}/qemu/{vmid}/status/start`
-- [ ] Implement `POST /nodes/{node}/qemu/{vmid}/status/stop`
+- [ ] Implement `POST /nodes/{node}/qemu/{vmid}/status/stop` (graceful, with optional `forceStop=1` body param)
 - [ ] Implement `POST /nodes/{node}/qemu/{vmid}/status/reboot`
 - [ ] Implement `POST /nodes/{node}/lxc/{ctid}/status/start`
-- [ ] Implement `POST /nodes/{node}/lxc/{ctid}/status/stop`
+- [ ] Implement `POST /nodes/{node}/lxc/{ctid}/status/stop` (graceful, with optional `forceStop=1` body param)
 - [ ] Implement `POST /nodes/{node}/lxc/{ctid}/status/reboot`
 - [ ] Implement `GET /nodes/{node}/tasks` → list of tasks
 - [ ] Implement `GET /nodes/{node}/tasks/{upid}/status` → task status
@@ -186,9 +188,12 @@
 - [ ] Implement `TaskStatus` enum: `running`, `ok`, `error`, `unknown`
 
 ### 3.3 Actions in VM/Container Detail
-- [ ] Add action buttons to `VmDetailScreen`: Start, Stop, Reboot
+- [ ] Add action buttons to `VmDetailScreen`: Start, Stop, Force Stop, Reboot
+  - **Stop** → `POST .../status/stop` (sends ACPI shutdown signal – graceful)
+  - **Force Stop** → `POST .../status/stop` with `forceStop=1` body param (immediate kill)
 - [ ] Show buttons only when action is valid (e.g. no Start when already running)
-- [ ] Show confirmation dialog before Stop/Reboot
+- [ ] Show confirmation dialog before Stop, Force Stop, and Reboot
+  - Force Stop dialog must clearly warn that the action is immediate and may cause data loss
 - [ ] On action: show loading indicator, call API, poll task status until complete
 - [ ] On success: refresh VM status, show snackbar confirmation
 - [ ] On error: show typed error message
@@ -304,6 +309,7 @@
 - [ ] Unit tests for all Riverpod providers
 - [ ] Unit tests for all Freezed models (fromJson/toJson roundtrip)
 - [ ] Widget tests for critical UI flows (add server, start VM)
+- [ ] Integration tests using `integration_test` package for end-to-end flows (add server → dashboard → VM action)
 - [ ] Manual end-to-end test on a real Proxmox instance (PVE 7.x and 8.x)
 
 ### 6.5 Play Store Release
@@ -311,8 +317,11 @@
 - [ ] Create Play Store screenshots (at least 4, phone + tablet)
 - [ ] Write Play Store listing: short description, full description, keywords
 - [ ] Set up Google Play Console, create app entry
+- [ ] Create and host a Privacy Policy (required by Play Store for apps handling credentials/network config)
+- [ ] Complete the Play Store Data Safety form (declare what data is collected: credentials stored on-device only, no data sent to third parties)
 - [ ] Sign release APK with upload keystore
-  - Generate keystore file locally, never commit it to git
+  - Generate keystore file locally
+  - Add `*.jks` and `*.keystore` to `.gitignore` – **never commit the keystore file**
   - Store keystore as base64-encoded GitHub Actions secret (`KEYSTORE_BASE64`)
   - Store keystore password, key alias and key password as separate GitHub Actions secrets
   - Decode and use in `build.yml` via `echo "$KEYSTORE_BASE64" | base64 --decode > upload.jks`
@@ -337,11 +346,11 @@ These are tracked here for planning purposes but are not in scope for v1.0.
 - [ ] Set up Apple Developer account
 - [ ] Submit to App Store
 
-### Console Access (noVNC)
+### Console Access
 - [ ] Research noVNC WebSocket token flow via Proxmox API
-- [ ] Implement `GET /nodes/{node}/qemu/{vmid}/vncproxy` to get VNC ticket
-- [ ] Embed noVNC in a `WebView` widget using `webview_flutter`
-- [ ] Handle authentication and session management for WebSocket
+- [ ] **QEMU VMs:** Implement `POST /nodes/{node}/qemu/{vmid}/vncproxy` to get VNC ticket → embed noVNC in a `WebView` using `webview_flutter`
+- [ ] **LXC Containers:** Use `POST /nodes/{node}/lxc/{ctid}/termproxy` (terminal/shell access) → embed xterm.js in a `WebView` – containers do not have a graphical VNC console
+- [ ] Handle authentication and session management for WebSocket connections in both cases
 
 ### Push Notifications
 - [ ] Research Proxmox webhook/notification support (PVE 8.x)

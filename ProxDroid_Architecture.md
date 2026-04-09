@@ -34,7 +34,7 @@ This document defines the technical architecture of ProxDroid. All decisions fol
 | Data Models | **Freezed** | Immutable, auto-generates copyWith/toJson |
 | Charts | **fl_chart** | Lightweight, highly customizable |
 | Local Storage | **Hive** + **flutter_secure_storage** | Hive for non-sensitive data; flutter_secure_storage for credentials (Android Keystore) |
-| Code Generation | **build_runner** | Required for Freezed + Riverpod Generator |
+| Code Generation | **build_runner** + **riverpod_generator** | Required for Freezed + Riverpod Generator |
 | CI/CD | **GitHub Actions** | Free for open source |
 
 ---
@@ -196,19 +196,34 @@ Core models: `Server`, `Node`, `Vm`, `Container`, `Task`, `BackupJob`, `BackupCo
 
 ## 7. API Client & SSL Handling
 
-The Proxmox API client is provided as a singleton via Riverpod. SSL override for self-signed certificates is a mandatory requirement and is handled via `onHttpClientCreate`:
+The Proxmox API client is provided as a singleton via Riverpod. SSL override for self-signed certificates is a mandatory requirement and is handled via `IOHttpClientAdapter` (Dio v5+):
 
 ```dart
-// Simplified example (Dio v5+)
-final dio = Dio(BaseOptions(baseUrl: 'https://$host:8006/api2/json'));
+import 'dart:io';
+import 'package:dio/dio.dart';
+import 'package:dio/io.dart'; // required for IOHttpClientAdapter
+
+final dio = Dio(BaseOptions(
+  baseUrl: 'https://$host:$port/api2/json',
+  connectTimeout: const Duration(seconds: 10),
+  receiveTimeout: const Duration(seconds: 30),
+));
 
 if (allowSelfSigned) {
-  (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client) {
-    client.badCertificateCallback = (cert, host, port) => true;
-    return client;
-  };
+  dio.httpClientAdapter = IOHttpClientAdapter(
+    createHttpClient: () {
+      final client = HttpClient();
+      // Accept self-signed certificates – user explicitly opts in per-server
+      client.badCertificateCallback = (cert, host, port) => true;
+      return client;
+    },
+  );
 }
 ```
+
+> **Security note:** `badCertificateCallback = true` disables certificate validation entirely. This is intentional for homelab use, where self-signed certs are the norm. Users who need stricter validation can leave `allowSelfSigned` off and rely on system CAs. A future enhancement could support certificate pinning (store the expected cert fingerprint per server).
+
+> **Deprecated API:** Dio v4 used `DefaultHttpClientAdapter` with `onHttpClientCreate`. Dio v5 replaced this with `IOHttpClientAdapter` and `createHttpClient`. Do **not** use the v4 pattern.
 
 **Auth flow:**
 1. API Token → `Authorization: PVEAPIToken=USER@REALM!TOKENID=UUID` header
@@ -219,21 +234,23 @@ if (allowSelfSigned) {
 ## 8. Navigation (go_router)
 
 ```
-/                         → Redirect → /servers or /dashboard
-/servers                  → Server list
-/servers/add              → Add server
-/dashboard                → Node overview (after server selection)
-/vms                      → VM list
-/vms/:vmid                → VM detail + charts
-/containers               → Container list
-/containers/:ctid         → Container detail
-/storage                  → Storage overview
-/storage/:id              → Storage detail + content list
-/backups                  → Backup list
-/tasks                    → Task viewer
-/tasks/:upid              → Task detail + log output
-/settings                 → Settings
+/                                   → Redirect → /servers or /dashboard
+/servers                            → Server list
+/servers/add                        → Add server
+/dashboard                          → Node overview (after server selection)
+/vms                                → VM list (all nodes)
+/vms/:node/:vmid                    → VM detail + charts
+/containers                         → Container list (all nodes)
+/containers/:node/:ctid             → Container detail
+/storage                            → Storage overview
+/storage/:node/:storage             → Storage detail + content list
+/backups                            → Backup list
+/tasks                              → Task viewer
+/tasks/:node/:upid                  → Task detail + log output
+/settings                           → Settings
 ```
+
+> **Note:** All Proxmox API calls require both `node` and the resource ID. Routes include `:node` to keep all navigation self-contained without relying on provider state for the node lookup.
 
 ---
 
@@ -274,11 +291,16 @@ sealed class ProxmoxException implements Exception {
 }
 class AuthException extends ProxmoxException { const AuthException(); }
 class NetworkException extends ProxmoxException { const NetworkException(); }
-class ServerException extends ProxmoxException { const ServerException(); }
+class TimeoutException extends ProxmoxException { const TimeoutException(); }
+class ServerException extends ProxmoxException {
+  final int statusCode;
+  final String? message;
+  const ServerException(this.statusCode, {this.message});
+}
 class PermissionException extends ProxmoxException { const PermissionException(); }
 ```
 
-These are translated into human-readable messages in the UI.
+These are translated into human-readable messages in the UI. `TimeoutException` covers both connection and receive timeouts from Dio. `ServerException` carries the HTTP status code so the UI can differentiate 4xx from 5xx errors.
 
 ---
 
@@ -303,6 +325,11 @@ dependencies:
   flutter_secure_storage: ^9.x # Sensitive data (API tokens, passwords) – encrypted
   # Charts
   fl_chart: ^0.x
+  # Utilities
+  connectivity_plus: ^6.x      # Detect network availability before API calls
+  package_info_plus: ^8.x      # Show app version in Settings/About
+  url_launcher: ^6.x           # Open donation links, GitHub URL from the app
+  intl: ^0.x                   # Date/time formatting (task timestamps, backup dates)
 
 dev_dependencies:
   build_runner: ^2.x
@@ -311,8 +338,10 @@ dev_dependencies:
   json_serializable: ^6.x
 
 # Post-MVP (add when needed):
-# webview_flutter: ^4.x       # Console access (noVNC)
+# webview_flutter: ^4.x       # Console access (noVNC / xterm.js)
 ```
+
+> **Note on Hive:** The original `hive` / `hive_flutter` package has not had a major release since 2022. The community-maintained fork **`hive_ce`** (Hive Community Edition) is a drop-in replacement with active maintenance and Dart 3 / null-safety fixes. Consider using `hive_ce` + `hive_ce_flutter` instead. Alternatively, **Isar** is a more modern embedded database for Flutter if a richer query model is needed.
 
 ---
 
