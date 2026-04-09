@@ -65,7 +65,8 @@ Proxmox VE is a widely used virtualization platform, especially in the homelab s
 | **Charts** | fl_chart |
 | **Local Storage** | Hive (non-sensitive data) + flutter_secure_storage (credentials) |
 | **CI/CD** | GitHub Actions |
-| **Distribution** | Google Play Store + GitHub Releases (APK) |
+| **Min Android** | API 26+ (Android 8.0 Oreo) |
+| **Distribution** | Google Play Store + F-Droid + GitHub Releases (APK) |
 
 ### 4.2 API Integration
 
@@ -164,7 +165,7 @@ No ads. Free. Exclusively voluntary donations:
 | Risk | Credentials (API tokens, passwords) must be stored securely on-device – plain Hive storage is not sufficient; requires `flutter_secure_storage` |
 | Risk | Google Play Store requires a Privacy Policy URL for apps that handle credentials and network configuration |
 | Assumption | Users have direct network access to the PVE server (LAN or VPN) |
-| Assumption | Proxmox VE 7.x and 8.x are supported |
+| Assumption | Proxmox VE 7.x and 8.x are supported; PVE 6.x is explicitly out of scope |
 | Assumption | Community interest is sufficient for active continued development |
 
 ---
@@ -175,7 +176,9 @@ No ads. Free. Exclusively voluntary donations:
 - [x] App architecture defined → see `ProxDroid_Architecture.md`
 - [x] License finalized: MIT
 - [ ] Create GitHub repository and set up initial Flutter project
+- [ ] Add community files: `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, GitHub issue/PR templates
 - [ ] Set up CI/CD with GitHub Actions (build + test)
+- [ ] Create and host Privacy Policy page (GitHub Pages recommended; required for Play Store)
 - [ ] Implement Proxmox API wrapper module (Phase 1)
 - [ ] First test setup with a local Proxmox server
 

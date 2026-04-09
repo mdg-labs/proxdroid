@@ -33,7 +33,7 @@ This document defines the technical architecture of ProxDroid. All decisions fol
 | HTTP Client | **Dio** | SSL override for self-signed certs, interceptors |
 | Data Models | **Freezed** | Immutable, auto-generates copyWith/toJson |
 | Charts | **fl_chart** | Lightweight, highly customizable |
-| Local Storage | **Hive** + **flutter_secure_storage** | Hive for non-sensitive data; flutter_secure_storage for credentials (Android Keystore) |
+| Local Storage | **hive_ce** + **flutter_secure_storage** | hive_ce (community-maintained Hive fork) for non-sensitive data; flutter_secure_storage for credentials (Android Keystore) |
 | Code Generation | **build_runner** + **riverpod_generator** | Required for Freezed + Riverpod Generator |
 | CI/CD | **GitHub Actions** | Free for open source |
 
@@ -188,6 +188,9 @@ class Vm with _$Vm {
 }
 
 enum VmStatus { running, stopped, paused, unknown }
+
+// LXC containers do not have a paused state — use a separate enum to avoid exposing an invalid state
+enum ContainerStatus { running, stopped, unknown }
 ```
 
 Core models: `Server`, `Node`, `Vm`, `Container`, `Task`, `BackupJob`, `BackupContent`, `Storage`, `ResourceDataPoint`
@@ -224,6 +227,10 @@ if (allowSelfSigned) {
 > **Security note:** `badCertificateCallback = true` disables certificate validation entirely. This is intentional for homelab use, where self-signed certs are the norm. Users who need stricter validation can leave `allowSelfSigned` off and rely on system CAs. A future enhancement could support certificate pinning (store the expected cert fingerprint per server).
 
 > **Deprecated API:** Dio v4 used `DefaultHttpClientAdapter` with `onHttpClientCreate`. Dio v5 replaced this with `IOHttpClientAdapter` and `createHttpClient`. Do **not** use the v4 pattern.
+
+> **HTTPS enforcement:** The app enforces HTTPS-only connections. At the "Add Server" form level, validate that the host input does not include an `http://` scheme and display a clear error if it does. Android API 28+ blocks cleartext HTTP at the OS level, producing cryptic errors — catching this early in the UI is far better UX. No `android:usesCleartextTraffic` override is needed or wanted.
+
+> **Key API efficiency:** Use `GET /cluster/resources` (with optional `?type=vm` or `?type=lxc`) to retrieve all VMs and containers across all nodes in a single call. This is substantially more efficient than iterating `GET /nodes/{node}/qemu` and `GET /nodes/{node}/lxc` per node, and is the preferred approach for populating list screens and the dashboard summary.
 
 **Auth flow:**
 1. API Token → `Authorization: PVEAPIToken=USER@REALM!TOKENID=UUID` header
@@ -279,6 +286,22 @@ Future<List<Vm>> vmList(Ref ref, String node) async {
 }
 ```
 
+### Server-switching invalidation (how it works)
+
+`apiClientProvider` watches `selectedServerProvider`. When the user switches servers, `selectedServerProvider` emits a new value, Riverpod rebuilds `apiClientProvider`, and because every API data provider `watch`es `apiClientProvider`, they are all invalidated and rebuilt in turn. This chain only works if `apiClientProvider` uses `ref.watch` — never `ref.read` — for `selectedServerProvider`.
+
+```dart
+@riverpod
+ProxmoxApiClient apiClient(Ref ref) {
+  final server = ref.watch(selectedServerProvider); // watch, not read
+  return ProxmoxApiClient(server: server);
+}
+```
+
+### Connectivity check
+
+Use `connectivity_plus` to check network availability before initiating API calls and to surface a persistent "No network connection" banner when offline. Expose a `connectivityProvider` that streams `ConnectivityResult` from `Connectivity().onConnectivityChanged`. API repositories do not need to check connectivity themselves — the interceptor layer can reject calls early when offline is detected, surfacing a `NetworkException`.
+
 ---
 
 ## 10. Error Handling
@@ -312,7 +335,7 @@ dependencies:
     sdk: flutter
   # State management
   flutter_riverpod: ^3.x
-  riverpod_annotation: ^4.x
+  riverpod_annotation: ^3.x   # Must match flutter_riverpod major version
   # Navigation
   go_router: ^15.x
   # HTTP
@@ -321,19 +344,19 @@ dependencies:
   freezed_annotation: ^3.x
   json_annotation: ^4.x
   # Storage
-  hive_flutter: ^1.x           # Non-sensitive data (server names, preferences)
-  flutter_secure_storage: ^9.x # Sensitive data (API tokens, passwords) – encrypted
+  hive_ce_flutter: ^2.x        # Non-sensitive data (server names, preferences) – use hive_ce, not the unmaintained hive
+  flutter_secure_storage: ^9.x # Sensitive data (API tokens, passwords) – encrypted via Android Keystore
   # Charts
   fl_chart: ^0.x
   # Utilities
-  connectivity_plus: ^6.x      # Detect network availability before API calls
+  connectivity_plus: ^6.x      # Network availability detection; drives offline banner + API call gating
   package_info_plus: ^8.x      # Show app version in Settings/About
   url_launcher: ^6.x           # Open donation links, GitHub URL from the app
-  intl: ^0.x                   # Date/time formatting (task timestamps, backup dates)
+  intl: ^0.x                   # Date/time formatting (task timestamps, backup dates) – not used for full i18n
 
 dev_dependencies:
   build_runner: ^2.x
-  riverpod_generator: ^4.x
+  riverpod_generator: ^3.x     # Must match flutter_riverpod major version
   freezed: ^3.x
   json_serializable: ^6.x
 
@@ -341,7 +364,7 @@ dev_dependencies:
 # webview_flutter: ^4.x       # Console access (noVNC / xterm.js)
 ```
 
-> **Note on Hive:** The original `hive` / `hive_flutter` package has not had a major release since 2022. The community-maintained fork **`hive_ce`** (Hive Community Edition) is a drop-in replacement with active maintenance and Dart 3 / null-safety fixes. Consider using `hive_ce` + `hive_ce_flutter` instead. Alternatively, **Isar** is a more modern embedded database for Flutter if a richer query model is needed.
+> **Note on Hive:** The original `hive` / `hive_flutter` package has not received a major release since 2022 and is not actively maintained. Use **`hive_ce`** (Hive Community Edition) — `hive_ce` + `hive_ce_flutter` — which is a drop-in replacement with active maintenance, Dart 3 support, and null-safety fixes. Do not use the original `hive` packages. Isar is a more feature-rich alternative if complex querying becomes necessary, but is overkill for ProxDroid's simple key-value storage needs.
 
 ---
 
