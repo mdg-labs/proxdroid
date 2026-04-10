@@ -63,9 +63,9 @@ Proxmox VE is a widely used virtualization platform, especially in the homelab s
 | **HTTP Client** | Dio (with SSL override for self-signed certs) |
 | **Data Models** | Freezed (immutable, code-generated) |
 | **Charts** | fl_chart |
-| **Local Storage** | Hive (non-sensitive data) + flutter_secure_storage (credentials) |
+| **Local Storage** | hive_ce (non-sensitive data) + flutter_secure_storage (credentials) |
 | **CI/CD** | GitHub Actions |
-| **Distribution** | Google Play Store + GitHub Releases (APK) |
+| **Distribution** | Google Play Store + F-Droid + GitHub Releases (APK) |
 
 ### 4.2 API Integration
 
@@ -114,7 +114,7 @@ Multi-server support is built into the architecture from day one. Users can add 
 - Dark theme as default, light theme optional
 - Modern, clean UI – Material 3
 - Charts and visualizations instead of plain text tables
-- Fast load times – optimistic UI updates where possible
+- Fast load times – optimistic UI updates for read-only state; **never** for destructive or power actions (start/stop/reboot must reflect actual server state after the task completes)
 - Error messages clear and human-readable (no raw API error output)
 - Simple onboarding – add a server in under 60 seconds
 
@@ -161,21 +161,23 @@ No ads. Free. Exclusively voluntary donations:
 | Risk | Proxmox API changes in future PVE versions may require updates |
 | Risk | Self-signed SSL handling can be complex on older Android versions |
 | Risk | Flutter ecosystem may be limited for certain native Android features |
-| Risk | Credentials (API tokens, passwords) must be stored securely on-device – plain Hive storage is not sufficient; requires `flutter_secure_storage` |
+| Risk | Credentials (API tokens, passwords) must be stored securely on-device – plain hive_ce storage is not encrypted and is not sufficient for credentials; requires `flutter_secure_storage` (Android Keystore-backed) |
 | Risk | Google Play Store requires a Privacy Policy URL for apps that handle credentials and network configuration |
 | Assumption | Users have direct network access to the PVE server (LAN or VPN) |
-| Assumption | Proxmox VE 7.x and 8.x are supported |
+| Assumption | Proxmox VE 7.x and 8.x are supported; PVE 6.x is explicitly out of scope |
 | Assumption | Community interest is sufficient for active continued development |
 
 ---
 
 ## 10. Next Steps
 
-- [x] Tech stack decided (Flutter, Riverpod, Freezed, go_router, Hive + flutter_secure_storage, Dio)
+- [x] Tech stack decided (Flutter, Riverpod, Freezed, go_router, hive_ce + flutter_secure_storage, Dio)
 - [x] App architecture defined → see `ProxDroid_Architecture.md`
 - [x] License finalized: MIT
 - [ ] Create GitHub repository and set up initial Flutter project
+- [ ] Add community files: `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, GitHub issue/PR templates
 - [ ] Set up CI/CD with GitHub Actions (build + test)
+- [ ] Create and host Privacy Policy page (GitHub Pages recommended; required for Play Store)
 - [ ] Implement Proxmox API wrapper module (Phase 1)
 - [ ] First test setup with a local Proxmox server
 
@@ -209,8 +211,12 @@ No ads. Free. Exclusively voluntary donations:
 | `go_router` | Navigation | [pub.dev/packages/go_router](https://pub.dev/packages/go_router) |
 | `freezed_annotation` | Immutable data models | [pub.dev/packages/freezed_annotation](https://pub.dev/packages/freezed_annotation) |
 | `fl_chart` | Charts & visualizations | [pub.dev/packages/fl_chart](https://pub.dev/packages/fl_chart) |
-| `hive_flutter` | Local storage (non-sensitive) | [pub.dev/packages/hive_flutter](https://pub.dev/packages/hive_flutter) |
+| `hive_ce_flutter` | Local storage (non-sensitive) – community-maintained Hive fork | [pub.dev/packages/hive_ce_flutter](https://pub.dev/packages/hive_ce_flutter) |
 | `flutter_secure_storage` | Secure credential storage | [pub.dev/packages/flutter_secure_storage](https://pub.dev/packages/flutter_secure_storage) |
+| `connectivity_plus` | Network availability detection | [pub.dev/packages/connectivity_plus](https://pub.dev/packages/connectivity_plus) |
+| `package_info_plus` | App version info for Settings/About screen | [pub.dev/packages/package_info_plus](https://pub.dev/packages/package_info_plus) |
+| `url_launcher` | Open donation and GitHub links from within the app | [pub.dev/packages/url_launcher](https://pub.dev/packages/url_launcher) |
+| `intl` | Date/time formatting for task timestamps and backup dates | [pub.dev/packages/intl](https://pub.dev/packages/intl) |
 
 ### Tools & Infrastructure
 
@@ -218,6 +224,7 @@ No ads. Free. Exclusively voluntary donations:
 |---|---|
 | GitHub Actions Documentation | [docs.github.com/actions](https://docs.github.com/en/actions) |
 | Google Play – Publish an app | [developer.android.com/distribute](https://developer.android.com/distribute/google-play/start) |
+| F-Droid – Inclusion How-To | [f-droid.org/docs/Inclusion_How-To](https://f-droid.org/docs/Inclusion_How-To/) |
 | Riverpod Documentation | [riverpod.dev](https://riverpod.dev) |
 
 ### Project Documents

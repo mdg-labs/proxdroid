@@ -33,7 +33,7 @@ This document defines the technical architecture of ProxDroid. All decisions fol
 | HTTP Client | **Dio** | SSL override for self-signed certs, interceptors |
 | Data Models | **Freezed** | Immutable, auto-generates copyWith/toJson |
 | Charts | **fl_chart** | Lightweight, highly customizable |
-| Local Storage | **Hive** + **flutter_secure_storage** | Hive for non-sensitive data; flutter_secure_storage for credentials (Android Keystore) |
+| Local Storage | **hive_ce** + **flutter_secure_storage** | hive_ce (community-maintained Hive fork) for non-sensitive data; flutter_secure_storage for credentials (Android Keystore) |
 | Code Generation | **build_runner** + **riverpod_generator** | Required for Freezed + Riverpod Generator |
 | CI/CD | **GitHub Actions** | Free for open source |
 
@@ -79,7 +79,8 @@ lib/
 │   │   │   └── server_providers.dart
 │   │   └── ui/
 │   │       ├── server_list_screen.dart
-│   │       └── add_server_screen.dart
+│   │       ├── add_server_screen.dart
+│   │       └── edit_server_screen.dart   # Reuses AddServerScreen form, pre-filled
 │   │
 │   ├── dashboard/                    # Node overview & summary
 │   │   ├── data/
@@ -130,10 +131,13 @@ lib/
     ├── widgets/
     │   ├── resource_chart.dart       # Reusable chart widget
     │   ├── status_badge.dart
-    │   ├── error_view.dart
-    │   └── loading_shimmer.dart
-    └── constants/
-        └── api_endpoints.dart        # All API paths in one place
+    │   ├── error_view.dart           # Error message + retry button
+    │   ├── loading_shimmer.dart
+    │   └── empty_state.dart          # Icon + message for empty lists
+    ├── constants/
+    │   └── api_endpoints.dart        # All API paths in one place
+    └── providers/
+        └── connectivity_provider.dart # Streams ConnectivityResult; drives offline banner
 ```
 
 ---
@@ -149,16 +153,16 @@ Providers (Riverpod)
         ↓ calls
 Repository (Data Layer)
         ↓ uses
-API Client / Hive Storage
+API Client / Local Storage (hive_ce)
 ```
 
 ### Example: Starting a VM
 
 ```
 vm_detail_screen.dart
-  → ref.read(vmProvider.notifier).startVm(vmid)
-      → VmNotifier calls vm_repository.startVm(vmid)
-          → vmRepository calls proxmox_api_client.post('/nodes/{node}/qemu/{vmid}/status/start')
+  → ref.read(vmProvider.notifier).startVm(node, vmid)   // node required for all Proxmox API calls
+      → VmNotifier calls vm_repository.startVm(node, vmid)
+          → vmRepository calls proxmox_api_client.post('/nodes/$node/qemu/$vmid/status/start')
               → Response: task ID → forwarded to features/tasks/data/task_repository.dart
 ```
 
@@ -188,6 +192,9 @@ class Vm with _$Vm {
 }
 
 enum VmStatus { running, stopped, paused, unknown }
+
+// LXC containers do not have a paused state — use a separate enum to avoid exposing an invalid state
+enum ContainerStatus { running, stopped, unknown }
 ```
 
 Core models: `Server`, `Node`, `Vm`, `Container`, `Task`, `BackupJob`, `BackupContent`, `Storage`, `ResourceDataPoint`
@@ -225,6 +232,10 @@ if (allowSelfSigned) {
 
 > **Deprecated API:** Dio v4 used `DefaultHttpClientAdapter` with `onHttpClientCreate`. Dio v5 replaced this with `IOHttpClientAdapter` and `createHttpClient`. Do **not** use the v4 pattern.
 
+> **HTTPS enforcement:** The app enforces HTTPS-only connections. At the "Add Server" form level, validate that the host input does not include an `http://` scheme and display a clear error if it does. Android API 28+ blocks cleartext HTTP at the OS level, producing cryptic errors — catching this early in the UI is far better UX. No `android:usesCleartextTraffic` override is needed or wanted.
+
+> **Key API efficiency:** Use `GET /cluster/resources` (with optional `?type=vm` or `?type=lxc`) to retrieve all VMs and containers across all nodes in a single call. This is substantially more efficient than iterating `GET /nodes/{node}/qemu` and `GET /nodes/{node}/lxc` per node, and is the preferred approach for populating list screens and the dashboard summary.
+
 **Auth flow:**
 1. API Token → `Authorization: PVEAPIToken=USER@REALM!TOKENID=UUID` header
 2. Username/Password → POST `/access/ticket` → cookie + CSRFPreventionToken
@@ -237,6 +248,7 @@ if (allowSelfSigned) {
 /                                   → Redirect → /servers or /dashboard
 /servers                            → Server list
 /servers/add                        → Add server
+/servers/edit/:serverId             → Edit server (name, host, port, credentials, SSL toggle)
 /dashboard                          → Node overview (after server selection)
 /vms                                → VM list (all nodes)
 /vms/:node/:vmid                    → VM detail + charts
@@ -256,8 +268,13 @@ if (allowSelfSigned) {
 
 ## 9. State Management – Riverpod Patterns
 
-### Server list (persistent, Hive)
+### Server list (persistent, hive_ce)
 ```dart
+// serverStorageProvider lives in core/storage/server_storage.dart
+// and exposes ServerStorage as a Riverpod provider
+@riverpod
+ServerStorage serverStorage(Ref ref) => ServerStorage();
+
 @riverpod
 class ServerListNotifier extends _$ServerListNotifier {
   @override
@@ -268,16 +285,40 @@ class ServerListNotifier extends _$ServerListNotifier {
 }
 ```
 
-### API data (async, auto-refresh)
+### API data (async, cluster-wide)
 ```dart
+// Primary: use GET /cluster/resources for all-nodes VM list (one call, no N-node iteration)
 @riverpod
-Future<List<Vm>> vmList(Ref ref, String node) async {
-  // apiClientProvider is scoped to the currently selectedServerProvider
-  // – switching servers invalidates all API providers automatically
+Future<List<Vm>> allVms(Ref ref) async {
+  final api = ref.watch(apiClientProvider); // watch invalidates when server switches
+  return api.getAllVms(); // calls GET /cluster/resources?type=vm
+}
+
+// Secondary: per-node fetch used only when node context is known (e.g. node detail screens)
+@riverpod
+Future<List<Vm>> nodeVms(Ref ref, String node) async {
   final api = ref.watch(apiClientProvider);
-  return api.getVms(node);
+  return api.getVms(node); // calls GET /nodes/{node}/qemu
 }
 ```
+
+### Server-switching invalidation (how it works)
+
+`apiClientProvider` watches `selectedServerProvider`. When the user switches servers, `selectedServerProvider` emits a new value, Riverpod rebuilds `apiClientProvider`, and because every API data provider `watch`es `apiClientProvider`, they are all invalidated and rebuilt in turn. This chain only works if `apiClientProvider` uses `ref.watch` — never `ref.read` — for `selectedServerProvider`.
+
+```dart
+@riverpod
+ProxmoxApiClient apiClient(Ref ref) {
+  final server = ref.watch(selectedServerProvider); // watch, not read
+  return ProxmoxApiClient(server: server);
+}
+```
+
+> **Null safety:** On first launch (no servers configured), `selectedServerProvider` holds `null`. `apiClientProvider` should guard against this — either by throwing a typed exception that the UI catches to redirect to `/servers`, or by making `apiClientProvider` return `null` and having all API providers short-circuit gracefully. The recommended approach is to redirect to `/servers` via go_router's `redirect` callback when `selectedServerProvider` is null, so API providers never fire without a server.
+
+### Connectivity check
+
+Use `connectivity_plus` to check network availability before initiating API calls and to surface a persistent "No network connection" banner when offline. Expose a `connectivityProvider` that streams `ConnectivityResult` from `Connectivity().onConnectivityChanged`. API repositories do not need to check connectivity themselves — the interceptor layer can reject calls early when offline is detected, surfacing a `NetworkException`.
 
 ---
 
@@ -291,7 +332,7 @@ sealed class ProxmoxException implements Exception {
 }
 class AuthException extends ProxmoxException { const AuthException(); }
 class NetworkException extends ProxmoxException { const NetworkException(); }
-class TimeoutException extends ProxmoxException { const TimeoutException(); }
+class ApiTimeoutException extends ProxmoxException { const ApiTimeoutException(); } // named ApiTimeoutException to avoid conflict with dart:async TimeoutException
 class ServerException extends ProxmoxException {
   final int statusCode;
   final String? message;
@@ -300,7 +341,7 @@ class ServerException extends ProxmoxException {
 class PermissionException extends ProxmoxException { const PermissionException(); }
 ```
 
-These are translated into human-readable messages in the UI. `TimeoutException` covers both connection and receive timeouts from Dio. `ServerException` carries the HTTP status code so the UI can differentiate 4xx from 5xx errors.
+These are translated into human-readable messages in the UI. `ApiTimeoutException` covers both connection and receive timeouts from Dio. Note: the class is named `ApiTimeoutException` (not `TimeoutException`) to avoid shadowing `dart:async`'s `TimeoutException`. `ServerException` carries the HTTP status code so the UI can differentiate 4xx from 5xx errors.
 
 ---
 
@@ -312,7 +353,7 @@ dependencies:
     sdk: flutter
   # State management
   flutter_riverpod: ^3.x
-  riverpod_annotation: ^4.x
+  riverpod_annotation: ^3.x   # Must match flutter_riverpod major version
   # Navigation
   go_router: ^15.x
   # HTTP
@@ -321,19 +362,20 @@ dependencies:
   freezed_annotation: ^3.x
   json_annotation: ^4.x
   # Storage
-  hive_flutter: ^1.x           # Non-sensitive data (server names, preferences)
-  flutter_secure_storage: ^9.x # Sensitive data (API tokens, passwords) – encrypted
+  hive_ce: ^2.x                # Core Hive CE API – list as explicit direct dependency (do not rely on transitive)
+  hive_ce_flutter: ^2.x        # Flutter integration for hive_ce (initialisation, path provider)
+  flutter_secure_storage: ^9.x # Sensitive data (API tokens, passwords) – encrypted via Android Keystore
   # Charts
   fl_chart: ^0.x
   # Utilities
-  connectivity_plus: ^6.x      # Detect network availability before API calls
+  connectivity_plus: ^6.x      # Network availability detection; drives offline banner + API call gating
   package_info_plus: ^8.x      # Show app version in Settings/About
   url_launcher: ^6.x           # Open donation links, GitHub URL from the app
-  intl: ^0.x                   # Date/time formatting (task timestamps, backup dates)
+  intl: ^0.x                   # Date/time formatting (task timestamps, backup dates) – not used for full i18n
 
 dev_dependencies:
   build_runner: ^2.x
-  riverpod_generator: ^4.x
+  riverpod_generator: ^3.x     # Must match flutter_riverpod major version
   freezed: ^3.x
   json_serializable: ^6.x
 
@@ -341,7 +383,7 @@ dev_dependencies:
 # webview_flutter: ^4.x       # Console access (noVNC / xterm.js)
 ```
 
-> **Note on Hive:** The original `hive` / `hive_flutter` package has not had a major release since 2022. The community-maintained fork **`hive_ce`** (Hive Community Edition) is a drop-in replacement with active maintenance and Dart 3 / null-safety fixes. Consider using `hive_ce` + `hive_ce_flutter` instead. Alternatively, **Isar** is a more modern embedded database for Flutter if a richer query model is needed.
+> **Note on Hive:** The original `hive` / `hive_flutter` package has not received a major release since 2022 and is not actively maintained. Use **`hive_ce`** (Hive Community Edition) — `hive_ce` + `hive_ce_flutter` — which is a drop-in replacement with active maintenance, Dart 3 support, and null-safety fixes. Do not use the original `hive` packages. Isar is a more feature-rich alternative if complex querying becomes necessary, but is overkill for ProxDroid's simple key-value storage needs.
 
 ---
 
@@ -356,7 +398,7 @@ dev_dependencies:
 | **Phase 4** | Charts (CPU, RAM, network, disk I/O) | Monitoring complete |
 | **Phase 5** | Storage, backup list & manual trigger | MVP feature-complete |
 | **Phase 6** | Polish, error handling, UX details | MVP release-ready |
-| **Post-MVP** | Console, push notifications, homescreen widget | v2.0 |
+| **Post-MVP** | Console, push notifications, homescreen widget, snapshot management, suspend/resume | v2.0 |
 
 ---
 

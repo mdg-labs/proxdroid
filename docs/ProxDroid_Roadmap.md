@@ -17,7 +17,7 @@
 | **Phase 3** | VM & container actions + task viewer | Can start, stop, reboot VMs/containers and track tasks |
 | **Phase 4** | Resource monitoring charts | Full real-time charts for CPU, RAM, network, disk I/O |
 | **Phase 5** | Storage & backup management | Can browse storage and trigger/view backups |
-| **Phase 6** | Polish & release prep | App is stable, polished, and ready for Play Store |
+| **Phase 6** | Polish & release prep | App is stable, polished, and released on Play Store, F-Droid, and GitHub |
 | **Post-MVP** | Extended features | Console, push notifications, homescreen widget |
 
 ---
@@ -28,16 +28,22 @@
 
 ### 0.1 Repository
 - [ ] Create GitHub repository (`proxdroid`)
-- [ ] Add `README.md` with project description, status badge, setup instructions
-- [ ] Add `LICENSE` file (GPL v3 or MIT – decide before this step)
-- [ ] Add `.gitignore` for Flutter/Dart
+- [ ] Add `README.md` with project description, status badge, setup instructions, download links
+- [ ] Add `LICENSE` file — **MIT** (already decided, see `ProxDroid_MVP_PRD.md` §7.1)
+- [ ] Add `CHANGELOG.md` following [Keep a Changelog](https://keepachangelog.com) format — maintain incrementally, do not write from scratch at release
+- [ ] Add `CONTRIBUTING.md` — how to set up the project locally, code style guide, PR process, commit message conventions
+- [ ] Add `CODE_OF_CONDUCT.md` — use the [Contributor Covenant](https://www.contributor-covenant.org) v2.1 template
+- [ ] Add GitHub issue templates in `.github/ISSUE_TEMPLATE/`: `bug_report.yml`, `feature_request.yml`
+- [ ] Add GitHub PR template: `.github/pull_request_template.md`
+- [ ] Add `.gitignore` for Flutter/Dart (include `*.jks`, `*.keystore`, `key.properties`)
 - [ ] Set up branch protection on `main` (require PR + CI pass)
 
 ### 0.2 Flutter Project
-- [ ] Initialize Flutter project (`flutter create proxdroid`)
+- [ ] Initialize Flutter project (`flutter create --org com.mdglabs proxdroid`)
+  - This sets the Android application ID to `com.mdglabs.proxdroid` — decide and set this now; it cannot be changed after Play Store submission or F-Droid inclusion
 - [ ] Remove default counter app boilerplate (`lib/main.dart` content, `test/widget_test.dart`)
 - [ ] Set minimum SDK to Android API 26 in `android/app/build.gradle`
-- [ ] Add all dependencies to `pubspec.yaml` (Riverpod, Dio, Freezed, go_router, Hive, fl_chart, flutter_secure_storage, connectivity_plus, package_info_plus, url_launcher, intl)
+- [ ] Add all dependencies to `pubspec.yaml` (Riverpod, Dio, Freezed, go_router, hive_ce + hive_ce_flutter, fl_chart, flutter_secure_storage, connectivity_plus, package_info_plus, url_launcher, intl)
 - [ ] Run `flutter pub get` and confirm no version conflicts
 - [ ] Set up `build_runner` and confirm code generation works (`dart run build_runner build`)
 
@@ -56,12 +62,16 @@
 
 ### 0.5 CI/CD (GitHub Actions)
 - [ ] Add workflow: `ci.yml` – runs on every push/PR to `main`
+  - Pin Flutter version via `subosito/flutter-action` (e.g. `flutter-version: '3.x.x'` or `channel: stable`) — unpinned Flutter causes random CI breakage when Google releases a new version
   - `flutter pub get`
   - `dart format --output=none --set-exit-if-changed .` (fail if code is not formatted)
   - `dart run build_runner build --delete-conflicting-outputs`
   - `flutter analyze`
   - `flutter test`
 - [ ] Add workflow: `build.yml` – runs on tags (`v*`)
+  - Pin same Flutter version as `ci.yml`
+  - `flutter pub get`
+  - `dart run build_runner build --delete-conflicting-outputs` (must run before build; generates Freezed/Riverpod code)
   - Build release APK (`flutter build apk --release`)
   - Upload APK as GitHub Release asset
 - [ ] Confirm both workflows pass on a clean run
@@ -73,18 +83,19 @@
 **Goal:** The user can add a Proxmox server (by hostname/IP, port, API token or username/password), the app connects to it, authenticates successfully, and stores the configuration locally. Self-signed certificates must work.
 
 ### 1.1 Core Data Models
-- [ ] Implement `Server` model (Freezed) – Hive-persisted fields only: id, name, host, port, authType, allowSelfSigned
+- [ ] Implement `Server` model (Freezed) – hive_ce-persisted fields only: id, name, host, port, authType, allowSelfSigned
   - **Note:** credentials (`apiToken`, `password`) are NOT fields on the `Server` model – they are stored separately in `flutter_secure_storage` keyed by server id, and loaded at runtime when building the `ProxmoxApiClient`
 - [ ] Implement `Node` model (Freezed) – fields: name, status, cpu, maxCpu, mem, maxMem, uptime
 - [ ] Add `ServerAuthType` enum: `apiToken`, `usernamePassword`
 - [ ] Run `build_runner` and confirm generated files are correct
 
 ### 1.2 Local Storage
-- [ ] Initialize Hive in `main.dart` for non-sensitive data (server names, hostnames, preferences)
-- [ ] Register Hive adapters for `Server` model (excluding credentials)
+- [ ] Add `hive_ce` and `hive_ce_flutter` packages (**not** the unmaintained `hive`/`hive_flutter` — see Architecture §11); list both as explicit direct dependencies
+- [ ] Initialize `hive_ce` in `main.dart` for non-sensitive data (server names, hostnames, preferences)
+- [ ] Register `TypeAdapter`s for the `Server` model with hive_ce (excluding credentials — credentials live in flutter_secure_storage only)
 - [ ] Initialize `flutter_secure_storage` for sensitive data (API tokens, passwords) – stored encrypted using Android Keystore
 - [ ] Implement `ServerStorage` – methods: `getAll()`, `save()`, `delete()`, `get(id)`
-  - Server metadata (name, host, port, authType) → Hive
+  - Server metadata (name, host, port, authType) → `hive_ce`
   - Credentials (apiToken, password) → `flutter_secure_storage`, keyed by server id
 - [ ] Write unit tests for `ServerStorage`
 
@@ -93,6 +104,7 @@
 - [ ] Add `BaseOptions`: base URL (`https://$host:$port/api2/json`), timeouts (connect: 10s, receive: 30s)
 - [ ] Implement SSL override using `IOHttpClientAdapter` + `createHttpClient` (Dio v5 API) for self-signed certs
   - **Do not use** `DefaultHttpClientAdapter` – that is the Dio v4 API and was removed in v5
+- [ ] Enforce HTTPS-only: validate in `AddServerScreen` that the host does not contain `http://` and surface a clear error if it does (Android API 28+ blocks cleartext HTTP at OS level with cryptic errors)
 - [ ] Implement `ApiInterceptor` for:
   - Attaching auth headers on every request (API token or ticket cookie)
   - Catching Dio errors and converting to typed `ProxmoxException` (`AuthException`, `NetworkException`, `TimeoutException`, `ServerException`, `PermissionException`)
@@ -103,18 +115,20 @@
 
 ### 1.4 Server Repository & Providers
 - [ ] Implement `ServerRepository` – wraps `ServerStorage`, exposes typed methods
-- [ ] Implement `ServerListNotifier` (Riverpod) – manages list of servers, persists via Hive
-- [ ] Implement `selectedServerProvider` – tracks which server is currently active
-- [ ] Implement `apiClientProvider` – creates `ProxmoxApiClient` for the selected server
+- [ ] Implement `ServerListNotifier` (Riverpod) – manages list of servers, persists via hive_ce
+- [ ] Implement `selectedServerProvider` – tracks which server is currently active; returns `null` when no server is configured
+- [ ] Implement `apiClientProvider` – creates `ProxmoxApiClient` for the selected server; watches (not reads) `selectedServerProvider` so all API providers invalidate on server switch
+- [ ] Implement go_router `redirect` callback: if `selectedServerProvider` is null, redirect all routes to `/servers` so API providers never fire without a server
 
 ### 1.5 Add Server UI
 - [ ] Build `ServerListScreen` – shows all saved servers, empty state with CTA
 - [ ] Build `AddServerScreen` – form with fields: name, host, port (default 8006), auth type toggle, credentials, allow self-signed toggle
 - [ ] Add connection test button – calls `GET /version` (returns PVE version info) and shows success/error feedback
 - [ ] Add server to list on success, show typed error message on failure
-- [ ] Add swipe-to-delete on server list items
-- [ ] Wire up go_router: `/servers` → `ServerListScreen`, `/servers/add` → `AddServerScreen`
-- [ ] Redirect to `/servers` on first launch (no servers saved), else to `/dashboard`
+- [ ] Add swipe-to-delete on server list items with undo snackbar (destructive action)
+- [ ] Add tap-to-edit on server list items → `EditServerScreen` (reuse `AddServerScreen` form, pre-filled)
+- [ ] Wire up go_router: `/servers` → `ServerListScreen`, `/servers/add` → `AddServerScreen`, `/servers/edit/:serverId` → `EditServerScreen`
+- [ ] Redirect to `/servers` on first launch (no servers saved), else to `/dashboard` (handled by go_router `redirect`)
 
 ---
 
@@ -125,22 +139,29 @@
 ### 2.1 API Methods
 - [ ] Implement `GET /nodes` → list of nodes
 - [ ] Implement `GET /nodes/{node}/status` → node resource details
-- [ ] Implement `GET /nodes/{node}/qemu` → list of VMs
-- [ ] Implement `GET /nodes/{node}/lxc` → list of containers
-- [ ] Add all relevant API endpoint constants to `shared/constants/api_endpoints.dart` (including `GET /version` for connection test)
+- [ ] Implement `GET /cluster/resources` → all VMs, containers, and nodes in a single call (preferred for list screens and dashboard summary; avoids N per-node requests)
+  - Supports `?type=vm`, `?type=lxc`, `?type=node` filters
+  - Use this as the primary source for `VmListScreen`, `ContainerListScreen`, and the cluster summary in `DashboardScreen`
+- [ ] Implement `GET /nodes/{node}/qemu` → list of VMs for a single node (used when per-node context is needed)
+- [ ] Implement `GET /nodes/{node}/lxc` → list of containers for a single node
+- [ ] Add all relevant API endpoint constants to `shared/constants/api_endpoints.dart` (including `GET /version` for connection test and `GET /cluster/resources`)
 
 ### 2.2 Data Models
 - [ ] Extend `Node` model with all relevant fields from API response
 - [ ] Implement `Vm` model (Freezed) – vmid (int), name, status (VmStatus), node, cpu, maxMem, mem, maxDisk, disk, uptime
 - [ ] Implement `Container` model (Freezed) – same fields as `Vm` but status uses `ContainerStatus` (not `VmStatus`), add `ostype`
 - [ ] Implement `VmStatus` enum: `running`, `stopped`, `paused`, `unknown`
-- [ ] Implement `ContainerStatus` enum: `running`, `stopped`, `unknown` (LXC has no paused state)
+- [ ] Implement `ContainerStatus` enum: `running`, `stopped`, `unknown` (LXC has no paused state — do **not** reuse `VmStatus` for containers)
 
 ### 2.3 Repositories & Providers
 - [ ] Implement `NodeRepository` with `getNodes()` and `getNodeStatus(node)`
-- [ ] Implement `VmRepository` with `getVms(node)`
-- [ ] Implement `ContainerRepository` with `getContainers(node)`
-- [ ] Implement async Riverpod providers for node list, VM list, container list
+- [ ] Implement `VmRepository` with:
+  - `getAllVms()` – uses `GET /cluster/resources?type=vm` (primary; call this for list screens)
+  - `getVms(node)` – uses `GET /nodes/{node}/qemu` (secondary; use only when per-node context is required)
+- [ ] Implement `ContainerRepository` with:
+  - `getAllContainers()` – uses `GET /cluster/resources?type=lxc` (primary)
+  - `getContainers(node)` – uses `GET /nodes/{node}/lxc` (secondary)
+- [ ] Implement async Riverpod providers: `allVmsProvider`, `allContainersProvider`, `nodeListProvider`
 - [ ] Add pull-to-refresh support on all list providers
 
 ### 2.4 Dashboard Screen
@@ -151,15 +172,17 @@
 
 ### 2.5 VM List & Detail
 - [ ] Build `VmListScreen` – filterable list of all VMs across all nodes
+  - Filter dimensions: search by name (text field), filter by status (all / running / stopped), filter by node
+  - Default sort: running VMs first, then alphabetical by name
 - [ ] Each VM row: name, vmid, node name, status badge (color-coded), CPU%, RAM usage
 - [ ] Build `VmDetailScreen` – full details: all resource fields, uptime, node
 - [ ] Add status badge widget (`shared/widgets/status_badge.dart`) – green/red/yellow
-- [ ] Wire up go_router: `/vms` → `VmListScreen`, `/vms/:vmid` → `VmDetailScreen`
+- [ ] Wire up go_router: `/vms` → `VmListScreen`, `/vms/:node/:vmid` → `VmDetailScreen`
 
 ### 2.6 Container List & Detail
 - [ ] Build `ContainerListScreen` – same structure as VM list
 - [ ] Build `ContainerDetailScreen` – same structure as VM detail
-- [ ] Wire up go_router: `/containers`, `/containers/:ctid`
+- [ ] Wire up go_router: `/containers`, `/containers/:node/:ctid`
 
 ### 2.7 Shared Widgets
 - [ ] Implement `LoadingShimmer` widget for list placeholders
@@ -179,9 +202,9 @@
 - [ ] Implement `POST /nodes/{node}/lxc/{ctid}/status/start`
 - [ ] Implement `POST /nodes/{node}/lxc/{ctid}/status/stop` (graceful, with optional `forceStop=1` body param)
 - [ ] Implement `POST /nodes/{node}/lxc/{ctid}/status/reboot`
-- [ ] Implement `GET /nodes/{node}/tasks` → list of tasks
+- [ ] Implement `GET /nodes/{node}/tasks` → list of tasks (supports `start` and `limit` query params for pagination — implement pagination from the start)
 - [ ] Implement `GET /nodes/{node}/tasks/{upid}/status` → task status
-- [ ] Implement `GET /nodes/{node}/tasks/{upid}/log` → task log output
+- [ ] Implement `GET /nodes/{node}/tasks/{upid}/log` → task log output (also supports `start` and `limit` for pagination)
 
 ### 3.2 Data Models
 - [ ] Implement `Task` model (Freezed) – upid, node, type, status, startTime, endTime, user
@@ -198,18 +221,22 @@
 - [ ] On success: refresh VM status, show snackbar confirmation
 - [ ] On error: show typed error message
 - [ ] Mirror all of the above for `ContainerDetailScreen`
+  - Note: containers have no Pause state (`ContainerStatus` has no `paused`) — do not show a Pause button for LXC containers
 
 ### 3.4 Task Repository & Providers
-- [ ] Implement `TaskRepository` with `getTasks(node)`, `getTaskStatus(upid)`, `getTaskLog(upid)`
-- [ ] Implement `taskListProvider` – lists all tasks across nodes, sorted by start time
-- [ ] Implement `taskStatusProvider(upid)` – polls running tasks every 3 seconds
+- [ ] Implement `TaskRepository` with:
+  - `getTasks(node, {int start = 0, int limit = 50})` – paginated; Proxmox has no `/cluster/tasks`, so tasks must be fetched per-node
+  - `getTaskStatus(node, upid)` – node is required for the status endpoint
+  - `getTaskLog(node, upid, {int start = 0, int limit = 500})` – paginated log lines
+- [ ] Implement `taskListProvider` – fetches tasks from all known nodes and merges, sorted by start time descending; uses `nodeListProvider` to enumerate nodes
+- [ ] Implement `taskStatusProvider(node, upid)` – polls running tasks every 3 seconds until status is no longer `running`
 
 ### 3.5 Task Viewer UI
 - [ ] Build `TaskListScreen` – list of all tasks, newest first
 - [ ] Each task row: type, VM/CT name, status badge, start time, duration
 - [ ] Color-code status: running (blue), ok (green), error (red)
 - [ ] Build `TaskDetailScreen` – full task log output in monospace font, auto-scroll to bottom
-- [ ] Wire up go_router: `/tasks`, `/tasks/:upid`
+- [ ] Wire up go_router: `/tasks`, `/tasks/:node/:upid`
 
 ---
 
@@ -241,7 +268,7 @@
 - [ ] Add all four charts to `VmDetailScreen` below the status/info section
 - [ ] Add all four charts to `ContainerDetailScreen`
 - [ ] Add node-level CPU and RAM charts to `DashboardScreen` node cards (compact version)
-- [ ] Implement auto-refresh: charts refresh every 30 seconds while screen is active
+- [ ] Implement auto-refresh: charts refresh every 60 seconds while screen is active (rrddata resolution is 60s per point; refreshing faster yields no new data)
 
 ---
 
@@ -253,12 +280,12 @@
 - [ ] Implement `GET /nodes/{node}/storage` → list of storage pools
 - [ ] Implement `GET /nodes/{node}/storage/{storage}/status` → storage details
 - [ ] Implement `GET /nodes/{node}/storage/{storage}/content` → list of content/backups
-- [ ] Implement `GET /cluster/backup` → list of backup jobs
+- [ ] Implement `GET /cluster/backup` → list of backup jobs (cluster-scoped endpoint; backup jobs are not tied to a single node)
 - [ ] Implement `POST /nodes/{node}/vzdump` → trigger a backup
 - [ ] Implement `GET /nodes/{node}/tasks` filtered by type `vzdump` for backup task tracking
 
 ### 5.2 Data Models
-- [ ] Implement `BackupJob` model in `core/models/backup.dart` (Freezed) – id, vmid, node, storage, schedule, lastRun, nextRun
+- [ ] Implement `BackupJob` model in `core/models/backup.dart` (Freezed) – id, vmids (list), storage, schedule, lastRun, nextRun (no `node` field — `GET /cluster/backup` is cluster-scoped and jobs apply cluster-wide)
 - [ ] Implement `BackupContent` model in `core/models/backup.dart` (Freezed) – volid, vmid, format, size, ctime
 - [ ] Implement `Storage` model in `core/models/storage.dart` (Freezed) – id, node, type, content, total, used, available, active
 
@@ -266,13 +293,13 @@
 - [ ] Build `StorageListScreen` – list of all storage pools across nodes
 - [ ] Each storage card: name, type, usage bar (used/total), availability badge
 - [ ] Build `StorageDetailScreen` – full details + list of content (backups, ISOs, etc.)
-- [ ] Wire up go_router: `/storage`, `/storage/:id`
+- [ ] Wire up go_router: `/storage`, `/storage/:node/:storage`
 
 ### 5.4 Backup UI
 - [ ] Build `BackupListScreen` – list of backup content grouped by VM/CT
 - [ ] Each backup row: VM name, date/time, size, format (vma, tar, etc.)
 - [ ] Add manual backup trigger button (FAB or per-VM action)
-- [ ] Build `TriggerBackupSheet` (bottom sheet) – select storage, compression, mode
+- [ ] Build `TriggerBackupSheet` (bottom sheet) – select storage, compression (zstd / lzo / gzip / none), mode (snapshot / suspend / stop)
 - [ ] On trigger: call vzdump API, navigate to task viewer to track progress
 - [ ] Wire up go_router: `/backups`
 
@@ -288,6 +315,7 @@
 - [ ] Handle network timeout gracefully (with retry option)
 - [ ] Handle session expiry for username/password auth (auto re-authenticate)
 - [ ] Handle empty states on all list screens
+- [ ] Implement persistent offline banner: when `connectivityProvider` reports no network, show a non-dismissible top banner across all screens; auto-dismiss when connectivity is restored
 
 ### 6.2 UX Polish
 - [ ] Add smooth page transitions (go_router transitions)
@@ -302,7 +330,7 @@
   - **Appearance:** theme toggle (dark/light/system)
   - **About:** app version, GitHub link, license info
   - **Support:** donation links (Ko-fi, GitHub Sponsors)
-- [ ] Wire up theme toggle to persist preference in Hive
+- [ ] Wire up theme toggle to persist preference in hive_ce
 
 ### 6.4 Testing
 - [ ] Unit tests for all repositories (mock API client)
@@ -311,13 +339,21 @@
 - [ ] Widget tests for critical UI flows (add server, start VM)
 - [ ] Integration tests using `integration_test` package for end-to-end flows (add server → dashboard → VM action)
 - [ ] Manual end-to-end test on a real Proxmox instance (PVE 7.x and 8.x)
+  - Integration tests that require a live PVE instance are skipped in CI by default (use `@Tags(['integration'])` and `flutter test --tags integration` to run selectively)
+  - Document test environment setup in `CONTRIBUTING.md` (e.g., Proxmox in a VM via QEMU/KVM on a local machine)
 
 ### 6.5 Play Store Release
 - [ ] Create app icons (launcher icon, adaptive icon for Android)
 - [ ] Create Play Store screenshots (at least 4, phone + tablet)
 - [ ] Write Play Store listing: short description, full description, keywords
 - [ ] Set up Google Play Console, create app entry
-- [ ] Create and host a Privacy Policy (required by Play Store for apps handling credentials/network config)
+- [ ] Create and host Privacy Policy (required by Play Store for apps handling credentials/network config)
+  - Host on GitHub Pages (`https://mdg-labs.github.io/proxdroid/privacy`)
+  - Content must declare: credentials stored on-device only, no telemetry, no data sent to third parties
+- [ ] Submit to F-Droid:
+  - Ensure build is reproducible (no proprietary SDKs, no Firebase, no Google Play Services)
+  - Open an inclusion request (merge request) at [gitlab.com/fdroid/fdroiddata](https://gitlab.com/fdroid/fdroiddata) — F-Droid maintainers add metadata to their own repo; you do not add metadata to the app repo
+  - F-Droid inclusion takes several weeks — submit as early as possible, ideally when the app is in beta
 - [ ] Complete the Play Store Data Safety form (declare what data is collected: credentials stored on-device only, no data sent to third parties)
 - [ ] Sign release APK with upload keystore
   - Generate keystore file locally
@@ -325,14 +361,19 @@
   - Store keystore as base64-encoded GitHub Actions secret (`KEYSTORE_BASE64`)
   - Store keystore password, key alias and key password as separate GitHub Actions secrets
   - Decode and use in `build.yml` via `echo "$KEYSTORE_BASE64" | base64 --decode > upload.jks`
+  - Also generate `key.properties` in CI from secrets (required by the Gradle signing config — without it the build fails even if the keystore file is present):
+    ```
+    echo "storePassword=$KEYSTORE_PASSWORD\nkeyPassword=$KEY_PASSWORD\nkeyAlias=$KEY_ALIAS\nstoreFile=../upload.jks" > android/key.properties
+    ```
+  - Add `key.properties` to `.gitignore` — never commit it
 - [ ] Configure `build.yml` GitHub Action to build signed APK on tag push
 - [ ] Submit to Play Store internal testing track first, then production
 
 ### 6.6 GitHub Release
 - [ ] Tag `v1.0.0`
-- [ ] Write release notes (changelog)
+- [ ] Write release notes from `CHANGELOG.md` (do not write from scratch — `CHANGELOG.md` should have been maintained throughout development)
 - [ ] Attach signed APK to GitHub Release
-- [ ] Update `README.md` with download badges (Play Store + GitHub Releases)
+- [ ] Update `README.md` with download badges (Play Store + F-Droid + GitHub Releases)
 
 ---
 
@@ -347,14 +388,32 @@ These are tracked here for planning purposes but are not in scope for v1.0.
 - [ ] Handle authentication and session management for WebSocket connections in both cases
 
 ### Push Notifications
-- [ ] Research Proxmox webhook/notification support (PVE 8.x)
-- [ ] Design notification backend or polling approach
-- [ ] Integrate Firebase Cloud Messaging (FCM) or local notifications
+- [ ] Research Proxmox notification support (PVE 8.1+ has a built-in notification system with webhook targets)
+- [ ] Design notification approach — two options based on distribution target:
+  - **F-Droid-compatible (recommended):** Use polling (background `WorkManager`-style task via `flutter_background_service`) + local notifications (`flutter_local_notifications`) — no proprietary SDK, works on all devices
+  - **Play Store only:** Firebase Cloud Messaging (FCM) via `firebase_messaging` — **not compatible with F-Droid** due to Google Play Services dependency; using FCM would require maintaining two separate build flavors
+- [ ] If supporting both F-Droid and Play Store: implement [UnifiedPush](https://unifiedpush.org) as a push delivery abstraction that supports both FCM (via a re-transmitter) and self-hosted push servers, keeping the app free of proprietary SDK requirements
 
 ### Homescreen Widget
 - [ ] Research Flutter homescreen widget options (`home_widget` package)
 - [ ] Design widget: shows running VM count + server status at a glance
 - [ ] Implement background refresh for widget data
+
+### Snapshot Management (P2)
+- [ ] Implement `GET /nodes/{node}/qemu/{vmid}/snapshot` → list snapshots for a VM
+- [ ] Implement `POST /nodes/{node}/qemu/{vmid}/snapshot` → create snapshot (name, description, optional RAM state)
+- [ ] Implement `DELETE /nodes/{node}/qemu/{vmid}/snapshot/{snapname}` → delete snapshot
+- [ ] Implement `POST /nodes/{node}/qemu/{vmid}/snapshot/{snapname}/rollback` → rollback to snapshot
+- [ ] Add snapshot list to `VmDetailScreen` with create/delete/rollback actions
+- [ ] Show confirmation dialog before rollback (destructive, irreversible action)
+- [ ] Note: LXC containers also support snapshots via the same pattern under `/nodes/{node}/lxc/{ctid}/snapshot`
+
+### Suspend / Resume for QEMU VMs (P3)
+- [ ] Implement `POST /nodes/{node}/qemu/{vmid}/status/suspend` → suspend VM (saves state to disk)
+- [ ] Implement `POST /nodes/{node}/qemu/{vmid}/status/resume` → resume VM from suspended state
+- [ ] Add Suspend/Resume buttons to `VmDetailScreen` (only show when VM is running / suspended respectively)
+- [ ] Extend `VmStatus` enum with `suspended` state
+- [ ] Note: Suspend/Resume is QEMU-only — LXC containers do not support this
 
 ---
 
