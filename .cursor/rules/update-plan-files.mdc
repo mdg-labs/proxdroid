@@ -1,0 +1,37 @@
+---
+description: Keep plan and roadmap files up to date after completing tasks
+alwaysApply: true
+---
+
+# Keep Plan Files Up to Date
+
+After completing any task, check whether the work done affects any plan or roadmap file and update it to reflect the current state.
+
+## Files to Maintain
+
+- `docs/ProxDroid_Roadmap.md` – primary roadmap; tracks phases, tasks, and completion status
+
+## What to Update
+
+- Mark completed checklist items with `[x]` (was `[ ]`)
+- Update phase status labels (e.g. `In Progress`, `Complete`) when a phase milestone is reached
+- Add newly discovered tasks or sub-tasks that emerged during implementation
+- Update the `**Status:**` frontmatter field if the overall document status changes
+
+## When to Update
+
+- After finishing a feature, fix, or setup step that corresponds to a tracked roadmap item
+- After completing a phase or milestone
+- When a planned task turns out to be unnecessary — mark it as `~~skipped~~` or remove it with a note
+
+## Example
+
+```markdown
+# Before
+- [ ] Create GitHub repository (`proxdroid`)
+
+# After completing the task
+- [x] Create GitHub repository (`proxdroid`)
+```
+
+Only update the plan files that are actually affected by the work done. Do not rewrite unrelated sections.
