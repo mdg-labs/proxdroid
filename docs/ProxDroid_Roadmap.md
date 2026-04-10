@@ -18,7 +18,7 @@
 | **Phase 4** | Resource monitoring charts | Full real-time charts for CPU, RAM, network, disk I/O |
 | **Phase 5** | Storage & backup management | Can browse storage and trigger/view backups |
 | **Phase 6** | Polish & release prep | App is stable, polished, and released on Play Store, F-Droid, and GitHub |
-| **Post-MVP** | Extended features | Console, push notifications, homescreen widget |
+| **Post-MVP** | Extended features | Console, push notifications, homescreen widget, snapshot management, suspend/resume |
 
 ---
 
@@ -107,7 +107,7 @@
 - [ ] Enforce HTTPS-only: validate in `AddServerScreen` that the host does not contain `http://` and surface a clear error if it does (Android API 28+ blocks cleartext HTTP at OS level with cryptic errors)
 - [ ] Implement `ApiInterceptor` for:
   - Attaching auth headers on every request (API token or ticket cookie)
-  - Catching Dio errors and converting to typed `ProxmoxException` (`AuthException`, `NetworkException`, `TimeoutException`, `ServerException`, `PermissionException`)
+  - Catching Dio errors and converting to typed `ProxmoxException` (`AuthException`, `NetworkException`, `ApiTimeoutException`, `ServerException`, `PermissionException`) — note `ApiTimeoutException`, not `TimeoutException`, to avoid conflict with `dart:async`
 - [ ] Implement API Token auth: attach `Authorization: PVEAPIToken=...` header
 - [ ] Implement Username/Password auth: POST `/access/ticket` → store ticket + CSRFPreventionToken, refresh on expiry
 - [ ] Expose `ProxmoxApiClient` as a Riverpod provider (scoped to selected server)
@@ -180,7 +180,7 @@
 - [ ] Wire up go_router: `/vms` → `VmListScreen`, `/vms/:node/:vmid` → `VmDetailScreen`
 
 ### 2.6 Container List & Detail
-- [ ] Build `ContainerListScreen` – same structure as VM list
+- [ ] Build `ContainerListScreen` – same structure and filter dimensions as VM list (search by name, filter by status, filter by node; default sort: running first)
 - [ ] Build `ContainerDetailScreen` – same structure as VM detail
 - [ ] Wire up go_router: `/containers`, `/containers/:node/:ctid`
 
@@ -233,7 +233,8 @@
 
 ### 3.5 Task Viewer UI
 - [ ] Build `TaskListScreen` – list of all tasks, newest first
-- [ ] Each task row: type, VM/CT name, status badge, start time, duration
+- [ ] Each task row: type, VMID (decoded from UPID), status badge, start time, duration
+  - Note: `Task.upid` encodes the node, type, PID, and VMID — parse the UPID to extract VMID, then resolve VMID → name via the VM/container list; if the VM no longer exists, fall back to displaying the raw VMID
 - [ ] Color-code status: running (blue), ok (green), error (red)
 - [ ] Build `TaskDetailScreen` – full task log output in monospace font, auto-scroll to bottom
 - [ ] Wire up go_router: `/tasks`, `/tasks/:node/:upid`
@@ -248,21 +249,20 @@
 - [ ] Implement `GET /nodes/{node}/qemu/{vmid}/rrddata` – historical resource data (timeframe: hour/day/week)
 - [ ] Implement `GET /nodes/{node}/lxc/{ctid}/rrddata` – same for containers
 - [ ] Implement `GET /nodes/{node}/rrddata` – node-level resource data
-- [ ] Support `timeframe` parameter: `hour`, `day`, `week`
+- [ ] Support `timeframe` parameter: `hour`, `day`, `week`, `month`, `year` (expose `hour`, `day`, `week`, `month` in the UI timeframe selector; `year` is optional)
 
 ### 4.2 Chart Data Models
 - [ ] Implement `ResourceDataPoint` model in `core/models/resource_data_point.dart` (Freezed) – fields: timestamp, cpu, mem, netIn, netOut, diskRead, diskWrite
-- [ ] Implement `ChartTimeframe` enum in same file: `hour`, `day`, `week`
+- [ ] Implement `ChartTimeframe` enum in same file: `hour`, `day`, `week`, `month`
 
 ### 4.3 Chart Widgets
 - [ ] Implement reusable `ResourceLineChart` widget (`shared/widgets/resource_chart.dart`)
   - Accepts: list of `ResourceDataPoint`, metric type, color, timeframe
   - Shows: line chart with gradient fill, axis labels, tooltip on touch
-- [ ] Implement `CpuChart` – CPU usage % over time
-- [ ] Implement `MemoryChart` – RAM usage (used vs total) over time
-- [ ] Implement `NetworkChart` – inbound + outbound traffic (two lines)
-- [ ] Implement `DiskIoChart` – read + write (two lines)
-- [ ] Add timeframe selector (1h / 1d / 1w) above each chart
+- [ ] Implement `CpuChart`, `MemoryChart`, `NetworkChart`, `DiskIoChart` as thin wrappers around `ResourceLineChart`
+  - Place in `features/vms/ui/widgets/` (VM-specific) and reuse for containers via `features/containers/ui/widgets/`
+  - The underlying `ResourceLineChart` widget lives in `shared/widgets/resource_chart.dart`
+- [ ] Add timeframe selector (1h / 1d / 1w / 1m) above each chart
 
 ### 4.4 Integration
 - [ ] Add all four charts to `VmDetailScreen` below the status/info section
@@ -307,7 +307,7 @@
 
 ## Phase 6 – Polish & Release Prep
 
-**Goal:** The app is stable, handles all error cases gracefully, feels polished, and is ready for a public release on the Play Store and GitHub.
+**Goal:** The app is stable, handles all error cases gracefully, feels polished, and is ready for a public release on the Play Store, F-Droid, and GitHub.
 
 ### 6.1 Error Handling & Edge Cases
 - [ ] Audit all screens for unhandled error states
@@ -328,7 +328,7 @@
 ### 6.3 Settings Screen
 - [ ] Build `SettingsScreen` with sections:
   - **Appearance:** theme toggle (dark/light/system)
-  - **About:** app version, GitHub link, license info
+  - **About:** app version, link to `github.com/mdg-labs/proxdroid`, Play Store listing link, F-Droid listing link, license info (MIT)
   - **Support:** donation links (Ko-fi, GitHub Sponsors)
 - [ ] Wire up theme toggle to persist preference in hive_ce
 
@@ -361,12 +361,16 @@
   - Store keystore as base64-encoded GitHub Actions secret (`KEYSTORE_BASE64`)
   - Store keystore password, key alias and key password as separate GitHub Actions secrets
   - Decode and use in `build.yml` via `echo "$KEYSTORE_BASE64" | base64 --decode > upload.jks`
-  - Also generate `key.properties` in CI from secrets (required by the Gradle signing config — without it the build fails even if the keystore file is present):
+  - Also generate `key.properties` in CI from secrets (required by the Gradle signing config — without it the build fails even if the keystore file is present). Use `printf` not `echo` — `echo` does not interpret `\n` as newlines in most shells:
     ```
-    echo "storePassword=$KEYSTORE_PASSWORD\nkeyPassword=$KEY_PASSWORD\nkeyAlias=$KEY_ALIAS\nstoreFile=../upload.jks" > android/key.properties
+    printf "storePassword=%s\nkeyPassword=%s\nkeyAlias=%s\nstoreFile=%s\n" \
+      "$KEYSTORE_PASSWORD" "$KEY_PASSWORD" "$KEY_ALIAS" "../upload.jks" \
+      > android/key.properties
     ```
   - Add `key.properties` to `.gitignore` — never commit it
-- [ ] Configure `build.yml` GitHub Action to build signed APK on tag push
+- [ ] Configure `build.yml` GitHub Action to build **two artifacts** on tag push:
+  - Signed AAB (`flutter build appbundle --release`) → for Play Store submission (Play Store requires AAB for new apps; APK is no longer accepted for new app submissions)
+  - Signed APK (`flutter build apk --release`) → for GitHub Releases and F-Droid sideload
 - [ ] Submit to Play Store internal testing track first, then production
 
 ### 6.6 GitHub Release

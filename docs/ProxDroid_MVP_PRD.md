@@ -101,6 +101,8 @@ Multi-server support is built into the architecture from day one. Users can add 
 | Manual backup trigger | P1 | MVP |
 | Task viewer (running & past tasks) | P1 | MVP |
 | Dark theme | P0 | MVP |
+| Light theme (optional, user-toggled) | P1 | MVP |
+| Edit saved server | P1 | MVP |
 | Console access (noVNC / xterm.js) | P2 | Post-MVP |
 | Push notifications | P2 | Post-MVP |
 | Homescreen widget | P3 | Post-MVP |
@@ -211,7 +213,8 @@ No ads. Free. Exclusively voluntary donations:
 | `go_router` | Navigation | [pub.dev/packages/go_router](https://pub.dev/packages/go_router) |
 | `freezed_annotation` | Immutable data models | [pub.dev/packages/freezed_annotation](https://pub.dev/packages/freezed_annotation) |
 | `fl_chart` | Charts & visualizations | [pub.dev/packages/fl_chart](https://pub.dev/packages/fl_chart) |
-| `hive_ce_flutter` | Local storage (non-sensitive) – community-maintained Hive fork | [pub.dev/packages/hive_ce_flutter](https://pub.dev/packages/hive_ce_flutter) |
+| `hive_ce` | Core Hive CE API – boxes, adapters, storage engine | [pub.dev/packages/hive_ce](https://pub.dev/packages/hive_ce) |
+| `hive_ce_flutter` | Flutter integration for hive_ce (init, path provider) | [pub.dev/packages/hive_ce_flutter](https://pub.dev/packages/hive_ce_flutter) |
 | `flutter_secure_storage` | Secure credential storage | [pub.dev/packages/flutter_secure_storage](https://pub.dev/packages/flutter_secure_storage) |
 | `connectivity_plus` | Network availability detection | [pub.dev/packages/connectivity_plus](https://pub.dev/packages/connectivity_plus) |
 | `package_info_plus` | App version info for Settings/About screen | [pub.dev/packages/package_info_plus](https://pub.dev/packages/package_info_plus) |
