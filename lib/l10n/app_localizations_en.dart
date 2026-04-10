@@ -85,4 +85,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sectionServers => 'Servers';
+
+  @override
+  String get sectionVms => 'Virtual machines';
+
+  @override
+  String get sectionContainers => 'Containers';
+
+  @override
+  String get sectionBackups => 'Backups';
+
+  @override
+  String get sectionTasks => 'Tasks';
+
+  @override
+  String get screenAddServer => 'Add server';
+
+  @override
+  String get screenEditServer => 'Edit server';
+
+  @override
+  String debugScreenBody(String name) {
+    return 'Placeholder — $name';
+  }
 }

@@ -103,5 +103,39 @@
   "sectionServers": "Servers",
   "@sectionServers": {
     "description": "Navigation or screen title for configured Proxmox servers list."
+  },
+  "sectionVms": "Virtual machines",
+  "@sectionVms": {
+    "description": "Navigation or screen title for the VM list."
+  },
+  "sectionContainers": "Containers",
+  "@sectionContainers": {
+    "description": "Navigation or screen title for the LXC container list."
+  },
+  "sectionBackups": "Backups",
+  "@sectionBackups": {
+    "description": "Navigation or screen title for backup content and jobs."
+  },
+  "sectionTasks": "Tasks",
+  "@sectionTasks": {
+    "description": "Navigation or screen title for the Proxmox task viewer."
+  },
+  "screenAddServer": "Add server",
+  "@screenAddServer": {
+    "description": "App bar title for adding a Proxmox server."
+  },
+  "screenEditServer": "Edit server",
+  "@screenEditServer": {
+    "description": "App bar title for editing a saved server."
+  },
+  "debugScreenBody": "Placeholder — {name}",
+  "@debugScreenBody": {
+    "description": "Short debug label for Phase 0 placeholder screens.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Server list"
+      }
+    }
   }
 }

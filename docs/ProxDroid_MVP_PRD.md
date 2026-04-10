@@ -180,9 +180,9 @@ No ads. Free. Exclusively voluntary donations:
 - [x] Tech stack decided (Flutter, Riverpod, Freezed, go_router, hive_ce + flutter_secure_storage, Dio)
 - [x] App architecture defined → see `ProxDroid_Architecture.md`
 - [x] License finalized: MIT
-- [ ] Create GitHub repository and set up initial Flutter project
-- [ ] Add community files: `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, GitHub issue/PR templates
-- [ ] Set up CI/CD with GitHub Actions (build + test)
+- [x] Create GitHub repository and set up initial Flutter project — [github.com/mdg-labs/proxdroid](https://github.com/mdg-labs/proxdroid); Android application ID **`com.mdglabs.proxdroid`** (see `ProxDroid_Roadmap.md` Phase 0.2)
+- [x] Add community files: `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, GitHub issue/PR templates
+- [x] Set up CI/CD with GitHub Actions (build + test)
 - [ ] Create and host Privacy Policy page (GitHub Pages recommended; required for Play Store)
 - [ ] Implement Proxmox API wrapper module (Phase 1)
 - [ ] First test setup with a local Proxmox server

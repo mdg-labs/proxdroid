@@ -1,4 +1,4 @@
-package com.example.proxdroid
+package com.mdglabs.proxdroid
 
 import io.flutter.embedding.android.FlutterActivity
 

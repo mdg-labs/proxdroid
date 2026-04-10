@@ -249,6 +249,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Servers'**
   String get sectionServers;
+
+  /// Navigation or screen title for the VM list.
+  ///
+  /// In en, this message translates to:
+  /// **'Virtual machines'**
+  String get sectionVms;
+
+  /// Navigation or screen title for the LXC container list.
+  ///
+  /// In en, this message translates to:
+  /// **'Containers'**
+  String get sectionContainers;
+
+  /// Navigation or screen title for backup content and jobs.
+  ///
+  /// In en, this message translates to:
+  /// **'Backups'**
+  String get sectionBackups;
+
+  /// Navigation or screen title for the Proxmox task viewer.
+  ///
+  /// In en, this message translates to:
+  /// **'Tasks'**
+  String get sectionTasks;
+
+  /// App bar title for adding a Proxmox server.
+  ///
+  /// In en, this message translates to:
+  /// **'Add server'**
+  String get screenAddServer;
+
+  /// App bar title for editing a saved server.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit server'**
+  String get screenEditServer;
+
+  /// Short debug label for Phase 0 placeholder screens.
+  ///
+  /// In en, this message translates to:
+  /// **'Placeholder — {name}'**
+  String debugScreenBody(String name);
 }
 
 class _AppLocalizationsDelegate

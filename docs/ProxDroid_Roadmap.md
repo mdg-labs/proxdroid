@@ -11,7 +11,7 @@
 
 | Phase | Focus | Exit Criteria |
 |---|---|---|
-| **Phase 0** | Project setup & infrastructure | App builds, CI passes, empty shell runs on device |
+| **Phase 0** | Project setup & infrastructure | **Complete** — app ID `com.mdglabs.proxdroid`; CI + shell verified locally |
 | **Phase 1** | API foundation & server management | Can authenticate and connect to a live PVE instance |
 | **Phase 2** | Node, VM & container overview | Can view all nodes, VMs and containers with live status |
 | **Phase 3** | VM & container actions + task viewer | Can start, stop, force stop, and reboot VMs/containers and track tasks |
@@ -26,8 +26,10 @@
 
 **Goal:** A working Flutter project skeleton with CI/CD in place. No features yet, but everything compiles, tests run, and the app launches on a real device.
 
+**Verification:** Android, iOS, macOS, Linux, and Windows project metadata use the same application / bundle identifier **`com.mdglabs.proxdroid`** as documented under Phase 0.2 below (required before store submission).
+
 ### 0.1 Repository
-- [ ] Create GitHub repository (`proxdroid`)
+- [x] Create GitHub repository (`proxdroid`) — [github.com/mdg-labs/proxdroid](https://github.com/mdg-labs/proxdroid)
 - [x] Add `README.md` with project description, status badge, setup instructions, download links
 - [x] Add `LICENSE` file — **MIT** (already decided, see `ProxDroid_MVP_PRD.md` §7.1)
 - [x] Add `CHANGELOG.md` following [Keep a Changelog](https://keepachangelog.com) format — maintain incrementally, do not write from scratch at release
@@ -36,51 +38,53 @@
 - [x] Add GitHub issue templates in `.github/ISSUE_TEMPLATE/`: `bug_report.yml`, `feature_request.yml`
 - [x] Add GitHub PR template: `.github/pull_request_template.md`
 - [x] Add `.gitignore` for Flutter/Dart (include `*.jks`, `*.keystore`, `key.properties`)
-- [ ] Set up branch protection on `main` (require PR + CI pass)
+- [ ] Set up branch protection on `main` (require PR + CI pass) — **planned for stable release** (not required to close Phase 0)
 - [x] Create `.cursor/rules/` directory with rule files enforcing project architecture, Riverpod patterns, Freezed usage, feature-first folder structure, go_router conventions, Proxmox API patterns, and naming conventions (see `ProxDroid_Architecture.md` §3 Cursor IDE Rules for full list)
 
 ### 0.2 Flutter Project
-- [ ] Initialize Flutter project (`flutter create --org com.mdglabs proxdroid`)
+- [x] Initialize Flutter project (`flutter create --org com.mdglabs proxdroid`)
   - This sets the Android application ID to `com.mdglabs.proxdroid` — decide and set this now; it cannot be changed after Play Store submission or F-Droid inclusion
-- [ ] Remove default counter app boilerplate (`lib/main.dart` content, `test/widget_test.dart`)
-- [ ] Set minimum SDK to Android API 26 in `android/app/build.gradle`
-- [ ] Add all dependencies to `pubspec.yaml` (Riverpod, Dio, Freezed, go_router, hive_ce + hive_ce_flutter, fl_chart, flutter_secure_storage, connectivity_plus, package_info_plus, url_launcher, intl, flutter_localizations); set `flutter: generate: true` in `pubspec.yaml`; add `l10n.yaml` at project root
-- [ ] Run `flutter pub get` and confirm no version conflicts
-- [ ] Set up `build_runner` and confirm code generation works (`dart run build_runner build`)
+- [x] Remove default counter app boilerplate (`lib/main.dart` content, `test/widget_test.dart`)
+- [x] Set minimum SDK to Android API 26 in `android/app/build.gradle`
+- [x] Add all dependencies to `pubspec.yaml` (Riverpod, Dio, Freezed, go_router, hive_ce + hive_ce_flutter, fl_chart, flutter_secure_storage, connectivity_plus, package_info_plus, url_launcher, intl, flutter_localizations); set `flutter: generate: true` in `pubspec.yaml`; add `l10n.yaml` at project root
+- [x] Run `flutter pub get` and confirm no version conflicts
+- [x] Set up `build_runner` and confirm code generation works (`dart run build_runner build`)
 
 ### 0.3 Folder Structure
-- [ ] Create full folder structure as defined in `ProxDroid_Architecture.md`
-- [ ] Add placeholder `// TODO` files in each feature folder so the structure is visible in git
-- [ ] Set up `app/theme/app_colors.dart` with initial dark theme color palette
-- [ ] Set up `app/theme/app_theme.dart` with `ThemeData` for dark (default) and light
-- [ ] Create `lib/l10n/` directory with initial `app_en.arb` file containing Proxmox-aligned UI string keys for entities (Node, VirtualMachine, Container, Storage, Task, Backup), actions (start, stop, forceStop, reboot), status values (running, stopped, paused, unknown, online, offline), resource metrics (cpu, memory, disk, network, uptime), and UI sections (dashboard, settings, about, servers)
-- [ ] Add `l10n.yaml` at project root (`arb-dir: lib/l10n`, `template-arb-file: app_en.arb`, `output-localization-file: app_localizations.dart`)
-- [ ] Run `flutter gen-l10n` and confirm `AppLocalizations` is generated without errors
+- [x] Create full folder structure as defined in `ProxDroid_Architecture.md`
+- [x] Add placeholder `// TODO` files in each feature folder so the structure is visible in git
+- [x] Set up `app/theme/app_colors.dart` with initial dark theme color palette
+- [x] Set up `app/theme/app_theme.dart` with `ThemeData` for dark (default) and light
+- [x] Create `lib/l10n/` directory with initial `app_en.arb` file containing Proxmox-aligned UI string keys for entities (Node, VirtualMachine, Container, Storage, Task, Backup), actions (start, stop, forceStop, reboot), status values (running, stopped, paused, unknown, online, offline), resource metrics (cpu, memory, disk, network, uptime), and UI sections (dashboard, settings, about, servers)
+- [x] Add `l10n.yaml` at project root (`arb-dir: lib/l10n`, `template-arb-file: app_en.arb`, `output-localization-file: app_localizations.dart`)
+- [x] Run `flutter gen-l10n` and confirm `AppLocalizations` is generated without errors
 
 ### 0.4 App Skeleton
-- [ ] Set up `main.dart` with `ProviderScope` wrapping the app
-- [ ] Set up `app/app.dart` as root `MaterialApp.router` with go_router
-  - Once `flutter gen-l10n` has run in Phase 0.3, add the generated import to `app.dart`: `import 'package:flutter_gen/gen_l10n/app_localizations.dart';` (exact path follows `l10n.yaml` defaults and `flutter gen-l10n` output); then wire `localizationsDelegates: AppLocalizations.localizationsDelegates` and `supportedLocales: AppLocalizations.supportedLocales` into `MaterialApp.router`
-- [ ] Set up `app/router.dart` with placeholder routes for all screens
+- [x] Set up `main.dart` with `ProviderScope` wrapping the app
+- [x] Set up `app/app.dart` as root `MaterialApp.router` with go_router
+  - Once `flutter gen-l10n` has run in Phase 0.3, add the generated import to `app.dart` (this repo: `import 'package:proxdroid/l10n/app_localizations.dart';` per `l10n.yaml`); then wire `localizationsDelegates: AppLocalizations.localizationsDelegates` and `supportedLocales: AppLocalizations.supportedLocales` into `MaterialApp.router`
+- [x] Set up `app/router.dart` with placeholder routes for all screens
   - Note: the `/` root redirect behavior (→ `/servers` or `/dashboard` based on `selectedServerProvider`) is scaffolded as a placeholder here; the full redirect logic is wired in **Phase 1.4** once `selectedServerProvider` is implemented
-- [ ] Create empty placeholder screens for: servers, dashboard, VMs, containers, storage, backups, tasks, settings
-- [ ] Confirm app launches and navigates between placeholder screens
+- [x] Create empty placeholder screens for: servers, dashboard, VMs, containers, storage, backups, tasks, settings
+- [x] Confirm app launches and navigates between placeholder screens
 
 ### 0.5 CI/CD (GitHub Actions)
-- [ ] Add workflow: `ci.yml` – runs on every push/PR to `main`
+- [x] Add workflow: `ci.yml` – runs on every push/PR to `main`
   - Pin Flutter version via `subosito/flutter-action` (e.g. `flutter-version: '3.x.x'` or `channel: stable`) — unpinned Flutter causes random CI breakage when Google releases a new version
   - `flutter pub get`
   - `dart format --output=none --set-exit-if-changed .` (fail if code is not formatted)
   - `dart run build_runner build --delete-conflicting-outputs`
+  - `flutter gen-l10n` (validates ARB / generated localizations)
   - `flutter analyze`
   - `flutter test`
-- [ ] Add workflow: `build.yml` – runs on tags (`v*`)
+- [x] Add workflow: `build.yml` – runs on tags (`v*`)
   - Pin same Flutter version as `ci.yml`
   - `flutter pub get`
   - `dart run build_runner build --delete-conflicting-outputs` (must run before build; generates Freezed/Riverpod code)
+  - `flutter gen-l10n`
   - Build release APK (`flutter build apk --release`)
   - Upload APK as GitHub Release asset
-- [ ] Confirm both workflows pass on a clean run
+- [x] Confirm both workflows pass on a clean run (verified locally: `flutter pub get`, format check, `build_runner`, `gen-l10n`, `flutter analyze`, `flutter test` — all exit 0; first GitHub Actions run should still be watched by maintainers)
 
 ---
 

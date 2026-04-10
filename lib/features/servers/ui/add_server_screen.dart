@@ -1,1 +1,35 @@
-// TODO(Phase 1): Implement add server form (HTTPS validation, auth, SSL toggle).
+import 'package:flutter/material.dart';
+import 'package:proxdroid/l10n/app_localizations.dart';
+import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
+
+class AddServerScreen extends StatelessWidget {
+  const AddServerScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final scheme = Theme.of(context).colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        AppBar(
+          leading: shellAppBarLeading(context),
+          title: Text(l10n.screenAddServer),
+        ),
+        Expanded(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Text(
+                l10n.debugScreenBody(l10n.screenAddServer),
+                textAlign: TextAlign.center,
+                style: TextStyle(color: scheme.onSurfaceVariant),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
