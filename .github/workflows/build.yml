@@ -1,6 +1,5 @@
 # Release APK on prerelease-style tags only. Uses GITHUB_TOKEN (default) with contents: write.
-# Stable semver tags like v1.0.0 do NOT match these globs and will not run this workflow until
-# you add broader patterns (e.g. 'v*') and decide draft/prerelease behavior for stable releases.
+# Stable semver tags like v1.0.0 do NOT match — a separate prod release workflow can be added later.
 # If you ever need a draft release first, set draft: true on softprops/action-gh-release.
 
 name: Build release APK
@@ -8,9 +7,8 @@ name: Build release APK
 on:
   push:
     tags:
-      # Tag name glob patterns (evaluated against the pushed tag; see GitHub Actions filter cheat sheet).
+      # Beta prerelease tags only (e.g. v0.1.0-beta.1).
       - 'v*-beta*'
-      - 'v*-dev*'
 
 permissions:
   contents: write

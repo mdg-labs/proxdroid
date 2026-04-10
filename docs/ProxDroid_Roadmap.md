@@ -1,6 +1,6 @@
 # ProxDroid – Development Roadmap
 
-**Version:** 0.1 | **Date:** April 2026 | **Status:** Draft — Phase 6 polish complete; **GitHub prerelease APKs** on `v*-beta*` / `v*-dev*` tags; Play Store & F-Droid **deferred**
+**Version:** 0.1 | **Date:** April 2026 | **Status:** Draft — Phase 6 polish complete; **GitHub prerelease APKs** on `v*-beta*` tags; Play Store & F-Droid **deferred**
 
 > For architecture decisions and tech stack → see `ProxDroid_Architecture.md`
 > For feature scope and product goals → see `ProxDroid_MVP_PRD.md`
@@ -77,7 +77,7 @@
   - `flutter gen-l10n` (validates ARB / generated localizations)
   - `flutter analyze`
   - `flutter test`
-- [x] Add workflow: `build.yml` – runs on prerelease-style tags only (`v*-beta*`, `v*-dev*`); publishes GitHub **prerelease** with APK
+- [x] Add workflow: `build.yml` – runs on beta prerelease tags only (`v*-beta*`); publishes GitHub **prerelease** with APK
   - Pin same Flutter version as `ci.yml`
   - `flutter pub get`
   - `dart run build_runner build --delete-conflicting-outputs` (must run before build; generates Freezed/Riverpod code)
@@ -397,10 +397,10 @@ Not in scope for the current **GitHub-only prerelease** path; pick up when targe
 - [ ] Submit to Play Store internal testing track first, then production
 
 ### 6.6 GitHub Release (prerelease path — **done** for current scope)
-- [x] **Tag convention:** push tags matching `v*-beta*` or `v*-dev*` (e.g. `v0.1.0-beta.1`, `v0.2.0-dev.1`) — triggers `build.yml`, creates/updates a GitHub **prerelease** with the release APK attached (unsigned APK; store signing deferred — §6.5)
+- [x] **Tag convention:** push tags matching `v*-beta*` (e.g. `v0.1.0-beta.1`) — triggers `build.yml`, creates/updates a GitHub **prerelease** with the release APK attached (unsigned APK; store signing deferred — §6.5). A separate prod release workflow can be added later for stable tags.
 - [x] **Release notes:** maintain `[Unreleased]` in `CHANGELOG.md` during development; when tagging, promote entries into a version section and paste or summarize into the GitHub release body (do not invent notes from scratch)
 - [x] **README:** download section documents GitHub Releases, tag patterns, and deferred Play/F-Droid; optional `build.yml` status badge
-- [ ] **Stable `v1.0.0` (or broader tag glob):** not required to close Phase 6 — widen `build.yml` tag filters and set `prerelease` / signing when ready for a non-prerelease or store track
+- [ ] **Prod / stable releases:** add a dedicated workflow (or extend CI) for stable tags such as `v1.0.0` when ready — not required to close Phase 6; beta workflow stays on `v*-beta*` only
 - [ ] **Store download badges** in README — deferred with §6.5
 
 ### 6.7 Localization & Terminology Review

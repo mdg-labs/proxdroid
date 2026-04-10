@@ -20,4 +20,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Error messages and empty states reviewed; Proxmox exceptions mapped to localized strings.
 - Pull-to-refresh and shimmer loading patterns on data-heavy screens.
 - Localization pass: formatted UI strings moved into `app_en.arb`; ongoing terminology alignment with Proxmox UI.
-- GitHub Actions: release workflow runs only on prerelease-style tags (`v*-beta*`, `v*-dev*`) and publishes GitHub **prereleases** with the release APK.
+- GitHub Actions: release workflow runs only on beta prerelease tags (`v*-beta*`) and publishes GitHub **prereleases** with the release APK.
