@@ -63,6 +63,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup, code style, PR process, 
 
 The app uses Proxmox’s JSON API at **`/api2/json/`**. If you use a reverse proxy or Cloudflare Tunnel, that path must reach Proxmox (see [CONTRIBUTING.md](CONTRIBUTING.md)). For clearer errors when adding a server, use **Settings → Troubleshooting → Verbose connection errors**.
 
+**Release APKs** must include the `INTERNET` permission in `android/app/src/main/AndroidManifest.xml`. If every connection fails with DNS-style errors on a sideloaded build but **debug** works, check that permission is in the **main** manifest (not only under `src/debug/`).
+
 ---
 
 ## License

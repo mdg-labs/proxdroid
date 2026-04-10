@@ -93,6 +93,10 @@ ProxDroid talks to Proxmox over **`https://<host>:<port>/api2/json/`** (same JSO
 
 If connection tests fail with a message about **HTML instead of JSON**, the tunnel or ingress rules are likely not routing the API. In the app, enable **Settings → Troubleshooting → Verbose connection errors** to see more detail after a failed **Test connection**.
 
+**Release builds:** `android.permission.INTERNET` must be in `android/app/src/main/AndroidManifest.xml`. It is not enough to declare it only under `src/debug/` or `src/profile/` — those are omitted from `flutter build apk --release`, and the app will fail DNS and all HTTP requests.
+
+**Proxies that require a browser session:** Proxmox’s API expects `POST /api2/json/access/ticket` (and usually `GET /api2/json/version`) to work **without** a prior web UI cookie. If Cloudflare Access or similar gates **all** `/api2/json/*` behind an interactive login, the mobile client cannot complete the ticket flow until you add an exception for the API paths (or use API tokens on an ungated hostname).
+
 ---
 
 ## Integration tests / live PVE
