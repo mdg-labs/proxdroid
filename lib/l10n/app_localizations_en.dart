@@ -429,4 +429,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get taskDetailLogEmpty => 'No log output.';
+
+  @override
+  String get chartTimeframeHour => '1h';
+
+  @override
+  String get chartTimeframeDay => '1d';
+
+  @override
+  String get chartTimeframeWeek => '1w';
+
+  @override
+  String get chartTimeframeMonth => '1m';
+
+  @override
+  String get chartNoData => 'No chart data for this period.';
+
+  @override
+  String get chartLoadError => 'Could not load chart data.';
+
+  @override
+  String get chartNetworkIn => 'In';
+
+  @override
+  String get chartNetworkOut => 'Out';
+
+  @override
+  String get chartDiskRead => 'Read';
+
+  @override
+  String get chartDiskWrite => 'Write';
+
+  @override
+  String get chartDiskIoSectionTitle => 'Disk I/O';
 }

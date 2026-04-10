@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:proxdroid/core/models/resource_data_point.dart';
 import 'package:proxdroid/core/models/task.dart' as pve;
 import 'package:proxdroid/core/models/vm.dart';
 import 'package:proxdroid/core/utils/formatters.dart';
@@ -8,6 +9,10 @@ import 'package:proxdroid/features/servers/ui/proxmox_exception_messages.dart';
 import 'package:proxdroid/features/tasks/providers/task_providers.dart';
 import 'package:proxdroid/features/vms/data/vm_repository.dart';
 import 'package:proxdroid/features/vms/providers/vm_providers.dart';
+import 'package:proxdroid/features/vms/ui/widgets/cpu_chart.dart';
+import 'package:proxdroid/features/vms/ui/widgets/disk_io_chart.dart';
+import 'package:proxdroid/features/vms/ui/widgets/memory_chart.dart';
+import 'package:proxdroid/features/vms/ui/widgets/network_chart.dart';
 import 'package:proxdroid/features/vms/ui/widgets/vm_status_badge.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
@@ -28,6 +33,10 @@ class VmDetailScreen extends ConsumerStatefulWidget {
 
 class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
   bool _powerBusy = false;
+  ChartTimeframe _cpuChartTf = ChartTimeframe.hour;
+  ChartTimeframe _memChartTf = ChartTimeframe.hour;
+  ChartTimeframe _netChartTf = ChartTimeframe.hour;
+  ChartTimeframe _diskChartTf = ChartTimeframe.hour;
 
   Future<void> _runPowerAction(
     Vm vm,
@@ -352,6 +361,38 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
                         LabeledRow(
                           label: l10n.metricUptime,
                           value: formatUptimeSeconds(vm.uptime),
+                        ),
+                        const SizedBox(height: 24),
+                        VmCpuChart(
+                          node: vm.node,
+                          vmid: vm.vmid,
+                          timeframe: _cpuChartTf,
+                          onTimeframeChanged:
+                              (tf) => setState(() => _cpuChartTf = tf),
+                        ),
+                        const SizedBox(height: 24),
+                        VmMemoryChart(
+                          node: vm.node,
+                          vmid: vm.vmid,
+                          timeframe: _memChartTf,
+                          onTimeframeChanged:
+                              (tf) => setState(() => _memChartTf = tf),
+                        ),
+                        const SizedBox(height: 24),
+                        VmNetworkChart(
+                          node: vm.node,
+                          vmid: vm.vmid,
+                          timeframe: _netChartTf,
+                          onTimeframeChanged:
+                              (tf) => setState(() => _netChartTf = tf),
+                        ),
+                        const SizedBox(height: 24),
+                        VmDiskIoChart(
+                          node: vm.node,
+                          vmid: vm.vmid,
+                          timeframe: _diskChartTf,
+                          onTimeframeChanged:
+                              (tf) => setState(() => _diskChartTf = tf),
                         ),
                       ],
                     ),

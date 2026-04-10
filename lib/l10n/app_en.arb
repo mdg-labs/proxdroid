@@ -551,5 +551,49 @@
   "taskDetailLogEmpty": "No log output.",
   "@taskDetailLogEmpty": {
     "description": "When log endpoint returns no lines."
+  },
+  "chartTimeframeHour": "1h",
+  "@chartTimeframeHour": {
+    "description": "RRD chart range: last hour."
+  },
+  "chartTimeframeDay": "1d",
+  "@chartTimeframeDay": {
+    "description": "RRD chart range: last day."
+  },
+  "chartTimeframeWeek": "1w",
+  "@chartTimeframeWeek": {
+    "description": "RRD chart range: last week."
+  },
+  "chartTimeframeMonth": "1m",
+  "@chartTimeframeMonth": {
+    "description": "RRD chart range: last month."
+  },
+  "chartNoData": "No chart data for this period.",
+  "@chartNoData": {
+    "description": "When RRD series is empty or all-null."
+  },
+  "chartLoadError": "Could not load chart data.",
+  "@chartLoadError": {
+    "description": "When rrddata request fails on a chart."
+  },
+  "chartNetworkIn": "In",
+  "@chartNetworkIn": {
+    "description": "Network chart legend for inbound traffic."
+  },
+  "chartNetworkOut": "Out",
+  "@chartNetworkOut": {
+    "description": "Network chart legend for outbound traffic."
+  },
+  "chartDiskRead": "Read",
+  "@chartDiskRead": {
+    "description": "Disk I/O chart legend for read rate."
+  },
+  "chartDiskWrite": "Write",
+  "@chartDiskWrite": {
+    "description": "Disk I/O chart legend for write rate."
+  },
+  "chartDiskIoSectionTitle": "Disk I/O",
+  "@chartDiskIoSectionTitle": {
+    "description": "Section title for disk throughput chart (distinct from disk usage)."
   }
 }

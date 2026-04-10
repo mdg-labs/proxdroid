@@ -885,6 +885,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No log output.'**
   String get taskDetailLogEmpty;
+
+  /// RRD chart range: last hour.
+  ///
+  /// In en, this message translates to:
+  /// **'1h'**
+  String get chartTimeframeHour;
+
+  /// RRD chart range: last day.
+  ///
+  /// In en, this message translates to:
+  /// **'1d'**
+  String get chartTimeframeDay;
+
+  /// RRD chart range: last week.
+  ///
+  /// In en, this message translates to:
+  /// **'1w'**
+  String get chartTimeframeWeek;
+
+  /// RRD chart range: last month.
+  ///
+  /// In en, this message translates to:
+  /// **'1m'**
+  String get chartTimeframeMonth;
+
+  /// When RRD series is empty or all-null.
+  ///
+  /// In en, this message translates to:
+  /// **'No chart data for this period.'**
+  String get chartNoData;
+
+  /// When rrddata request fails on a chart.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load chart data.'**
+  String get chartLoadError;
+
+  /// Network chart legend for inbound traffic.
+  ///
+  /// In en, this message translates to:
+  /// **'In'**
+  String get chartNetworkIn;
+
+  /// Network chart legend for outbound traffic.
+  ///
+  /// In en, this message translates to:
+  /// **'Out'**
+  String get chartNetworkOut;
+
+  /// Disk I/O chart legend for read rate.
+  ///
+  /// In en, this message translates to:
+  /// **'Read'**
+  String get chartDiskRead;
+
+  /// Disk I/O chart legend for write rate.
+  ///
+  /// In en, this message translates to:
+  /// **'Write'**
+  String get chartDiskWrite;
+
+  /// Section title for disk throughput chart (distinct from disk usage).
+  ///
+  /// In en, this message translates to:
+  /// **'Disk I/O'**
+  String get chartDiskIoSectionTitle;
 }
 
 class _AppLocalizationsDelegate

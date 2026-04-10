@@ -8,6 +8,7 @@ import 'package:proxdroid/core/api/api_interceptors.dart';
 import 'package:proxdroid/core/models/container.dart';
 import 'package:proxdroid/core/models/node.dart';
 import 'package:proxdroid/core/models/proxmox_json_helpers.dart';
+import 'package:proxdroid/core/models/resource_data_point.dart';
 import 'package:proxdroid/core/models/server.dart';
 import 'package:proxdroid/core/models/task.dart';
 import 'package:proxdroid/core/models/vm.dart';
@@ -427,6 +428,50 @@ class ProxmoxApiClient {
     return taskStatusFromApiData(response.data?['data']);
   }
 
+  /// `GET /nodes/{node}/qemu/{vmid}/rrddata?timeframe=…`
+  Future<List<ResourceDataPoint>> fetchQemuRrdData(
+    String node,
+    int vmid,
+    ChartTimeframe timeframe,
+  ) async {
+    final response = await _unwrap(
+      _dio.get<Map<String, dynamic>>(
+        ApiEndpoints.nodeQemuVmRrdData(node, vmid),
+        queryParameters: <String, dynamic>{'timeframe': timeframe.apiValue},
+      ),
+    );
+    return parseProxmoxRrdData(response.data?['data']);
+  }
+
+  /// `GET /nodes/{node}/lxc/{ctid}/rrddata?timeframe=…`
+  Future<List<ResourceDataPoint>> fetchLxcRrdData(
+    String node,
+    int ctid,
+    ChartTimeframe timeframe,
+  ) async {
+    final response = await _unwrap(
+      _dio.get<Map<String, dynamic>>(
+        ApiEndpoints.nodeLxcCtRrdData(node, ctid),
+        queryParameters: <String, dynamic>{'timeframe': timeframe.apiValue},
+      ),
+    );
+    return parseProxmoxRrdData(response.data?['data']);
+  }
+
+  /// `GET /nodes/{node}/rrddata?timeframe=…`
+  Future<List<ResourceDataPoint>> fetchNodeRrdData(
+    String node,
+    ChartTimeframe timeframe,
+  ) async {
+    final response = await _unwrap(
+      _dio.get<Map<String, dynamic>>(
+        ApiEndpoints.nodeRrdData(node),
+        queryParameters: <String, dynamic>{'timeframe': timeframe.apiValue},
+      ),
+    );
+    return parseProxmoxRrdData(response.data?['data']);
+  }
+
   /// `GET /nodes/{node}/tasks/{upid}/log` with pagination.
   Future<List<String>> fetchTaskLog(
     String node,
@@ -496,6 +541,141 @@ List<dynamic> _dataAsList(dynamic data) {
     throw const ServerException(502, message: 'Expected JSON array in data');
   }
   return data;
+}
+
+/// Parses Proxmox `rrddata` response `data` field into [ResourceDataPoint]s.
+///
+/// **Object rows:** reads `time`, `cpu`, `mem`, `netin`, `netout`,
+/// `diskread`, `diskwrite` (case-insensitive keys).
+///
+/// **Array rows (QEMU/LXC RRD order):** index `0` = Unix time (seconds);
+/// `2` = `cpu`; `3` = `mem` (bytes); `5` = `netin`; `6` = `netout`;
+/// `7` = `diskread`; `8` = `diskwrite`. Index `1` is `maxcpu` (ignored here).
+///
+/// Sparse trailing rows (time-only) are skipped when no metrics are present.
+List<ResourceDataPoint> parseProxmoxRrdData(dynamic data) {
+  if (data == null) {
+    return const [];
+  }
+  if (data is! List<dynamic>) {
+    throw const ServerException(
+      502,
+      message: 'Expected JSON array in rrddata data',
+    );
+  }
+  final out = <ResourceDataPoint>[];
+  for (final row in data) {
+    final point = _resourceDataPointFromRrdRow(row);
+    if (point != null) {
+      out.add(point);
+    }
+  }
+  return out;
+}
+
+ResourceDataPoint? _resourceDataPointFromRrdRow(dynamic row) {
+  if (row is Map) {
+    final m = Map<String, dynamic>.from(row);
+    final ts = _rrdTimestamp(m['time'] ?? m['t']);
+    if (ts == null) {
+      return null;
+    }
+    final cpu = _rrdDouble(m, 'cpu');
+    final mem = _rrdDouble(m, 'mem');
+    final netIn = _rrdDouble(m, 'netin');
+    final netOut = _rrdDouble(m, 'netout');
+    final diskRead = _rrdDouble(m, 'diskread');
+    final diskWrite = _rrdDouble(m, 'diskwrite');
+    final hasMetric =
+        cpu != null ||
+        mem != null ||
+        netIn != null ||
+        netOut != null ||
+        diskRead != null ||
+        diskWrite != null;
+    if (!hasMetric) {
+      return null;
+    }
+    return ResourceDataPoint(
+      timestamp: ts,
+      cpu: cpu,
+      mem: mem,
+      netIn: netIn,
+      netOut: netOut,
+      diskRead: diskRead,
+      diskWrite: diskWrite,
+    );
+  }
+  if (row is List<dynamic>) {
+    if (row.isEmpty) {
+      return null;
+    }
+    final ts = _rrdTimestamp(row[0]);
+    if (ts == null) {
+      return null;
+    }
+    double? cpu;
+    double? mem;
+    double? netIn;
+    double? netOut;
+    double? diskRead;
+    double? diskWrite;
+    if (row.length > 2) {
+      cpu = proxmoxDouble(row[2]);
+    }
+    if (row.length > 3) {
+      mem = proxmoxDouble(row[3]);
+    }
+    if (row.length > 5) {
+      netIn = proxmoxDouble(row[5]);
+    }
+    if (row.length > 6) {
+      netOut = proxmoxDouble(row[6]);
+    }
+    if (row.length > 7) {
+      diskRead = proxmoxDouble(row[7]);
+    }
+    if (row.length > 8) {
+      diskWrite = proxmoxDouble(row[8]);
+    }
+    final hasMetric =
+        cpu != null ||
+        mem != null ||
+        netIn != null ||
+        netOut != null ||
+        diskRead != null ||
+        diskWrite != null;
+    if (!hasMetric) {
+      return null;
+    }
+    return ResourceDataPoint(
+      timestamp: ts,
+      cpu: cpu,
+      mem: mem,
+      netIn: netIn,
+      netOut: netOut,
+      diskRead: diskRead,
+      diskWrite: diskWrite,
+    );
+  }
+  return null;
+}
+
+DateTime? _rrdTimestamp(dynamic value) {
+  final secs = proxmoxInt(value) ?? proxmoxDouble(value)?.toInt();
+  if (secs == null) {
+    return null;
+  }
+  return DateTime.fromMillisecondsSinceEpoch(secs * 1000, isUtc: true);
+}
+
+double? _rrdDouble(Map<String, dynamic> map, String key) {
+  for (final e in map.entries) {
+    if (e.key.toLowerCase() == key) {
+      return proxmoxDouble(e.value);
+    }
+  }
+  return null;
 }
 
 /// PVE task log `data`: list of `{ "n": int, "t": "line" }` or plain strings.

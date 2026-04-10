@@ -102,9 +102,11 @@ lib/
 │   │
 │   ├── dashboard/                    # Node overview & summary
 │   │   ├── data/
-│   │   │   └── dashboard_repository.dart
+│   │   │   ├── dashboard_repository.dart
+│   │   │   └── rrd_repository.dart   # Proxmox rrddata (VM/LXC/node charts)
 │   │   ├── providers/
-│   │   │   └── dashboard_providers.dart
+│   │   │   ├── dashboard_providers.dart
+│   │   │   └── rrd_providers.dart      # Chart data + 60s polling
 │   │   └── ui/
 │   │       └── dashboard_screen.dart
 │   │
@@ -118,12 +120,16 @@ lib/
 │   │       ├── vm_detail_screen.dart
 │   │       └── widgets/
 │   │           ├── vm_status_badge.dart
-│   │           └── vm_resource_chart.dart
+│   │           ├── cpu_chart.dart
+│   │           ├── memory_chart.dart
+│   │           ├── network_chart.dart
+│   │           └── disk_io_chart.dart
 │   │
 │   ├── containers/                   # LXC container management
 │   │   ├── data/
 │   │   ├── providers/
 │   │   └── ui/
+│   │       └── widgets/              # chart wrappers (parallel to vms/widgets)
 │   │
 │   ├── storage/                      # Storage overview
 │   │   ├── data/

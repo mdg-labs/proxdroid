@@ -74,3 +74,10 @@ double? memoryFraction(int? mem, int? maxMem) {
   if (mem == null || maxMem == null || maxMem <= 0) return null;
   return (mem / maxMem).clamp(0.0, 1.0);
 }
+
+/// Formats a rate in bytes per second (e.g. `1.2 MB/s`).
+String formatDataRate(double? bytesPerSecond, {String ifNull = '—'}) {
+  if (bytesPerSecond == null || bytesPerSecond < 0) return ifNull;
+  final rounded = bytesPerSecond.round();
+  return '${formatBytes(rounded)}/s';
+}

@@ -56,4 +56,19 @@ abstract final class ApiEndpoints {
   static String nodeTaskLog(String node, String upid) =>
       '/nodes/${Uri.encodeComponent(node)}/tasks/'
       '${Uri.encodeComponent(upid)}/log';
+
+  /// `GET /nodes/{node}/qemu/{vmid}/rrddata` — optional `timeframe` query
+  /// (`hour`, `day`, `week`, `month`).
+  static String nodeQemuVmRrdData(String node, int vmid) =>
+      '/nodes/${Uri.encodeComponent(node)}/qemu/'
+      '${Uri.encodeComponent(vmid.toString())}/rrddata';
+
+  /// `GET /nodes/{node}/lxc/{ctid}/rrddata` — optional `timeframe` query.
+  static String nodeLxcCtRrdData(String node, int ctid) =>
+      '/nodes/${Uri.encodeComponent(node)}/lxc/'
+      '${Uri.encodeComponent(ctid.toString())}/rrddata';
+
+  /// `GET /nodes/{node}/rrddata` — node-level RRD; optional `timeframe` query.
+  static String nodeRrdData(String node) =>
+      '/nodes/${Uri.encodeComponent(node)}/rrddata';
 }

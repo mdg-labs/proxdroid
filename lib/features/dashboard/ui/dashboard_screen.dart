@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:proxdroid/core/models/node.dart';
+import 'package:proxdroid/core/models/resource_data_point.dart';
 import 'package:proxdroid/core/models/vm.dart';
 import 'package:proxdroid/core/utils/formatters.dart';
 import 'package:proxdroid/features/containers/providers/container_providers.dart';
 import 'package:proxdroid/features/dashboard/providers/dashboard_providers.dart';
+import 'package:proxdroid/features/dashboard/providers/rrd_providers.dart';
 import 'package:proxdroid/features/servers/ui/proxmox_exception_messages.dart';
 import 'package:proxdroid/features/vms/providers/vm_providers.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
@@ -12,6 +14,7 @@ import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
 import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
+import 'package:proxdroid/shared/widgets/resource_chart.dart';
 import 'package:proxdroid/shared/widgets/status_badge.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -273,6 +276,10 @@ class DashboardScreen extends ConsumerWidget {
                                     ),
                                   ),
                                 ],
+                                if (online) ...[
+                                  const SizedBox(height: 16),
+                                  _NodeRrdSparklines(nodeName: node.name),
+                                ],
                               ],
                             ),
                           ),
@@ -286,6 +293,135 @@ class DashboardScreen extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Compact CPU + memory line charts from node-level rrddata (1h, no selector).
+class _NodeRrdSparklines extends ConsumerWidget {
+  const _NodeRrdSparklines({required this.nodeName});
+
+  final String nodeName;
+
+  static const _tf = ChartTimeframe.hour;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final scheme = Theme.of(context).colorScheme;
+    final async = ref.watch(nodeRrdDataProvider(nodeName, _tf));
+
+    return async.when(
+      loading:
+          () => Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      l10n.metricCpu,
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                    const SizedBox(height: 4),
+                    const SizedBox(
+                      height: 88,
+                      child: Center(
+                        child: SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      l10n.metricMemory,
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                    const SizedBox(height: 4),
+                    const SizedBox(
+                      height: 88,
+                      child: Center(
+                        child: SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+      error:
+          (e, _) => Text(
+            l10n.chartLoadError,
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: scheme.error),
+          ),
+      data:
+          (points) => Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      l10n.metricCpu,
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                    const SizedBox(height: 4),
+                    ResourceLineChart(
+                      data: points,
+                      metric: ResourceChartMetric.cpu,
+                      primaryColor: scheme.primary,
+                      timeframe: _tf,
+                      onTimeframeChanged: (_) {},
+                      l10n: l10n,
+                      compact: true,
+                      chartHeight: 88,
+                      showTimeframeSelector: false,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      l10n.metricMemory,
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                    const SizedBox(height: 4),
+                    ResourceLineChart(
+                      data: points,
+                      metric: ResourceChartMetric.memory,
+                      primaryColor: scheme.secondary,
+                      timeframe: _tf,
+                      onTimeframeChanged: (_) {},
+                      l10n: l10n,
+                      compact: true,
+                      chartHeight: 88,
+                      showTimeframeSelector: false,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
     );
   }
 }

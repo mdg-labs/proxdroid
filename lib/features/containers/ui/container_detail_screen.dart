@@ -2,11 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:proxdroid/core/models/container.dart' as px;
+import 'package:proxdroid/core/models/resource_data_point.dart';
 import 'package:proxdroid/core/models/task.dart' as pve;
 import 'package:proxdroid/core/utils/formatters.dart';
 import 'package:proxdroid/features/containers/data/container_repository.dart';
 import 'package:proxdroid/features/containers/providers/container_providers.dart';
 import 'package:proxdroid/features/containers/ui/widgets/container_status_badge.dart';
+import 'package:proxdroid/features/containers/ui/widgets/cpu_chart.dart';
+import 'package:proxdroid/features/containers/ui/widgets/disk_io_chart.dart';
+import 'package:proxdroid/features/containers/ui/widgets/memory_chart.dart';
+import 'package:proxdroid/features/containers/ui/widgets/network_chart.dart';
 import 'package:proxdroid/features/servers/ui/proxmox_exception_messages.dart';
 import 'package:proxdroid/features/tasks/providers/task_providers.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
@@ -33,6 +38,10 @@ class ContainerDetailScreen extends ConsumerStatefulWidget {
 
 class _ContainerDetailScreenState extends ConsumerState<ContainerDetailScreen> {
   bool _powerBusy = false;
+  ChartTimeframe _cpuChartTf = ChartTimeframe.hour;
+  ChartTimeframe _memChartTf = ChartTimeframe.hour;
+  ChartTimeframe _netChartTf = ChartTimeframe.hour;
+  ChartTimeframe _diskChartTf = ChartTimeframe.hour;
 
   Future<void> _runPowerAction(
     px.Container ct,
@@ -366,6 +375,38 @@ class _ContainerDetailScreenState extends ConsumerState<ContainerDetailScreen> {
                         LabeledRow(
                           label: l10n.labelContainerOsType,
                           value: ct.ostype ?? l10n.valueUnavailable,
+                        ),
+                        const SizedBox(height: 24),
+                        ContainerCpuChart(
+                          node: ct.node,
+                          ctid: ct.vmid,
+                          timeframe: _cpuChartTf,
+                          onTimeframeChanged:
+                              (tf) => setState(() => _cpuChartTf = tf),
+                        ),
+                        const SizedBox(height: 24),
+                        ContainerMemoryChart(
+                          node: ct.node,
+                          ctid: ct.vmid,
+                          timeframe: _memChartTf,
+                          onTimeframeChanged:
+                              (tf) => setState(() => _memChartTf = tf),
+                        ),
+                        const SizedBox(height: 24),
+                        ContainerNetworkChart(
+                          node: ct.node,
+                          ctid: ct.vmid,
+                          timeframe: _netChartTf,
+                          onTimeframeChanged:
+                              (tf) => setState(() => _netChartTf = tf),
+                        ),
+                        const SizedBox(height: 24),
+                        ContainerDiskIoChart(
+                          node: ct.node,
+                          ctid: ct.vmid,
+                          timeframe: _diskChartTf,
+                          onTimeframeChanged:
+                              (tf) => setState(() => _diskChartTf = tf),
                         ),
                       ],
                     ),

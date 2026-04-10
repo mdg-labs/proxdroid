@@ -1,6 +1,6 @@
 # ProxDroid – Development Roadmap
 
-**Version:** 0.1 | **Date:** April 2026 | **Status:** Draft — Phase 3 complete (VM/LXC power actions; task repository, providers, and viewer UI)
+**Version:** 0.1 | **Date:** April 2026 | **Status:** Draft — Phase 4 complete (resource monitoring charts; rrddata, fl_chart, dashboard sparklines)
 
 > For architecture decisions and tech stack → see `ProxDroid_Architecture.md`
 > For feature scope and product goals → see `ProxDroid_MVP_PRD.md`
@@ -15,7 +15,7 @@
 | **Phase 1** | API foundation & server management | **Complete** — server config, auth, Hive + secure storage, Dio client, go_router redirects, add/edit server UI |
 | **Phase 2** | Node, VM & container overview | **Complete** — dashboard, VM/LXC lists + detail, shared status badge, l10n |
 | **Phase 3** | VM & container actions + task viewer | **Complete** — power actions on detail screens + merged task list, detail log, encoded UPID routes |
-| **Phase 4** | Resource monitoring charts | Full real-time charts for CPU, RAM, network, disk I/O |
+| **Phase 4** | Resource monitoring charts | **Complete** — VM/LXC/node rrddata charts with timeframe selector and 60s refresh |
 | **Phase 5** | Storage & backup management | Can browse storage and trigger/view backups |
 | **Phase 6** | Polish & release prep | App is stable, polished, and released on Play Store, F-Droid, and GitHub |
 | **Post-MVP** | Extended features | Console, push notifications, homescreen widget, snapshot management, suspend/resume |
@@ -264,29 +264,29 @@
 **Goal:** VM and container detail screens show real-time and historical charts for CPU, RAM, network I/O and disk I/O using fl_chart.
 
 ### 4.1 API Methods
-- [ ] Implement `GET /nodes/{node}/qemu/{vmid}/rrddata` – historical resource data (timeframe: hour/day/week/month)
-- [ ] Implement `GET /nodes/{node}/lxc/{ctid}/rrddata` – same for containers
-- [ ] Implement `GET /nodes/{node}/rrddata` – node-level resource data
-- [ ] Support `timeframe` parameter: `hour`, `day`, `week`, `month` — expose all four in the UI timeframe selector; `year` is **not** exposed in the MVP UI (API supports it but granularity is too low to be useful on a small screen) and is **not** included in the `ChartTimeframe` enum
+- [x] Implement `GET /nodes/{node}/qemu/{vmid}/rrddata` – historical resource data (timeframe: hour/day/week/month)
+- [x] Implement `GET /nodes/{node}/lxc/{ctid}/rrddata` – same for containers
+- [x] Implement `GET /nodes/{node}/rrddata` – node-level resource data
+- [x] Support `timeframe` parameter: `hour`, `day`, `week`, `month` — expose all four in the UI timeframe selector; `year` is **not** exposed in the MVP UI (API supports it but granularity is too low to be useful on a small screen) and is **not** included in the `ChartTimeframe` enum
 
 ### 4.2 Chart Data Models
-- [ ] Implement `ResourceDataPoint` model in `core/models/resource_data_point.dart` (Freezed) – fields: timestamp, cpu, mem, netIn, netOut, diskRead, diskWrite
-- [ ] Implement `ChartTimeframe` enum in same file: `hour`, `day`, `week`, `month` (year is intentionally excluded — see §4.1)
+- [x] Implement `ResourceDataPoint` model in `core/models/resource_data_point.dart` (Freezed) – fields: timestamp, cpu, mem, netIn, netOut, diskRead, diskWrite
+- [x] Implement `ChartTimeframe` enum in same file: `hour`, `day`, `week`, `month` (year is intentionally excluded — see §4.1)
 
 ### 4.3 Chart Widgets
-- [ ] Implement reusable `ResourceLineChart` widget (`shared/widgets/resource_chart.dart`)
+- [x] Implement reusable `ResourceLineChart` widget (`shared/widgets/resource_chart.dart`)
   - Accepts: list of `ResourceDataPoint`, metric type, color, timeframe
   - Shows: line chart with gradient fill, axis labels, tooltip on touch
-- [ ] Implement `CpuChart`, `MemoryChart`, `NetworkChart`, `DiskIoChart` as thin wrappers around `ResourceLineChart`
+- [x] Implement `CpuChart`, `MemoryChart`, `NetworkChart`, `DiskIoChart` as thin wrappers around `ResourceLineChart`
   - Place in `features/vms/ui/widgets/` (VM-specific) and reuse for containers via `features/containers/ui/widgets/`
   - The underlying `ResourceLineChart` widget lives in `shared/widgets/resource_chart.dart`
-- [ ] Add timeframe selector (1h / 1d / 1w / 1m) above each chart
+- [x] Add timeframe selector (1h / 1d / 1w / 1m) above each chart
 
 ### 4.4 Integration
-- [ ] Add all four charts to `VmDetailScreen` below the status/info section
-- [ ] Add all four charts to `ContainerDetailScreen`
-- [ ] Add node-level CPU and RAM charts to `DashboardScreen` node cards (compact version)
-- [ ] Implement auto-refresh: charts refresh every 60 seconds while screen is active (rrddata resolution is 60s per point; refreshing faster yields no new data)
+- [x] Add all four charts to `VmDetailScreen` below the status/info section
+- [x] Add all four charts to `ContainerDetailScreen`
+- [x] Add node-level CPU and RAM charts to `DashboardScreen` node cards (compact version)
+- [x] Implement auto-refresh: charts refresh every 60 seconds while screen is active (rrddata resolution is 60s per point; refreshing faster yields no new data)
 
 ---
 
