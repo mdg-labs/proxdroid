@@ -252,9 +252,7 @@ class DashboardScreen extends ConsumerWidget {
                             Text(
                               '${l10n.metricUptime}: ${formatUptimeSeconds(node.uptime)}',
                               style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(
-                                    color: scheme.onSurfaceVariant,
-                                  ),
+                                  ?.copyWith(color: scheme.onSurfaceVariant),
                             ),
                             const SizedBox(height: 12),
 
@@ -275,10 +273,7 @@ class DashboardScreen extends ConsumerWidget {
                               value: memFrac,
                               valueSuffix:
                                   memFrac != null
-                                      ? formatMemoryRatio(
-                                        node.mem,
-                                        node.maxMem,
-                                      )
+                                      ? formatMemoryRatio(node.mem, node.maxMem)
                                       : l10n.valueUnavailable,
                             ),
 

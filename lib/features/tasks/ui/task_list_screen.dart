@@ -135,7 +135,8 @@ class TaskListScreen extends ConsumerWidget {
                   height: minPullHeight,
                   child: ErrorView(
                     message: proxmoxExceptionMessage(e, l10n),
-                    onRetry: () => ref.read(taskListProvider.notifier).refresh(),
+                    onRetry:
+                        () => ref.read(taskListProvider.notifier).refresh(),
                   ),
                 ),
               ],
@@ -180,10 +181,11 @@ class TaskListScreen extends ConsumerWidget {
               final start = task.startTime;
               String startedText = l10n.valueUnavailable;
               if (start != null) {
-                final dt = DateTime.fromMillisecondsSinceEpoch(
-                  start * 1000,
-                  isUtc: true,
-                ).toLocal();
+                final dt =
+                    DateTime.fromMillisecondsSinceEpoch(
+                      start * 1000,
+                      isUtc: true,
+                    ).toLocal();
                 startedText = DateFormat.yMMMd(locale).add_Hm().format(dt);
               }
               final durationText =
@@ -202,9 +204,9 @@ class TaskListScreen extends ConsumerWidget {
                     const SizedBox(height: 2),
                     Text(
                       '${l10n.taskRowGuest}: $guest',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: scheme.onSurface,
-                      ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(color: scheme.onSurface),
                     ),
                     Text(
                       '${l10n.taskRowStarted}: $startedText · '
@@ -220,9 +222,10 @@ class TaskListScreen extends ConsumerWidget {
                   variant: _statusVariant(task.status),
                 ),
                 showDividerBelow: index < tasks.length - 1,
-                onTap: () => context.push(
-                  '/tasks/${Uri.encodeComponent(task.node)}/${Uri.encodeComponent(task.upid)}',
-                ),
+                onTap:
+                    () => context.push(
+                      '/tasks/${Uri.encodeComponent(task.node)}/${Uri.encodeComponent(task.upid)}',
+                    ),
               );
             },
           ),

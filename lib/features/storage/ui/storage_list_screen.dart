@@ -115,9 +115,10 @@ class StorageListScreen extends ConsumerWidget {
               return Card(
                 margin: EdgeInsets.zero,
                 child: InkWell(
-                  onTap: () => context.push(
-                    '/storage/${Uri.encodeComponent(s.node)}/${Uri.encodeComponent(s.id)}',
-                  ),
+                  onTap:
+                      () => context.push(
+                        '/storage/${Uri.encodeComponent(s.node)}/${Uri.encodeComponent(s.id)}',
+                      ),
                   borderRadius: BorderRadius.circular(12),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
@@ -129,8 +130,7 @@ class StorageListScreen extends ConsumerWidget {
                             Expanded(
                               child: Text(
                                 s.id,
-                                style:
-                                    Theme.of(context).textTheme.titleMedium,
+                                style: Theme.of(context).textTheme.titleMedium,
                               ),
                             ),
                             StatusBadge(

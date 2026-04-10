@@ -170,51 +170,36 @@ class BackupListScreen extends ConsumerWidget {
                           if (j.schedule.isNotEmpty)
                             Text(
                               j.schedule,
-                              style: Theme.of(
-                                context,
-                              ).textTheme.bodySmall?.copyWith(
-                                color: scheme.onSurfaceVariant,
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(color: scheme.onSurfaceVariant),
                             ),
                           if (j.storage.isNotEmpty)
                             Text(
                               '${l10n.backupFieldStorage}: ${j.storage}',
-                              style: Theme.of(
-                                context,
-                              ).textTheme.bodySmall?.copyWith(
-                                color: scheme.onSurfaceVariant,
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(color: scheme.onSurfaceVariant),
                             ),
                           if (j.vmids.isNotEmpty)
                             Text(
                               l10n.backupJobVmids(j.vmids.join(', ')),
-                              style: Theme.of(
-                                context,
-                              ).textTheme.bodySmall?.copyWith(
-                                color: scheme.onSurfaceVariant,
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(color: scheme.onSurfaceVariant),
                             ),
                           if (j.nextRun != null)
                             Text(
                               l10n.backupJobNextRun(
                                 formatProxmoxUnixSeconds(j.nextRun),
                               ),
-                              style: Theme.of(
-                                context,
-                              ).textTheme.bodySmall?.copyWith(
-                                color: scheme.onSurfaceVariant,
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(color: scheme.onSurfaceVariant),
                             ),
                           if (j.lastRun != null)
                             Text(
                               l10n.backupJobLastRun(
                                 formatProxmoxUnixSeconds(j.lastRun),
                               ),
-                              style: Theme.of(
-                                context,
-                              ).textTheme.bodySmall?.copyWith(
-                                color: scheme.onSurfaceVariant,
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(color: scheme.onSurfaceVariant),
                             ),
                         ],
                       ),
@@ -267,11 +252,8 @@ class BackupListScreen extends ConsumerWidget {
                                   formatProxmoxUnixSeconds(it.ctime),
                                 if (it.size != null) formatBytes(it.size),
                               ].join(' · '),
-                              style: Theme.of(
-                                context,
-                              ).textTheme.bodySmall?.copyWith(
-                                color: scheme.onSurfaceVariant,
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(color: scheme.onSurfaceVariant),
                             ),
                           );
                         }).toList(),
@@ -293,9 +275,10 @@ class BackupListScreen extends ConsumerWidget {
                       '${t.type} · ${_statusLine(t, l10n)}',
                       style: TextStyle(color: scheme.onSurfaceVariant),
                     ),
-                    onTap: () => context.push(
-                      '/tasks/${Uri.encodeComponent(t.node)}/${Uri.encodeComponent(t.upid)}',
-                    ),
+                    onTap:
+                        () => context.push(
+                          '/tasks/${Uri.encodeComponent(t.node)}/${Uri.encodeComponent(t.upid)}',
+                        ),
                   );
                 }, childCount: vzTasks.length),
               ),

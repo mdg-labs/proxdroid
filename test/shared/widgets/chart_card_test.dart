@@ -7,10 +7,7 @@ Widget _wrap(Widget widget, ThemeData theme) {
   return MaterialApp(
     theme: theme,
     home: Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: widget,
-      ),
+      body: Padding(padding: const EdgeInsets.all(16), child: widget),
     ),
   );
 }

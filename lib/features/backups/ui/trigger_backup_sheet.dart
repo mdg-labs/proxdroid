@@ -60,9 +60,10 @@ Future<void> showTriggerBackupSheet(
 }) {
   return showPremiumModalBottomSheet<void>(
     context: context,
-    builder: (ctx) => PremiumBottomSheet(
-      child: TriggerBackupSheet(initialGuest: initialGuest),
-    ),
+    builder:
+        (ctx) => PremiumBottomSheet(
+          child: TriggerBackupSheet(initialGuest: initialGuest),
+        ),
   );
 }
 

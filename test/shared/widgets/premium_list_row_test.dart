@@ -6,9 +6,7 @@ import 'package:proxdroid/shared/widgets/premium_list_row.dart';
 Widget _wrap(Widget widget, ThemeData theme) {
   return MaterialApp(
     theme: theme,
-    home: Scaffold(
-      body: SizedBox(width: 360, child: widget),
-    ),
+    home: Scaffold(body: SizedBox(width: 360, child: widget)),
   );
 }
 
@@ -18,10 +16,7 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
     await tester.pumpWidget(
-      _wrap(
-        const PremiumListRow(title: Text('pve-node-01')),
-        AppTheme.dark,
-      ),
+      _wrap(const PremiumListRow(title: Text('pve-node-01')), AppTheme.dark),
     );
     await tester.pump();
 
@@ -36,10 +31,7 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
     await tester.pumpWidget(
-      _wrap(
-        const PremiumListRow(title: Text('pve-node-01')),
-        AppTheme.light,
-      ),
+      _wrap(const PremiumListRow(title: Text('pve-node-01')), AppTheme.light),
     );
     await tester.pump();
 
@@ -115,31 +107,29 @@ void main() {
   });
 
   // Behavioral: no chevron when showChevron = false (default)
-  testWidgets(
-    'PremiumListRow does not show chevron icon by default',
-    (tester) async {
-      await tester.pumpWidget(
-        _wrap(const PremiumListRow(title: Text('Item')), AppTheme.dark),
-      );
-      await tester.pump();
+  testWidgets('PremiumListRow does not show chevron icon by default', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _wrap(const PremiumListRow(title: Text('Item')), AppTheme.dark),
+    );
+    await tester.pump();
 
-      expect(find.byIcon(Icons.chevron_right), findsNothing);
-    },
-  );
+    expect(find.byIcon(Icons.chevron_right), findsNothing);
+  });
 
   // Behavioral: divider is absent when showDividerBelow = false
-  testWidgets(
-    'PremiumListRow omits divider when showDividerBelow is false',
-    (tester) async {
-      await tester.pumpWidget(
-        _wrap(
-          const PremiumListRow(title: Text('Item'), showDividerBelow: false),
-          AppTheme.dark,
-        ),
-      );
-      await tester.pump();
+  testWidgets('PremiumListRow omits divider when showDividerBelow is false', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _wrap(
+        const PremiumListRow(title: Text('Item'), showDividerBelow: false),
+        AppTheme.dark,
+      ),
+    );
+    await tester.pump();
 
-      expect(find.byType(Divider), findsNothing);
-    },
-  );
+    expect(find.byType(Divider), findsNothing);
+  });
 }

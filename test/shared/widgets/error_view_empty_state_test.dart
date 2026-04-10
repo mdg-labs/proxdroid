@@ -21,9 +21,7 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        _wrapL10n(
-          ErrorView(message: 'Connection failed', onRetry: () {}),
-        ),
+        _wrapL10n(ErrorView(message: 'Connection failed', onRetry: () {})),
       );
       await tester.pump();
 
@@ -31,18 +29,17 @@ void main() {
       expect(find.byType(FilledButton), findsOneWidget);
     });
 
-    testWidgets(
-      'ErrorView shows no retry button when onRetry is null',
-      (tester) async {
-        await tester.pumpWidget(
-          _wrapL10n(const ErrorView(message: 'Something went wrong')),
-        );
-        await tester.pump();
+    testWidgets('ErrorView shows no retry button when onRetry is null', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrapL10n(const ErrorView(message: 'Something went wrong')),
+      );
+      await tester.pump();
 
-        expect(find.byType(FilledButton), findsNothing);
-        expect(find.byType(TextButton), findsNothing);
-      },
-    );
+      expect(find.byType(FilledButton), findsNothing);
+      expect(find.byType(TextButton), findsNothing);
+    });
 
     testWidgets('ErrorView retry button renders in light theme', (
       tester,

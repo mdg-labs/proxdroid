@@ -245,12 +245,7 @@ class _MetadataCard extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Text(
-                      taskMeta!.type,
-                      style: tt.titleLarge,
-                    ),
-                  ),
+                  Expanded(child: Text(taskMeta!.type, style: tt.titleLarge)),
                   const SizedBox(width: 8),
                   StatusBadge(
                     label: _statusLabel(taskMeta!.status, l10n),

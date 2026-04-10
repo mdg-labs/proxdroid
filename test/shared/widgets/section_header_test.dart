@@ -8,9 +8,7 @@ import 'package:proxdroid/shared/widgets/section_header.dart';
 Widget _wrap(Widget widget, ThemeData theme) {
   return MaterialApp(
     theme: theme,
-    home: Scaffold(
-      body: SizedBox(width: 360, child: widget),
-    ),
+    home: Scaffold(body: SizedBox(width: 360, child: widget)),
   );
 }
 
@@ -20,10 +18,7 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
     await tester.pumpWidget(
-      _wrap(
-        const SectionHeader(title: 'Virtual Machines'),
-        AppTheme.dark,
-      ),
+      _wrap(const SectionHeader(title: 'Virtual Machines'), AppTheme.dark),
     );
     await tester.pump();
 
@@ -38,10 +33,7 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
     await tester.pumpWidget(
-      _wrap(
-        const SectionHeader(title: 'Virtual Machines'),
-        AppTheme.light,
-      ),
+      _wrap(const SectionHeader(title: 'Virtual Machines'), AppTheme.light),
     );
     await tester.pump();
 
@@ -96,10 +88,7 @@ void main() {
   // Behavioral: emphasis variant uses primary color
   testWidgets('SectionHeader emphasis uses primary color text', (tester) async {
     await tester.pumpWidget(
-      _wrap(
-        const SectionHeader(title: 'Servers'),
-        AppTheme.dark,
-      ),
+      _wrap(const SectionHeader(title: 'Servers'), AppTheme.dark),
     );
     await tester.pump();
 

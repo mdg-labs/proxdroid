@@ -55,10 +55,7 @@ class ResourceGaugeRow extends StatelessWidget {
           const SizedBox(height: 6),
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: value,
-              minHeight: 6,
-            ),
+            child: LinearProgressIndicator(value: value, minHeight: 6),
           ),
         ],
       ],

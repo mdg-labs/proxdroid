@@ -297,11 +297,7 @@ class _ResourceLineChartCanvas extends StatelessWidget {
               };
               final item = LineTooltipItem(
                 '$timeStr\n$body',
-                TextStyle(
-                  color: scheme.onSurface,
-                  fontSize: 12,
-                  height: 1.25,
-                ),
+                TextStyle(color: scheme.onSurface, fontSize: 12, height: 1.25),
               );
               return [
                 for (var j = 0; j < touchedSpots.length; j++)

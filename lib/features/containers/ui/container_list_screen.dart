@@ -297,9 +297,10 @@ class _ContainerListScreenState extends ConsumerState<ContainerListScreen> {
                             ),
                             showChevron: true,
                             showDividerBelow: false,
-                            onTap: () => context.push(
-                              '/containers/${Uri.encodeComponent(ct.node)}/${Uri.encodeComponent(ct.vmid.toString())}',
-                            ),
+                            onTap:
+                                () => context.push(
+                                  '/containers/${Uri.encodeComponent(ct.node)}/${Uri.encodeComponent(ct.vmid.toString())}',
+                                ),
                           ),
                         ),
                       );

@@ -300,9 +300,10 @@ class _VmListScreenState extends ConsumerState<VmListScreen> {
                             ),
                             showChevron: true,
                             showDividerBelow: false,
-                            onTap: () => context.push(
-                              '/vms/${Uri.encodeComponent(vm.node)}/${Uri.encodeComponent(vm.vmid.toString())}',
-                            ),
+                            onTap:
+                                () => context.push(
+                                  '/vms/${Uri.encodeComponent(vm.node)}/${Uri.encodeComponent(vm.vmid.toString())}',
+                                ),
                           ),
                         ),
                       );

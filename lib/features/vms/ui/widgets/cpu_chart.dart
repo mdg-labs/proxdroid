@@ -60,7 +60,8 @@ class VmCpuChart extends ConsumerWidget {
               error: e,
               errorMessage: proxmoxExceptionMessage(e, l10n),
               onRetry:
-                  () => ref.invalidate(vmRrdDataProvider(node, vmid, timeframe)),
+                  () =>
+                      ref.invalidate(vmRrdDataProvider(node, vmid, timeframe)),
               showTimeframeSelector: false,
             ),
         data:
