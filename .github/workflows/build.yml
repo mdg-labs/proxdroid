@@ -1,4 +1,6 @@
-# Release APK on version tags. Uses GITHUB_TOKEN (default) with contents: write.
+# Release APK on prerelease-style tags only. Uses GITHUB_TOKEN (default) with contents: write.
+# Stable semver tags like v1.0.0 do NOT match these globs and will not run this workflow until
+# you add broader patterns (e.g. 'v*') and decide draft/prerelease behavior for stable releases.
 # If you ever need a draft release first, set draft: true on softprops/action-gh-release.
 
 name: Build release APK
@@ -6,7 +8,9 @@ name: Build release APK
 on:
   push:
     tags:
-      - 'v*'
+      # Tag name glob patterns (evaluated against the pushed tag; see GitHub Actions filter cheat sheet).
+      - 'v*-beta*'
+      - 'v*-dev*'
 
 permissions:
   contents: write
@@ -31,4 +35,5 @@ jobs:
       - name: Upload APK to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          prerelease: true
           files: build/app/outputs/flutter-apk/app-release.apk

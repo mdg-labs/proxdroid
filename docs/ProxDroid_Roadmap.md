@@ -1,6 +1,6 @@
 # ProxDroid – Development Roadmap
 
-**Version:** 0.1 | **Date:** April 2026 | **Status:** Draft — Phase 5 complete (storage & backup management; vzdump, backup content, cluster jobs)
+**Version:** 0.1 | **Date:** April 2026 | **Status:** Draft — Phase 6 polish complete; **GitHub prerelease APKs** on `v*-beta*` / `v*-dev*` tags; Play Store & F-Droid **deferred**
 
 > For architecture decisions and tech stack → see `ProxDroid_Architecture.md`
 > For feature scope and product goals → see `ProxDroid_MVP_PRD.md`
@@ -17,7 +17,7 @@
 | **Phase 3** | VM & container actions + task viewer | **Complete** — power actions on detail screens + merged task list, detail log, encoded UPID routes |
 | **Phase 4** | Resource monitoring charts | **Complete** — VM/LXC/node rrddata charts with timeframe selector and 60s refresh |
 | **Phase 5** | Storage & backup management | **Complete** — browse storage usage/content, cluster backup jobs, aggregated backup files, manual vzdump + task navigation |
-| **Phase 6** | Polish & release prep | App is stable, polished, and released on Play Store, F-Droid, and GitHub |
+| **Phase 6** | Polish & release prep | **Complete** for polish + **GitHub prereleases** (APK on tag); Play Store & F-Droid **deferred** |
 | **Post-MVP** | Extended features | Console, push notifications, homescreen widget, snapshot management, suspend/resume |
 
 ---
@@ -77,7 +77,7 @@
   - `flutter gen-l10n` (validates ARB / generated localizations)
   - `flutter analyze`
   - `flutter test`
-- [x] Add workflow: `build.yml` – runs on tags (`v*`)
+- [x] Add workflow: `build.yml` – runs on prerelease-style tags only (`v*-beta*`, `v*-dev*`); publishes GitHub **prerelease** with APK
   - Pin same Flutter version as `ci.yml`
   - `flutter pub get`
   - `dart run build_runner build --delete-conflicting-outputs` (must run before build; generates Freezed/Riverpod code)
@@ -325,7 +325,7 @@
 
 ## Phase 6 – Polish & Release Prep
 
-**Goal:** The app is stable, handles all error cases gracefully, feels polished, and is ready for a public release on the Play Store, F-Droid, and GitHub.
+**Goal:** The app is stable, handles all error cases gracefully, feels polished, and is distributable via **GitHub prerelease APKs** (tag convention documented in README and CI). Play Store and F-Droid remain **deferred** (§6.5).
 
 ### 6.1 Error Handling & Edge Cases
 - [x] Audit all screens for unhandled error states
@@ -340,8 +340,8 @@
 - [x] Add haptic feedback on action buttons (start/stop/reboot)
 - [x] Add pull-to-refresh on all data screens
 - [x] Ensure all loading states use shimmer (no blank screens)
-- [ ] Review all typography, spacing, icon usage for consistency
-- [ ] Test dark and light theme on multiple screen sizes
+- [ ] Review all typography, spacing, icon usage for consistency — **ongoing**
+- [ ] Test dark and light theme on multiple screen sizes — **ongoing** (manual QA)
 
 ### 6.3 Settings Screen
 - [x] Build `SettingsScreen` with sections:
@@ -362,7 +362,10 @@
 - [ ] Manual end-to-end test on a real Proxmox instance (PVE 7.x and 8.x)
   - Live-PVE tests remain opt-in; use `@Tags(['integration'])` and the command in `CONTRIBUTING.md`
 
-### 6.5 Play Store Release
+### 6.5 Play Store / F-Droid Release (**deferred**)
+
+Not in scope for the current **GitHub-only prerelease** path; pick up when targeting store listing. Checklist below unchanged for future work.
+
 - [ ] Create app icons (launcher icon, adaptive icon for Android)
 - [ ] Create Play Store screenshots (at least 4, phone + tablet)
 - [ ] Write Play Store listing: short description, full description, keywords
@@ -393,18 +396,19 @@
   - Signed APK (`flutter build apk --release`) → for GitHub Releases and F-Droid sideload
 - [ ] Submit to Play Store internal testing track first, then production
 
-### 6.6 GitHub Release
-- [ ] Tag `v1.0.0`
-- [ ] Write release notes from `CHANGELOG.md` (do not write from scratch — `CHANGELOG.md` should have been maintained throughout development)
-- [ ] Attach signed APK to GitHub Release
-- [ ] Update `README.md` with download badges (Play Store + F-Droid + GitHub Releases)
+### 6.6 GitHub Release (prerelease path — **done** for current scope)
+- [x] **Tag convention:** push tags matching `v*-beta*` or `v*-dev*` (e.g. `v0.1.0-beta.1`, `v0.2.0-dev.1`) — triggers `build.yml`, creates/updates a GitHub **prerelease** with the release APK attached (unsigned APK; store signing deferred — §6.5)
+- [x] **Release notes:** maintain `[Unreleased]` in `CHANGELOG.md` during development; when tagging, promote entries into a version section and paste or summarize into the GitHub release body (do not invent notes from scratch)
+- [x] **README:** download section documents GitHub Releases, tag patterns, and deferred Play/F-Droid; optional `build.yml` status badge
+- [ ] **Stable `v1.0.0` (or broader tag glob):** not required to close Phase 6 — widen `build.yml` tag filters and set `prerelease` / signing when ready for a non-prerelease or store track
+- [ ] **Store download badges** in README — deferred with §6.5
 
 ### 6.7 Localization & Terminology Review
 - [x] Audit `lib/features` for hard-coded user-visible UI strings; moved formatted subtitles (settings version, server host:port) to `app_en.arb`
 - [ ] Verify all ARB keys use Proxmox-aligned terminology (Node, Virtual Machine, Container, Storage, Task, Backup — consistent with Proxmox web UI labels) — ongoing review
 - [x] Run `flutter gen-l10n` after ARB changes (CI includes this step)
 - [x] Error surfacing: `proxmoxExceptionMessage` maps exceptions to l10n; avoid showing raw exception text in UI
-- [ ] Review release-facing strings: Play Store listing description, Privacy Policy URL, in-app About screen — ensure consistency with ARB keys
+- [ ] Review release-facing strings: Play Store listing, Privacy Policy URL — **deferred** with §6.5; in-app About / GitHub-facing copy aligned with ARB where applicable — **ongoing**
 
 ---
 

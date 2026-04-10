@@ -3,6 +3,7 @@
 **A modern, open-source Android client for Proxmox Virtual Environment (PVE)**
 
 ![CI](https://github.com/mdg-labs/proxdroid/actions/workflows/ci.yml/badge.svg)
+![Release APK](https://github.com/mdg-labs/proxdroid/actions/workflows/build.yml/badge.svg)
 
 ProxDroid fills the gap of high-quality, modern Proxmox VE clients on Android. Built with Flutter and Material 3, it offers VM and container management, real-time resource charts, multi-server support, and a clean dark-theme UI.
 
@@ -26,7 +27,11 @@ ProxDroid fills the gap of high-quality, modern Proxmox VE clients on Android. B
 
 ## Download
 
-Coming soon — Play Store, F-Droid, GitHub Releases
+**GitHub Releases (prerelease APKs):** Prebuilt release APKs are attached automatically when you push a tag that matches **`v*-beta*`** or **`v*-dev*`** (for example `v0.1.0-beta.1` or `v0.2.0-dev.1`). See [Releases](https://github.com/mdg-labs/proxdroid/releases).
+
+**Play Store** and **F-Droid** are planned but not available yet.
+
+To cut a prerelease locally: update `CHANGELOG.md`, tag with a matching name, push the tag, and confirm the [Release APK](https://github.com/mdg-labs/proxdroid/actions/workflows/build.yml) workflow completes.
 
 ---
 
