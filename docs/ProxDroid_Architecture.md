@@ -66,7 +66,7 @@ lib/
 │   │   ├── storage.dart
 │   │   └── resource_data_point.dart  # Chart data (CPU, RAM, net, disk over time)
 │   ├── storage/
-│   │   └── server_storage.dart       # Server metadata (Hive) + credentials (flutter_secure_storage)
+│   │   └── server_storage.dart       # Server metadata (hive_ce) + credentials (flutter_secure_storage)
 │   └── utils/
 │       ├── formatters.dart           # Bytes, CPU%, uptime, etc.
 │       └── extensions.dart
@@ -237,8 +237,10 @@ if (allowSelfSigned) {
 > **Key API efficiency:** Use `GET /cluster/resources` (with optional `?type=vm` or `?type=lxc`) to retrieve all VMs and containers across all nodes in a single call. This is substantially more efficient than iterating `GET /nodes/{node}/qemu` and `GET /nodes/{node}/lxc` per node, and is the preferred approach for populating list screens and the dashboard summary.
 
 **Auth flow:**
-1. API Token → `Authorization: PVEAPIToken=USER@REALM!TOKENID=UUID` header
-2. Username/Password → POST `/access/ticket` → cookie + CSRFPreventionToken
+1. API Token → `Authorization: PVEAPIToken=USER@REALM!TOKENID=UUID` header — stateless, no expiry
+2. Username/Password → POST `/access/ticket` → returns `ticket` (used as cookie `PVEAuthCookie`) + `CSRFPreventionToken` (sent as header on all mutating requests)
+   - Ticket expires after **2 hours** (PVE default). The interceptor must detect a `401` response and automatically re-authenticate before retrying the original request.
+   - Store ticket and CSRF token in memory only (never on disk) — re-authenticate on app restart.
 
 ---
 
@@ -300,6 +302,17 @@ Future<List<Vm>> nodeVms(Ref ref, String node) async {
   final api = ref.watch(apiClientProvider);
   return api.getVms(node); // calls GET /nodes/{node}/qemu
 }
+```
+
+### Selected server (source of truth for which server is active)
+```dart
+// selectedServerProvider is a StateProvider — the UI writes to it when the user taps a server.
+// Stored in server_providers.dart alongside ServerListNotifier.
+final selectedServerProvider = StateProvider<Server?>((ref) {
+  // Default to the first saved server, or null if the list is empty.
+  final servers = ref.watch(serverListNotifierProvider);
+  return servers.isEmpty ? null : servers.first;
+});
 ```
 
 ### Server-switching invalidation (how it works)
