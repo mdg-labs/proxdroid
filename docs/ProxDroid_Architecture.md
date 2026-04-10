@@ -338,17 +338,8 @@ Future<List<Vm>> nodeVms(Ref ref, String node) async {
 ```
 
 ### Selected server (source of truth for which server is active)
-```dart
-// selectedServerProvider is a StateProvider — the UI writes to it when the user taps a server.
-// Stored in server_providers.dart alongside ServerListNotifier.
-final selectedServerProvider = StateProvider<Server?>((ref) {
-  // Default to the first saved server, or null if the list is empty.
-  final servers = ref.watch(serverListNotifierProvider);
-  return servers.isEmpty ? null : servers.first;
-});
-```
 
-> **Implementation note — preserving user selection:** The `StateProvider` shown above watches `serverListNotifierProvider`. In Riverpod, this means the provider **rebuilds** whenever the server list changes (add, remove, edit). On every rebuild, state resets to `servers.first`, discarding any explicit selection the user made. For MVP with a short server list this is acceptable, but the correct production pattern is: (1) persist the **selected server ID** (not the full object) in hive_ce; (2) implement `selectedServerProvider` as a `@riverpod class` `Notifier<Server?>` that loads the persisted ID on `build()`, falls back to `servers.first` if the persisted ID is not in the list, and persists the new ID when the user explicitly switches servers.
+> **Implementation note — preserving user selection:** A simple `StateProvider` for `selectedServerProvider` would watch `serverListNotifierProvider`. In Riverpod, this means the provider **rebuilds** whenever the server list changes (add, remove, edit). On every rebuild, state resets to `servers.first`, discarding any explicit selection the user made. For MVP with a short server list this is acceptable, but the correct production pattern is: (1) persist the **selected server ID** (not the full object) in hive_ce; (2) implement `selectedServerProvider` as a `@riverpod class` `Notifier<Server?>` that loads the persisted ID on `build()`, falls back to `servers.first` if the persisted ID is not in the list, and persists the new ID when the user explicitly switches servers.
 
 ### Server-switching invalidation (how it works)
 
@@ -369,6 +360,15 @@ ProxmoxApiClient apiClient(Ref ref) {
 ### Connectivity check
 
 Use `connectivity_plus` to check network availability before initiating API calls and to surface a persistent "No network connection" banner when offline. Expose a `connectivityProvider` that streams `ConnectivityResult` from `Connectivity().onConnectivityChanged`. API repositories do not need to check connectivity themselves — the interceptor layer can reject calls early when offline is detected, surfacing a `NetworkException`.
+
+### Concurrent refresh cycles
+
+Two independent refresh cycles can be active simultaneously on the VM/container detail screen:
+
+- **Task polling** (Phase 3): polls `taskStatusProvider` every 3 seconds while a task is running. Stops automatically once the task status is no longer `running`. Triggered only when an action (start/stop/reboot) is in progress.
+- **Chart auto-refresh** (Phase 4): re-fetches rrddata every 60 seconds while the screen is visible. Always active on detail screens.
+
+These two cycles are independent Riverpod providers and must not share timers or cancel each other. The 3-second task poller uses `ref.invalidate` or a `Timer`-based approach scoped to the notifier's lifecycle. The 60-second chart refresh uses `ref.keepAlive()` or an `AutoDisposeTimer` tied to the provider.
 
 ---
 

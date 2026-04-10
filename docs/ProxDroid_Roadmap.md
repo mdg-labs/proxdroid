@@ -89,9 +89,9 @@
 **Goal:** The user can add a Proxmox server (by hostname/IP, port, API token or username/password), the app connects to it, authenticates successfully, and stores the configuration locally. Self-signed certificates must work.
 
 ### 1.1 Core Data Models
-- [ ] Implement `Server` model (Freezed) – hive_ce-persisted fields only: id, name, host, port, authType, allowSelfSigned
+- [ ] Implement `Server` model in `core/models/server.dart` (Freezed) – hive_ce-persisted fields only: id, name, host, port, authType, allowSelfSigned
   - **Note:** credentials (`apiToken`, `password`) are NOT fields on the `Server` model – they are stored separately in `flutter_secure_storage` keyed by server id, and loaded at runtime when building the `ProxmoxApiClient`
-- [ ] Implement `Node` model (Freezed) – fields: name, status, cpu, maxCpu, mem, maxMem, uptime
+- [ ] Implement `Node` model in `core/models/node.dart` (Freezed) – fields: name, status, cpu, maxCpu, mem, maxMem, uptime
 - [ ] Add `ServerAuthType` enum: `apiToken`, `usernamePassword`
 - [ ] Run `build_runner` and confirm generated files are correct
 
@@ -156,8 +156,8 @@
 
 ### 2.2 Data Models
 - [ ] Extend `Node` model with all relevant fields from API response
-- [ ] Implement `Vm` model (Freezed) – vmid (int), name, status (VmStatus), node, cpu, maxMem, mem, maxDisk, disk, uptime
-- [ ] Implement `Container` model (Freezed) – same fields as `Vm` but status uses `ContainerStatus` (not `VmStatus`), add `ostype`
+- [ ] Implement `Vm` model in `core/models/vm.dart` (Freezed) – vmid (int), name, status (VmStatus), node, cpu, maxMem, mem, maxDisk, disk, uptime
+- [ ] Implement `Container` model in `core/models/container.dart` (Freezed) – same fields as `Vm` but status uses `ContainerStatus` (not `VmStatus`), add `ostype`
 - [ ] Implement `VmStatus` enum: `running`, `stopped`, `paused`, `unknown`
 - [ ] Implement `ContainerStatus` enum: `running`, `stopped`, `unknown` (LXC has no paused state — do **not** reuse `VmStatus` for containers)
 
@@ -177,6 +177,7 @@
 - [ ] Each node card: name, online/offline badge, CPU usage bar, RAM usage bar, uptime
 - [ ] Show cluster-wide summary at top (total VMs, running VMs, total containers)
 - [ ] Handle loading state (shimmer), error state (retry button), empty state
+- [ ] Wire up go_router: `/dashboard` → `DashboardScreen`
 
 ### 2.5 VM List & Detail
 - [ ] Build `VmListScreen` – filterable list of all VMs across all nodes
@@ -217,7 +218,7 @@
 - [ ] Implement `GET /nodes/{node}/tasks/{upid}/log` → task log output (also supports `start` and `limit` for pagination)
 
 ### 3.2 Data Models
-- [ ] Implement `Task` model (Freezed) – upid, node, type, status, startTime, endTime, user
+- [ ] Implement `Task` model in `core/models/task.dart` (Freezed) – upid, node, type, status, startTime, endTime, user
 - [ ] Implement `TaskStatus` enum: `running`, `ok`, `error`, `unknown`
 
 ### 3.3 Actions in VM/Container Detail
@@ -256,7 +257,7 @@
 **Goal:** VM and container detail screens show real-time and historical charts for CPU, RAM, network I/O and disk I/O using fl_chart.
 
 ### 4.1 API Methods
-- [ ] Implement `GET /nodes/{node}/qemu/{vmid}/rrddata` – historical resource data (timeframe: hour/day/week)
+- [ ] Implement `GET /nodes/{node}/qemu/{vmid}/rrddata` – historical resource data (timeframe: hour/day/week/month)
 - [ ] Implement `GET /nodes/{node}/lxc/{ctid}/rrddata` – same for containers
 - [ ] Implement `GET /nodes/{node}/rrddata` – node-level resource data
 - [ ] Support `timeframe` parameter: `hour`, `day`, `week`, `month` — expose all four in the UI timeframe selector; `year` is **not** exposed in the MVP UI (API supports it but granularity is too low to be useful on a small screen) and is **not** included in the `ChartTimeframe` enum
@@ -295,7 +296,7 @@
 - [ ] Implement `GET /nodes/{node}/tasks` filtered by type `vzdump` for backup task tracking
 
 ### 5.2 Data Models
-- [ ] Implement `BackupJob` model in `core/models/backup.dart` (Freezed) – id, vmids (list), storage, schedule, lastRun, nextRun (no `node` field — `GET /cluster/backup` is cluster-scoped and jobs apply cluster-wide)
+- [ ] Implement `BackupJob` model in `core/models/backup.dart` (Freezed) – id, vmids (list), storage, schedule, lastRun, nextRun (no `node` field — `GET /cluster/backup` is cluster-scoped and jobs apply cluster-wide); vmids is a list — one job can cover multiple VMs/containers, which matches the GET /cluster/backup API response where a single job entry lists all covered vmids
 - [ ] Implement `BackupContent` model in `core/models/backup.dart` (Freezed) – volid, vmid, format, size, ctime
 - [ ] Implement `Storage` model in `core/models/storage.dart` (Freezed) – id, node, type, content, total, used, available, active
 
@@ -341,6 +342,7 @@
   - **About:** app version, link to `github.com/mdg-labs/proxdroid`, Play Store listing link, F-Droid listing link, license info (MIT)
   - **Support:** donation links (Ko-fi, GitHub Sponsors)
 - [ ] Wire up theme toggle to persist preference in hive_ce
+- [ ] Wire up go_router: `/settings` → `SettingsScreen`
 
 ### 6.4 Testing
 - [ ] Unit tests for all repositories (mock API client)

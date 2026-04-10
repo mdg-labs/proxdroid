@@ -104,10 +104,11 @@ Multi-server support is built into the architecture from day one. Users can add 
 | Task viewer (running & past tasks) | P1 | MVP |
 | Dark theme | P0 | MVP |
 | Light theme (optional, user-toggled) | P1 | MVP |
+| Localization-ready (ARB + gen_l10n, English base) | P1 | MVP |
 | Edit saved server | P1 | MVP |
 | Console access (noVNC / xterm.js) | P2 | Post-MVP |
 | Push notifications | P2 | Post-MVP |
-| Homescreen widget | P3 | Post-MVP |
+| Homescreen widget & quick actions | P3 | Post-MVP |
 | Snapshot management | P2 | Post-MVP |
 | Suspend / Resume (QEMU) | P3 | Post-MVP |
 
