@@ -460,14 +460,22 @@ abstract class AppLocalizations {
   /// **'Password'**
   String get serverAuthTypeUsernamePassword;
 
+  /// Section header for server name, host, and port fields.
+  ///
+  /// In en, this message translates to:
+  /// **'Identity'**
+  String get serverFormIdentitySection;
+
   /// Section title above auth type and credential fields.
   ///
   /// In en, this message translates to:
   /// **'Authentication'**
-  String get serverFormIdentitySection;
-
   String get serverFormAuthentication;
 
+  /// Section header for SSL / certificate options.
+  ///
+  /// In en, this message translates to:
+  /// **'Security'**
   String get serverFormSecuritySection;
 
   /// Switch label to trust self-signed TLS certificates.

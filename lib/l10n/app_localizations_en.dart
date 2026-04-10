@@ -200,8 +200,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get serverFormIdentitySection => 'Identity';
 
+  @override
   String get serverFormAuthentication => 'Authentication';
 
+  @override
   String get serverFormSecuritySection => 'Security';
 
   @override
