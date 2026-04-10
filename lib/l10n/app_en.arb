@@ -1,0 +1,107 @@
+{
+  "@@locale": "en",
+  "appTitle": "ProxDroid",
+  "@appTitle": {
+    "description": "Application title shown in the system UI (e.g. task switcher, launcher label)."
+  },
+  "entityNode": "Node",
+  "@entityNode": {
+    "description": "Proxmox cluster node entity label (matches PVE terminology)."
+  },
+  "entityVirtualMachine": "Virtual Machine",
+  "@entityVirtualMachine": {
+    "description": "QEMU/KVM virtual machine entity label (matches PVE terminology)."
+  },
+  "entityContainer": "Container",
+  "@entityContainer": {
+    "description": "LXC container entity label (matches PVE terminology)."
+  },
+  "entityStorage": "Storage",
+  "@entityStorage": {
+    "description": "Storage pool or volume entity label (matches PVE terminology)."
+  },
+  "entityTask": "Task",
+  "@entityTask": {
+    "description": "Proxmox task (UPID) entity label (matches PVE terminology)."
+  },
+  "entityBackup": "Backup",
+  "@entityBackup": {
+    "description": "Backup job or backup content entity label (matches PVE terminology)."
+  },
+  "actionStart": "Start",
+  "@actionStart": {
+    "description": "Action to start a VM or container."
+  },
+  "actionStop": "Stop",
+  "@actionStop": {
+    "description": "Action to gracefully stop a VM or container."
+  },
+  "actionForceStop": "Force stop",
+  "@actionForceStop": {
+    "description": "Action to forcibly stop a VM or container (hard stop)."
+  },
+  "actionReboot": "Reboot",
+  "@actionReboot": {
+    "description": "Action to reboot a VM or container."
+  },
+  "statusRunning": "Running",
+  "@statusRunning": {
+    "description": "Resource is running."
+  },
+  "statusStopped": "Stopped",
+  "@statusStopped": {
+    "description": "Resource is stopped."
+  },
+  "statusPaused": "Paused",
+  "@statusPaused": {
+    "description": "VM is paused (not used for LXC in MVP)."
+  },
+  "statusUnknown": "Unknown",
+  "@statusUnknown": {
+    "description": "Status could not be determined."
+  },
+  "statusOnline": "Online",
+  "@statusOnline": {
+    "description": "Node or service is reachable (online)."
+  },
+  "statusOffline": "Offline",
+  "@statusOffline": {
+    "description": "Node or service is not reachable (offline)."
+  },
+  "metricCpu": "CPU",
+  "@metricCpu": {
+    "description": "Label for CPU usage metric."
+  },
+  "metricMemory": "Memory",
+  "@metricMemory": {
+    "description": "Label for memory (RAM) usage metric."
+  },
+  "metricDisk": "Disk",
+  "@metricDisk": {
+    "description": "Label for disk usage or I/O metric."
+  },
+  "metricNetwork": "Network",
+  "@metricNetwork": {
+    "description": "Label for network traffic metric."
+  },
+  "metricUptime": "Uptime",
+  "@metricUptime": {
+    "description": "Label for uptime duration metric."
+  },
+  "sectionDashboard": "Dashboard",
+  "@sectionDashboard": {
+    "description": "Navigation or screen title for the cluster/node dashboard."
+  },
+  "sectionSettings": "Settings",
+  "@sectionSettings": {
+    "description": "Navigation or screen title for app settings."
+  },
+  "sectionAbout": "About",
+  "@sectionAbout": {
+    "description": "Navigation or screen title for about / app info."
+  },
+  "sectionServers": "Servers",
+  "@sectionServers": {
+    "description": "Navigation or screen title for configured Proxmox servers list."
+  }
+}
