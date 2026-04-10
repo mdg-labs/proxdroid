@@ -60,6 +60,37 @@ void main() {
     },
   );
 
+  test(
+    'getAllContainers falls back to type=vm on 400 with empty JSON body',
+    () async {
+      final (client, adapter) = proxmoxClientWithFakeAdapter([
+        ResponseBody.fromString(
+          jsonEncode(<String, dynamic>{}),
+          400,
+          headers: {
+            Headers.contentTypeHeader: [Headers.jsonContentType],
+          },
+        ),
+        jsonResponse([
+          <String, dynamic>{
+            'type': 'lxc',
+            'vmid': 201,
+            'name': 'ct-empty-400',
+            'status': 'running',
+            'node': 'n1',
+          },
+        ]),
+      ]);
+
+      final list = await ContainerRepository(client).getAllContainers();
+      expect(list, hasLength(1));
+      expect(list.single.vmid, 201);
+      expect(adapter.requests, hasLength(2));
+      expect(adapter.requests[0].queryParameters['type'], 'lxc');
+      expect(adapter.requests[1].queryParameters['type'], 'vm');
+    },
+  );
+
   test('getAllContainers uses type=lxc when server accepts it', () async {
     final (client, adapter) = proxmoxClientWithFakeAdapter([
       jsonResponse([

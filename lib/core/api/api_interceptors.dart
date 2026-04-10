@@ -55,15 +55,35 @@ ProxmoxException mapDioException(DioException e) {
 }
 
 String? _messageFromResponse(dynamic data) {
-  if (data is Map<String, dynamic>) {
-    final errors = data['errors'];
-    if (errors is String) return errors;
-    if (errors is Map && errors.isNotEmpty) {
-      final first = errors.values.first;
-      if (first is String) return first;
+  if (data is! Map) {
+    return null;
+  }
+  final map = Map<String, dynamic>.from(data);
+  final errors = map['errors'];
+  if (errors is String) {
+    return errors;
+  }
+  if (errors is Map && errors.isNotEmpty) {
+    for (final v in errors.values) {
+      final s = _stringFromProxmoxErrorValue(v);
+      if (s != null && s.isNotEmpty) {
+        return s;
+      }
     }
-    final message = data['message'];
-    if (message is String) return message;
+  }
+  final message = map['message'];
+  if (message is String) {
+    return message;
+  }
+  return null;
+}
+
+String? _stringFromProxmoxErrorValue(Object? v) {
+  if (v is String) {
+    return v;
+  }
+  if (v is List && v.isNotEmpty) {
+    return _stringFromProxmoxErrorValue(v.first);
   }
   return null;
 }

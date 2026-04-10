@@ -337,8 +337,8 @@ class ProxmoxApiClient {
   /// `GET /cluster/resources?type=lxc` — all LXCs cluster-wide (legacy filter).
   ///
   /// Newer gateways only allow `type` in `{ vm, storage, node, sdn }`. On HTTP 400
-  /// indicating `lxc` is not a valid filter, falls back to `type=vm` and keeps
-  /// rows with `type: lxc`.
+  /// from `type=lxc` (including when the error body parses to a null message),
+  /// falls back to `type=vm` and keeps rows with `type: lxc`.
   Future<List<Container>> fetchAllContainers() async {
     try {
       final response = await _unwrap(
@@ -349,7 +349,7 @@ class ProxmoxApiClient {
       );
       return _containersFromClusterResourcesData(response.data?['data']);
     } on ServerException catch (e) {
-      if (_clusterResourcesQueryRejectedForLxc(e)) {
+      if (e.statusCode == 400) {
         return _fetchAllContainersViaVmGuestFilter();
       }
       rethrow;
@@ -380,12 +380,6 @@ class ProxmoxApiClient {
       final m = Map<String, dynamic>.from(e as Map);
       return Container.fromClusterResourcesItem(m);
     }).toList();
-  }
-
-  bool _clusterResourcesQueryRejectedForLxc(ServerException e) {
-    if (e.statusCode != 400) return false;
-    final msg = e.message?.toLowerCase() ?? '';
-    return msg.contains('lxc') && msg.contains('enum');
   }
 
   /// `GET /nodes/{node}/lxc` — containers on one node.
