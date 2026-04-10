@@ -71,4 +71,26 @@ abstract final class ApiEndpoints {
   /// `GET /nodes/{node}/rrddata` — node-level RRD; optional `timeframe` query.
   static String nodeRrdData(String node) =>
       '/nodes/${Uri.encodeComponent(node)}/rrddata';
+
+  /// `GET /nodes/{node}/storage` — storage pools on a node.
+  static String nodeStorage(String node) =>
+      '/nodes/${Uri.encodeComponent(node)}/storage';
+
+  /// `GET /nodes/{node}/storage/{storage}/status` — capacity and usage.
+  static String nodeStorageStatus(String node, String storage) =>
+      '/nodes/${Uri.encodeComponent(node)}/storage/'
+      '${Uri.encodeComponent(storage)}/status';
+
+  /// `GET /nodes/{node}/storage/{storage}/content` — volumes (optional
+  /// `content` query, e.g. `backup`, `iso`).
+  static String nodeStorageContent(String node, String storage) =>
+      '/nodes/${Uri.encodeComponent(node)}/storage/'
+      '${Uri.encodeComponent(storage)}/content';
+
+  /// `GET /cluster/backup` — scheduled vzdump jobs (cluster-scoped).
+  static const String clusterBackup = '/cluster/backup';
+
+  /// `POST /nodes/{node}/vzdump` — run a manual backup (form body).
+  static String nodeVzdump(String node) =>
+      '/nodes/${Uri.encodeComponent(node)}/vzdump';
 }

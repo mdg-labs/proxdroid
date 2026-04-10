@@ -5,6 +5,7 @@ import 'package:proxdroid/core/models/resource_data_point.dart';
 import 'package:proxdroid/core/models/task.dart' as pve;
 import 'package:proxdroid/core/models/vm.dart';
 import 'package:proxdroid/core/utils/formatters.dart';
+import 'package:proxdroid/features/backups/ui/trigger_backup_sheet.dart';
 import 'package:proxdroid/features/servers/ui/proxmox_exception_messages.dart';
 import 'package:proxdroid/features/tasks/providers/task_providers.dart';
 import 'package:proxdroid/features/vms/data/vm_repository.dart';
@@ -189,24 +190,45 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
     final async = ref.watch(allVmsProvider);
     final id = int.tryParse(widget.vmid);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        AppBar(
-          leading: shellAppBarLeading(context),
-          title: Text(l10n.entityVirtualMachine),
-        ),
-        Expanded(
-          child: async.when(
-            loading: () => const LoadingShimmer(itemCount: 4),
-            error:
-                (e, _) => ErrorView(
+    return async.when(
+      loading:
+          () => Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AppBar(
+                leading: shellAppBarLeading(context),
+                title: Text(l10n.entityVirtualMachine),
+              ),
+              const Expanded(child: LoadingShimmer(itemCount: 4)),
+            ],
+          ),
+      error:
+          (e, _) => Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AppBar(
+                leading: shellAppBarLeading(context),
+                title: Text(l10n.entityVirtualMachine),
+              ),
+              Expanded(
+                child: ErrorView(
                   message: proxmoxExceptionMessage(e, l10n),
                   onRetry: () => ref.read(allVmsProvider.notifier).refresh(),
                 ),
-            data: (vms) {
-              if (id == null) {
-                return EmptyState(
+              ),
+            ],
+          ),
+      data: (vms) {
+        if (id == null) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AppBar(
+                leading: shellAppBarLeading(context),
+                title: Text(l10n.entityVirtualMachine),
+              ),
+              Expanded(
+                child: EmptyState(
                   icon: Icons.error_outline,
                   title: l10n.vmNotFoundTitle,
                   message: l10n.vmNotFoundMessage,
@@ -214,19 +236,30 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
                     onPressed: () => context.pop(),
                     child: Text(l10n.actionGoBack),
                   ),
-                );
-              }
+                ),
+              ),
+            ],
+          );
+        }
 
-              Vm? found;
-              for (final v in vms) {
-                if (v.node == widget.node && v.vmid == id) {
-                  found = v;
-                  break;
-                }
-              }
+        Vm? found;
+        for (final v in vms) {
+          if (v.node == widget.node && v.vmid == id) {
+            found = v;
+            break;
+          }
+        }
 
-              if (found == null) {
-                return EmptyState(
+        if (found == null) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AppBar(
+                leading: shellAppBarLeading(context),
+                title: Text(l10n.entityVirtualMachine),
+              ),
+              Expanded(
+                child: EmptyState(
                   icon: Icons.computer_outlined,
                   title: l10n.vmNotFoundTitle,
                   message: l10n.vmNotFoundMessage,
@@ -234,20 +267,52 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
                     onPressed: () => context.pop(),
                     child: Text(l10n.actionGoBack),
                   ),
-                );
-              }
+                ),
+              ),
+            ],
+          );
+        }
 
-              final vm = found;
-              final title =
-                  vm.name.isEmpty ? '${l10n.labelVmid} ${vm.vmid}' : vm.name;
+        final vm = found;
+        final title =
+            vm.name.isEmpty ? '${l10n.labelVmid} ${vm.vmid}' : vm.name;
 
-              final canStart =
-                  vm.status == VmStatus.stopped ||
-                  vm.status == VmStatus.unknown;
-              final canStopOrReboot =
-                  vm.status == VmStatus.running || vm.status == VmStatus.paused;
+        final canStart =
+            vm.status == VmStatus.stopped || vm.status == VmStatus.unknown;
+        final canStopOrReboot =
+            vm.status == VmStatus.running || vm.status == VmStatus.paused;
 
-              return Stack(
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            AppBar(
+              leading: shellAppBarLeading(context),
+              title: Text(l10n.entityVirtualMachine),
+              actions: [
+                IconButton(
+                  tooltip: l10n.actionBackup,
+                  icon: const Icon(Icons.backup_outlined),
+                  onPressed:
+                      _powerBusy
+                          ? null
+                          : () => showTriggerBackupSheet(
+                            context,
+                            ref,
+                            initialGuest: BackupGuestTarget(
+                              node: vm.node,
+                              vmid: vm.vmid,
+                              isLxc: false,
+                              displayLabel:
+                                  vm.name.isEmpty
+                                      ? '${l10n.entityVirtualMachine} ${vm.vmid}'
+                                      : vm.name,
+                            ),
+                          ),
+                ),
+              ],
+            ),
+            Expanded(
+              child: Stack(
                 children: [
                   RefreshIndicator(
                     onRefresh: () async {
@@ -405,11 +470,11 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
                     const Center(child: CircularProgressIndicator()),
                   ],
                 ],
-              );
-            },
-          ),
-        ),
-      ],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

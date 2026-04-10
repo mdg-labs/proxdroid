@@ -12,6 +12,7 @@ import 'package:proxdroid/features/containers/ui/widgets/cpu_chart.dart';
 import 'package:proxdroid/features/containers/ui/widgets/disk_io_chart.dart';
 import 'package:proxdroid/features/containers/ui/widgets/memory_chart.dart';
 import 'package:proxdroid/features/containers/ui/widgets/network_chart.dart';
+import 'package:proxdroid/features/backups/ui/trigger_backup_sheet.dart';
 import 'package:proxdroid/features/servers/ui/proxmox_exception_messages.dart';
 import 'package:proxdroid/features/tasks/providers/task_providers.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
@@ -194,25 +195,46 @@ class _ContainerDetailScreenState extends ConsumerState<ContainerDetailScreen> {
     final async = ref.watch(allContainersProvider);
     final id = int.tryParse(widget.ctid);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        AppBar(
-          leading: shellAppBarLeading(context),
-          title: Text(l10n.entityContainer),
-        ),
-        Expanded(
-          child: async.when(
-            loading: () => const LoadingShimmer(itemCount: 4),
-            error:
-                (e, _) => ErrorView(
+    return async.when(
+      loading:
+          () => Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AppBar(
+                leading: shellAppBarLeading(context),
+                title: Text(l10n.entityContainer),
+              ),
+              const Expanded(child: LoadingShimmer(itemCount: 4)),
+            ],
+          ),
+      error:
+          (e, _) => Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AppBar(
+                leading: shellAppBarLeading(context),
+                title: Text(l10n.entityContainer),
+              ),
+              Expanded(
+                child: ErrorView(
                   message: proxmoxExceptionMessage(e, l10n),
                   onRetry:
                       () => ref.read(allContainersProvider.notifier).refresh(),
                 ),
-            data: (containers) {
-              if (id == null) {
-                return EmptyState(
+              ),
+            ],
+          ),
+      data: (containers) {
+        if (id == null) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AppBar(
+                leading: shellAppBarLeading(context),
+                title: Text(l10n.entityContainer),
+              ),
+              Expanded(
+                child: EmptyState(
                   icon: Icons.error_outline,
                   title: l10n.containerNotFoundTitle,
                   message: l10n.containerNotFoundMessage,
@@ -220,19 +242,30 @@ class _ContainerDetailScreenState extends ConsumerState<ContainerDetailScreen> {
                     onPressed: () => context.pop(),
                     child: Text(l10n.actionGoBack),
                   ),
-                );
-              }
+                ),
+              ),
+            ],
+          );
+        }
 
-              px.Container? found;
-              for (final c in containers) {
-                if (c.node == widget.node && c.vmid == id) {
-                  found = c;
-                  break;
-                }
-              }
+        px.Container? found;
+        for (final c in containers) {
+          if (c.node == widget.node && c.vmid == id) {
+            found = c;
+            break;
+          }
+        }
 
-              if (found == null) {
-                return EmptyState(
+        if (found == null) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AppBar(
+                leading: shellAppBarLeading(context),
+                title: Text(l10n.entityContainer),
+              ),
+              Expanded(
+                child: EmptyState(
                   icon: Icons.inventory_2_outlined,
                   title: l10n.containerNotFoundTitle,
                   message: l10n.containerNotFoundMessage,
@@ -240,19 +273,52 @@ class _ContainerDetailScreenState extends ConsumerState<ContainerDetailScreen> {
                     onPressed: () => context.pop(),
                     child: Text(l10n.actionGoBack),
                   ),
-                );
-              }
+                ),
+              ),
+            ],
+          );
+        }
 
-              final ct = found;
-              final title =
-                  ct.name.isEmpty ? '${l10n.labelCtid} ${ct.vmid}' : ct.name;
+        final ct = found;
+        final title =
+            ct.name.isEmpty ? '${l10n.labelCtid} ${ct.vmid}' : ct.name;
 
-              final canStart =
-                  ct.status == px.ContainerStatus.stopped ||
-                  ct.status == px.ContainerStatus.unknown;
-              final canStopOrReboot = ct.status == px.ContainerStatus.running;
+        final canStart =
+            ct.status == px.ContainerStatus.stopped ||
+            ct.status == px.ContainerStatus.unknown;
+        final canStopOrReboot = ct.status == px.ContainerStatus.running;
 
-              return Stack(
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            AppBar(
+              leading: shellAppBarLeading(context),
+              title: Text(l10n.entityContainer),
+              actions: [
+                IconButton(
+                  tooltip: l10n.actionBackup,
+                  icon: const Icon(Icons.backup_outlined),
+                  onPressed:
+                      _powerBusy
+                          ? null
+                          : () => showTriggerBackupSheet(
+                            context,
+                            ref,
+                            initialGuest: BackupGuestTarget(
+                              node: ct.node,
+                              vmid: ct.vmid,
+                              isLxc: true,
+                              displayLabel:
+                                  ct.name.isEmpty
+                                      ? '${l10n.entityContainer} ${ct.vmid}'
+                                      : ct.name,
+                            ),
+                          ),
+                ),
+              ],
+            ),
+            Expanded(
+              child: Stack(
                 children: [
                   RefreshIndicator(
                     onRefresh: () async {
@@ -419,11 +485,11 @@ class _ContainerDetailScreenState extends ConsumerState<ContainerDetailScreen> {
                     const Center(child: CircularProgressIndicator()),
                   ],
                 ],
-              );
-            },
-          ),
-        ),
-      ],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

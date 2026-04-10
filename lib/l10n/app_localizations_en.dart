@@ -462,4 +462,137 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chartDiskIoSectionTitle => 'Disk I/O';
+
+  @override
+  String get actionBackup => 'Backup';
+
+  @override
+  String get storageEmptyTitle => 'No storage pools';
+
+  @override
+  String get storageEmptyMessage =>
+      'No storage pools were found on any online node.';
+
+  @override
+  String get storageUsageSection => 'Usage';
+
+  @override
+  String get storageContentTypesLabel => 'Content types';
+
+  @override
+  String get storageActive => 'Active';
+
+  @override
+  String get storageInactive => 'Inactive';
+
+  @override
+  String get storageDetailContentTitle => 'Content';
+
+  @override
+  String get storageContentEmpty => 'No volumes in this pool.';
+
+  @override
+  String get storageTypeLabel => 'Type';
+
+  @override
+  String storagePoolOnNode(String pool, String node) {
+    return '$pool · $node';
+  }
+
+  @override
+  String get backupListEmptyTitle => 'No backup files';
+
+  @override
+  String get backupListEmptyMessage =>
+      'No backup volumes were found on storages that support backups.';
+
+  @override
+  String get backupSectionScheduledJobs => 'Scheduled jobs';
+
+  @override
+  String get backupSectionFiles => 'Backup files';
+
+  @override
+  String get backupSectionRecentTasks => 'Recent backup tasks';
+
+  @override
+  String get backupGroupedUnknownGuest => 'Other';
+
+  @override
+  String backupJobVmids(String ids) {
+    return 'Guests: $ids';
+  }
+
+  @override
+  String backupJobNextRun(String when) {
+    return 'Next run: $when';
+  }
+
+  @override
+  String backupJobLastRun(String when) {
+    return 'Last run: $when';
+  }
+
+  @override
+  String get backupTriggerTitle => 'Run backup';
+
+  @override
+  String get backupFieldGuest => 'Guest';
+
+  @override
+  String get backupFieldStorage => 'Destination storage';
+
+  @override
+  String get backupFieldCompress => 'Compression';
+
+  @override
+  String get backupFieldMode => 'Backup mode';
+
+  @override
+  String get backupCompressZstd => 'Zstandard (zstd)';
+
+  @override
+  String get backupCompressLzo => 'LZO';
+
+  @override
+  String get backupCompressGzip => 'Gzip';
+
+  @override
+  String get backupCompressNone => 'None';
+
+  @override
+  String get backupModeSnapshot => 'Snapshot';
+
+  @override
+  String get backupModeSuspend => 'Suspend';
+
+  @override
+  String get backupModeStop => 'Stop';
+
+  @override
+  String get backupTriggerStart => 'Start backup';
+
+  @override
+  String get backupNoDestinationStorage =>
+      'No storage supports backups in this cluster.';
+
+  @override
+  String get backupFabTooltip => 'Run backup';
+
+  @override
+  String get labelFormat => 'Format';
+
+  @override
+  String get labelVolumeId => 'Volume';
+
+  @override
+  String get labelContentKind => 'Kind';
+
+  @override
+  String get storageLabelAvailable => 'Available';
+
+  @override
+  String storageAvailableSpace(String size) {
+    return 'Available: $size';
+  }
 }

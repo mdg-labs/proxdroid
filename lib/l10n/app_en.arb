@@ -595,5 +595,199 @@
   "chartDiskIoSectionTitle": "Disk I/O",
   "@chartDiskIoSectionTitle": {
     "description": "Section title for disk throughput chart (distinct from disk usage)."
+  },
+  "actionBackup": "Backup",
+  "@actionBackup": {
+    "description": "Open manual vzdump backup flow from VM/container detail or backups screen."
+  },
+  "storageEmptyTitle": "No storage pools",
+  "@storageEmptyTitle": {
+    "description": "Empty state when no storage is returned for the cluster."
+  },
+  "storageEmptyMessage": "No storage pools were found on any online node.",
+  "@storageEmptyMessage": {
+    "description": "Body for empty storage list."
+  },
+  "storageUsageSection": "Usage",
+  "@storageUsageSection": {
+    "description": "Label above storage usage bar on list cards."
+  },
+  "storageContentTypesLabel": "Content types",
+  "@storageContentTypesLabel": {
+    "description": "Label for supported content kinds (backup, images, …)."
+  },
+  "storageActive": "Active",
+  "@storageActive": {
+    "description": "Badge when storage pool is active."
+  },
+  "storageInactive": "Inactive",
+  "@storageInactive": {
+    "description": "Badge when storage pool is not active."
+  },
+  "storageDetailContentTitle": "Content",
+  "@storageDetailContentTitle": {
+    "description": "Section title for storage content list."
+  },
+  "storageContentEmpty": "No volumes in this pool.",
+  "@storageContentEmpty": {
+    "description": "When storage content API returns an empty list."
+  },
+  "storageTypeLabel": "Type",
+  "@storageTypeLabel": {
+    "description": "Storage pool type (lvm, dir, pbs, …)."
+  },
+  "storagePoolOnNode": "{pool} · {node}",
+  "@storagePoolOnNode": {
+    "description": "Storage id and owning node for dropdown labels.",
+    "placeholders": {
+      "pool": {
+        "type": "String",
+        "example": "local"
+      },
+      "node": {
+        "type": "String",
+        "example": "pve"
+      }
+    }
+  },
+  "backupListEmptyTitle": "No backup files",
+  "@backupListEmptyTitle": {
+    "description": "When no backup content rows were aggregated."
+  },
+  "backupListEmptyMessage": "No backup volumes were found on storages that support backups.",
+  "@backupListEmptyMessage": {
+    "description": "Body when backup file list is empty."
+  },
+  "backupSectionScheduledJobs": "Scheduled jobs",
+  "@backupSectionScheduledJobs": {
+    "description": "Header for cluster backup job list from GET /cluster/backup."
+  },
+  "backupSectionFiles": "Backup files",
+  "@backupSectionFiles": {
+    "description": "Header for aggregated backup content."
+  },
+  "backupSectionRecentTasks": "Recent backup tasks",
+  "@backupSectionRecentTasks": {
+    "description": "Header for vzdump task history."
+  },
+  "backupGroupedUnknownGuest": "Other",
+  "@backupGroupedUnknownGuest": {
+    "description": "Group title when backup has no vmid (e.g. manual uploads)."
+  },
+  "backupJobVmids": "Guests: {ids}",
+  "@backupJobVmids": {
+    "description": "Comma-separated vmids covered by a backup job.",
+    "placeholders": {
+      "ids": {
+        "type": "String",
+        "example": "100, 101"
+      }
+    }
+  },
+  "backupJobNextRun": "Next run: {when}",
+  "@backupJobNextRun": {
+    "description": "Next scheduled backup run time.",
+    "placeholders": {
+      "when": {
+        "type": "String",
+        "example": "Apr 10, 2026 03:00"
+      }
+    }
+  },
+  "backupJobLastRun": "Last run: {when}",
+  "@backupJobLastRun": {
+    "description": "Last backup job run time when API provides it.",
+    "placeholders": {
+      "when": {
+        "type": "String",
+        "example": "Apr 9, 2026 03:00"
+      }
+    }
+  },
+  "backupTriggerTitle": "Run backup",
+  "@backupTriggerTitle": {
+    "description": "Bottom sheet title for manual vzdump."
+  },
+  "backupFieldGuest": "Guest",
+  "@backupFieldGuest": {
+    "description": "Field label for VM or LXC selection."
+  },
+  "backupFieldStorage": "Destination storage",
+  "@backupFieldStorage": {
+    "description": "Field label for backup target storage pool."
+  },
+  "backupFieldCompress": "Compression",
+  "@backupFieldCompress": {
+    "description": "Vzdump compression option."
+  },
+  "backupFieldMode": "Backup mode",
+  "@backupFieldMode": {
+    "description": "Vzdump mode snapshot/suspend/stop."
+  },
+  "backupCompressZstd": "Zstandard (zstd)",
+  "@backupCompressZstd": {
+    "description": "Compression option label."
+  },
+  "backupCompressLzo": "LZO",
+  "@backupCompressLzo": {
+    "description": "Compression option label."
+  },
+  "backupCompressGzip": "Gzip",
+  "@backupCompressGzip": {
+    "description": "Compression option label."
+  },
+  "backupCompressNone": "None",
+  "@backupCompressNone": {
+    "description": "No compression."
+  },
+  "backupModeSnapshot": "Snapshot",
+  "@backupModeSnapshot": {
+    "description": "Vzdump snapshot mode."
+  },
+  "backupModeSuspend": "Suspend",
+  "@backupModeSuspend": {
+    "description": "Vzdump suspend mode."
+  },
+  "backupModeStop": "Stop",
+  "@backupModeStop": {
+    "description": "Vzdump stop mode."
+  },
+  "backupTriggerStart": "Start backup",
+  "@backupTriggerStart": {
+    "description": "Submit button for vzdump bottom sheet."
+  },
+  "backupNoDestinationStorage": "No storage supports backups in this cluster.",
+  "@backupNoDestinationStorage": {
+    "description": "When no pool has backup content type for vzdump target."
+  },
+  "backupFabTooltip": "Run backup",
+  "@backupFabTooltip": {
+    "description": "FAB on backup list screen."
+  },
+  "labelFormat": "Format",
+  "@labelFormat": {
+    "description": "Generic format label (backup vma/tar, …)."
+  },
+  "labelVolumeId": "Volume",
+  "@labelVolumeId": {
+    "description": "Proxmox volume id / path label."
+  },
+  "labelContentKind": "Kind",
+  "@labelContentKind": {
+    "description": "Storage content kind (backup, iso, …)."
+  },
+  "storageLabelAvailable": "Available",
+  "@storageLabelAvailable": {
+    "description": "Label for free space on a storage pool."
+  },
+  "storageAvailableSpace": "Available: {size}",
+  "@storageAvailableSpace": {
+    "description": "Free space on a storage pool.",
+    "placeholders": {
+      "size": {
+        "type": "String",
+        "example": "120 GB"
+      }
+    }
   }
 }

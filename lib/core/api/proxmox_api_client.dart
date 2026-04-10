@@ -5,9 +5,11 @@ import 'package:dio/io.dart';
 
 import 'package:proxdroid/core/api/api_exceptions.dart';
 import 'package:proxdroid/core/api/api_interceptors.dart';
+import 'package:proxdroid/core/models/backup.dart';
 import 'package:proxdroid/core/models/container.dart';
 import 'package:proxdroid/core/models/node.dart';
 import 'package:proxdroid/core/models/proxmox_json_helpers.dart';
+import 'package:proxdroid/core/models/storage.dart';
 import 'package:proxdroid/core/models/resource_data_point.dart';
 import 'package:proxdroid/core/models/server.dart';
 import 'package:proxdroid/core/models/task.dart';
@@ -401,15 +403,22 @@ class ProxmoxApiClient {
       _postPowerAction(ApiEndpoints.nodeLxcCtStatus(node, ctid, 'reboot'));
 
   /// `GET /nodes/{node}/tasks` with pagination.
+  ///
+  /// Optional [typefilter] (e.g. `vzdump`) when supported by the PVE version.
   Future<List<Task>> fetchTasksForNode(
     String node, {
     int start = 0,
     int limit = 50,
+    String? typefilter,
   }) async {
+    final query = <String, dynamic>{'start': start, 'limit': limit};
+    if (typefilter != null && typefilter.isNotEmpty) {
+      query['typefilter'] = typefilter;
+    }
     final response = await _unwrap(
       _dio.get<Map<String, dynamic>>(
         ApiEndpoints.nodeTasks(node),
-        queryParameters: <String, dynamic>{'start': start, 'limit': limit},
+        queryParameters: query,
       ),
     );
     final list = _dataAsList(response.data?['data']);
@@ -418,6 +427,116 @@ class ProxmoxApiClient {
       m.putIfAbsent('node', () => node);
       return Task.fromJson(m);
     }).toList();
+  }
+
+  /// `GET /nodes/{node}/tasks` filtered to vzdump-style tasks (uses
+  /// `typefilter=vzdump` when available, plus a client-side type check).
+  Future<List<Task>> fetchVzdumpTasksForNode(
+    String node, {
+    int start = 0,
+    int limit = 50,
+  }) async {
+    final tasks = await fetchTasksForNode(
+      node,
+      start: start,
+      limit: limit,
+      typefilter: 'vzdump',
+    );
+    return tasks.where((t) {
+      final ty = t.type.toLowerCase();
+      return ty == 'vzdump' || ty.contains('vzdump');
+    }).toList();
+  }
+
+  /// `GET /nodes/{node}/storage` — storage pools.
+  Future<List<Storage>> fetchStorageForNode(String node) async {
+    final response = await _unwrap(
+      _dio.get<Map<String, dynamic>>(ApiEndpoints.nodeStorage(node)),
+    );
+    final list = _dataAsList(response.data?['data']);
+    return list.map((dynamic e) {
+      final m = Map<String, dynamic>.from(e as Map);
+      return Storage.fromNodeStorageListRow(m, node: node);
+    }).toList();
+  }
+
+  /// `GET /nodes/{node}/storage/{storage}/status` — usage and flags.
+  Future<Storage> fetchStorageStatus(String node, String storage) async {
+    final response = await _unwrap(
+      _dio.get<Map<String, dynamic>>(
+        ApiEndpoints.nodeStorageStatus(node, storage),
+      ),
+    );
+    final body = response.data;
+    final raw = body?['data'];
+    if (raw is! Map<String, dynamic>) {
+      throw const ServerException(502, message: 'Invalid storage status');
+    }
+    final m = Map<String, dynamic>.from(raw);
+    m['node'] = node;
+    m.putIfAbsent('storage', () => storage);
+    return Storage.fromJson(m);
+  }
+
+  /// `GET /nodes/{node}/storage/{storage}/content` — optional [contentKind]
+  /// limits rows (e.g. `backup`).
+  Future<List<BackupContent>> fetchStorageContent(
+    String node,
+    String storage, {
+    String? contentKind,
+  }) async {
+    final query = <String, dynamic>{};
+    if (contentKind != null && contentKind.isNotEmpty) {
+      query['content'] = contentKind;
+    }
+    final response = await _unwrap(
+      _dio.get<Map<String, dynamic>>(
+        ApiEndpoints.nodeStorageContent(node, storage),
+        queryParameters: query.isEmpty ? null : query,
+      ),
+    );
+    final list = _dataAsList(response.data?['data']);
+    return list.map((dynamic e) {
+      final m = Map<String, dynamic>.from(e as Map);
+      return BackupContent.fromJson(m);
+    }).toList();
+  }
+
+  /// `GET /cluster/backup` — backup job definitions.
+  Future<List<BackupJob>> fetchClusterBackupJobs() async {
+    final response = await _unwrap(
+      _dio.get<Map<String, dynamic>>(ApiEndpoints.clusterBackup),
+    );
+    final list = _dataAsList(response.data?['data']);
+    return list.map((dynamic e) {
+      final m = Map<String, dynamic>.from(e as Map);
+      return BackupJob.fromJson(m);
+    }).toList();
+  }
+
+  /// `POST /nodes/{node}/vzdump` — manual backup; returns task UPID.
+  ///
+  /// [compress] is sent as PVE expects (`0` none, or `zstd` / `lzo` / `gzip`).
+  Future<String> triggerVzdump(
+    String node, {
+    required int vmid,
+    required String storage,
+    required String mode,
+    required String compress,
+  }) async {
+    final response = await _unwrap(
+      _dio.post<Map<String, dynamic>>(
+        ApiEndpoints.nodeVzdump(node),
+        data: <String, dynamic>{
+          'vmid': vmid,
+          'storage': storage,
+          'mode': mode,
+          'compress': compress,
+        },
+        options: Options(contentType: Headers.formUrlEncodedContentType),
+      ),
+    );
+    return _parsePowerActionUpid(response.data);
   }
 
   /// `GET /nodes/{node}/tasks/{upid}/status`.

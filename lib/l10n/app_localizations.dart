@@ -951,6 +951,246 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Disk I/O'**
   String get chartDiskIoSectionTitle;
+
+  /// Open manual vzdump backup flow from VM/container detail or backups screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup'**
+  String get actionBackup;
+
+  /// Empty state when no storage is returned for the cluster.
+  ///
+  /// In en, this message translates to:
+  /// **'No storage pools'**
+  String get storageEmptyTitle;
+
+  /// Body for empty storage list.
+  ///
+  /// In en, this message translates to:
+  /// **'No storage pools were found on any online node.'**
+  String get storageEmptyMessage;
+
+  /// Label above storage usage bar on list cards.
+  ///
+  /// In en, this message translates to:
+  /// **'Usage'**
+  String get storageUsageSection;
+
+  /// Label for supported content kinds (backup, images, …).
+  ///
+  /// In en, this message translates to:
+  /// **'Content types'**
+  String get storageContentTypesLabel;
+
+  /// Badge when storage pool is active.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get storageActive;
+
+  /// Badge when storage pool is not active.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get storageInactive;
+
+  /// Section title for storage content list.
+  ///
+  /// In en, this message translates to:
+  /// **'Content'**
+  String get storageDetailContentTitle;
+
+  /// When storage content API returns an empty list.
+  ///
+  /// In en, this message translates to:
+  /// **'No volumes in this pool.'**
+  String get storageContentEmpty;
+
+  /// Storage pool type (lvm, dir, pbs, …).
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get storageTypeLabel;
+
+  /// Storage id and owning node for dropdown labels.
+  ///
+  /// In en, this message translates to:
+  /// **'{pool} · {node}'**
+  String storagePoolOnNode(String pool, String node);
+
+  /// When no backup content rows were aggregated.
+  ///
+  /// In en, this message translates to:
+  /// **'No backup files'**
+  String get backupListEmptyTitle;
+
+  /// Body when backup file list is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No backup volumes were found on storages that support backups.'**
+  String get backupListEmptyMessage;
+
+  /// Header for cluster backup job list from GET /cluster/backup.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled jobs'**
+  String get backupSectionScheduledJobs;
+
+  /// Header for aggregated backup content.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup files'**
+  String get backupSectionFiles;
+
+  /// Header for vzdump task history.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent backup tasks'**
+  String get backupSectionRecentTasks;
+
+  /// Group title when backup has no vmid (e.g. manual uploads).
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get backupGroupedUnknownGuest;
+
+  /// Comma-separated vmids covered by a backup job.
+  ///
+  /// In en, this message translates to:
+  /// **'Guests: {ids}'**
+  String backupJobVmids(String ids);
+
+  /// Next scheduled backup run time.
+  ///
+  /// In en, this message translates to:
+  /// **'Next run: {when}'**
+  String backupJobNextRun(String when);
+
+  /// Last backup job run time when API provides it.
+  ///
+  /// In en, this message translates to:
+  /// **'Last run: {when}'**
+  String backupJobLastRun(String when);
+
+  /// Bottom sheet title for manual vzdump.
+  ///
+  /// In en, this message translates to:
+  /// **'Run backup'**
+  String get backupTriggerTitle;
+
+  /// Field label for VM or LXC selection.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest'**
+  String get backupFieldGuest;
+
+  /// Field label for backup target storage pool.
+  ///
+  /// In en, this message translates to:
+  /// **'Destination storage'**
+  String get backupFieldStorage;
+
+  /// Vzdump compression option.
+  ///
+  /// In en, this message translates to:
+  /// **'Compression'**
+  String get backupFieldCompress;
+
+  /// Vzdump mode snapshot/suspend/stop.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup mode'**
+  String get backupFieldMode;
+
+  /// Compression option label.
+  ///
+  /// In en, this message translates to:
+  /// **'Zstandard (zstd)'**
+  String get backupCompressZstd;
+
+  /// Compression option label.
+  ///
+  /// In en, this message translates to:
+  /// **'LZO'**
+  String get backupCompressLzo;
+
+  /// Compression option label.
+  ///
+  /// In en, this message translates to:
+  /// **'Gzip'**
+  String get backupCompressGzip;
+
+  /// No compression.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get backupCompressNone;
+
+  /// Vzdump snapshot mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshot'**
+  String get backupModeSnapshot;
+
+  /// Vzdump suspend mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspend'**
+  String get backupModeSuspend;
+
+  /// Vzdump stop mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get backupModeStop;
+
+  /// Submit button for vzdump bottom sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Start backup'**
+  String get backupTriggerStart;
+
+  /// When no pool has backup content type for vzdump target.
+  ///
+  /// In en, this message translates to:
+  /// **'No storage supports backups in this cluster.'**
+  String get backupNoDestinationStorage;
+
+  /// FAB on backup list screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Run backup'**
+  String get backupFabTooltip;
+
+  /// Generic format label (backup vma/tar, …).
+  ///
+  /// In en, this message translates to:
+  /// **'Format'**
+  String get labelFormat;
+
+  /// Proxmox volume id / path label.
+  ///
+  /// In en, this message translates to:
+  /// **'Volume'**
+  String get labelVolumeId;
+
+  /// Storage content kind (backup, iso, …).
+  ///
+  /// In en, this message translates to:
+  /// **'Kind'**
+  String get labelContentKind;
+
+  /// Label for free space on a storage pool.
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get storageLabelAvailable;
+
+  /// Free space on a storage pool.
+  ///
+  /// In en, this message translates to:
+  /// **'Available: {size}'**
+  String storageAvailableSpace(String size);
 }
 
 class _AppLocalizationsDelegate

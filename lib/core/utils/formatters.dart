@@ -1,5 +1,7 @@
 // Pure display helpers for resource rows and detail screens.
 
+import 'package:intl/intl.dart';
+
 String formatBytes(int? bytes, {String ifNull = '—'}) {
   if (bytes == null) return ifNull;
   if (bytes < 0) return ifNull;
@@ -80,4 +82,15 @@ String formatDataRate(double? bytesPerSecond, {String ifNull = '—'}) {
   if (bytesPerSecond == null || bytesPerSecond < 0) return ifNull;
   final rounded = bytesPerSecond.round();
   return '${formatBytes(rounded)}/s';
+}
+
+/// Proxmox Unix time in **seconds** (e.g. backup `ctime`) → local date/time.
+String formatProxmoxUnixSeconds(int? seconds, {String ifNull = '—'}) {
+  if (seconds == null || seconds <= 0) return ifNull;
+  final local =
+      DateTime.fromMillisecondsSinceEpoch(
+        seconds * 1000,
+        isUtc: true,
+      ).toLocal();
+  return DateFormat.yMMMd().add_Hm().format(local);
 }

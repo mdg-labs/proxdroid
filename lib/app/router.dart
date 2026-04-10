@@ -166,8 +166,12 @@ GoRouter router(Ref ref) {
               GoRoute(
                 path: ':node/:storage',
                 builder: (BuildContext context, GoRouterState state) {
-                  final node = state.pathParameters['node']!;
-                  final storage = state.pathParameters['storage']!;
+                  final node = Uri.decodeComponent(
+                    state.pathParameters['node']!,
+                  );
+                  final storage = Uri.decodeComponent(
+                    state.pathParameters['storage']!,
+                  );
                   return StorageDetailScreen(node: node, storage: storage);
                 },
               ),

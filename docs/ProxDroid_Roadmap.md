@@ -1,6 +1,6 @@
 # ProxDroid – Development Roadmap
 
-**Version:** 0.1 | **Date:** April 2026 | **Status:** Draft — Phase 4 complete (resource monitoring charts; rrddata, fl_chart, dashboard sparklines)
+**Version:** 0.1 | **Date:** April 2026 | **Status:** Draft — Phase 5 complete (storage & backup management; vzdump, backup content, cluster jobs)
 
 > For architecture decisions and tech stack → see `ProxDroid_Architecture.md`
 > For feature scope and product goals → see `ProxDroid_MVP_PRD.md`
@@ -16,7 +16,7 @@
 | **Phase 2** | Node, VM & container overview | **Complete** — dashboard, VM/LXC lists + detail, shared status badge, l10n |
 | **Phase 3** | VM & container actions + task viewer | **Complete** — power actions on detail screens + merged task list, detail log, encoded UPID routes |
 | **Phase 4** | Resource monitoring charts | **Complete** — VM/LXC/node rrddata charts with timeframe selector and 60s refresh |
-| **Phase 5** | Storage & backup management | Can browse storage and trigger/view backups |
+| **Phase 5** | Storage & backup management | **Complete** — browse storage usage/content, cluster backup jobs, aggregated backup files, manual vzdump + task navigation |
 | **Phase 6** | Polish & release prep | App is stable, polished, and released on Play Store, F-Droid, and GitHub |
 | **Post-MVP** | Extended features | Console, push notifications, homescreen widget, snapshot management, suspend/resume |
 
@@ -295,31 +295,31 @@
 **Goal:** The user can browse all storage pools and their usage, view backup jobs and their history, and manually trigger a backup for a VM or container.
 
 ### 5.1 API Methods
-- [ ] Implement `GET /nodes/{node}/storage` → list of storage pools
-- [ ] Implement `GET /nodes/{node}/storage/{storage}/status` → storage details
-- [ ] Implement `GET /nodes/{node}/storage/{storage}/content` → list of content/backups
-- [ ] Implement `GET /cluster/backup` → list of backup jobs (cluster-scoped endpoint; backup jobs are not tied to a single node)
-- [ ] Implement `POST /nodes/{node}/vzdump` → trigger a backup
-- [ ] Implement `GET /nodes/{node}/tasks` filtered by type `vzdump` for backup task tracking
+- [x] Implement `GET /nodes/{node}/storage` → list of storage pools
+- [x] Implement `GET /nodes/{node}/storage/{storage}/status` → storage details
+- [x] Implement `GET /nodes/{node}/storage/{storage}/content` → list of content/backups
+- [x] Implement `GET /cluster/backup` → list of backup jobs (cluster-scoped endpoint; backup jobs are not tied to a single node)
+- [x] Implement `POST /nodes/{node}/vzdump` → trigger a backup
+- [x] Implement `GET /nodes/{node}/tasks` filtered by type `vzdump` for backup task tracking
 
 ### 5.2 Data Models
-- [ ] Implement `BackupJob` model in `core/models/backup.dart` (Freezed) – id, vmids (list), storage, schedule, lastRun, nextRun (no `node` field — `GET /cluster/backup` is cluster-scoped and jobs apply cluster-wide); vmids is a list — one job can cover multiple VMs/containers, which matches the GET /cluster/backup API response where a single job entry lists all covered vmids
-- [ ] Implement `BackupContent` model in `core/models/backup.dart` (Freezed) – volid, vmid, format, size, ctime
-- [ ] Implement `Storage` model in `core/models/storage.dart` (Freezed) – id, node, type, content, total, used, available, active
+- [x] Implement `BackupJob` model in `core/models/backup.dart` (Freezed) – id, vmids (list), storage, schedule, lastRun, nextRun (no `node` field — `GET /cluster/backup` is cluster-scoped and jobs apply cluster-wide); vmids is a list — one job can cover multiple VMs/containers, which matches the GET /cluster/backup API response where a single job entry lists all covered vmids
+- [x] Implement `BackupContent` model in `core/models/backup.dart` (Freezed) – volid, vmid, format, size, ctime
+- [x] Implement `Storage` model in `core/models/storage.dart` (Freezed) – id, node, type, content, total, used, available, active
 
 ### 5.3 Storage UI
-- [ ] Build `StorageListScreen` – list of all storage pools across nodes
-- [ ] Each storage card: name, type, usage bar (used/total), availability badge
-- [ ] Build `StorageDetailScreen` – full details + list of content (backups, ISOs, etc.)
-- [ ] Wire up go_router: `/storage`, `/storage/:node/:storage`
+- [x] Build `StorageListScreen` – list of all storage pools across nodes
+- [x] Each storage card: name, type, usage bar (used/total), availability badge
+- [x] Build `StorageDetailScreen` – full details + list of content (backups, ISOs, etc.)
+- [x] Wire up go_router: `/storage`, `/storage/:node/:storage`
 
 ### 5.4 Backup UI
-- [ ] Build `BackupListScreen` – list of backup content grouped by VM/CT
-- [ ] Each backup row: VM name, date/time, size, format (vma, tar, etc.)
-- [ ] Add manual backup trigger button (FAB or per-VM action)
-- [ ] Build `TriggerBackupSheet` (bottom sheet) – select storage, compression (zstd / lzo / gzip / none), mode (snapshot / suspend / stop)
-- [ ] On trigger: call vzdump API, navigate to task viewer to track progress
-- [ ] Wire up go_router: `/backups`
+- [x] Build `BackupListScreen` – list of backup content grouped by VM/CT
+- [x] Each backup row: VM name, date/time, size, format (vma, tar, etc.)
+- [x] Add manual backup trigger button (FAB or per-VM action)
+- [x] Build `TriggerBackupSheet` (bottom sheet) – select storage, compression (zstd / lzo / gzip / none), mode (snapshot / suspend / stop)
+- [x] On trigger: call vzdump API, navigate to task viewer to track progress
+- [x] Wire up go_router: `/backups`
 
 ---
 

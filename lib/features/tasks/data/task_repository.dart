@@ -6,8 +6,23 @@ class TaskRepository {
 
   final ProxmoxApiClient _client;
 
-  Future<List<Task>> getTasks(String node, {int start = 0, int limit = 50}) =>
-      _client.fetchTasksForNode(node, start: start, limit: limit);
+  Future<List<Task>> getTasks(
+    String node, {
+    int start = 0,
+    int limit = 50,
+    String? typefilter,
+  }) => _client.fetchTasksForNode(
+    node,
+    start: start,
+    limit: limit,
+    typefilter: typefilter,
+  );
+
+  Future<List<Task>> getVzdumpTasks(
+    String node, {
+    int start = 0,
+    int limit = 50,
+  }) => _client.fetchVzdumpTasksForNode(node, start: start, limit: limit);
 
   Future<TaskStatus> getTaskStatus(String node, String upid) =>
       _client.fetchTaskStatus(node, upid);
