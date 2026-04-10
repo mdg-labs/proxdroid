@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:proxdroid/core/models/resource_data_point.dart';
@@ -121,7 +122,10 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
                 child: Text(l10n.actionCancel),
               ),
               FilledButton(
-                onPressed: () => Navigator.pop(ctx, true),
+                onPressed: () {
+                  HapticFeedback.mediumImpact();
+                  Navigator.pop(ctx, true);
+                },
                 child: Text(l10n.actionConfirm),
               ),
             ],
@@ -154,7 +158,10 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
                 child: Text(l10n.actionCancel),
               ),
               FilledButton(
-                onPressed: () => Navigator.pop(ctx, true),
+                onPressed: () {
+                  HapticFeedback.mediumImpact();
+                  Navigator.pop(ctx, true);
+                },
                 child: Text(l10n.actionConfirm),
               ),
             ],
@@ -176,7 +183,10 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
                 child: Text(l10n.actionCancel),
               ),
               FilledButton(
-                onPressed: () => Navigator.pop(ctx, true),
+                onPressed: () {
+                  HapticFeedback.mediumImpact();
+                  Navigator.pop(ctx, true);
+                },
                 child: Text(l10n.actionConfirm),
               ),
             ],
@@ -340,11 +350,15 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
                                   onPressed:
                                       _powerBusy
                                           ? null
-                                          : () => _runPowerAction(
-                                            vm,
-                                            (r) => r.startVm(vm.node, vm.vmid),
-                                            l10n.actionStart,
-                                          ),
+                                          : () {
+                                            HapticFeedback.lightImpact();
+                                            _runPowerAction(
+                                              vm,
+                                              (r) =>
+                                                  r.startVm(vm.node, vm.vmid),
+                                              l10n.actionStart,
+                                            );
+                                          },
                                   child: Text(l10n.actionStart),
                                 ),
                               if (canStopOrReboot) ...[

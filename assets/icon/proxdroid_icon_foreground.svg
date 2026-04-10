@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+
+  <g transform="translate(256,256) scale(1.47) translate(-253.5,-233.5)">
+
+    <defs>
+      <!-- Clip in local (pre-transform) coordinates.
+           Body bottom = y 148+188 = 336.
+           Legs start at y=326, so clip rect starts at y=336 downward. -->
+      <clipPath id="legsClip">
+        <rect x="150" y="336" width="220" height="100"/>
+      </clipPath>
+    </defs>
+
+    <!-- Legs – only the portion below body bottom (y=336) is visible -->
+    <g clip-path="url(#legsClip)">
+      <path d="M200 326 L236 326 L236 352 Q236 370 220 370 L216 370 Q200 370 200 352 Z" fill="#F97316" opacity="0.85"/>
+      <path d="M276 326 L312 326 L312 352 Q312 370 296 370 L292 370 Q276 370 276 352 Z" fill="#F97316" opacity="0.85"/>
+    </g>
+
+    <!-- Body – transparent fill, stroke only -->
+    <rect x="176" y="148" width="160" height="188" rx="36" fill="none" stroke="#F97316" stroke-width="8"/>
+
+    <!-- Antenna left -->
+    <line x1="210" y1="148" x2="188" y2="108" stroke="#F97316" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="188" cy="108" r="11" fill="#F97316"/>
+
+    <!-- Antenna right -->
+    <line x1="302" y1="148" x2="324" y2="108" stroke="#F97316" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="324" cy="108" r="11" fill="#F97316"/>
+
+    <!-- Eyes / status LEDs -->
+    <rect x="196" y="178" width="34" height="22" rx="8" fill="#F97316"/>
+    <rect x="282" y="178" width="34" height="22" rx="8" fill="#F97316"/>
+
+    <!-- Rack unit 1 – orange LED left, green status dot right with glow -->
+    <rect x="200" y="220" width="112" height="22" rx="6" fill="#F97316" opacity="0.18" stroke="#F97316" stroke-width="2"/>
+    <circle cx="216" cy="231" r="6" fill="#F97316"/>
+    <circle cx="296" cy="231" r="10" fill="#10B981" opacity="0.15"/>
+    <circle cx="296" cy="231" r="7" fill="#10B981" opacity="0.3"/>
+    <circle cx="296" cy="231" r="4" fill="#10B981"/>
+
+    <!-- Rack unit 2 -->
+    <rect x="200" y="252" width="112" height="22" rx="6" fill="#F97316" opacity="0.18" stroke="#F97316" stroke-width="2"/>
+    <circle cx="216" cy="263" r="6" fill="#F97316"/>
+
+    <!-- Rack unit 3 (dimmed = offline) -->
+    <rect x="200" y="284" width="112" height="22" rx="6" fill="#F97316" opacity="0.08" stroke="#F97316" stroke-width="2"/>
+    <circle cx="216" cy="295" r="6" fill="#F97316" opacity="0.3"/>
+
+  </g>
+
+</svg>

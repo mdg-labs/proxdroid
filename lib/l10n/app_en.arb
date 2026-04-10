@@ -4,6 +4,10 @@
   "@appTitle": {
     "description": "Application title shown in the system UI (e.g. task switcher, launcher label)."
   },
+  "offlineBannerMessage": "No network connection. Some actions may not work until you are back online.",
+  "@offlineBannerMessage": {
+    "description": "Persistent banner when the device has no connectivity (Phase 6.1)."
+  },
   "entityNode": "Node",
   "@entityNode": {
     "description": "Proxmox cluster node entity label (matches PVE terminology)."
@@ -181,6 +185,20 @@
   "serverDeletedSnackbar": "Server removed",
   "@serverDeletedSnackbar": {
     "description": "SnackBar after swipe-to-delete on a server."
+  },
+  "serverListHostPortSubtitle": "{host}:{port}",
+  "@serverListHostPortSubtitle": {
+    "description": "Server list tile subtitle: host and API port (no scheme).",
+    "placeholders": {
+      "host": {
+        "type": "String",
+        "example": "pve.home"
+      },
+      "port": {
+        "type": "int",
+        "example": "8006"
+      }
+    }
   },
   "serverFieldName": "Display name",
   "@serverFieldName": {
@@ -789,5 +807,87 @@
         "example": "120 GB"
       }
     }
+  },
+  "actionClose": "Close",
+  "@actionClose": {
+    "description": "Dismiss a dialog (e.g. license summary)."
+  },
+  "settingsAppearanceSection": "Appearance",
+  "@settingsAppearanceSection": {
+    "description": "Settings section: theme / display."
+  },
+  "settingsThemeDark": "Dark",
+  "@settingsThemeDark": {
+    "description": "Theme option: dark mode."
+  },
+  "settingsThemeLight": "Light",
+  "@settingsThemeLight": {
+    "description": "Theme option: light mode."
+  },
+  "settingsThemeSystem": "System",
+  "@settingsThemeSystem": {
+    "description": "Theme option: follow OS light/dark (short label for segmented control)."
+  },
+  "settingsAboutSection": "About",
+  "@settingsAboutSection": {
+    "description": "Settings section: version and project info."
+  },
+  "settingsVersion": "Version",
+  "@settingsVersion": {
+    "description": "Label for app version row in Settings."
+  },
+  "settingsVersionSubtitle": "{version} ({buildNumber})",
+  "@settingsVersionSubtitle": {
+    "description": "About row subtitle: semantic version and build number.",
+    "placeholders": {
+      "version": {
+        "type": "String",
+        "example": "0.1.0"
+      },
+      "buildNumber": {
+        "type": "String",
+        "example": "1"
+      }
+    }
+  },
+  "settingsLoading": "Loading…",
+  "@settingsLoading": {
+    "description": "Placeholder while package info loads."
+  },
+  "settingsVersionUnavailable": "Unavailable",
+  "@settingsVersionUnavailable": {
+    "description": "When package version could not be read."
+  },
+  "settingsSourceCode": "Source code",
+  "@settingsSourceCode": {
+    "description": "Link to GitHub repository."
+  },
+  "settingsLicenseTitle": "License",
+  "@settingsLicenseTitle": {
+    "description": "MIT license dialog title and list tile title."
+  },
+  "settingsLicenseTileSubtitle": "MIT License — tap for summary",
+  "@settingsLicenseTileSubtitle": {
+    "description": "Subtitle on license row in Settings."
+  },
+  "settingsLicenseSummary": "ProxDroid is licensed under the MIT License. You may use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, subject to including the copyright notice and permission notice in all copies. The software is provided \"as is\", without warranty of any kind. See the LICENSE file in the repository for the full text.",
+  "@settingsLicenseSummary": {
+    "description": "Short MIT summary in About dialog (not full legal text)."
+  },
+  "settingsSupportSection": "Support",
+  "@settingsSupportSection": {
+    "description": "Settings section: donations / sponsorship."
+  },
+  "settingsSupportKofi": "Ko-fi",
+  "@settingsSupportKofi": {
+    "description": "Support link title for Ko-fi."
+  },
+  "settingsSupportGithubSponsors": "GitHub Sponsors",
+  "@settingsSupportGithubSponsors": {
+    "description": "Support link title for GitHub Sponsors."
+  },
+  "settingsCouldNotOpenLink": "Could not open link",
+  "@settingsCouldNotOpenLink": {
+    "description": "Snackbar when url_launcher fails."
   }
 }

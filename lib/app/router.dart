@@ -22,6 +22,22 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'router.g.dart';
 
+CustomTransitionPage<void> _fadeShellPage(GoRouterState state, Widget screen) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: screen,
+    transitionsBuilder: (
+      BuildContext context,
+      Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      Widget child,
+    ) {
+      return FadeTransition(opacity: animation, child: child);
+    },
+    transitionDuration: const Duration(milliseconds: 250),
+  );
+}
+
 /// Notifies [GoRouter] when server list or selection changes so [GoRouter.redirect] re-runs.
 final class GoRouterRefreshNotifier extends ChangeNotifier {
   GoRouterRefreshNotifier(Ref ref) {
@@ -92,121 +108,136 @@ GoRouter router(Ref ref) {
         routes: <RouteBase>[
           GoRoute(
             path: '/servers',
-            builder: (BuildContext context, GoRouterState state) {
-              return const ServerListScreen();
-            },
+            pageBuilder:
+                (BuildContext context, GoRouterState state) =>
+                    _fadeShellPage(state, const ServerListScreen()),
             routes: <RouteBase>[
               GoRoute(
                 path: 'add',
-                builder: (BuildContext context, GoRouterState state) {
-                  return const AddServerScreen();
-                },
+                pageBuilder:
+                    (BuildContext context, GoRouterState state) =>
+                        _fadeShellPage(state, const AddServerScreen()),
               ),
               GoRoute(
                 path: 'edit/:serverId',
-                builder: (BuildContext context, GoRouterState state) {
+                pageBuilder: (BuildContext context, GoRouterState state) {
                   final serverId = state.pathParameters['serverId']!;
-                  return EditServerScreen(serverId: serverId);
+                  return _fadeShellPage(
+                    state,
+                    EditServerScreen(serverId: serverId),
+                  );
                 },
               ),
             ],
           ),
           GoRoute(
             path: '/dashboard',
-            builder: (BuildContext context, GoRouterState state) {
-              return const DashboardScreen();
-            },
+            pageBuilder:
+                (BuildContext context, GoRouterState state) =>
+                    _fadeShellPage(state, const DashboardScreen()),
           ),
           GoRoute(
             path: '/vms',
-            builder: (BuildContext context, GoRouterState state) {
-              return const VmListScreen();
-            },
+            pageBuilder:
+                (BuildContext context, GoRouterState state) =>
+                    _fadeShellPage(state, const VmListScreen()),
             routes: <RouteBase>[
               GoRoute(
                 path: ':node/:vmid',
-                builder: (BuildContext context, GoRouterState state) {
+                pageBuilder: (BuildContext context, GoRouterState state) {
                   final node = Uri.decodeComponent(
                     state.pathParameters['node']!,
                   );
                   final vmid = Uri.decodeComponent(
                     state.pathParameters['vmid']!,
                   );
-                  return VmDetailScreen(node: node, vmid: vmid);
+                  return _fadeShellPage(
+                    state,
+                    VmDetailScreen(node: node, vmid: vmid),
+                  );
                 },
               ),
             ],
           ),
           GoRoute(
             path: '/containers',
-            builder: (BuildContext context, GoRouterState state) {
-              return const ContainerListScreen();
-            },
+            pageBuilder:
+                (BuildContext context, GoRouterState state) =>
+                    _fadeShellPage(state, const ContainerListScreen()),
             routes: <RouteBase>[
               GoRoute(
                 path: ':node/:ctid',
-                builder: (BuildContext context, GoRouterState state) {
+                pageBuilder: (BuildContext context, GoRouterState state) {
                   final node = Uri.decodeComponent(
                     state.pathParameters['node']!,
                   );
                   final ctid = Uri.decodeComponent(
                     state.pathParameters['ctid']!,
                   );
-                  return ContainerDetailScreen(node: node, ctid: ctid);
+                  return _fadeShellPage(
+                    state,
+                    ContainerDetailScreen(node: node, ctid: ctid),
+                  );
                 },
               ),
             ],
           ),
           GoRoute(
             path: '/storage',
-            builder: (BuildContext context, GoRouterState state) {
-              return const StorageListScreen();
-            },
+            pageBuilder:
+                (BuildContext context, GoRouterState state) =>
+                    _fadeShellPage(state, const StorageListScreen()),
             routes: <RouteBase>[
               GoRoute(
                 path: ':node/:storage',
-                builder: (BuildContext context, GoRouterState state) {
+                pageBuilder: (BuildContext context, GoRouterState state) {
                   final node = Uri.decodeComponent(
                     state.pathParameters['node']!,
                   );
                   final storage = Uri.decodeComponent(
                     state.pathParameters['storage']!,
                   );
-                  return StorageDetailScreen(node: node, storage: storage);
+                  return _fadeShellPage(
+                    state,
+                    StorageDetailScreen(node: node, storage: storage),
+                  );
                 },
               ),
             ],
           ),
           GoRoute(
             path: '/backups',
-            builder: (BuildContext context, GoRouterState state) {
-              return const BackupListScreen();
-            },
+            pageBuilder:
+                (BuildContext context, GoRouterState state) =>
+                    _fadeShellPage(state, const BackupListScreen()),
           ),
           GoRoute(
             path: '/tasks',
-            builder: (BuildContext context, GoRouterState state) {
-              return const TaskListScreen();
-            },
+            pageBuilder:
+                (BuildContext context, GoRouterState state) =>
+                    _fadeShellPage(state, const TaskListScreen()),
             routes: <RouteBase>[
               GoRoute(
                 path: ':node/:upid',
-                builder: (BuildContext context, GoRouterState state) {
+                pageBuilder: (BuildContext context, GoRouterState state) {
                   final node = Uri.decodeComponent(
                     state.pathParameters['node']!,
                   );
                   final upidParam = state.pathParameters['upid']!;
                   final upid = Uri.decodeComponent(upidParam);
-                  return TaskDetailScreen(node: node, upid: upid);
+                  return _fadeShellPage(
+                    state,
+                    TaskDetailScreen(node: node, upid: upid),
+                  );
                 },
               ),
             ],
           ),
           GoRoute(
             path: '/settings',
-            builder: (BuildContext context, GoRouterState state) {
-              return const SettingsScreen();
-            },
+            pageBuilder:
+                (BuildContext context, GoRouterState state) =>
+                    _fadeShellPage(state, const SettingsScreen()),
           ),
         ],
       ),

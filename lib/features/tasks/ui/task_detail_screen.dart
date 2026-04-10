@@ -55,6 +55,12 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen> {
     return null;
   }
 
+  Future<void> _refreshLog(WidgetRef ref) async {
+    ref.invalidate(taskLogProvider(widget.node, widget.upid));
+    ref.read(taskListProvider.notifier).refresh();
+    await ref.read(taskLogProvider(widget.node, widget.upid).future);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -70,101 +76,111 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen> {
           title: Text(l10n.entityTask),
         ),
         Expanded(
-          child: logAsync.when(
-            loading:
-                () => ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    _MetadataBlock(
-                      l10n: l10n,
-                      scheme: scheme,
-                      taskMeta: taskMeta,
-                      upid: widget.upid,
-                    ),
-                    Text(
-                      l10n.taskDetailLogTitle,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    const LoadingShimmer(itemCount: 3),
-                  ],
-                ),
-            error:
-                (e, _) => ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    _MetadataBlock(
-                      l10n: l10n,
-                      scheme: scheme,
-                      taskMeta: taskMeta,
-                      upid: widget.upid,
-                    ),
-                    Text(
-                      l10n.taskDetailLogTitle,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    ErrorView(
-                      message: proxmoxExceptionMessage(e, l10n),
-                      onRetry:
-                          () => ref.invalidate(
-                            taskLogProvider(widget.node, widget.upid),
-                          ),
-                    ),
-                  ],
-                ),
-            data: (lines) {
-              if (!_scheduledLogScroll) {
-                _scheduledLogScroll = true;
-                void scrollTwice() {
-                  if (!mounted) {
-                    return;
-                  }
-                  _scrollLogToBottom();
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (mounted) {
-                      _scrollLogToBottom();
+          child: RefreshIndicator(
+            onRefresh: () => _refreshLog(ref),
+            child: logAsync.when(
+              loading:
+                  () => ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(16),
+                    children: [
+                      _MetadataBlock(
+                        l10n: l10n,
+                        scheme: scheme,
+                        taskMeta: taskMeta,
+                        upid: widget.upid,
+                      ),
+                      Text(
+                        l10n.taskDetailLogTitle,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      const LoadingShimmer(
+                        itemCount: 3,
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                      ),
+                    ],
+                  ),
+              error:
+                  (e, _) => ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(16),
+                    children: [
+                      _MetadataBlock(
+                        l10n: l10n,
+                        scheme: scheme,
+                        taskMeta: taskMeta,
+                        upid: widget.upid,
+                      ),
+                      Text(
+                        l10n.taskDetailLogTitle,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      ErrorView(
+                        message: proxmoxExceptionMessage(e, l10n),
+                        onRetry:
+                            () => ref.invalidate(
+                              taskLogProvider(widget.node, widget.upid),
+                            ),
+                      ),
+                    ],
+                  ),
+              data: (lines) {
+                if (!_scheduledLogScroll) {
+                  _scheduledLogScroll = true;
+                  void scrollTwice() {
+                    if (!mounted) {
+                      return;
                     }
+                    _scrollLogToBottom();
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (mounted) {
+                        _scrollLogToBottom();
+                      }
+                    });
+                  }
+
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    scrollTwice();
                   });
                 }
-
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  scrollTwice();
-                });
-              }
-              final mono = TextStyle(
-                fontFamily: 'monospace',
-                fontSize: 12,
-                color: scheme.onSurface,
-              );
-              return ListView(
-                controller: _scrollController,
-                padding: const EdgeInsets.all(16),
-                children: [
-                  _MetadataBlock(
-                    l10n: l10n,
-                    scheme: scheme,
-                    taskMeta: taskMeta,
-                    upid: widget.upid,
-                  ),
-                  Text(
-                    l10n.taskDetailLogTitle,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 8),
-                  if (lines.isEmpty)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      child: Text(
-                        l10n.taskDetailLogEmpty,
-                        style: TextStyle(color: scheme.onSurfaceVariant),
-                      ),
-                    )
-                  else
-                    ...lines.map((line) => SelectableText(line, style: mono)),
-                ],
-              );
-            },
+                final mono = TextStyle(
+                  fontFamily: 'monospace',
+                  fontSize: 12,
+                  color: scheme.onSurface,
+                );
+                return ListView(
+                  controller: _scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    _MetadataBlock(
+                      l10n: l10n,
+                      scheme: scheme,
+                      taskMeta: taskMeta,
+                      upid: widget.upid,
+                    ),
+                    Text(
+                      l10n.taskDetailLogTitle,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    if (lines.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: Text(
+                          l10n.taskDetailLogEmpty,
+                          style: TextStyle(color: scheme.onSurfaceVariant),
+                        ),
+                      )
+                    else
+                      ...lines.map((line) => SelectableText(line, style: mono)),
+                  ],
+                );
+              },
+            ),
           ),
         ),
       ],

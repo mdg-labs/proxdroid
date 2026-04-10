@@ -24,6 +24,19 @@ class BackupListScreen extends ConsumerWidget {
     ref.read(backupJobsProvider.notifier).refresh();
     ref.read(clusterBackupContentProvider.notifier).refresh();
     ref.read(clusterVzdumpTasksProvider.notifier).refresh();
+    ref.read(allVmsProvider.notifier).refresh();
+    ref.read(allContainersProvider.notifier).refresh();
+  }
+
+  Future<void> _pullRefresh(WidgetRef ref) async {
+    _refresh(ref);
+    await Future.wait<void>([
+      ref.read(backupJobsProvider.future),
+      ref.read(clusterBackupContentProvider.future),
+      ref.read(clusterVzdumpTasksProvider.future),
+      ref.read(allVmsProvider.future),
+      ref.read(allContainersProvider.future),
+    ]);
   }
 
   static String _guestName(
@@ -58,9 +71,19 @@ class BackupListScreen extends ConsumerWidget {
     final tasksAsync = ref.watch(clusterVzdumpTasksProvider);
     final vmsAsync = ref.watch(allVmsProvider);
     final ctsAsync = ref.watch(allContainersProvider);
+    final minPullHeight = MediaQuery.sizeOf(context).height * 0.5;
 
-    if (jobsAsync.hasError || filesAsync.hasError || tasksAsync.hasError) {
-      final err = jobsAsync.error ?? filesAsync.error ?? tasksAsync.error!;
+    if (jobsAsync.hasError ||
+        filesAsync.hasError ||
+        tasksAsync.hasError ||
+        vmsAsync.hasError ||
+        ctsAsync.hasError) {
+      final err =
+          jobsAsync.error ??
+          filesAsync.error ??
+          tasksAsync.error ??
+          vmsAsync.error ??
+          ctsAsync.error!;
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -69,9 +92,20 @@ class BackupListScreen extends ConsumerWidget {
             title: Text(l10n.sectionBackups),
           ),
           Expanded(
-            child: ErrorView(
-              message: proxmoxExceptionMessage(err, l10n),
-              onRetry: () => _refresh(ref),
+            child: RefreshIndicator(
+              onRefresh: () => _pullRefresh(ref),
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  SizedBox(
+                    height: minPullHeight,
+                    child: ErrorView(
+                      message: proxmoxExceptionMessage(err, l10n),
+                      onRetry: () => _refresh(ref),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -90,7 +124,24 @@ class BackupListScreen extends ConsumerWidget {
             leading: shellAppBarLeading(context),
             title: Text(l10n.sectionBackups),
           ),
-          const Expanded(child: LoadingShimmer(itemCount: 8)),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: () => _pullRefresh(ref),
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  SizedBox(
+                    height: minPullHeight,
+                    child: const LoadingShimmer(
+                      itemCount: 8,
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       );
     }
@@ -126,12 +177,7 @@ class BackupListScreen extends ConsumerWidget {
           child: Stack(
             children: [
               RefreshIndicator(
-                onRefresh: () async {
-                  _refresh(ref);
-                  await ref.read(clusterBackupContentProvider.future);
-                  await ref.read(backupJobsProvider.future);
-                  await ref.read(clusterVzdumpTasksProvider.future);
-                },
+                onRefresh: () => _pullRefresh(ref),
                 child: CustomScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   slivers: [

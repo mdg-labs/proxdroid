@@ -1,9 +1,19 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
+import 'package:proxdroid/shared/providers/connectivity_provider.dart';
+
+bool _connectivityLooksOffline(List<ConnectivityResult> results) {
+  if (results.isEmpty) {
+    return true;
+  }
+  return results.every((r) => r == ConnectivityResult.none);
+}
 
 /// Shell layout: [Scaffold] with [NavigationDrawer] for primary sections.
-class AppShell extends StatelessWidget {
+class AppShell extends ConsumerWidget {
   const AppShell({required this.child, required this.currentPath, super.key});
 
   final Widget child;
@@ -22,12 +32,59 @@ class AppShell extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     final selectedIndex = _selectedIndexForLocation(currentPath);
 
+    final connectivityAsync = ref.watch(connectivityProvider);
+    final showOffline = connectivityAsync.when(
+      data: _connectivityLooksOffline,
+      loading: () => false,
+      error: (_, _) => false,
+    );
+
     return Scaffold(
-      body: child,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (showOffline)
+            Material(
+              color: scheme.errorContainer,
+              elevation: 0,
+              child: SafeArea(
+                bottom: false,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.wifi_off,
+                        color: scheme.onErrorContainer,
+                        size: 22,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          l10n.offlineBannerMessage,
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: scheme.onErrorContainer,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          Expanded(child: child),
+        ],
+      ),
       drawer: NavigationDrawer(
         selectedIndex: selectedIndex,
         onDestinationSelected: (index) {

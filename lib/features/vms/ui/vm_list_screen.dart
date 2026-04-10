@@ -79,6 +79,12 @@ class _VmListScreenState extends ConsumerState<VmListScreen> {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final async = ref.watch(allVmsProvider);
+    final minPullHeight = MediaQuery.sizeOf(context).height * 0.5;
+
+    Future<void> refreshVms() async {
+      ref.read(allVmsProvider.notifier).refresh();
+      await ref.read(allVmsProvider.future);
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -89,18 +95,56 @@ class _VmListScreenState extends ConsumerState<VmListScreen> {
         ),
         Expanded(
           child: async.when(
-            loading: () => const LoadingShimmer(),
+            loading:
+                () => RefreshIndicator(
+                  onRefresh: refreshVms,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(
+                        height: minPullHeight,
+                        child: const LoadingShimmer(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
             error:
-                (e, _) => ErrorView(
-                  message: proxmoxExceptionMessage(e, l10n),
-                  onRetry: () => ref.read(allVmsProvider.notifier).refresh(),
+                (e, _) => RefreshIndicator(
+                  onRefresh: refreshVms,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(
+                        height: minPullHeight,
+                        child: ErrorView(
+                          message: proxmoxExceptionMessage(e, l10n),
+                          onRetry:
+                              () => ref.read(allVmsProvider.notifier).refresh(),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
             data: (vms) {
               if (vms.isEmpty) {
-                return EmptyState(
-                  icon: Icons.computer_outlined,
-                  title: l10n.vmListEmptyTitle,
-                  message: l10n.vmListEmptyMessage,
+                return RefreshIndicator(
+                  onRefresh: refreshVms,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(
+                        height: minPullHeight,
+                        child: EmptyState(
+                          icon: Icons.computer_outlined,
+                          title: l10n.vmListEmptyTitle,
+                          message: l10n.vmListEmptyMessage,
+                        ),
+                      ),
+                    ],
+                  ),
                 );
               }
 
@@ -108,10 +152,7 @@ class _VmListScreenState extends ConsumerState<VmListScreen> {
               final filtered = _applyFilters(vms);
 
               return RefreshIndicator(
-                onRefresh: () async {
-                  ref.read(allVmsProvider.notifier).refresh();
-                  await ref.read(allVmsProvider.future);
-                },
+                onRefresh: refreshVms,
                 child: CustomScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   slivers: [

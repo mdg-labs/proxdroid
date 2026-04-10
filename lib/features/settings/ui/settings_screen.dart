@@ -1,14 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:proxdroid/features/settings/providers/settings_providers.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class SettingsScreen extends StatelessWidget {
+const _githubRepoUrl = 'https://github.com/mdg-labs/proxdroid';
+const _kofiUrl = 'https://ko-fi.com/';
+const _githubSponsorsUrl = 'https://github.com/sponsors/mdg-labs';
+
+class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
+  Future<void> _openUrl(BuildContext context, String url) async {
+    final uri = Uri.parse(url);
+    final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!context.mounted || ok) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(AppLocalizations.of(context)!.settingsCouldNotOpenLink),
+      ),
+    );
+  }
+
+  void _showLicenseDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    showDialog<void>(
+      context: context,
+      builder:
+          (ctx) => AlertDialog(
+            title: Text(l10n.settingsLicenseTitle),
+            content: SingleChildScrollView(
+              child: Text(l10n.settingsLicenseSummary),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: Text(l10n.actionClose),
+              ),
+            ],
+          ),
+    );
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
+    final themeMode = ref.watch(appThemeModeProvider);
+    final packageInfoAsync = ref.watch(packageInfoProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -18,18 +59,134 @@ class SettingsScreen extends StatelessWidget {
           title: Text(l10n.sectionSettings),
         ),
         Expanded(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Text(
-                l10n.debugScreenBody(l10n.sectionSettings),
-                textAlign: TextAlign.center,
-                style: TextStyle(color: scheme.onSurfaceVariant),
+          child: ListView(
+            padding: const EdgeInsets.only(bottom: 24),
+            children: [
+              _SectionHeader(
+                title: l10n.settingsAppearanceSection,
+                colorScheme: scheme,
               ),
-            ),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                child: SegmentedButton<ThemeMode>(
+                  segments: [
+                    ButtonSegment<ThemeMode>(
+                      value: ThemeMode.dark,
+                      label: Text(l10n.settingsThemeDark),
+                      icon: const Icon(Icons.dark_mode_outlined),
+                    ),
+                    ButtonSegment<ThemeMode>(
+                      value: ThemeMode.light,
+                      label: Text(l10n.settingsThemeLight),
+                      icon: const Icon(Icons.light_mode_outlined),
+                    ),
+                    ButtonSegment<ThemeMode>(
+                      value: ThemeMode.system,
+                      label: Text(l10n.settingsThemeSystem),
+                      icon: const Icon(Icons.brightness_auto_outlined),
+                    ),
+                  ],
+                  selected: {themeMode},
+                  onSelectionChanged: (Set<ThemeMode> selected) {
+                    final mode = selected.first;
+                    ref.read(appThemeModeProvider.notifier).setThemeMode(mode);
+                  },
+                ),
+              ),
+              const Divider(height: 1),
+              _SectionHeader(
+                title: l10n.settingsAboutSection,
+                colorScheme: scheme,
+              ),
+              packageInfoAsync.when(
+                data:
+                    (PackageInfo info) => ListTile(
+                      title: Text(l10n.settingsVersion),
+                      subtitle: Text(
+                        l10n.settingsVersionSubtitle(
+                          info.version,
+                          info.buildNumber,
+                        ),
+                      ),
+                    ),
+                loading:
+                    () => ListTile(
+                      title: Text(l10n.settingsVersion),
+                      subtitle: Text(l10n.settingsLoading),
+                    ),
+                error:
+                    (Object error, StackTrace stackTrace) => ListTile(
+                      title: Text(l10n.settingsVersion),
+                      subtitle: Text(l10n.settingsVersionUnavailable),
+                    ),
+              ),
+              ListTile(
+                title: Text(l10n.settingsSourceCode),
+                subtitle: Text(_githubRepoUrl),
+                trailing: Icon(
+                  Icons.open_in_new,
+                  color: scheme.onSurfaceVariant,
+                ),
+                onTap: () => _openUrl(context, _githubRepoUrl),
+              ),
+              ListTile(
+                title: Text(l10n.settingsLicenseTitle),
+                subtitle: Text(l10n.settingsLicenseTileSubtitle),
+                trailing: Icon(
+                  Icons.chevron_right,
+                  color: scheme.onSurfaceVariant,
+                ),
+                onTap: () => _showLicenseDialog(context),
+              ),
+              const Divider(height: 1),
+              _SectionHeader(
+                title: l10n.settingsSupportSection,
+                colorScheme: scheme,
+              ),
+              ListTile(
+                title: Text(l10n.settingsSupportKofi),
+                subtitle: Text(_kofiUrl),
+                trailing: Icon(
+                  Icons.open_in_new,
+                  color: scheme.onSurfaceVariant,
+                ),
+                onTap: () => _openUrl(context, _kofiUrl),
+              ),
+              ListTile(
+                title: Text(l10n.settingsSupportGithubSponsors),
+                subtitle: Text(_githubSponsorsUrl),
+                trailing: Icon(
+                  Icons.open_in_new,
+                  color: scheme.onSurfaceVariant,
+                ),
+                onTap: () => _openUrl(context, _githubSponsorsUrl),
+              ),
+            ],
           ),
         ),
       ],
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({required this.title, required this.colorScheme});
+
+  final String title;
+  final ColorScheme colorScheme;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = Theme.of(context).textTheme.titleSmall?.copyWith(
+      color: colorScheme.primary,
+      fontWeight: FontWeight.w600,
+    );
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
+      child: Text(title, style: style),
     );
   }
 }

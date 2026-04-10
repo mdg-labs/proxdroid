@@ -6,17 +6,33 @@ part of 'settings_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$appThemeModeHash() => r'b6fa53e4905fcee5827ce6ecf6da2bb57acdc8d0';
+String _$packageInfoHash() => r'854bbb0e381edfdddbd736229351d6cc918a2ad1';
 
-/// Active [ThemeMode] for [MaterialApp.router].
+/// Cached [PackageInfo] for Settings / About.
 ///
-/// Phase 6 adds a settings toggle and persistence in hive_ce
+/// Copied from [packageInfo].
+@ProviderFor(packageInfo)
+final packageInfoProvider = FutureProvider<PackageInfo>.internal(
+  packageInfo,
+  name: r'packageInfoProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$packageInfoHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef PackageInfoRef = FutureProviderRef<PackageInfo>;
+String _$appThemeModeHash() => r'a88002df7dfa3337675096faed14cd28502c766f';
+
+/// Active [ThemeMode] for [MaterialApp.router]; persisted in hive_ce
 /// ([ProxDroid_Roadmap.md] §6.3).
 ///
-/// Copied from [appThemeMode].
-@ProviderFor(appThemeMode)
-final appThemeModeProvider = AutoDisposeProvider<ThemeMode>.internal(
-  appThemeMode,
+/// Copied from [AppThemeMode].
+@ProviderFor(AppThemeMode)
+final appThemeModeProvider = NotifierProvider<AppThemeMode, ThemeMode>.internal(
+  AppThemeMode.new,
   name: r'appThemeModeProvider',
   debugGetCreateSourceHash:
       const bool.fromEnvironment('dart.vm.product') ? null : _$appThemeModeHash,
@@ -24,8 +40,6 @@ final appThemeModeProvider = AutoDisposeProvider<ThemeMode>.internal(
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef AppThemeModeRef = AutoDisposeProviderRef<ThemeMode>;
+typedef _$AppThemeMode = Notifier<ThemeMode>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -8,11 +8,11 @@ import 'package:proxdroid/features/containers/providers/container_providers.dart
 import 'package:proxdroid/features/dashboard/providers/dashboard_providers.dart';
 import 'package:proxdroid/features/dashboard/providers/rrd_providers.dart';
 import 'package:proxdroid/features/servers/ui/proxmox_exception_messages.dart';
+import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
 import 'package:proxdroid/features/vms/providers/vm_providers.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
-import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
 import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
 import 'package:proxdroid/shared/widgets/resource_chart.dart';
 import 'package:proxdroid/shared/widgets/status_badge.dart';
@@ -40,6 +40,15 @@ class DashboardScreen extends ConsumerWidget {
     final vmsAsync = ref.watch(allVmsProvider);
     final containersAsync = ref.watch(allContainersProvider);
 
+    final minPullHeight = MediaQuery.sizeOf(context).height * 0.5;
+
+    Future<void> pullRefresh() async {
+      _refreshAll(ref);
+      await ref.read(nodeListProvider.future);
+      await ref.read(allVmsProvider.future);
+      await ref.read(allContainersProvider.future);
+    }
+
     if (nodesAsync.hasError || vmsAsync.hasError || containersAsync.hasError) {
       final err = nodesAsync.error ?? vmsAsync.error ?? containersAsync.error!;
       return Column(
@@ -50,9 +59,20 @@ class DashboardScreen extends ConsumerWidget {
             title: Text(l10n.sectionDashboard),
           ),
           Expanded(
-            child: ErrorView(
-              message: proxmoxExceptionMessage(err, l10n),
-              onRetry: () => _refreshAll(ref),
+            child: RefreshIndicator(
+              onRefresh: pullRefresh,
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  SizedBox(
+                    height: minPullHeight,
+                    child: ErrorView(
+                      message: proxmoxExceptionMessage(err, l10n),
+                      onRetry: () => _refreshAll(ref),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -69,7 +89,24 @@ class DashboardScreen extends ConsumerWidget {
             leading: shellAppBarLeading(context),
             title: Text(l10n.sectionDashboard),
           ),
-          const Expanded(child: LoadingShimmer(itemCount: 6)),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: pullRefresh,
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  SizedBox(
+                    height: minPullHeight,
+                    child: const LoadingShimmer(
+                      itemCount: 6,
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       );
     }
@@ -95,10 +132,21 @@ class DashboardScreen extends ConsumerWidget {
             title: Text(l10n.sectionDashboard),
           ),
           Expanded(
-            child: EmptyState(
-              icon: Icons.dns_outlined,
-              title: l10n.dashboardEmptyNodesTitle,
-              message: l10n.dashboardEmptyNodesMessage,
+            child: RefreshIndicator(
+              onRefresh: pullRefresh,
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  SizedBox(
+                    height: minPullHeight,
+                    child: EmptyState(
+                      icon: Icons.dns_outlined,
+                      title: l10n.dashboardEmptyNodesTitle,
+                      message: l10n.dashboardEmptyNodesMessage,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -114,12 +162,7 @@ class DashboardScreen extends ConsumerWidget {
         ),
         Expanded(
           child: RefreshIndicator(
-            onRefresh: () async {
-              _refreshAll(ref);
-              await ref.read(nodeListProvider.future);
-              await ref.read(allVmsProvider.future);
-              await ref.read(allContainersProvider.future);
-            },
+            onRefresh: pullRefresh,
             child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
@@ -314,6 +357,7 @@ class _NodeRrdSparklines extends ConsumerWidget {
     return async.when(
       loading:
           () => Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: Column(
@@ -324,16 +368,7 @@ class _NodeRrdSparklines extends ConsumerWidget {
                       style: Theme.of(context).textTheme.labelSmall,
                     ),
                     const SizedBox(height: 4),
-                    const SizedBox(
-                      height: 88,
-                      child: Center(
-                        child: SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      ),
-                    ),
+                    const PulsingPlaceholder(height: 88),
                   ],
                 ),
               ),
@@ -347,27 +382,50 @@ class _NodeRrdSparklines extends ConsumerWidget {
                       style: Theme.of(context).textTheme.labelSmall,
                     ),
                     const SizedBox(height: 4),
-                    const SizedBox(
-                      height: 88,
-                      child: Center(
-                        child: SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      ),
-                    ),
+                    const PulsingPlaceholder(height: 88),
                   ],
                 ),
               ),
             ],
           ),
       error:
-          (e, _) => Text(
-            l10n.chartLoadError,
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(color: scheme.error),
+          (e, _) => Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      l10n.metricCpu,
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      l10n.metricMemory,
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Icon(Icons.error_outline, size: 28, color: scheme.error),
+              const SizedBox(height: 8),
+              Text(
+                proxmoxExceptionMessage(e, l10n),
+                textAlign: TextAlign.center,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: scheme.onSurface),
+              ),
+              TextButton.icon(
+                onPressed:
+                    () => ref.invalidate(nodeRrdDataProvider(nodeName, _tf)),
+                icon: const Icon(Icons.refresh),
+                label: Text(l10n.actionRetry),
+              ),
+            ],
           ),
       data:
           (points) => Row(

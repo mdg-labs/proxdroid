@@ -73,6 +73,12 @@ class _ContainerListScreenState extends ConsumerState<ContainerListScreen> {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final async = ref.watch(allContainersProvider);
+    final minPullHeight = MediaQuery.sizeOf(context).height * 0.5;
+
+    Future<void> refreshContainers() async {
+      ref.read(allContainersProvider.notifier).refresh();
+      await ref.read(allContainersProvider.future);
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -83,19 +89,59 @@ class _ContainerListScreenState extends ConsumerState<ContainerListScreen> {
         ),
         Expanded(
           child: async.when(
-            loading: () => const LoadingShimmer(),
+            loading:
+                () => RefreshIndicator(
+                  onRefresh: refreshContainers,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(
+                        height: minPullHeight,
+                        child: const LoadingShimmer(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
             error:
-                (e, _) => ErrorView(
-                  message: proxmoxExceptionMessage(e, l10n),
-                  onRetry:
-                      () => ref.read(allContainersProvider.notifier).refresh(),
+                (e, _) => RefreshIndicator(
+                  onRefresh: refreshContainers,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(
+                        height: minPullHeight,
+                        child: ErrorView(
+                          message: proxmoxExceptionMessage(e, l10n),
+                          onRetry:
+                              () =>
+                                  ref
+                                      .read(allContainersProvider.notifier)
+                                      .refresh(),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
             data: (containers) {
               if (containers.isEmpty) {
-                return EmptyState(
-                  icon: Icons.inventory_2_outlined,
-                  title: l10n.containerListEmptyTitle,
-                  message: l10n.containerListEmptyMessage,
+                return RefreshIndicator(
+                  onRefresh: refreshContainers,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(
+                        height: minPullHeight,
+                        child: EmptyState(
+                          icon: Icons.inventory_2_outlined,
+                          title: l10n.containerListEmptyTitle,
+                          message: l10n.containerListEmptyMessage,
+                        ),
+                      ),
+                    ],
+                  ),
                 );
               }
 
@@ -104,10 +150,7 @@ class _ContainerListScreenState extends ConsumerState<ContainerListScreen> {
               final filtered = _applyFilters(containers);
 
               return RefreshIndicator(
-                onRefresh: () async {
-                  ref.read(allContainersProvider.notifier).refresh();
-                  await ref.read(allContainersProvider.future);
-                },
+                onRefresh: refreshContainers,
                 child: CustomScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   slivers: [

@@ -12,6 +12,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'ProxDroid';
 
   @override
+  String get offlineBannerMessage =>
+      'No network connection. Some actions may not work until you are back online.';
+
+  @override
   String get entityNode => 'Node';
 
   @override
@@ -142,6 +146,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get serverDeletedSnackbar => 'Server removed';
+
+  @override
+  String serverListHostPortSubtitle(String host, int port) {
+    return '$host:$port';
+  }
 
   @override
   String get serverFieldName => 'Display name';
@@ -595,4 +604,61 @@ class AppLocalizationsEn extends AppLocalizations {
   String storageAvailableSpace(String size) {
     return 'Available: $size';
   }
+
+  @override
+  String get actionClose => 'Close';
+
+  @override
+  String get settingsAppearanceSection => 'Appearance';
+
+  @override
+  String get settingsThemeDark => 'Dark';
+
+  @override
+  String get settingsThemeLight => 'Light';
+
+  @override
+  String get settingsThemeSystem => 'System';
+
+  @override
+  String get settingsAboutSection => 'About';
+
+  @override
+  String get settingsVersion => 'Version';
+
+  @override
+  String settingsVersionSubtitle(String version, String buildNumber) {
+    return '$version ($buildNumber)';
+  }
+
+  @override
+  String get settingsLoading => 'Loading…';
+
+  @override
+  String get settingsVersionUnavailable => 'Unavailable';
+
+  @override
+  String get settingsSourceCode => 'Source code';
+
+  @override
+  String get settingsLicenseTitle => 'License';
+
+  @override
+  String get settingsLicenseTileSubtitle => 'MIT License — tap for summary';
+
+  @override
+  String get settingsLicenseSummary =>
+      'ProxDroid is licensed under the MIT License. You may use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, subject to including the copyright notice and permission notice in all copies. The software is provided \"as is\", without warranty of any kind. See the LICENSE file in the repository for the full text.';
+
+  @override
+  String get settingsSupportSection => 'Support';
+
+  @override
+  String get settingsSupportKofi => 'Ko-fi';
+
+  @override
+  String get settingsSupportGithubSponsors => 'GitHub Sponsors';
+
+  @override
+  String get settingsCouldNotOpenLink => 'Could not open link';
 }

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:proxdroid/core/models/resource_data_point.dart';
 import 'package:proxdroid/core/utils/formatters.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
+import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
 
 /// Which metric(s) [ResourceLineChart] plots.
 enum ResourceChartMetric { cpu, memory, network, diskIo }
@@ -60,6 +61,7 @@ class ResourceLineChart extends StatelessWidget {
     this.chartHeight,
     this.isLoading = false,
     this.error,
+    this.errorMessage,
     this.onRetry,
     this.showTimeframeSelector = true,
     super.key,
@@ -76,6 +78,7 @@ class ResourceLineChart extends StatelessWidget {
   final double? chartHeight;
   final bool isLoading;
   final Object? error;
+  final String? errorMessage;
   final VoidCallback? onRetry;
   final bool showTimeframeSelector;
 
@@ -104,12 +107,13 @@ class ResourceLineChart extends StatelessWidget {
 
   Widget _buildBody(BuildContext context, ColorScheme scheme, double h) {
     if (error != null) {
+      final msg = errorMessage ?? l10n.chartLoadError;
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              l10n.chartLoadError,
+              msg,
               textAlign: TextAlign.center,
               style: Theme.of(
                 context,
@@ -124,7 +128,7 @@ class ResourceLineChart extends StatelessWidget {
       );
     }
     if (isLoading && data.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
+      return PulsingPlaceholder(height: h);
     }
     if (data.isEmpty) {
       return Center(

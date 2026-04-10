@@ -87,19 +87,19 @@ chore: bump flutter_riverpod to 3.1.0
 
 ---
 
-## Integration Tests
+## Integration tests / live PVE
 
-Integration tests require a live Proxmox VE instance (PVE 7.x or 8.x). A VM running Proxmox VE on a local machine (e.g. via QEMU/KVM) is sufficient.
+End-to-end tests live under `integration_test/` (see `integration_test/app_test.dart`). Tag each test with `tags: ['integration']` on `testWidgets` so you can run them selectively with `--tags integration`.
 
-To run integration tests:
+**Default CI and local checks:** `flutter test` only runs the `test/` tree. It does **not** run `integration_test/` unless you pass that path, so the default suite stays green without a Proxmox server.
+
+**Run tagged integration tests** (placeholder today; use this when you add device-level or live-PVE scenarios):
 
 ```bash
-flutter test --tags integration
+flutter test integration_test --tags integration
 ```
 
-Integration tests are excluded from CI by default (they are tagged with `@Tags(['integration'])` and require a configured PVE instance). The standard CI run (`flutter test`) skips them automatically.
-
-To set up a local PVE test instance, refer to the [Proxmox VE documentation](https://pve.proxmox.com/pve-docs/).
+**Live PVE (optional, maintainer / manual only):** Real cluster tests are opt-in. When you add them, gate API calls on environment variables or secrets and document the setup here. A VM running Proxmox VE (7.x or 8.x) on a local machine (e.g. QEMU/KVM) is enough for manual runs. See the [Proxmox VE documentation](https://pve.proxmox.com/pve-docs/).
 
 ---
 

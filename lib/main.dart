@@ -5,6 +5,7 @@ import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
 import 'package:proxdroid/app/app.dart';
 import 'package:proxdroid/core/models/server.dart';
+import 'package:proxdroid/core/storage/app_settings_repository.dart';
 import 'package:proxdroid/core/storage/secure_storage_backend.dart';
 import 'package:proxdroid/core/storage/server_adapter.dart';
 import 'package:proxdroid/core/storage/server_storage.dart';
@@ -18,14 +19,19 @@ Future<void> main() async {
   }
 
   final serverBox = await Hive.openBox<Server>(kServersHiveBoxName);
+  final settingsBox = await Hive.openBox<String>(kSettingsHiveBoxName);
   final serverStorage = ServerStorage(
     box: serverBox,
     secureStorage: FlutterSecureStorageAdapter(const FlutterSecureStorage()),
   );
+  final appSettingsRepository = AppSettingsRepository(box: settingsBox);
 
   runApp(
     ProviderScope(
-      overrides: [serverStorageProvider.overrideWithValue(serverStorage)],
+      overrides: [
+        serverStorageProvider.overrideWithValue(serverStorage),
+        appSettingsRepositoryProvider.overrideWithValue(appSettingsRepository),
+      ],
       child: const ProxDroidApp(),
     ),
   );

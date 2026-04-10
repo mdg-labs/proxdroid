@@ -328,38 +328,39 @@
 **Goal:** The app is stable, handles all error cases gracefully, feels polished, and is ready for a public release on the Play Store, F-Droid, and GitHub.
 
 ### 6.1 Error Handling & Edge Cases
-- [ ] Audit all screens for unhandled error states
-- [ ] Ensure all `ProxmoxException` types have clear, user-friendly messages
-- [ ] Handle network timeout gracefully (with retry option)
-- [ ] Handle session expiry for username/password auth (auto re-authenticate)
-- [ ] Handle empty states on all list screens
-- [ ] Implement persistent offline banner: when `connectivityProvider` reports no network, show a non-dismissible top banner across all screens; auto-dismiss when connectivity is restored
+- [x] Audit all screens for unhandled error states
+- [x] Ensure all `ProxmoxException` types have clear, user-friendly messages
+- [x] Handle network timeout gracefully (with retry option)
+- [x] Handle session expiry for username/password auth (auto re-authenticate) — wired in `ProxmoxAuthInterceptor` (Phase 1+); verified unchanged in Phase 6
+- [x] Handle empty states on all list screens
+- [x] Implement persistent offline banner: when `connectivityProvider` reports no network, show a non-dismissible top banner across all screens; auto-dismiss when connectivity is restored
 
 ### 6.2 UX Polish
-- [ ] Add smooth page transitions (go_router transitions)
-- [ ] Add haptic feedback on action buttons (start/stop/reboot)
-- [ ] Add pull-to-refresh on all data screens
-- [ ] Ensure all loading states use shimmer (no blank screens)
+- [x] Add smooth page transitions (go_router transitions)
+- [x] Add haptic feedback on action buttons (start/stop/reboot)
+- [x] Add pull-to-refresh on all data screens
+- [x] Ensure all loading states use shimmer (no blank screens)
 - [ ] Review all typography, spacing, icon usage for consistency
 - [ ] Test dark and light theme on multiple screen sizes
 
 ### 6.3 Settings Screen
-- [ ] Build `SettingsScreen` with sections:
-  - **Appearance:** theme toggle (dark/light/system)
-  - **About:** app version, link to `github.com/mdg-labs/proxdroid`, Play Store listing link, F-Droid listing link, license info (MIT)
-  - **Support:** donation links (Ko-fi, GitHub Sponsors)
-- [ ] Wire up theme toggle to persist preference in hive_ce
-- [ ] Wire up go_router: `/settings` → `SettingsScreen`
+- [x] Build `SettingsScreen` with sections:
+  - **Appearance:** theme control (dark/light/system) via `SegmentedButton`
+  - **About:** app version (`package_info_plus`), link to `github.com/mdg-labs/proxdroid`, MIT license summary dialog (Play Store / F-Droid links deferred — out of scope for this release; see §6.5–6.6)
+  - **Support:** Ko-fi and GitHub Sponsors tiles (`url_launcher`)
+- [x] Wire up theme preference to hive_ce (`settings` box, key `themeMode`; values `dark` / `light` / `system`)
+- [x] go_router: `/settings` → `SettingsScreen` (already wired)
 
 ### 6.4 Testing
-- [ ] Unit tests for all repositories (mock API client)
-- [ ] Unit tests for all Riverpod providers
-- [ ] Unit tests for all Freezed models (fromJson/toJson roundtrip)
-- [ ] Widget tests for critical UI flows (add server, start VM)
-- [ ] Integration tests using `integration_test` package for end-to-end flows (add server → dashboard → VM action)
+- [x] Representative repository unit tests (Vm, Node, Task via fake HTTP adapter + `ProxmoxApiClient`; `AppSettingsRepository` via Hive) — expand to remaining repos over time
+- [x] Representative Riverpod unit test (`AppThemeMode` with `ProviderContainer` overrides)
+- [x] Representative Freezed JSON roundtrip tests (`Vm`, `Node`, `Task`)
+- [x] Widget tests: `SettingsScreen` section title; `ServerEditorPage` save validation (empty name)
+- [x] `integration_test` scaffold with `testWidgets(..., tags: ['integration'])`; documented in `CONTRIBUTING.md` (`flutter test integration_test --tags integration`); default `flutter test` does not run `integration_test/`
+- [ ] Unit / widget coverage for all repositories, providers, and critical flows (e.g. start VM) — ongoing
+- [ ] Integration tests for end-to-end flows (add server → dashboard → VM action) against optional live PVE
 - [ ] Manual end-to-end test on a real Proxmox instance (PVE 7.x and 8.x)
-  - Integration tests that require a live PVE instance are skipped in CI by default (use `@Tags(['integration'])` and `flutter test --tags integration` to run selectively)
-  - Document test environment setup in `CONTRIBUTING.md` (e.g., Proxmox in a VM via QEMU/KVM on a local machine)
+  - Live-PVE tests remain opt-in; use `@Tags(['integration'])` and the command in `CONTRIBUTING.md`
 
 ### 6.5 Play Store Release
 - [ ] Create app icons (launcher icon, adaptive icon for Android)
@@ -399,10 +400,10 @@
 - [ ] Update `README.md` with download badges (Play Store + F-Droid + GitHub Releases)
 
 ### 6.7 Localization & Terminology Review
-- [ ] Audit all screens for hard-coded UI strings — move any remaining strings to `lib/l10n/app_en.arb`
-- [ ] Verify all ARB keys use Proxmox-aligned terminology (Node, Virtual Machine, Container, Storage, Task, Backup — consistent with Proxmox web UI labels)
-- [ ] Run `flutter gen-l10n` and confirm clean generation with no missing keys
-- [ ] Verify all `ProxmoxException` error messages are surfaced via localized strings (not hard-coded in the exception class)
+- [x] Audit `lib/features` for hard-coded user-visible UI strings; moved formatted subtitles (settings version, server host:port) to `app_en.arb`
+- [ ] Verify all ARB keys use Proxmox-aligned terminology (Node, Virtual Machine, Container, Storage, Task, Backup — consistent with Proxmox web UI labels) — ongoing review
+- [x] Run `flutter gen-l10n` after ARB changes (CI includes this step)
+- [x] Error surfacing: `proxmoxExceptionMessage` maps exceptions to l10n; avoid showing raw exception text in UI
 - [ ] Review release-facing strings: Play Store listing description, Privacy Policy URL, in-app About screen — ensure consistency with ARB keys
 
 ---

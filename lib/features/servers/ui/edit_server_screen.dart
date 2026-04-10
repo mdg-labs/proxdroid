@@ -17,6 +17,12 @@ class EditServerScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final asyncServer = ref.watch(serverByIdProvider(serverId));
+    final minPullHeight = MediaQuery.sizeOf(context).height * 0.5;
+
+    Future<void> pullRefresh() async {
+      ref.invalidate(serverByIdProvider(serverId));
+      await ref.read(serverByIdProvider(serverId).future);
+    }
 
     return asyncServer.when(
       loading:
@@ -27,7 +33,23 @@ class EditServerScreen extends ConsumerWidget {
                 leading: shellAppBarLeading(context),
                 title: Text(l10n.screenEditServer),
               ),
-              const Expanded(child: LoadingShimmer()),
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: pullRefresh,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(
+                        height: minPullHeight,
+                        child: const LoadingShimmer(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
       error:
@@ -39,9 +61,22 @@ class EditServerScreen extends ConsumerWidget {
                 title: Text(l10n.screenEditServer),
               ),
               Expanded(
-                child: ErrorView(
-                  message: l10n.serverEditLoadError,
-                  onRetry: () => ref.invalidate(serverByIdProvider(serverId)),
+                child: RefreshIndicator(
+                  onRefresh: pullRefresh,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(
+                        height: minPullHeight,
+                        child: ErrorView(
+                          message: l10n.serverEditLoadError,
+                          onRetry:
+                              () =>
+                                  ref.invalidate(serverByIdProvider(serverId)),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

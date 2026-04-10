@@ -37,6 +37,13 @@ class StorageDetailScreen extends ConsumerWidget {
     final scheme = Theme.of(context).colorScheme;
     final detailAsync = ref.watch(storageDetailProvider(node, storage));
     final contentAsync = ref.watch(storageContentProvider(node, storage));
+    final minPullHeight = MediaQuery.sizeOf(context).height * 0.5;
+
+    Future<void> pullRefresh() async {
+      _refresh(ref);
+      await ref.read(storageDetailProvider(node, storage).future);
+      await ref.read(storageContentProvider(node, storage).future);
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -44,20 +51,43 @@ class StorageDetailScreen extends ConsumerWidget {
         AppBar(leading: shellAppBarLeading(context), title: Text(storage)),
         Expanded(
           child: detailAsync.when(
-            loading: () => const LoadingShimmer(itemCount: 5),
+            loading:
+                () => RefreshIndicator(
+                  onRefresh: pullRefresh,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(
+                        height: minPullHeight,
+                        child: const LoadingShimmer(
+                          itemCount: 5,
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
             error:
-                (e, _) => ErrorView(
-                  message: proxmoxExceptionMessage(e, l10n),
-                  onRetry: () => _refresh(ref),
+                (e, _) => RefreshIndicator(
+                  onRefresh: pullRefresh,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(
+                        height: minPullHeight,
+                        child: ErrorView(
+                          message: proxmoxExceptionMessage(e, l10n),
+                          onRetry: () => _refresh(ref),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
             data: (s) {
               final frac = _usageFraction(s.total, s.used);
               return RefreshIndicator(
-                onRefresh: () async {
-                  _refresh(ref);
-                  await ref.read(storageDetailProvider(node, storage).future);
-                  await ref.read(storageContentProvider(node, storage).future);
-                },
+                onRefresh: pullRefresh,
                 child: CustomScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   slivers: [

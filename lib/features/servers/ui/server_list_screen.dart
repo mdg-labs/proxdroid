@@ -64,62 +64,109 @@ class ServerListScreen extends ConsumerWidget {
     final scheme = Theme.of(context).colorScheme;
     final async = ref.watch(serverListNotifierProvider);
 
-    Widget body = async.when(
-      loading: () => const LoadingShimmer(),
-      error:
-          (Object error, StackTrace stackTrace) => ErrorView(
-            message: l10n.serversLoadError,
-            onRetry: () => ref.invalidate(serverListNotifierProvider),
-          ),
-      data: (servers) {
-        if (servers.isEmpty) {
-          return EmptyState(
-            icon: Icons.dns_outlined,
-            title: l10n.serversEmptyTitle,
-            message: l10n.serversEmptyMessage,
-            action: FilledButton.icon(
-              onPressed: () => context.push('/servers/add'),
-              icon: const Icon(Icons.add),
-              label: Text(l10n.serversEmptyCta),
+    Future<void> onPullRefresh() async {
+      ref.invalidate(serverListNotifierProvider);
+      await ref.read(serverListNotifierProvider.future);
+    }
+
+    final minPullHeight = MediaQuery.sizeOf(context).height * 0.5;
+
+    Widget body = RefreshIndicator(
+      onRefresh: onPullRefresh,
+      child: async.when(
+        loading:
+            () => ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: minPullHeight,
+                  child: const LoadingShimmer(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                  ),
+                ),
+              ],
             ),
-          );
-        }
-        return ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          itemCount: servers.length,
-          itemBuilder: (context, index) {
-            final server = servers[index];
-            return Dismissible(
-              key: ValueKey<String>(server.id),
-              direction: DismissDirection.endToStart,
-              confirmDismiss:
-                  (_) => _confirmDismiss(context, ref, server, l10n),
-              background: Container(
-                alignment: Alignment.centerRight,
-                padding: const EdgeInsets.only(right: 24),
-                margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                decoration: BoxDecoration(
-                  color: scheme.errorContainer,
-                  borderRadius: BorderRadius.circular(12),
+        error:
+            (Object error, StackTrace stackTrace) => ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: minPullHeight,
+                  child: ErrorView(
+                    message: l10n.serversLoadError,
+                    onRetry: () => ref.invalidate(serverListNotifierProvider),
+                  ),
                 ),
-                child: Icon(
-                  Icons.delete_outline,
-                  color: scheme.onErrorContainer,
+              ],
+            ),
+        data: (servers) {
+          if (servers.isEmpty) {
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: minPullHeight,
+                  child: EmptyState(
+                    icon: Icons.dns_outlined,
+                    title: l10n.serversEmptyTitle,
+                    message: l10n.serversEmptyMessage,
+                    action: FilledButton.icon(
+                      onPressed: () => context.push('/servers/add'),
+                      icon: const Icon(Icons.add),
+                      label: Text(l10n.serversEmptyCta),
+                    ),
+                  ),
                 ),
-              ),
-              child: Card(
-                margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                child: ListTile(
-                  title: Text(server.name),
-                  subtitle: Text('${server.host}:${server.port}'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => context.push('/servers/edit/${server.id}'),
-                ),
-              ),
+              ],
             );
-          },
-        );
-      },
+          }
+          return ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            itemCount: servers.length,
+            itemBuilder: (context, index) {
+              final server = servers[index];
+              return Dismissible(
+                key: ValueKey<String>(server.id),
+                direction: DismissDirection.endToStart,
+                confirmDismiss:
+                    (_) => _confirmDismiss(context, ref, server, l10n),
+                background: Container(
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.only(right: 24),
+                  margin: const EdgeInsets.symmetric(
+                    vertical: 4,
+                    horizontal: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: scheme.errorContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.delete_outline,
+                    color: scheme.onErrorContainer,
+                  ),
+                ),
+                child: Card(
+                  margin: const EdgeInsets.symmetric(
+                    vertical: 4,
+                    horizontal: 8,
+                  ),
+                  child: ListTile(
+                    title: Text(server.name),
+                    subtitle: Text(
+                      l10n.serverListHostPortSubtitle(server.host, server.port),
+                    ),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => context.push('/servers/edit/${server.id}'),
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
 
     return Stack(

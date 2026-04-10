@@ -34,6 +34,13 @@ class StorageListScreen extends ConsumerWidget {
     final scheme = Theme.of(context).colorScheme;
     final async = ref.watch(allClusterStorageProvider);
     final nodesAsync = ref.watch(nodeListProvider);
+    final minPullHeight = MediaQuery.sizeOf(context).height * 0.5;
+
+    Future<void> pullRefresh() async {
+      _refresh(ref);
+      await ref.read(allClusterStorageProvider.future);
+      await ref.read(nodeListProvider.future);
+    }
 
     if (async.hasError || nodesAsync.hasError) {
       final err = async.error ?? nodesAsync.error!;
@@ -45,9 +52,20 @@ class StorageListScreen extends ConsumerWidget {
             title: Text(l10n.entityStorage),
           ),
           Expanded(
-            child: ErrorView(
-              message: proxmoxExceptionMessage(err, l10n),
-              onRetry: () => _refresh(ref),
+            child: RefreshIndicator(
+              onRefresh: pullRefresh,
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  SizedBox(
+                    height: minPullHeight,
+                    child: ErrorView(
+                      message: proxmoxExceptionMessage(err, l10n),
+                      onRetry: () => _refresh(ref),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -62,13 +80,31 @@ class StorageListScreen extends ConsumerWidget {
             leading: shellAppBarLeading(context),
             title: Text(l10n.entityStorage),
           ),
-          const Expanded(child: LoadingShimmer(itemCount: 6)),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: pullRefresh,
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  SizedBox(
+                    height: minPullHeight,
+                    child: const LoadingShimmer(
+                      itemCount: 6,
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       );
     }
 
     final list = async.requireValue;
     if (list.isEmpty) {
+      final minPullHeight = MediaQuery.sizeOf(context).height * 0.5;
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -77,10 +113,24 @@ class StorageListScreen extends ConsumerWidget {
             title: Text(l10n.entityStorage),
           ),
           Expanded(
-            child: EmptyState(
-              icon: Icons.storage_outlined,
-              title: l10n.storageEmptyTitle,
-              message: l10n.storageEmptyMessage,
+            child: RefreshIndicator(
+              onRefresh: () async {
+                _refresh(ref);
+                await ref.read(allClusterStorageProvider.future);
+              },
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  SizedBox(
+                    height: minPullHeight,
+                    child: EmptyState(
+                      icon: Icons.storage_outlined,
+                      title: l10n.storageEmptyTitle,
+                      message: l10n.storageEmptyMessage,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -96,10 +146,7 @@ class StorageListScreen extends ConsumerWidget {
         ),
         Expanded(
           child: RefreshIndicator(
-            onRefresh: () async {
-              _refresh(ref);
-              await ref.read(allClusterStorageProvider.future);
-            },
+            onRefresh: pullRefresh,
             child: ListView.separated(
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(16),

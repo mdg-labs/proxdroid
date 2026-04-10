@@ -106,6 +106,12 @@ class TaskListScreen extends ConsumerWidget {
     final vms = ref.watch(allVmsProvider).valueOrNull ?? const <Vm>[];
     final containers =
         ref.watch(allContainersProvider).valueOrNull ?? const <px.Container>[];
+    final minPullHeight = MediaQuery.sizeOf(context).height * 0.5;
+
+    Future<void> refreshTasks() async {
+      ref.read(taskListProvider.notifier).refresh();
+      await ref.read(taskListProvider.future);
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -116,27 +122,63 @@ class TaskListScreen extends ConsumerWidget {
         ),
         Expanded(
           child: tasksAsync.when(
-            loading: () => const LoadingShimmer(itemCount: 8),
+            loading:
+                () => RefreshIndicator(
+                  onRefresh: refreshTasks,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(
+                        height: minPullHeight,
+                        child: const LoadingShimmer(
+                          itemCount: 8,
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
             error:
-                (e, _) => ErrorView(
-                  message:
-                      '${l10n.taskListLoadError}\n${proxmoxExceptionMessage(e, l10n)}',
-                  onRetry: () => ref.read(taskListProvider.notifier).refresh(),
+                (e, _) => RefreshIndicator(
+                  onRefresh: refreshTasks,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(
+                        height: minPullHeight,
+                        child: ErrorView(
+                          message: proxmoxExceptionMessage(e, l10n),
+                          onRetry:
+                              () =>
+                                  ref.read(taskListProvider.notifier).refresh(),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
             data: (tasks) {
               if (tasks.isEmpty) {
-                return EmptyState(
-                  icon: Icons.task_alt_outlined,
-                  title: l10n.taskListEmptyTitle,
-                  message: l10n.taskListEmptyMessage,
+                return RefreshIndicator(
+                  onRefresh: refreshTasks,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(
+                        height: minPullHeight,
+                        child: EmptyState(
+                          icon: Icons.task_alt_outlined,
+                          title: l10n.taskListEmptyTitle,
+                          message: l10n.taskListEmptyMessage,
+                        ),
+                      ),
+                    ],
+                  ),
                 );
               }
 
               return RefreshIndicator(
-                onRefresh: () async {
-                  ref.read(taskListProvider.notifier).refresh();
-                  await ref.read(taskListProvider.future);
-                },
+                onRefresh: refreshTasks,
                 child: ListView.separated(
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding: const EdgeInsets.symmetric(vertical: 8),

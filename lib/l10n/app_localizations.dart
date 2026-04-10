@@ -100,6 +100,12 @@ abstract class AppLocalizations {
   /// **'ProxDroid'**
   String get appTitle;
 
+  /// Persistent banner when the device has no connectivity (Phase 6.1).
+  ///
+  /// In en, this message translates to:
+  /// **'No network connection. Some actions may not work until you are back online.'**
+  String get offlineBannerMessage;
+
   /// Proxmox cluster node entity label (matches PVE terminology).
   ///
   /// In en, this message translates to:
@@ -357,6 +363,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Server removed'**
   String get serverDeletedSnackbar;
+
+  /// Server list tile subtitle: host and API port (no scheme).
+  ///
+  /// In en, this message translates to:
+  /// **'{host}:{port}'**
+  String serverListHostPortSubtitle(String host, int port);
 
   /// Label for the friendly server name field.
   ///
@@ -1191,6 +1203,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Available: {size}'**
   String storageAvailableSpace(String size);
+
+  /// Dismiss a dialog (e.g. license summary).
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get actionClose;
+
+  /// Settings section: theme / display.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get settingsAppearanceSection;
+
+  /// Theme option: dark mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get settingsThemeDark;
+
+  /// Theme option: light mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get settingsThemeLight;
+
+  /// Theme option: follow OS light/dark (short label for segmented control).
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get settingsThemeSystem;
+
+  /// Settings section: version and project info.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get settingsAboutSection;
+
+  /// Label for app version row in Settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get settingsVersion;
+
+  /// About row subtitle: semantic version and build number.
+  ///
+  /// In en, this message translates to:
+  /// **'{version} ({buildNumber})'**
+  String settingsVersionSubtitle(String version, String buildNumber);
+
+  /// Placeholder while package info loads.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading…'**
+  String get settingsLoading;
+
+  /// When package version could not be read.
+  ///
+  /// In en, this message translates to:
+  /// **'Unavailable'**
+  String get settingsVersionUnavailable;
+
+  /// Link to GitHub repository.
+  ///
+  /// In en, this message translates to:
+  /// **'Source code'**
+  String get settingsSourceCode;
+
+  /// MIT license dialog title and list tile title.
+  ///
+  /// In en, this message translates to:
+  /// **'License'**
+  String get settingsLicenseTitle;
+
+  /// Subtitle on license row in Settings.
+  ///
+  /// In en, this message translates to:
+  /// **'MIT License — tap for summary'**
+  String get settingsLicenseTileSubtitle;
+
+  /// Short MIT summary in About dialog (not full legal text).
+  ///
+  /// In en, this message translates to:
+  /// **'ProxDroid is licensed under the MIT License. You may use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, subject to including the copyright notice and permission notice in all copies. The software is provided \"as is\", without warranty of any kind. See the LICENSE file in the repository for the full text.'**
+  String get settingsLicenseSummary;
+
+  /// Settings section: donations / sponsorship.
+  ///
+  /// In en, this message translates to:
+  /// **'Support'**
+  String get settingsSupportSection;
+
+  /// Support link title for Ko-fi.
+  ///
+  /// In en, this message translates to:
+  /// **'Ko-fi'**
+  String get settingsSupportKofi;
+
+  /// Support link title for GitHub Sponsors.
+  ///
+  /// In en, this message translates to:
+  /// **'GitHub Sponsors'**
+  String get settingsSupportGithubSponsors;
+
+  /// Snackbar when url_launcher fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open link'**
+  String get settingsCouldNotOpenLink;
 }
 
 class _AppLocalizationsDelegate
