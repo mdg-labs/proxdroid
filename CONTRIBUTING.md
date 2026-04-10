@@ -96,8 +96,10 @@ End-to-end tests live under `integration_test/` (see `integration_test/app_test.
 **Run tagged integration tests** (placeholder today; use this when you add device-level or live-PVE scenarios):
 
 ```bash
-flutter test integration_test --tags integration
+flutter test integration_test --tags integration -d flutter-tester
 ```
+
+On many Linux setups the default device is **Linux desktop**, which triggers a full desktop build and requires **CMake**. Using **`-d flutter-tester`** runs the same tests in the VM test embedder without that build. For on-device or live UI, use `-d <device_id>` (Android emulator, Chrome, etc.).
 
 **Live PVE (optional, maintainer / manual only):** Real cluster tests are opt-in. When you add them, gate API calls on environment variables or secrets and document the setup here. A VM running Proxmox VE (7.x or 8.x) on a local machine (e.g. QEMU/KVM) is enough for manual runs. See the [Proxmox VE documentation](https://pve.proxmox.com/pve-docs/).
 

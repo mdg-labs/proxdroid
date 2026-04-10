@@ -355,7 +355,7 @@
 - [x] Representative repository unit tests (Vm, Node, Task via fake HTTP adapter + `ProxmoxApiClient`; `AppSettingsRepository` via Hive) — expand to remaining repos over time
 - [x] Representative Riverpod unit test (`AppThemeMode` with `ProviderContainer` overrides)
 - [x] Representative Freezed JSON roundtrip tests (`Vm`, `Node`, `Task`)
-- [x] Widget tests: `SettingsScreen` section title; `ServerEditorPage` save validation (empty name)
+- [x] Widget tests: settings Appearance l10n + theme `SegmentedButton` smoke; `ServerEditorPage` save validation (empty name)
 - [x] `integration_test` scaffold with `testWidgets(..., tags: ['integration'])`; documented in `CONTRIBUTING.md` (`flutter test integration_test --tags integration`); default `flutter test` does not run `integration_test/`
 - [ ] Unit / widget coverage for all repositories, providers, and critical flows (e.g. start VM) — ongoing
 - [ ] Integration tests for end-to-end flows (add server → dashboard → VM action) against optional live PVE
