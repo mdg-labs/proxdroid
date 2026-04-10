@@ -10,6 +10,7 @@ import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
+import 'package:proxdroid/shared/widgets/premium_list_row.dart';
 import 'package:proxdroid/shared/widgets/shell_section_body.dart';
 
 enum _ContainerStatusFilter { all, running, stopped }
@@ -259,7 +260,8 @@ class _ContainerListScreenState extends ConsumerState<ContainerListScreen> {
                         padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
                         child: Card(
                           margin: EdgeInsets.zero,
-                          child: ListTile(
+                          clipBehavior: Clip.antiAlias,
+                          child: PremiumListRow(
                             title: Text(
                               ct.name.isEmpty
                                   ? '${l10n.labelCtid} ${ct.vmid}'
@@ -267,46 +269,37 @@ class _ContainerListScreenState extends ConsumerState<ContainerListScreen> {
                             ),
                             subtitle: Text(
                               '${l10n.labelCtid} ${ct.vmid} · ${l10n.entityNode} ${ct.node}',
-                              style: TextStyle(color: scheme.onSurfaceVariant),
                             ),
-                            trailing: Row(
+                            trailing: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.end,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    ContainerStatusBadge(status: ct.status),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      formatCpuPercent(ct.cpu),
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.labelSmall?.copyWith(
-                                        color: scheme.onSurfaceVariant,
-                                      ),
-                                    ),
-                                    Text(
-                                      formatMemoryRatio(ct.mem, ct.maxMem),
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.labelSmall?.copyWith(
-                                        color: scheme.onSurfaceVariant,
-                                      ),
-                                    ),
-                                  ],
+                                ContainerStatusBadge(status: ct.status),
+                                const SizedBox(height: 4),
+                                Text(
+                                  formatCpuPercent(ct.cpu),
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.labelSmall?.copyWith(
+                                    color: scheme.onSurfaceVariant,
+                                  ),
                                 ),
-                                Icon(
-                                  Icons.chevron_right,
-                                  color: scheme.onSurfaceVariant,
+                                Text(
+                                  formatMemoryRatio(ct.mem, ct.maxMem),
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.labelSmall?.copyWith(
+                                    color: scheme.onSurfaceVariant,
+                                  ),
                                 ),
                               ],
                             ),
-                            onTap:
-                                () => context.push(
-                                  '/containers/${Uri.encodeComponent(ct.node)}/${Uri.encodeComponent(ct.vmid.toString())}',
-                                ),
+                            showChevron: true,
+                            showDividerBelow: false,
+                            onTap: () => context.push(
+                              '/containers/${Uri.encodeComponent(ct.node)}/${Uri.encodeComponent(ct.vmid.toString())}',
+                            ),
                           ),
                         ),
                       );

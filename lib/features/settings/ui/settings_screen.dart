@@ -5,6 +5,7 @@ import 'package:proxdroid/features/settings/providers/settings_providers.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/widgets/grouped_section.dart';
 import 'package:proxdroid/shared/widgets/pill_segmented.dart';
+import 'package:proxdroid/shared/widgets/premium_modals.dart';
 import 'package:proxdroid/shared/widgets/section_header.dart';
 import 'package:proxdroid/shared/widgets/shell_section_body.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -29,21 +30,16 @@ class SettingsScreen extends ConsumerWidget {
 
   void _showLicenseDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    showDialog<void>(
+    showPremiumDialog<void>(
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            title: Text(l10n.settingsLicenseTitle),
-            content: SingleChildScrollView(
-              child: Text(l10n.settingsLicenseSummary),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(),
-                child: Text(l10n.actionClose),
-              ),
-            ],
-          ),
+      title: Text(l10n.settingsLicenseTitle),
+      content: Text(l10n.settingsLicenseSummary),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.actionClose),
+        ),
+      ],
     );
   }
 

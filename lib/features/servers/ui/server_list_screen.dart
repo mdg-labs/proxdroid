@@ -8,6 +8,7 @@ import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
+import 'package:proxdroid/shared/widgets/premium_list_row.dart';
 import 'package:proxdroid/shared/widgets/shell_section_body.dart';
 
 class ServerListScreen extends ConsumerWidget {
@@ -153,12 +154,14 @@ class ServerListScreen extends ConsumerWidget {
                     vertical: 4,
                     horizontal: 8,
                   ),
-                  child: ListTile(
+                  clipBehavior: Clip.antiAlias,
+                  child: PremiumListRow(
                     title: Text(server.name),
                     subtitle: Text(
                       l10n.serverListHostPortSubtitle(server.host, server.port),
                     ),
-                    trailing: const Icon(Icons.chevron_right),
+                    showChevron: true,
+                    showDividerBelow: false,
                     onTap: () => context.push('/servers/edit/${server.id}'),
                   ),
                 ),

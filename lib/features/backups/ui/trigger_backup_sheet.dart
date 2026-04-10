@@ -10,6 +10,7 @@ import 'package:proxdroid/features/servers/ui/proxmox_exception_messages.dart';
 import 'package:proxdroid/features/storage/providers/storage_providers.dart';
 import 'package:proxdroid/features/vms/providers/vm_providers.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
+import 'package:proxdroid/shared/widgets/premium_modals.dart';
 
 /// Target guest for a manual vzdump (VM or LXC).
 class BackupGuestTarget {
@@ -57,16 +58,11 @@ Future<void> showTriggerBackupSheet(
   WidgetRef ref, {
   BackupGuestTarget? initialGuest,
 }) {
-  return showModalBottomSheet<void>(
+  return showPremiumModalBottomSheet<void>(
     context: context,
-    isScrollControlled: true,
-    showDragHandle: true,
-    builder: (ctx) {
-      return Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(ctx).bottom),
-        child: TriggerBackupSheet(initialGuest: initialGuest),
-      );
-    },
+    builder: (ctx) => PremiumBottomSheet(
+      child: TriggerBackupSheet(initialGuest: initialGuest),
+    ),
   );
 }
 
@@ -377,7 +373,6 @@ class _TriggerBackupSheetState extends ConsumerState<TriggerBackupSheet> {
 
     return SafeArea(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,

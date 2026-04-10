@@ -198,7 +198,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get serverAuthTypeUsernamePassword => 'Password';
 
   @override
+  String get serverFormIdentitySection => 'Identity';
+
   String get serverFormAuthentication => 'Authentication';
+
+  String get serverFormSecuritySection => 'Security';
 
   @override
   String get serverAllowSelfSigned => 'Allow self-signed certificate';
@@ -719,4 +723,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsCouldNotOpenLink => 'Could not open link';
+
+  @override
+  String get navDashboard => 'Dashboard';
+
+  @override
+  String get navVMs => 'VMs';
+
+  @override
+  String get navContainers => 'Containers';
+
+  @override
+  String get navTasks => 'Tasks';
+
+  @override
+  String get navMore => 'More';
 }

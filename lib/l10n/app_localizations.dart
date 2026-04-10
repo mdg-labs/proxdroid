@@ -464,7 +464,11 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Authentication'**
+  String get serverFormIdentitySection;
+
   String get serverFormAuthentication;
+
+  String get serverFormSecuritySection;
 
   /// Switch label to trust self-signed TLS certificates.
   ///
@@ -1419,6 +1423,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not open link'**
   String get settingsCouldNotOpenLink;
+
+  /// Bottom navigation bar label for the Dashboard tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Dashboard'**
+  String get navDashboard;
+
+  /// Bottom navigation bar label for the Virtual Machines tab (abbreviated for space).
+  ///
+  /// In en, this message translates to:
+  /// **'VMs'**
+  String get navVMs;
+
+  /// Bottom navigation bar label for the LXC Containers tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Containers'**
+  String get navContainers;
+
+  /// Bottom navigation bar label for the Proxmox Tasks tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Tasks'**
+  String get navTasks;
+
+  /// Bottom navigation bar label for the More tab, which opens the full navigation drawer.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get navMore;
 }
 
 class _AppLocalizationsDelegate

@@ -104,4 +104,19 @@ abstract final class AppColors {
   static const Color lightStatusSuccessForeground = Color(0xFF1B4332);
   static const Color lightStatusWarningBackground = Color(0xFFFFF8E1);
   static const Color lightStatusWarningForeground = Color(0xFF5C4A00);
+
+  // --- Chart series colors (§9) ---
+  //
+  // CPU:  colorScheme.primary (blue)   — from theme, not a constant here.
+  // Memory: colorScheme.secondary (tan/gold) — from theme, not a constant here.
+
+  /// Network out: muted purple-grey per §9 "blue + muted purple/grey".
+  /// Approximated as desaturated mauve — readable on true-black at chart scale.
+  static const Color chartNetworkOut = Color(0xFF9B8FA4);
+
+  /// Disk read: amber-300 per §9 "amber + blue-grey".
+  static const Color chartDiskRead = Color(0xFFFFB74D);
+
+  /// Disk write: blue-grey-400 per §9 "amber + blue-grey".
+  static const Color chartDiskWrite = Color(0xFF78909C);
 }

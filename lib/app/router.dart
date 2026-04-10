@@ -101,143 +101,186 @@ GoRouter router(Ref ref) {
         (BuildContext context, GoRouterState state) =>
             _redirectForServer(ref, state),
     routes: <RouteBase>[
-      ShellRoute(
-        builder: (BuildContext context, GoRouterState state, Widget child) {
-          return AppShell(currentPath: state.uri.path, child: child);
+      StatefulShellRoute.indexedStack(
+        builder: (
+          BuildContext context,
+          GoRouterState state,
+          StatefulNavigationShell navigationShell,
+        ) {
+          return AppShell(
+            currentPath: state.uri.path,
+            navigationShell: navigationShell,
+          );
         },
-        routes: <RouteBase>[
-          GoRoute(
-            path: '/servers',
-            pageBuilder:
-                (BuildContext context, GoRouterState state) =>
-                    _fadeShellPage(state, const ServerListScreen()),
+        branches: <StatefulShellBranch>[
+          // Branch 0 — Dashboard (bottom nav tab 0)
+          StatefulShellBranch(
             routes: <RouteBase>[
               GoRoute(
-                path: 'add',
+                path: '/dashboard',
                 pageBuilder:
                     (BuildContext context, GoRouterState state) =>
-                        _fadeShellPage(state, const AddServerScreen()),
-              ),
-              GoRoute(
-                path: 'edit/:serverId',
-                pageBuilder: (BuildContext context, GoRouterState state) {
-                  final serverId = state.pathParameters['serverId']!;
-                  return _fadeShellPage(
-                    state,
-                    EditServerScreen(serverId: serverId),
-                  );
-                },
+                        _fadeShellPage(state, const DashboardScreen()),
               ),
             ],
           ),
-          GoRoute(
-            path: '/dashboard',
-            pageBuilder:
-                (BuildContext context, GoRouterState state) =>
-                    _fadeShellPage(state, const DashboardScreen()),
-          ),
-          GoRoute(
-            path: '/vms',
-            pageBuilder:
-                (BuildContext context, GoRouterState state) =>
-                    _fadeShellPage(state, const VmListScreen()),
+
+          // Branch 1 — VMs (bottom nav tab 1)
+          StatefulShellBranch(
             routes: <RouteBase>[
               GoRoute(
-                path: ':node/:vmid',
-                pageBuilder: (BuildContext context, GoRouterState state) {
-                  final node = Uri.decodeComponent(
-                    state.pathParameters['node']!,
-                  );
-                  final vmid = Uri.decodeComponent(
-                    state.pathParameters['vmid']!,
-                  );
-                  return _fadeShellPage(
-                    state,
-                    VmDetailScreen(node: node, vmid: vmid),
-                  );
-                },
+                path: '/vms',
+                pageBuilder:
+                    (BuildContext context, GoRouterState state) =>
+                        _fadeShellPage(state, const VmListScreen()),
+                routes: <RouteBase>[
+                  GoRoute(
+                    path: ':node/:vmid',
+                    pageBuilder: (BuildContext context, GoRouterState state) {
+                      final node = Uri.decodeComponent(
+                        state.pathParameters['node']!,
+                      );
+                      final vmid = Uri.decodeComponent(
+                        state.pathParameters['vmid']!,
+                      );
+                      return _fadeShellPage(
+                        state,
+                        VmDetailScreen(node: node, vmid: vmid),
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),
-          GoRoute(
-            path: '/containers',
-            pageBuilder:
-                (BuildContext context, GoRouterState state) =>
-                    _fadeShellPage(state, const ContainerListScreen()),
+
+          // Branch 2 — Containers (bottom nav tab 2)
+          StatefulShellBranch(
             routes: <RouteBase>[
               GoRoute(
-                path: ':node/:ctid',
-                pageBuilder: (BuildContext context, GoRouterState state) {
-                  final node = Uri.decodeComponent(
-                    state.pathParameters['node']!,
-                  );
-                  final ctid = Uri.decodeComponent(
-                    state.pathParameters['ctid']!,
-                  );
-                  return _fadeShellPage(
-                    state,
-                    ContainerDetailScreen(node: node, ctid: ctid),
-                  );
-                },
+                path: '/containers',
+                pageBuilder:
+                    (BuildContext context, GoRouterState state) =>
+                        _fadeShellPage(state, const ContainerListScreen()),
+                routes: <RouteBase>[
+                  GoRoute(
+                    path: ':node/:ctid',
+                    pageBuilder: (BuildContext context, GoRouterState state) {
+                      final node = Uri.decodeComponent(
+                        state.pathParameters['node']!,
+                      );
+                      final ctid = Uri.decodeComponent(
+                        state.pathParameters['ctid']!,
+                      );
+                      return _fadeShellPage(
+                        state,
+                        ContainerDetailScreen(node: node, ctid: ctid),
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),
-          GoRoute(
-            path: '/storage',
-            pageBuilder:
-                (BuildContext context, GoRouterState state) =>
-                    _fadeShellPage(state, const StorageListScreen()),
+
+          // Branch 3 — Tasks (bottom nav tab 3)
+          StatefulShellBranch(
             routes: <RouteBase>[
               GoRoute(
-                path: ':node/:storage',
-                pageBuilder: (BuildContext context, GoRouterState state) {
-                  final node = Uri.decodeComponent(
-                    state.pathParameters['node']!,
-                  );
-                  final storage = Uri.decodeComponent(
-                    state.pathParameters['storage']!,
-                  );
-                  return _fadeShellPage(
-                    state,
-                    StorageDetailScreen(node: node, storage: storage),
-                  );
-                },
+                path: '/tasks',
+                pageBuilder:
+                    (BuildContext context, GoRouterState state) =>
+                        _fadeShellPage(state, const TaskListScreen()),
+                routes: <RouteBase>[
+                  GoRoute(
+                    path: ':node/:upid',
+                    pageBuilder: (BuildContext context, GoRouterState state) {
+                      final node = Uri.decodeComponent(
+                        state.pathParameters['node']!,
+                      );
+                      // UPID contains colons (e.g. UPID:node:...) — callers must
+                      // percent-encode via Uri.encodeComponent before pushing this
+                      // route. Decoded here to restore the canonical UPID string.
+                      // T8.8: encoding verified present — see go_router.mdc rule.
+                      final upidParam = state.pathParameters['upid']!;
+                      final upid = Uri.decodeComponent(upidParam);
+                      return _fadeShellPage(
+                        state,
+                        TaskDetailScreen(node: node, upid: upid),
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),
-          GoRoute(
-            path: '/backups',
-            pageBuilder:
-                (BuildContext context, GoRouterState state) =>
-                    _fadeShellPage(state, const BackupListScreen()),
-          ),
-          GoRoute(
-            path: '/tasks',
-            pageBuilder:
-                (BuildContext context, GoRouterState state) =>
-                    _fadeShellPage(state, const TaskListScreen()),
+
+          // Branch 4 — More / overflow (bottom nav tab 4 opens drawer)
+          // Holds /servers, /storage, /backups, /settings so the router can
+          // resolve all 14 paths. Tapping "More" in the nav bar opens the
+          // NavigationDrawer rather than navigating.
+          StatefulShellBranch(
             routes: <RouteBase>[
               GoRoute(
-                path: ':node/:upid',
-                pageBuilder: (BuildContext context, GoRouterState state) {
-                  final node = Uri.decodeComponent(
-                    state.pathParameters['node']!,
-                  );
-                  final upidParam = state.pathParameters['upid']!;
-                  final upid = Uri.decodeComponent(upidParam);
-                  return _fadeShellPage(
-                    state,
-                    TaskDetailScreen(node: node, upid: upid),
-                  );
-                },
+                path: '/servers',
+                pageBuilder:
+                    (BuildContext context, GoRouterState state) =>
+                        _fadeShellPage(state, const ServerListScreen()),
+                routes: <RouteBase>[
+                  GoRoute(
+                    path: 'add',
+                    pageBuilder:
+                        (BuildContext context, GoRouterState state) =>
+                            _fadeShellPage(state, const AddServerScreen()),
+                  ),
+                  GoRoute(
+                    path: 'edit/:serverId',
+                    pageBuilder: (BuildContext context, GoRouterState state) {
+                      final serverId = state.pathParameters['serverId']!;
+                      return _fadeShellPage(
+                        state,
+                        EditServerScreen(serverId: serverId),
+                      );
+                    },
+                  ),
+                ],
+              ),
+              GoRoute(
+                path: '/storage',
+                pageBuilder:
+                    (BuildContext context, GoRouterState state) =>
+                        _fadeShellPage(state, const StorageListScreen()),
+                routes: <RouteBase>[
+                  GoRoute(
+                    path: ':node/:storage',
+                    pageBuilder: (BuildContext context, GoRouterState state) {
+                      final node = Uri.decodeComponent(
+                        state.pathParameters['node']!,
+                      );
+                      final storage = Uri.decodeComponent(
+                        state.pathParameters['storage']!,
+                      );
+                      return _fadeShellPage(
+                        state,
+                        StorageDetailScreen(node: node, storage: storage),
+                      );
+                    },
+                  ),
+                ],
+              ),
+              GoRoute(
+                path: '/backups',
+                pageBuilder:
+                    (BuildContext context, GoRouterState state) =>
+                        _fadeShellPage(state, const BackupListScreen()),
+              ),
+              GoRoute(
+                path: '/settings',
+                pageBuilder:
+                    (BuildContext context, GoRouterState state) =>
+                        _fadeShellPage(state, const SettingsScreen()),
               ),
             ],
-          ),
-          GoRoute(
-            path: '/settings',
-            pageBuilder:
-                (BuildContext context, GoRouterState state) =>
-                    _fadeShellPage(state, const SettingsScreen()),
           ),
         ],
       ),

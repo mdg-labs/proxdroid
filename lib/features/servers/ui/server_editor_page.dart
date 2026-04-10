@@ -10,7 +10,11 @@ import 'package:proxdroid/features/servers/providers/server_providers.dart';
 import 'package:proxdroid/features/settings/providers/settings_providers.dart';
 import 'package:proxdroid/features/servers/ui/proxmox_exception_messages.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
+import 'package:proxdroid/shared/widgets/grouped_section.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
+import 'package:proxdroid/shared/widgets/pill_segmented.dart';
+import 'package:proxdroid/shared/widgets/premium_modals.dart';
+import 'package:proxdroid/shared/widgets/section_header.dart';
 import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
 import 'package:uuid/uuid.dart';
 
@@ -191,21 +195,27 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
     if (!ref.read(verboseConnectionErrorsProvider)) return;
     if (!context.mounted) return;
     final l10n = AppLocalizations.of(context)!;
-    showDialog<void>(
+    final scheme = Theme.of(context).colorScheme;
+    showPremiumDialog<void>(
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            title: Text(l10n.connectionDiagnosticsTitle),
-            content: SingleChildScrollView(
-              child: SelectableText(proxmoxExceptionDiagnosticsText(error)),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(),
-                child: Text(l10n.actionClose),
-              ),
-            ],
-          ),
+      title: Text(l10n.connectionDiagnosticsTitle),
+      content: Container(
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainer,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        padding: const EdgeInsets.all(12),
+        child: SelectableText(
+          proxmoxExceptionDiagnosticsText(error),
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.actionClose),
+        ),
+      ],
     );
   }
 
@@ -493,202 +503,231 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
           child: Form(
             key: _formKey,
             child: ListView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.only(bottom: 24),
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               children: [
-                TextFormField(
-                  controller: _nameController,
-                  decoration: InputDecoration(
-                    labelText: l10n.serverFieldName,
-                    hintText: l10n.serverFieldNameHint,
-                    border: const OutlineInputBorder(),
+                GroupedSection(
+                  topSpacing: 0,
+                  header: SectionHeader(title: l10n.serverFormIdentitySection),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        TextFormField(
+                          controller: _nameController,
+                          decoration: InputDecoration(
+                            labelText: l10n.serverFieldName,
+                            hintText: l10n.serverFieldNameHint,
+                            border: const OutlineInputBorder(),
+                          ),
+                          textInputAction: TextInputAction.next,
+                          validator: (v) {
+                            if (v == null || v.trim().isEmpty) {
+                              return l10n.serverNameErrorEmpty;
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _hostController,
+                          decoration: InputDecoration(
+                            labelText: l10n.serverFieldHost,
+                            hintText: l10n.serverFieldHostHint,
+                            border: const OutlineInputBorder(),
+                          ),
+                          textInputAction: TextInputAction.next,
+                          autocorrect: false,
+                          validator: (v) => _validateHost(v, l10n),
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _portController,
+                          decoration: InputDecoration(
+                            labelText: l10n.serverFieldPort,
+                            border: const OutlineInputBorder(),
+                          ),
+                          keyboardType: TextInputType.number,
+                          textInputAction: TextInputAction.next,
+                          validator: (v) {
+                            if (v == null || v.trim().isEmpty) {
+                              return l10n.serverPortErrorInvalid;
+                            }
+                            final p = int.tryParse(v.trim());
+                            if (p == null || p < 1 || p > 65535) {
+                              return l10n.serverPortErrorInvalid;
+                            }
+                            return null;
+                          },
+                        ),
+                      ],
+                    ),
                   ),
-                  textInputAction: TextInputAction.next,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
-                      return l10n.serverNameErrorEmpty;
-                    }
-                    return null;
-                  },
                 ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _hostController,
-                  decoration: InputDecoration(
-                    labelText: l10n.serverFieldHost,
-                    hintText: l10n.serverFieldHostHint,
-                    border: const OutlineInputBorder(),
+                const Divider(height: 1),
+                GroupedSection(
+                  topSpacing: 0,
+                  header: SectionHeader(title: l10n.serverFormAuthentication),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        PillSegmentedButton<ServerAuthType>(
+                          segments: [
+                            ButtonSegment(
+                              value: ServerAuthType.apiToken,
+                              label: Text(l10n.serverAuthTypeApiToken),
+                            ),
+                            ButtonSegment(
+                              value: ServerAuthType.usernamePassword,
+                              label: Text(l10n.serverAuthTypeUsernamePassword),
+                            ),
+                          ],
+                          selected: {_authType},
+                          onSelectionChanged: (selection) {
+                            setState(() => _authType = selection.first);
+                          },
+                          padding: EdgeInsets.zero,
+                        ),
+                        const SizedBox(height: 16),
+                        if (_authType == ServerAuthType.apiToken) ...[
+                          TextFormField(
+                            controller: _tokenController,
+                            decoration: InputDecoration(
+                              labelText: l10n.serverFieldApiToken,
+                              hintText: l10n.serverFieldApiTokenHint,
+                              border: const OutlineInputBorder(),
+                              helperText:
+                                  _isEdit
+                                      ? l10n.serverApiTokenLeaveBlankHint
+                                      : null,
+                            ),
+                            obscureText: true,
+                            autocorrect: false,
+                            validator: (v) {
+                              if (_isEdit) return null;
+                              if (v == null || v.trim().isEmpty) {
+                                return l10n.serverApiTokenErrorEmpty;
+                              }
+                              return null;
+                            },
+                          ),
+                        ] else ...[
+                          Text(
+                            l10n.serverLoginComposeHint,
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: scheme.onSurfaceVariant),
+                          ),
+                          const SizedBox(height: 8),
+                          TextFormField(
+                            controller: _usernameController,
+                            decoration: InputDecoration(
+                              labelText: l10n.serverFieldUsername,
+                              hintText: l10n.serverFieldUsernameHint,
+                              border: const OutlineInputBorder(),
+                            ),
+                            textInputAction: TextInputAction.next,
+                            autocorrect: false,
+                            validator: (v) {
+                              if (v == null || v.trim().isEmpty) {
+                                return l10n.serverUsernameErrorEmpty;
+                              }
+                              if (v.contains('@')) {
+                                return l10n.serverUsernameErrorContainsAt;
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          DropdownButtonFormField<String>(
+                            // Controlled after async load; `initialValue` only applies on first build.
+                            // ignore: deprecated_member_use
+                            value: _realmDropdownValue,
+                            decoration: InputDecoration(
+                              labelText: l10n.serverFieldRealm,
+                              border: const OutlineInputBorder(),
+                            ),
+                            items: [
+                              DropdownMenuItem(
+                                value: _realmPam,
+                                child: Text(l10n.serverRealmPam),
+                              ),
+                              DropdownMenuItem(
+                                value: _realmPve,
+                                child: Text(l10n.serverRealmPve),
+                              ),
+                              DropdownMenuItem(
+                                value: _realmOther,
+                                child: Text(l10n.serverRealmOther),
+                              ),
+                            ],
+                            onChanged: (v) {
+                              if (v == null) return;
+                              setState(() => _realmDropdownValue = v);
+                            },
+                          ),
+                          if (_realmDropdownValue == _realmOther) ...[
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: _customRealmController,
+                              decoration: InputDecoration(
+                                labelText: l10n.serverFieldRealmCustom,
+                                hintText: l10n.serverFieldRealmCustomHint,
+                                border: const OutlineInputBorder(),
+                              ),
+                              textInputAction: TextInputAction.next,
+                              autocorrect: false,
+                              validator: (v) {
+                                if (_realmDropdownValue != _realmOther) {
+                                  return null;
+                                }
+                                if (v == null || v.trim().isEmpty) {
+                                  return l10n.serverRealmErrorEmpty;
+                                }
+                                if (v.contains(' ') || v.contains('@')) {
+                                  return l10n.serverRealmErrorInvalid;
+                                }
+                                return null;
+                              },
+                            ),
+                          ],
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            controller: _passwordController,
+                            decoration: InputDecoration(
+                              labelText: l10n.serverFieldPassword,
+                              border: const OutlineInputBorder(),
+                              helperText:
+                                  _isEdit
+                                      ? l10n.serverPasswordLeaveBlankHint
+                                      : null,
+                            ),
+                            obscureText: true,
+                            autocorrect: false,
+                            validator: (v) {
+                              if (_isEdit) return null;
+                              if (v == null || v.isEmpty) {
+                                return l10n.serverPasswordErrorEmpty;
+                              }
+                              return null;
+                            },
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
-                  textInputAction: TextInputAction.next,
-                  autocorrect: false,
-                  validator: (v) => _validateHost(v, l10n),
                 ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _portController,
-                  decoration: InputDecoration(
-                    labelText: l10n.serverFieldPort,
-                    border: const OutlineInputBorder(),
+                const Divider(height: 1),
+                GroupedSection(
+                  topSpacing: 0,
+                  header: SectionHeader(title: l10n.serverFormSecuritySection),
+                  child: SwitchListTile(
+                    title: Text(l10n.serverAllowSelfSigned),
+                    value: _allowSelfSigned,
+                    onChanged: (v) => setState(() => _allowSelfSigned = v),
                   ),
-                  keyboardType: TextInputType.number,
-                  textInputAction: TextInputAction.next,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
-                      return l10n.serverPortErrorInvalid;
-                    }
-                    final p = int.tryParse(v.trim());
-                    if (p == null || p < 1 || p > 65535) {
-                      return l10n.serverPortErrorInvalid;
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  l10n.serverFormAuthentication,
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-                const SizedBox(height: 8),
-                SegmentedButton<ServerAuthType>(
-                  segments: [
-                    ButtonSegment(
-                      value: ServerAuthType.apiToken,
-                      label: Text(l10n.serverAuthTypeApiToken),
-                    ),
-                    ButtonSegment(
-                      value: ServerAuthType.usernamePassword,
-                      label: Text(l10n.serverAuthTypeUsernamePassword),
-                    ),
-                  ],
-                  selected: {_authType},
-                  onSelectionChanged: (selection) {
-                    setState(() => _authType = selection.first);
-                  },
-                ),
-                const SizedBox(height: 16),
-                if (_authType == ServerAuthType.apiToken) ...[
-                  TextFormField(
-                    controller: _tokenController,
-                    decoration: InputDecoration(
-                      labelText: l10n.serverFieldApiToken,
-                      hintText: l10n.serverFieldApiTokenHint,
-                      border: const OutlineInputBorder(),
-                      helperText:
-                          _isEdit ? l10n.serverApiTokenLeaveBlankHint : null,
-                    ),
-                    obscureText: true,
-                    autocorrect: false,
-                    validator: (v) {
-                      if (_isEdit) return null;
-                      if (v == null || v.trim().isEmpty) {
-                        return l10n.serverApiTokenErrorEmpty;
-                      }
-                      return null;
-                    },
-                  ),
-                ] else ...[
-                  Text(
-                    l10n.serverLoginComposeHint,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    controller: _usernameController,
-                    decoration: InputDecoration(
-                      labelText: l10n.serverFieldUsername,
-                      hintText: l10n.serverFieldUsernameHint,
-                      border: const OutlineInputBorder(),
-                    ),
-                    textInputAction: TextInputAction.next,
-                    autocorrect: false,
-                    validator: (v) {
-                      if (v == null || v.trim().isEmpty) {
-                        return l10n.serverUsernameErrorEmpty;
-                      }
-                      if (v.contains('@')) {
-                        return l10n.serverUsernameErrorContainsAt;
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<String>(
-                    // Controlled after async load; `initialValue` only applies on first build.
-                    // ignore: deprecated_member_use
-                    value: _realmDropdownValue,
-                    decoration: InputDecoration(
-                      labelText: l10n.serverFieldRealm,
-                      border: const OutlineInputBorder(),
-                    ),
-                    items: [
-                      DropdownMenuItem(
-                        value: _realmPam,
-                        child: Text(l10n.serverRealmPam),
-                      ),
-                      DropdownMenuItem(
-                        value: _realmPve,
-                        child: Text(l10n.serverRealmPve),
-                      ),
-                      DropdownMenuItem(
-                        value: _realmOther,
-                        child: Text(l10n.serverRealmOther),
-                      ),
-                    ],
-                    onChanged: (v) {
-                      if (v == null) return;
-                      setState(() => _realmDropdownValue = v);
-                    },
-                  ),
-                  if (_realmDropdownValue == _realmOther) ...[
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _customRealmController,
-                      decoration: InputDecoration(
-                        labelText: l10n.serverFieldRealmCustom,
-                        hintText: l10n.serverFieldRealmCustomHint,
-                        border: const OutlineInputBorder(),
-                      ),
-                      textInputAction: TextInputAction.next,
-                      autocorrect: false,
-                      validator: (v) {
-                        if (_realmDropdownValue != _realmOther) return null;
-                        if (v == null || v.trim().isEmpty) {
-                          return l10n.serverRealmErrorEmpty;
-                        }
-                        if (v.contains(' ') || v.contains('@')) {
-                          return l10n.serverRealmErrorInvalid;
-                        }
-                        return null;
-                      },
-                    ),
-                  ],
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _passwordController,
-                    decoration: InputDecoration(
-                      labelText: l10n.serverFieldPassword,
-                      border: const OutlineInputBorder(),
-                      helperText:
-                          _isEdit ? l10n.serverPasswordLeaveBlankHint : null,
-                    ),
-                    obscureText: true,
-                    autocorrect: false,
-                    validator: (v) {
-                      if (_isEdit) return null;
-                      if (v == null || v.isEmpty) {
-                        return l10n.serverPasswordErrorEmpty;
-                      }
-                      return null;
-                    },
-                  ),
-                ],
-                const SizedBox(height: 16),
-                SwitchListTile(
-                  title: Text(l10n.serverAllowSelfSigned),
-                  value: _allowSelfSigned,
-                  onChanged: (v) => setState(() => _allowSelfSigned = v),
                 ),
               ],
             ),

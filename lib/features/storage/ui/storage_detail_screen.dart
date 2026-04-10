@@ -6,8 +6,10 @@ import 'package:proxdroid/features/storage/providers/storage_providers.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
+import 'package:proxdroid/shared/widgets/icon_badge_avatar.dart';
 import 'package:proxdroid/shared/widgets/labeled_row.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
+import 'package:proxdroid/shared/widgets/resource_gauge_row.dart';
 import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
 import 'package:proxdroid/shared/widgets/status_badge.dart';
 
@@ -35,6 +37,7 @@ class StorageDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
     final detailAsync = ref.watch(storageDetailProvider(node, storage));
     final contentAsync = ref.watch(storageContentProvider(node, storage));
     final minPullHeight = MediaQuery.sizeOf(context).height * 0.5;
@@ -59,10 +62,10 @@ class StorageDetailScreen extends ConsumerWidget {
                     children: [
                       SizedBox(
                         height: minPullHeight,
-                        child: const LoadingShimmer(
+                        child: LoadingShimmer(
                           itemCount: 5,
                           shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
+                          physics: const NeverScrollableScrollPhysics(),
                         ),
                       ),
                     ],
@@ -97,80 +100,118 @@ class StorageDetailScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // — Premium header (T6.5 / T6.7) —
                             Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(
-                                  child: Text(
-                                    s.id,
-                                    style:
-                                        Theme.of(
-                                          context,
-                                        ).textTheme.headlineSmall,
-                                  ),
+                                IconBadgeAvatar(
+                                  icon: Icons.storage_rounded,
+                                  size: 56,
+                                  iconSize: 28,
+                                  borderRadius: 14,
                                 ),
-                                StatusBadge(
-                                  label:
-                                      s.active
-                                          ? l10n.storageActive
-                                          : l10n.storageInactive,
-                                  variant:
-                                      s.active
-                                          ? StatusBadgeVariant.success
-                                          : StatusBadgeVariant.neutral,
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              s.id,
+                                              style: tt.titleLarge,
+                                            ),
+                                          ),
+                                          StatusBadge(
+                                            label:
+                                                s.active
+                                                    ? l10n.storageActive
+                                                    : l10n.storageInactive,
+                                            variant:
+                                                s.active
+                                                    ? StatusBadgeVariant.success
+                                                    : StatusBadgeVariant
+                                                        .neutral,
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        s.node,
+                                        style: tt.bodySmall?.copyWith(
+                                          color: scheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 16),
-                            LabeledRow(label: l10n.entityNode, value: s.node),
-                            LabeledRow(
-                              label: l10n.storageTypeLabel,
-                              value:
-                                  s.type.isEmpty
-                                      ? l10n.valueUnavailable
-                                      : s.type,
-                            ),
-                            if (s.content.isNotEmpty)
-                              LabeledRow(
-                                label: l10n.storageContentTypesLabel,
-                                value: s.content.join(', '),
+
+                            // — Metadata rows —
+                            Card(
+                              margin: EdgeInsets.zero,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
                               ),
-                            const SizedBox(height: 12),
-                            Text(
-                              l10n.storageUsageSection,
-                              style: Theme.of(context).textTheme.labelMedium,
-                            ),
-                            const SizedBox(height: 4),
-                            if (frac != null)
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(4),
-                                child: LinearProgressIndicator(
-                                  value: frac,
-                                  minHeight: 8,
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                  16,
+                                  12,
+                                  16,
+                                  4,
                                 ),
-                              )
-                            else
-                              Text(
-                                l10n.valueUnavailable,
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(color: scheme.onSurfaceVariant),
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    LabeledRow(
+                                      label: l10n.entityNode,
+                                      value: s.node,
+                                    ),
+                                    LabeledRow(
+                                      label: l10n.storageTypeLabel,
+                                      value:
+                                          s.type.isEmpty
+                                              ? l10n.valueUnavailable
+                                              : s.type,
+                                    ),
+                                    if (s.content.isNotEmpty)
+                                      LabeledRow(
+                                        label: l10n.storageContentTypesLabel,
+                                        value: s.content.join(', '),
+                                      ),
+                                    if (s.available != null)
+                                      LabeledRow(
+                                        label: l10n.storageLabelAvailable,
+                                        value: formatBytes(s.available),
+                                      ),
+                                  ],
+                                ),
                               ),
-                            if (frac != null) ...[
-                              const SizedBox(height: 4),
-                              Text(
-                                formatMemoryRatio(s.used, s.total),
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(color: scheme.onSurfaceVariant),
-                              ),
-                            ],
-                            if (s.available != null)
-                              LabeledRow(
-                                label: l10n.storageLabelAvailable,
-                                value: formatBytes(s.available),
-                              ),
+                            ),
+                            const SizedBox(height: 16),
+
+                            // — Usage gauge (T6.5: ResourceGaugeRow) —
+                            ResourceGaugeRow(
+                              label: l10n.storageUsageSection,
+                              value: frac,
+                              valueSuffix:
+                                  frac != null
+                                      ? formatMemoryRatio(s.used, s.total)
+                                      : l10n.valueUnavailable,
+                            ),
                             const SizedBox(height: 24),
+
+                            // — Content section header —
                             Text(
                               l10n.storageDetailContentTitle,
-                              style: Theme.of(context).textTheme.titleMedium,
+                              style: tt.titleMedium,
                             ),
                           ],
                         ),
@@ -233,9 +274,7 @@ class StorageDetailScreen extends ConsumerWidget {
                                       formatProxmoxUnixSeconds(c.ctime),
                                     if (c.size != null) formatBytes(c.size),
                                   ].where((e) => e.isNotEmpty).join(' · '),
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.bodySmall?.copyWith(
+                                  style: tt.bodySmall?.copyWith(
                                     color: scheme.onSurfaceVariant,
                                   ),
                                 ),

@@ -120,9 +120,16 @@ abstract final class AppTheme {
         foregroundColor: colorScheme.onSurface,
         surfaceTintColor: colorScheme.surfaceTint,
       ),
+      drawerTheme: DrawerThemeData(
+        backgroundColor: colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.horizontal(right: Radius.circular(20)),
+        ),
+      ),
       navigationDrawerTheme: NavigationDrawerThemeData(
         backgroundColor: colorScheme.surface,
-        indicatorColor: colorScheme.primary.withValues(alpha: 0.28),
+        indicatorColor: colorScheme.primary.withValues(alpha: 0.38),
         indicatorShape: pillShape,
       ),
       dialogTheme: DialogThemeData(

@@ -270,6 +270,9 @@ class _ResourceLineChartCanvas extends StatelessWidget {
           enabled: true,
           handleBuiltInTouches: true,
           touchTooltipData: LineTouchTooltipData(
+            // §9: surface fill, onSurface text, 12 radius.
+            getTooltipColor: (_) => scheme.surface,
+            tooltipRoundedRadius: 12,
             maxContentWidth: 240,
             getTooltipItems: (touchedSpots) {
               if (touchedSpots.isEmpty) {
@@ -295,7 +298,7 @@ class _ResourceLineChartCanvas extends StatelessWidget {
               final item = LineTooltipItem(
                 '$timeStr\n$body',
                 TextStyle(
-                  color: scheme.onInverseSurface,
+                  color: scheme.onSurface,
                   fontSize: 12,
                   height: 1.25,
                 ),

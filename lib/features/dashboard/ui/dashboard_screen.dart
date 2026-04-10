@@ -8,13 +8,15 @@ import 'package:proxdroid/features/containers/providers/container_providers.dart
 import 'package:proxdroid/features/dashboard/providers/dashboard_providers.dart';
 import 'package:proxdroid/features/dashboard/providers/rrd_providers.dart';
 import 'package:proxdroid/features/servers/ui/proxmox_exception_messages.dart';
-import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
 import 'package:proxdroid/features/vms/providers/vm_providers.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
+import 'package:proxdroid/shared/widgets/chart_card.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
-import 'package:proxdroid/shared/widgets/shell_section_body.dart';
+import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
 import 'package:proxdroid/shared/widgets/resource_chart.dart';
+import 'package:proxdroid/shared/widgets/resource_gauge_row.dart';
+import 'package:proxdroid/shared/widgets/shell_section_body.dart';
 import 'package:proxdroid/shared/widgets/status_badge.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -83,10 +85,10 @@ class DashboardScreen extends ConsumerWidget {
             children: [
               SizedBox(
                 height: minPullHeight,
-                child: const LoadingShimmer(
+                child: LoadingShimmer(
                   itemCount: 6,
                   shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
+                  physics: const NeverScrollableScrollPhysics(),
                 ),
               ),
             ],
@@ -136,6 +138,7 @@ class DashboardScreen extends ConsumerWidget {
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
+            // — Cluster summary card —
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
               sliver: SliverToBoxAdapter(
@@ -187,6 +190,8 @@ class DashboardScreen extends ConsumerWidget {
                 ),
               ),
             ),
+
+            // — Per-node cards —
             SliverPadding(
               padding: const EdgeInsets.all(16),
               sliver: SliverList(
@@ -205,6 +210,7 @@ class DashboardScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // Node name + icon + status badge
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -246,70 +252,37 @@ class DashboardScreen extends ConsumerWidget {
                             Text(
                               '${l10n.metricUptime}: ${formatUptimeSeconds(node.uptime)}',
                               style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(color: scheme.onSurfaceVariant),
+                                  ?.copyWith(
+                                    color: scheme.onSurfaceVariant,
+                                  ),
                             ),
                             const SizedBox(height: 12),
-                            Text(
-                              l10n.metricCpu,
-                              style: Theme.of(context).textTheme.labelMedium,
+
+                            // CPU gauge (T6.4: ResourceGaugeRow)
+                            ResourceGaugeRow(
+                              label: l10n.metricCpu,
+                              value: cpuFrac,
+                              valueSuffix:
+                                  cpuFrac != null
+                                      ? formatCpuPercent(cpuFrac)
+                                      : l10n.valueUnavailable,
                             ),
-                            const SizedBox(height: 4),
-                            if (cpuFrac != null)
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(4),
-                                child: LinearProgressIndicator(
-                                  value: cpuFrac,
-                                  minHeight: 8,
-                                  color: scheme.primary,
-                                  backgroundColor:
-                                      scheme.surfaceContainerHighest,
-                                ),
-                              )
-                            else
-                              Text(
-                                l10n.valueUnavailable,
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(color: scheme.onSurfaceVariant),
-                              ),
-                            if (cpuFrac != null) ...[
-                              const SizedBox(height: 4),
-                              Text(
-                                formatCpuPercent(cpuFrac),
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(color: scheme.onSurfaceVariant),
-                              ),
-                            ],
                             const SizedBox(height: 12),
-                            Text(
-                              l10n.metricMemory,
-                              style: Theme.of(context).textTheme.labelMedium,
+
+                            // Memory gauge (T6.4: ResourceGaugeRow)
+                            ResourceGaugeRow(
+                              label: l10n.metricMemory,
+                              value: memFrac,
+                              valueSuffix:
+                                  memFrac != null
+                                      ? formatMemoryRatio(
+                                        node.mem,
+                                        node.maxMem,
+                                      )
+                                      : l10n.valueUnavailable,
                             ),
-                            const SizedBox(height: 4),
-                            if (memFrac != null)
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(4),
-                                child: LinearProgressIndicator(
-                                  value: memFrac,
-                                  minHeight: 8,
-                                  color: scheme.primary,
-                                  backgroundColor:
-                                      scheme.surfaceContainerHighest,
-                                ),
-                              )
-                            else
-                              Text(
-                                l10n.valueUnavailable,
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(color: scheme.onSurfaceVariant),
-                              ),
-                            if (memFrac != null) ...[
-                              const SizedBox(height: 4),
-                              Text(
-                                formatMemoryRatio(node.mem, node.maxMem),
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(color: scheme.onSurfaceVariant),
-                              ),
-                            ],
+
+                            // Compact sparkline charts (T6.4: ChartCard compact)
                             if (online) ...[
                               const SizedBox(height: 16),
                               _NodeRrdSparklines(nodeName: node.name),
@@ -330,6 +303,7 @@ class DashboardScreen extends ConsumerWidget {
 }
 
 /// Compact CPU + memory line charts from node-level rrddata (1h, no selector).
+/// Wrapped in compact [ChartCard]s per T6.4.
 class _NodeRrdSparklines extends ConsumerWidget {
   const _NodeRrdSparklines({required this.nodeName});
 
@@ -349,30 +323,18 @@ class _NodeRrdSparklines extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      l10n.metricCpu,
-                      style: Theme.of(context).textTheme.labelSmall,
-                    ),
-                    const SizedBox(height: 4),
-                    const PulsingPlaceholder(height: 88),
-                  ],
+                child: ChartCard(
+                  title: l10n.metricCpu,
+                  compact: true,
+                  child: const PulsingPlaceholder(height: 88),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      l10n.metricMemory,
-                      style: Theme.of(context).textTheme.labelSmall,
-                    ),
-                    const SizedBox(height: 4),
-                    const PulsingPlaceholder(height: 88),
-                  ],
+                child: ChartCard(
+                  title: l10n.metricMemory,
+                  compact: true,
+                  child: const PulsingPlaceholder(height: 88),
                 ),
               ),
             ],
@@ -421,50 +383,38 @@ class _NodeRrdSparklines extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      l10n.metricCpu,
-                      style: Theme.of(context).textTheme.labelSmall,
-                    ),
-                    const SizedBox(height: 4),
-                    ResourceLineChart(
-                      data: points,
-                      metric: ResourceChartMetric.cpu,
-                      primaryColor: scheme.primary,
-                      timeframe: _tf,
-                      onTimeframeChanged: (_) {},
-                      l10n: l10n,
-                      compact: true,
-                      chartHeight: 88,
-                      showTimeframeSelector: false,
-                    ),
-                  ],
+                child: ChartCard(
+                  title: l10n.metricCpu,
+                  compact: true,
+                  child: ResourceLineChart(
+                    data: points,
+                    metric: ResourceChartMetric.cpu,
+                    primaryColor: scheme.primary,
+                    timeframe: _tf,
+                    onTimeframeChanged: (_) {},
+                    l10n: l10n,
+                    compact: true,
+                    chartHeight: 88,
+                    showTimeframeSelector: false,
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      l10n.metricMemory,
-                      style: Theme.of(context).textTheme.labelSmall,
-                    ),
-                    const SizedBox(height: 4),
-                    ResourceLineChart(
-                      data: points,
-                      metric: ResourceChartMetric.memory,
-                      primaryColor: scheme.secondary,
-                      timeframe: _tf,
-                      onTimeframeChanged: (_) {},
-                      l10n: l10n,
-                      compact: true,
-                      chartHeight: 88,
-                      showTimeframeSelector: false,
-                    ),
-                  ],
+                child: ChartCard(
+                  title: l10n.metricMemory,
+                  compact: true,
+                  child: ResourceLineChart(
+                    data: points,
+                    metric: ResourceChartMetric.memory,
+                    primaryColor: scheme.secondary,
+                    timeframe: _tf,
+                    onTimeframeChanged: (_) {},
+                    l10n: l10n,
+                    compact: true,
+                    chartHeight: 88,
+                    showTimeframeSelector: false,
+                  ),
                 ),
               ),
             ],

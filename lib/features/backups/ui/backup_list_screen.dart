@@ -15,7 +15,8 @@ import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
-import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
+import 'package:proxdroid/shared/widgets/section_header.dart';
+import 'package:proxdroid/shared/widgets/shell_section_body.dart';
 
 class BackupListScreen extends ConsumerWidget {
   const BackupListScreen({super.key});
@@ -73,6 +74,8 @@ class BackupListScreen extends ConsumerWidget {
     final ctsAsync = ref.watch(allContainersProvider);
     final minPullHeight = MediaQuery.sizeOf(context).height * 0.5;
 
+    final Widget body;
+
     if (jobsAsync.hasError ||
         filesAsync.hasError ||
         tasksAsync.hasError ||
@@ -84,295 +87,234 @@ class BackupListScreen extends ConsumerWidget {
           tasksAsync.error ??
           vmsAsync.error ??
           ctsAsync.error!;
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          AppBar(
-            leading: shellAppBarLeading(context),
-            title: Text(l10n.sectionBackups),
-          ),
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: () => _pullRefresh(ref),
-              child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                children: [
-                  SizedBox(
-                    height: minPullHeight,
-                    child: ErrorView(
-                      message: proxmoxExceptionMessage(err, l10n),
-                      onRetry: () => _refresh(ref),
-                    ),
-                  ),
-                ],
+      body = RefreshIndicator(
+        onRefresh: () => _pullRefresh(ref),
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            SizedBox(
+              height: minPullHeight,
+              child: ErrorView(
+                message: proxmoxExceptionMessage(err, l10n),
+                onRetry: () => _refresh(ref),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       );
-    }
-
-    if (!jobsAsync.hasValue ||
+    } else if (!jobsAsync.hasValue ||
         !filesAsync.hasValue ||
         !tasksAsync.hasValue ||
         !vmsAsync.hasValue ||
         !ctsAsync.hasValue) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          AppBar(
-            leading: shellAppBarLeading(context),
-            title: Text(l10n.sectionBackups),
-          ),
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: () => _pullRefresh(ref),
-              child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                children: [
-                  SizedBox(
-                    height: minPullHeight,
-                    child: const LoadingShimmer(
-                      itemCount: 8,
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                    ),
-                  ),
-                ],
+      body = RefreshIndicator(
+        onRefresh: () => _pullRefresh(ref),
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            SizedBox(
+              height: minPullHeight,
+              child: const LoadingShimmer(
+                itemCount: 8,
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
               ),
             ),
-          ),
-        ],
-      );
-    }
-
-    final jobs = jobsAsync.requireValue;
-    final files = filesAsync.requireValue;
-    final vzTasks = tasksAsync.requireValue;
-    final vms = vmsAsync.requireValue;
-    final cts = ctsAsync.requireValue;
-
-    final byVmid = <int?, List<BackupContentEntry>>{};
-    for (final e in files) {
-      byVmid.putIfAbsent(e.item.vmid, () => []).add(e);
-    }
-    final sortedKeys =
-        byVmid.keys.toList()..sort((a, b) {
-          if (a == null && b == null) return 0;
-          if (a == null) return 1;
-          if (b == null) return -1;
-          return a.compareTo(b);
-        });
-
-    final emptyFiles = files.isEmpty;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        AppBar(
-          leading: shellAppBarLeading(context),
-          title: Text(l10n.sectionBackups),
+          ],
         ),
-        Expanded(
-          child: Stack(
-            children: [
-              RefreshIndicator(
-                onRefresh: () => _pullRefresh(ref),
-                child: CustomScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  slivers: [
-                    if (jobs.isNotEmpty) ...[
-                      SliverPadding(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                        sliver: SliverToBoxAdapter(
-                          child: Text(
-                            l10n.backupSectionScheduledJobs,
-                            style: Theme.of(context).textTheme.titleMedium,
+      );
+    } else {
+      final jobs = jobsAsync.requireValue;
+      final files = filesAsync.requireValue;
+      final vzTasks = tasksAsync.requireValue;
+      final vms = vmsAsync.requireValue;
+      final cts = ctsAsync.requireValue;
+
+      final byVmid = <int?, List<BackupContentEntry>>{};
+      for (final e in files) {
+        byVmid.putIfAbsent(e.item.vmid, () => []).add(e);
+      }
+      final sortedKeys =
+          byVmid.keys.toList()..sort((a, b) {
+            if (a == null && b == null) return 0;
+            if (a == null) return 1;
+            if (b == null) return -1;
+            return a.compareTo(b);
+          });
+
+      final emptyFiles = files.isEmpty;
+
+      body = RefreshIndicator(
+        onRefresh: () => _pullRefresh(ref),
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            if (jobs.isNotEmpty) ...[
+              SliverToBoxAdapter(
+                child: SectionHeader(title: l10n.backupSectionScheduledJobs),
+              ),
+              SliverList(
+                delegate: SliverChildBuilderDelegate((context, i) {
+                  final j = jobs[i];
+                  return Card(
+                    margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            j.id,
+                            style: Theme.of(context).textTheme.titleSmall,
                           ),
-                        ),
+                          if (j.schedule.isNotEmpty)
+                            Text(
+                              j.schedule,
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodySmall?.copyWith(
+                                color: scheme.onSurfaceVariant,
+                              ),
+                            ),
+                          if (j.storage.isNotEmpty)
+                            Text(
+                              '${l10n.backupFieldStorage}: ${j.storage}',
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodySmall?.copyWith(
+                                color: scheme.onSurfaceVariant,
+                              ),
+                            ),
+                          if (j.vmids.isNotEmpty)
+                            Text(
+                              l10n.backupJobVmids(j.vmids.join(', ')),
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodySmall?.copyWith(
+                                color: scheme.onSurfaceVariant,
+                              ),
+                            ),
+                          if (j.nextRun != null)
+                            Text(
+                              l10n.backupJobNextRun(
+                                formatProxmoxUnixSeconds(j.nextRun),
+                              ),
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodySmall?.copyWith(
+                                color: scheme.onSurfaceVariant,
+                              ),
+                            ),
+                          if (j.lastRun != null)
+                            Text(
+                              l10n.backupJobLastRun(
+                                formatProxmoxUnixSeconds(j.lastRun),
+                              ),
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodySmall?.copyWith(
+                                color: scheme.onSurfaceVariant,
+                              ),
+                            ),
+                        ],
                       ),
-                      SliverList(
-                        delegate: SliverChildBuilderDelegate((context, i) {
-                          final j = jobs[i];
-                          return Card(
-                            margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                            child: Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    j.id,
-                                    style:
-                                        Theme.of(context).textTheme.titleSmall,
-                                  ),
-                                  if (j.schedule.isNotEmpty)
-                                    Text(
-                                      j.schedule,
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.bodySmall?.copyWith(
-                                        color: scheme.onSurfaceVariant,
-                                      ),
-                                    ),
-                                  if (j.storage.isNotEmpty)
-                                    Text(
-                                      '${l10n.backupFieldStorage}: ${j.storage}',
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.bodySmall?.copyWith(
-                                        color: scheme.onSurfaceVariant,
-                                      ),
-                                    ),
-                                  if (j.vmids.isNotEmpty)
-                                    Text(
-                                      l10n.backupJobVmids(j.vmids.join(', ')),
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.bodySmall?.copyWith(
-                                        color: scheme.onSurfaceVariant,
-                                      ),
-                                    ),
-                                  if (j.nextRun != null)
-                                    Text(
-                                      l10n.backupJobNextRun(
-                                        formatProxmoxUnixSeconds(j.nextRun),
-                                      ),
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.bodySmall?.copyWith(
-                                        color: scheme.onSurfaceVariant,
-                                      ),
-                                    ),
-                                  if (j.lastRun != null)
-                                    Text(
-                                      l10n.backupJobLastRun(
-                                        formatProxmoxUnixSeconds(j.lastRun),
-                                      ),
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.bodySmall?.copyWith(
-                                        color: scheme.onSurfaceVariant,
-                                      ),
-                                    ),
-                                ],
+                    ),
+                  );
+                }, childCount: jobs.length),
+              ),
+            ],
+            SliverToBoxAdapter(
+              child: SectionHeader(title: l10n.backupSectionFiles),
+            ),
+            if (emptyFiles)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: EmptyState(
+                    icon: Icons.folder_off_outlined,
+                    title: l10n.backupListEmptyTitle,
+                    message: l10n.backupListEmptyMessage,
+                  ),
+                ),
+              )
+            else
+              SliverList(
+                delegate: SliverChildBuilderDelegate((context, i) {
+                  final vmid = sortedKeys[i];
+                  final entries = byVmid[vmid]!;
+                  final title = _guestName(vmid, vms, cts, l10n);
+                  return ExpansionTile(
+                    title: Text(title),
+                    subtitle: Text(
+                      l10n.entityBackup,
+                      style: TextStyle(color: scheme.onSurfaceVariant),
+                    ),
+                    children:
+                        entries.map((e) {
+                          final it = e.item;
+                          return ListTile(
+                            title: Text(
+                              it.volid,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            subtitle: Text(
+                              [
+                                l10n.storagePoolOnNode(e.storageId, e.node),
+                                if (it.format.isNotEmpty)
+                                  '${l10n.labelFormat}: ${it.format}',
+                                if (it.ctime != null)
+                                  formatProxmoxUnixSeconds(it.ctime),
+                                if (it.size != null) formatBytes(it.size),
+                              ].join(' · '),
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodySmall?.copyWith(
+                                color: scheme.onSurfaceVariant,
                               ),
                             ),
                           );
-                        }, childCount: jobs.length),
-                      ),
-                    ],
-                    SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                      sliver: SliverToBoxAdapter(
-                        child: Text(
-                          l10n.backupSectionFiles,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ),
-                    ),
-                    if (emptyFiles)
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: EmptyState(
-                            icon: Icons.folder_off_outlined,
-                            title: l10n.backupListEmptyTitle,
-                            message: l10n.backupListEmptyMessage,
-                          ),
-                        ),
-                      )
-                    else
-                      SliverList(
-                        delegate: SliverChildBuilderDelegate((context, i) {
-                          final vmid = sortedKeys[i];
-                          final entries = byVmid[vmid]!;
-                          final title = _guestName(vmid, vms, cts, l10n);
-                          return ExpansionTile(
-                            title: Text(title),
-                            subtitle: Text(
-                              l10n.entityBackup,
-                              style: TextStyle(color: scheme.onSurfaceVariant),
-                            ),
-                            children:
-                                entries.map((e) {
-                                  final it = e.item;
-                                  return ListTile(
-                                    title: Text(
-                                      it.volid,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    subtitle: Text(
-                                      [
-                                        l10n.storagePoolOnNode(
-                                          e.storageId,
-                                          e.node,
-                                        ),
-                                        if (it.format.isNotEmpty)
-                                          '${l10n.labelFormat}: ${it.format}',
-                                        if (it.ctime != null)
-                                          formatProxmoxUnixSeconds(it.ctime),
-                                        if (it.size != null)
-                                          formatBytes(it.size),
-                                      ].join(' · '),
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.bodySmall?.copyWith(
-                                        color: scheme.onSurfaceVariant,
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
-                          );
-                        }, childCount: sortedKeys.length),
-                      ),
-                    if (vzTasks.isNotEmpty) ...[
-                      SliverPadding(
-                        padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-                        sliver: SliverToBoxAdapter(
-                          child: Text(
-                            l10n.backupSectionRecentTasks,
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                        ),
-                      ),
-                      SliverList(
-                        delegate: SliverChildBuilderDelegate((context, i) {
-                          final t = vzTasks[i];
-                          final vmid = vmidFromProxmoxUpid(t.upid);
-                          final guest = _guestName(vmid, vms, cts, l10n);
-                          return ListTile(
-                            title: Text(guest),
-                            subtitle: Text(
-                              '${t.type} · ${_statusLine(t, l10n)}',
-                              style: TextStyle(color: scheme.onSurfaceVariant),
-                            ),
-                            onTap:
-                                () => context.push(
-                                  '/tasks/${Uri.encodeComponent(t.node)}/${Uri.encodeComponent(t.upid)}',
-                                ),
-                          );
-                        }, childCount: vzTasks.length),
-                      ),
-                    ],
-                    const SliverToBoxAdapter(child: SizedBox(height: 88)),
-                  ],
-                ),
+                        }).toList(),
+                  );
+                }, childCount: sortedKeys.length),
               ),
-              Positioned(
-                right: 16,
-                bottom: 16,
-                child: FloatingActionButton(
-                  onPressed: () => showTriggerBackupSheet(context, ref),
-                  tooltip: l10n.backupFabTooltip,
-                  child: const Icon(Icons.add),
-                ),
+            if (vzTasks.isNotEmpty) ...[
+              SliverToBoxAdapter(
+                child: SectionHeader(title: l10n.backupSectionRecentTasks),
+              ),
+              SliverList(
+                delegate: SliverChildBuilderDelegate((context, i) {
+                  final t = vzTasks[i];
+                  final vmid = vmidFromProxmoxUpid(t.upid);
+                  final guest = _guestName(vmid, vms, cts, l10n);
+                  return ListTile(
+                    title: Text(guest),
+                    subtitle: Text(
+                      '${t.type} · ${_statusLine(t, l10n)}',
+                      style: TextStyle(color: scheme.onSurfaceVariant),
+                    ),
+                    onTap: () => context.push(
+                      '/tasks/${Uri.encodeComponent(t.node)}/${Uri.encodeComponent(t.upid)}',
+                    ),
+                  );
+                }, childCount: vzTasks.length),
               ),
             ],
-          ),
+            const SliverToBoxAdapter(child: SizedBox(height: 88)),
+          ],
         ),
-      ],
+      );
+    }
+
+    return ShellSectionBody(
+      title: Text(l10n.sectionBackups),
+      body: body,
+      floatingActionButton: FloatingActionButton(
+        heroTag: 'backup_list_fab',
+        onPressed: () => showTriggerBackupSheet(context, ref),
+        tooltip: l10n.backupFabTooltip,
+        child: const Icon(Icons.add),
+      ),
     );
   }
 

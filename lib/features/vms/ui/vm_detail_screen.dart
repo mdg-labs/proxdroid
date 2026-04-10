@@ -19,8 +19,10 @@ import 'package:proxdroid/features/vms/ui/widgets/vm_status_badge.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
+import 'package:proxdroid/shared/widgets/icon_badge_avatar.dart';
 import 'package:proxdroid/shared/widgets/labeled_row.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
+import 'package:proxdroid/shared/widgets/premium_modals.dart';
 import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
 
 class VmDetailScreen extends ConsumerStatefulWidget {
@@ -110,93 +112,90 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
 
   Future<bool?> _confirmStop() async {
     final l10n = AppLocalizations.of(context)!;
-    return showDialog<bool>(
+    final tt = Theme.of(context).textTheme;
+    return showPremiumDialog<bool>(
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            title: Text(l10n.powerConfirmStopTitle),
-            content: Text(l10n.powerConfirmStopBody),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
-                child: Text(l10n.actionCancel),
-              ),
-              FilledButton(
-                onPressed: () {
-                  HapticFeedback.mediumImpact();
-                  Navigator.pop(ctx, true);
-                },
-                child: Text(l10n.actionConfirm),
-              ),
-            ],
-          ),
+      title: Text(l10n.powerConfirmStopTitle),
+      content: Text(l10n.powerConfirmStopBody, style: tt.bodyMedium),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: Text(l10n.actionCancel),
+        ),
+        FilledButton(
+          onPressed: () {
+            HapticFeedback.mediumImpact();
+            Navigator.pop(context, true);
+          },
+          child: Text(l10n.actionConfirm),
+        ),
+      ],
     );
   }
 
   Future<bool?> _confirmForceStop() async {
     final l10n = AppLocalizations.of(context)!;
-    return showDialog<bool>(
+    final tt = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
+    return showPremiumDialog<bool>(
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            title: Text(l10n.powerConfirmForceStopTitle),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(l10n.powerConfirmForceStopBody),
-                const SizedBox(height: 12),
-                Text(
-                  l10n.powerConfirmForceStopWarning,
-                  style: TextStyle(color: Theme.of(ctx).colorScheme.error),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
-                child: Text(l10n.actionCancel),
-              ),
-              FilledButton(
-                onPressed: () {
-                  HapticFeedback.mediumImpact();
-                  Navigator.pop(ctx, true);
-                },
-                child: Text(l10n.actionConfirm),
-              ),
-            ],
+      title: Text(l10n.powerConfirmForceStopTitle),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.powerConfirmForceStopBody, style: tt.bodyMedium),
+          const SizedBox(height: 12),
+          Text(
+            l10n.powerConfirmForceStopWarning,
+            style: tt.bodyMedium?.copyWith(color: scheme.error),
           ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: Text(l10n.actionCancel),
+        ),
+        FilledButton(
+          onPressed: () {
+            HapticFeedback.mediumImpact();
+            Navigator.pop(context, true);
+          },
+          child: Text(l10n.actionConfirm),
+        ),
+      ],
     );
   }
 
   Future<bool?> _confirmReboot() async {
     final l10n = AppLocalizations.of(context)!;
-    return showDialog<bool>(
+    final tt = Theme.of(context).textTheme;
+    return showPremiumDialog<bool>(
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            title: Text(l10n.powerConfirmRebootTitle),
-            content: Text(l10n.powerConfirmRebootBody),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
-                child: Text(l10n.actionCancel),
-              ),
-              FilledButton(
-                onPressed: () {
-                  HapticFeedback.mediumImpact();
-                  Navigator.pop(ctx, true);
-                },
-                child: Text(l10n.actionConfirm),
-              ),
-            ],
-          ),
+      title: Text(l10n.powerConfirmRebootTitle),
+      content: Text(l10n.powerConfirmRebootBody, style: tt.bodyMedium),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: Text(l10n.actionCancel),
+        ),
+        FilledButton(
+          onPressed: () {
+            HapticFeedback.mediumImpact();
+            Navigator.pop(context, true);
+          },
+          child: Text(l10n.actionConfirm),
+        ),
+      ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final scheme = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
     final async = ref.watch(allVmsProvider);
     final id = int.tryParse(widget.vmid);
 
@@ -333,13 +332,60 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: const EdgeInsets.all(16),
                       children: [
-                        Text(
-                          title,
-                          style: Theme.of(context).textTheme.headlineSmall,
+                        // — Premium header (T6.9 / T6.7) —
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            IconBadgeAvatar(
+                              icon: Icons.computer_rounded,
+                              size: 56,
+                              iconSize: 28,
+                              borderRadius: 14,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(title, style: tt.titleLarge),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        '${l10n.labelVmid} ${vm.vmid}',
+                                        style: tt.bodySmall?.copyWith(
+                                          color: scheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                        ),
+                                        child: Text(
+                                          '·',
+                                          style: tt.bodySmall?.copyWith(
+                                            color: scheme.onSurfaceVariant,
+                                          ),
+                                        ),
+                                      ),
+                                      Text(
+                                        vm.node,
+                                        style: tt.bodySmall?.copyWith(
+                                          color: scheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  VmStatusBadge(status: vm.status),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 8),
-                        VmStatusBadge(status: vm.status),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 20),
+
+                        // — Power actions row —
                         if (canStart || canStopOrReboot) ...[
                           Wrap(
                             spacing: 8,
@@ -421,27 +467,51 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
                               ],
                             ],
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 20),
                         ],
-                        LabeledRow(label: l10n.labelVmid, value: '${vm.vmid}'),
-                        LabeledRow(label: l10n.entityNode, value: vm.node),
-                        LabeledRow(
-                          label: l10n.metricCpu,
-                          value: formatCpuPercent(vm.cpu),
+
+                        // — Labeled metric rows (T6.9) —
+                        Card(
+                          margin: EdgeInsets.zero,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                LabeledRow(
+                                  label: l10n.labelVmid,
+                                  value: '${vm.vmid}',
+                                ),
+                                LabeledRow(
+                                  label: l10n.entityNode,
+                                  value: vm.node,
+                                ),
+                                LabeledRow(
+                                  label: l10n.metricCpu,
+                                  value: formatCpuPercent(vm.cpu),
+                                ),
+                                LabeledRow(
+                                  label: l10n.metricMemory,
+                                  value: formatMemoryRatio(vm.mem, vm.maxMem),
+                                ),
+                                LabeledRow(
+                                  label: l10n.metricDisk,
+                                  value: formatMemoryRatio(vm.disk, vm.maxDisk),
+                                ),
+                                LabeledRow(
+                                  label: l10n.metricUptime,
+                                  value: formatUptimeSeconds(vm.uptime),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                        LabeledRow(
-                          label: l10n.metricMemory,
-                          value: formatMemoryRatio(vm.mem, vm.maxMem),
-                        ),
-                        LabeledRow(
-                          label: l10n.metricDisk,
-                          value: formatMemoryRatio(vm.disk, vm.maxDisk),
-                        ),
-                        LabeledRow(
-                          label: l10n.metricUptime,
-                          value: formatUptimeSeconds(vm.uptime),
-                        ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 20),
+
+                        // — Charts (each wrapped in ChartCard by their widget) —
                         VmCpuChart(
                           node: vm.node,
                           vmid: vm.vmid,
@@ -449,7 +519,7 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
                           onTimeframeChanged:
                               (tf) => setState(() => _cpuChartTf = tf),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 16),
                         VmMemoryChart(
                           node: vm.node,
                           vmid: vm.vmid,
@@ -457,7 +527,7 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
                           onTimeframeChanged:
                               (tf) => setState(() => _memChartTf = tf),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 16),
                         VmNetworkChart(
                           node: vm.node,
                           vmid: vm.vmid,
@@ -465,7 +535,7 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
                           onTimeframeChanged:
                               (tf) => setState(() => _netChartTf = tf),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 16),
                         VmDiskIoChart(
                           node: vm.node,
                           vmid: vm.vmid,
@@ -473,6 +543,7 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
                           onTimeframeChanged:
                               (tf) => setState(() => _diskChartTf = tf),
                         ),
+                        const SizedBox(height: 16),
                       ],
                     ),
                   ),

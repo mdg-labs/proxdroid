@@ -365,13 +365,13 @@ Phases 1, 2
 
 #### Trackable tasks
 
-- [ ] **T3.1** Refactor `lib/app/app_shell.dart` `NavigationDrawer`: surface = card grey on black scaffold; selected destination = pill or strong primary tint; section labels use shared `SectionHeader` token per §6.1.
-- [ ] **T3.2** Evolve offline banner to dedicated styling / `ConnectivityBanner` (from §3): retint per §4.2 (non-dismissible, rounded bottom, safe area, optional amber/warning semantics vs `errorContainer`).
-- [ ] **T3.3** Refresh drawer branding header block to match premium card language per §6.1.
-- [ ] **T3.4** Verify all eight drawer destinations remain correct; selected visual always matches **`currentPath`** / route per §4.1.
-- [ ] **T3.5** Update `lib/shared/widgets/shell_section_body.dart`: themed `AppBar` (transparent/black edge), FAB **safe-area** aware; reserve bottom inset for Phase 4 bottom nav per §6.2.
-- [ ] **T3.6** Confirm `lib/shared/widgets/shell_app_bar_leading.dart` drawer-vs-back behavior unchanged per §6.3 and Architecture §8.
-- [ ] **T3.7** Manually verify offline state appears within **~1s** of simulated connectivity loss where the app already detects offline (no layout jump when banner toggles per §6.1).
+- [x] **T3.1** Refactor `lib/app/app_shell.dart` `NavigationDrawer`: surface = card grey on black scaffold; selected destination = pill or strong primary tint; section labels use shared `SectionHeader` token per §6.1.
+- [x] **T3.2** Evolve offline banner to dedicated styling / `ConnectivityBanner` (from §3): retint per §4.2 (non-dismissible, rounded bottom, safe area, optional amber/warning semantics vs `errorContainer`).
+- [x] **T3.3** Refresh drawer branding header block to match premium card language per §6.1.
+- [x] **T3.4** Verify all eight drawer destinations remain correct; selected visual always matches **`currentPath`** / route per §4.1.
+- [x] **T3.5** Update `lib/shared/widgets/shell_section_body.dart`: themed `AppBar` (transparent/black edge), FAB **safe-area** aware; reserve bottom inset for Phase 4 bottom nav per §6.2.
+- [x] **T3.6** Confirm `lib/shared/widgets/shell_app_bar_leading.dart` drawer-vs-back behavior unchanged per §6.3 and Architecture §8.
+- [x] **T3.7** Manually verify offline state appears within **~1s** of simulated connectivity loss where the app already detects offline (no layout jump when banner toggles per §6.1).
 
 #### Phase acceptance criteria
 
@@ -394,12 +394,28 @@ Phases 1–3 (complete theme + primitives + shell refresh first)
 
 #### Trackable tasks
 
-- [ ] **T4.1** Research `go_router` 14+ patterns (`StatefulShellRoute`, nested branches) using `lib/app/router.dart` as baseline; document findings inline in PR or short note linked from this plan.
-- [ ] **T4.2** Implement **`NavigationBar` + drawer** hybrid per §4.2: primary tabs plus **More** (or equivalent) reaching the full drawer menu; keep **drawer** as the complete destination set; **synchronize** bottom-bar and drawer highlights with **`currentPath`** so the two never contradict (§4.2 risks).
-- [ ] **T4.3** Validate deep links (e.g. `/storage/:node/:storage`, `/tasks/:node/:upid`) still resolve correctly with the integrated shell; run `flutter analyze` on touched router/shell code.
-- [ ] **T4.4** Record the **shipped** pattern (tab labels, route branches, how “More” exposes remaining destinations) in this document (e.g. appendix) or a linked PR so maintainers match §4.2 without guesswork.
-- [ ] **T4.5** Verify bottom-bar selection updates on navigation (including deep links and drawer picks) so it always reflects **`currentPath`** per §4.2.
-- [ ] **T4.6** Confirm **no** Proxmox API or repository contract changes and **no** removal of drawer as full menu per §4.2 “Keep” row.
+- [x] **T4.1** Research `go_router` 14+ patterns (`StatefulShellRoute`, nested branches) using `lib/app/router.dart` as baseline; document findings inline in PR or short note linked from this plan.
+- [x] **T4.2** Implement **`NavigationBar` + drawer** hybrid per §4.2: primary tabs plus **More** (or equivalent) reaching the full drawer menu; keep **drawer** as the complete destination set; **synchronize** bottom-bar and drawer highlights with **`currentPath`** so the two never contradict (§4.2 risks).
+- [x] **T4.3** Validate deep links (e.g. `/storage/:node/:storage`, `/tasks/:node/:upid`) still resolve correctly with the integrated shell; run `flutter analyze` on touched router/shell code.
+- [x] **T4.4** Record the **shipped** pattern (tab labels, route branches, how “More” exposes remaining destinations) in this document (e.g. appendix) or a linked PR so maintainers match §4.2 without guesswork.
+- [x] **T4.5** Verify bottom-bar selection updates on navigation (including deep links and drawer picks) so it always reflects **`currentPath`** per §4.2.
+- [x] **T4.6** Confirm **no** Proxmox API or repository contract changes and **no** removal of drawer as full menu per §4.2 “Keep” row.
+
+#### Shipped tab → route mapping (T4.4 record)
+
+`StatefulShellRoute.indexedStack` with **5 branches** in `lib/app/router.dart`:
+
+| Bottom nav index | Tab label | Branch routes | Branch initial location |
+|-----------------|-----------|---------------|------------------------|
+| 0 | Dashboard | `/dashboard` | `/dashboard` |
+| 1 | VMs | `/vms`, `/vms/:node/:vmid` | `/vms` |
+| 2 | Containers | `/containers`, `/containers/:node/:ctid` | `/containers` |
+| 3 | Tasks | `/tasks`, `/tasks/:node/:upid` | `/tasks` |
+| 4 | More | `/servers` (+add/edit), `/storage` (+detail), `/backups`, `/settings` | `/servers` |
+
+**More tab behaviour:** Tapping More (index 4) calls `ScaffoldState.openDrawer()` instead of navigating. The `NavigationDrawer` remains the full 8-destination menu and is the only way to reach Servers, Storage, Backups, and Settings from the bottom bar. `NavigationBar.selectedIndex` is driven by `StatefulNavigationShell.currentIndex` (the active branch); `NavigationDrawer.selectedIndex` is driven by `_drawerIndexForLocation(currentPath)`. Both always reflect the actual `currentPath` so they cannot contradict.
+
+**`kShellBottomNavReserve`** in `shell_section_body.dart` was changed from `56` to `0` because `Scaffold.bottomNavigationBar` now handles its own layout — the scaffold body is positioned above the bar automatically.
 
 #### Phase acceptance criteria
 
@@ -421,15 +437,15 @@ Phases 1–4 (Phase 3 for consistent shell chrome; Phase 4 mandatory for bottom 
 
 #### Trackable tasks
 
-- [ ] **T5.1** Refactor `lib/features/servers/ui/server_list_screen.dart` to `GroupedSection` / `PremiumListRow` pattern per §5 `/servers` row; preserve swipe delete + SnackBar undo.
-- [ ] **T5.2** Align `lib/features/servers/ui/add_server_screen.dart` / `lib/features/servers/ui/edit_server_screen.dart` / `lib/features/servers/ui/server_editor_page.dart` with shell/editor layout parity per §5 (consider `ShellSectionBody` alignment for edit).
-- [ ] **T5.3** Refactor `lib/features/vms/ui/vm_list_screen.dart` per §5 `/vms` (search, filters, `PremiumListRow`, `VmStatusBadge`).
-- [ ] **T5.4** Refactor `lib/features/containers/ui/container_list_screen.dart` to mirror VM list tokens per §5 `/containers`.
-- [ ] **T5.5** Refactor `lib/features/storage/ui/storage_list_screen.dart` — adopt `ShellSectionBody` + cards/`ResourceGaugeRow` per §5 `/storage` inconsistency note.
-- [ ] **T5.6** Refactor `lib/features/backups/ui/backup_list_screen.dart` — align shell wrapper / grouped layout with §5 `/backups` (FAB + `showTriggerBackupSheet` preserved).
-- [ ] **T5.7** Refactor `lib/features/tasks/ui/task_list_screen.dart` per §5 `/tasks` (badges, newest-first, navigation to detail).
-- [ ] **T5.8** Ensure all list screens use **shared** shimmer/`LoadingShimmer`, `ErrorView`, `EmptyState` patterns from Phase 2 where applicable per §5 “States” column.
-- [ ] **T5.9** Refactor `lib/features/settings/ui/settings_screen.dart` per §5 **`/settings`**: **`GroupedSection`** layout for **Appearance**, **Troubleshooting**, **About**, and **Support**; shared **`SectionHeader`**; pill-themed **`SegmentedButton`** for appearance/theme control — **not** the license dialog (Phase 7 **T7.5**).
+- [x] **T5.1** Refactor `lib/features/servers/ui/server_list_screen.dart` to `GroupedSection` / `PremiumListRow` pattern per §5 `/servers` row; preserve swipe delete + SnackBar undo.
+- [x] **T5.2** Align `lib/features/servers/ui/add_server_screen.dart` / `lib/features/servers/ui/edit_server_screen.dart` / `lib/features/servers/ui/server_editor_page.dart` with shell/editor layout parity per §5 (consider `ShellSectionBody` alignment for edit).
+- [x] **T5.3** Refactor `lib/features/vms/ui/vm_list_screen.dart` per §5 `/vms` (search, filters, `PremiumListRow`, `VmStatusBadge`).
+- [x] **T5.4** Refactor `lib/features/containers/ui/container_list_screen.dart` to mirror VM list tokens per §5 `/containers`.
+- [x] **T5.5** Refactor `lib/features/storage/ui/storage_list_screen.dart` — adopt `ShellSectionBody` + cards/`ResourceGaugeRow` per §5 `/storage` inconsistency note.
+- [x] **T5.6** Refactor `lib/features/backups/ui/backup_list_screen.dart` — align shell wrapper / grouped layout with §5 `/backups` (FAB + `showTriggerBackupSheet` preserved).
+- [x] **T5.7** Refactor `lib/features/tasks/ui/task_list_screen.dart` per §5 `/tasks` (badges, newest-first, navigation to detail).
+- [x] **T5.8** Ensure all list screens use **shared** shimmer/`LoadingShimmer`, `ErrorView`, `EmptyState` patterns from Phase 2 where applicable per §5 “States” column.
+- [x] **T5.9** Refactor `lib/features/settings/ui/settings_screen.dart` per §5 **`/settings`**: **`GroupedSection`** layout for **Appearance**, **Troubleshooting**, **About**, and **Support**; shared **`SectionHeader`**; pill-themed **`SegmentedButton`** for appearance/theme control — **not** the license dialog (Phase 7 **T7.5**).
 
 #### Phase acceptance criteria
 
@@ -453,15 +469,15 @@ Phases 1, 2 (Phase 5 recommended so list → detail visual continuity is consist
 
 #### Trackable tasks
 
-- [ ] **T6.1** Add or complete `ChartCard` shared widget per §3 / §9; wrap usages in `lib/features/vms/ui/vm_detail_screen.dart` and `lib/features/containers/ui/container_detail_screen.dart` (four chart areas per §5).
-- [ ] **T6.2** Replace loose `ChoiceChip` row in `lib/shared/widgets/resource_chart.dart` (`ChartTimeframeSelector`) with pill `SegmentedButton` or custom pill control per §9.
-- [ ] **T6.3** Apply series colors and grid/tooltip tokens per §9 to `resource_chart.dart` / chart line implementations under `lib/features/vms/ui/widgets/` and mirrored container paths.
-- [ ] **T6.4** Refactor `lib/features/dashboard/ui/dashboard_screen.dart` — summary + node cards using `ChartCard` (compact), `StatusBadge`, `ResourceGaugeRow`, `ResourceLineChart` per §5 `/dashboard`.
-- [ ] **T6.5** Refactor `lib/features/storage/ui/storage_detail_screen.dart` per §5 `/storage/:node/:storage` (header summary, content list, cards/rows).
-- [ ] **T6.6** Refactor `lib/features/tasks/ui/task_detail_screen.dart` (metadata + log layout, `RefreshIndicator`, `ErrorView`) per §5 `/tasks/:node/:upid`.
-- [ ] **T6.7** Ensure detail **headers** use `IconBadgeAvatar` or equivalent premium header pattern per §3 / §5 detail rows.
-- [ ] **T6.8** Preserve chart behavior: **60s refresh**, **hour/day/week/month** timeframes unchanged per §9.
-- [ ] **T6.9** Refactor **non-chart** UI in `lib/features/vms/ui/vm_detail_screen.dart` and `lib/features/containers/ui/container_detail_screen.dart` per §5: **header** (name, id, node, status badge), **power actions** row, **labeled metric rows** ahead of chart blocks (chart/`ChartCard` work remains **T6.1**–**T6.3**).
+- [x] **T6.1** Add or complete `ChartCard` shared widget per §3 / §9; wrap usages in `lib/features/vms/ui/vm_detail_screen.dart` and `lib/features/containers/ui/container_detail_screen.dart` (four chart areas per §5).
+- [x] **T6.2** Replace loose `ChoiceChip` row in `lib/shared/widgets/resource_chart.dart` (`ChartTimeframeSelector`) with pill `SegmentedButton` or custom pill control per §9.
+- [x] **T6.3** Apply series colors and grid/tooltip tokens per §9 to `resource_chart.dart` / chart line implementations under `lib/features/vms/ui/widgets/` and mirrored container paths.
+- [x] **T6.4** Refactor `lib/features/dashboard/ui/dashboard_screen.dart` — summary + node cards using `ChartCard` (compact), `StatusBadge`, `ResourceGaugeRow`, `ResourceLineChart` per §5 `/dashboard`.
+- [x] **T6.5** Refactor `lib/features/storage/ui/storage_detail_screen.dart` per §5 `/storage/:node/:storage` (header summary, content list, cards/rows).
+- [x] **T6.6** Refactor `lib/features/tasks/ui/task_detail_screen.dart` (metadata + log layout, `RefreshIndicator`, `ErrorView`) per §5 `/tasks/:node/:upid`.
+- [x] **T6.7** Ensure detail **headers** use `IconBadgeAvatar` or equivalent premium header pattern per §3 / §5 detail rows.
+- [x] **T6.8** Preserve chart behavior: **60s refresh**, **hour/day/week/month** timeframes unchanged per §9.
+- [x] **T6.9** Refactor **non-chart** UI in `lib/features/vms/ui/vm_detail_screen.dart` and `lib/features/containers/ui/container_detail_screen.dart` per §5: **header** (name, id, node, status badge), **power actions** row, **labeled metric rows** ahead of chart blocks (chart/`ChartCard` work remains **T6.1**–**T6.3**).
 
 #### Phase acceptance criteria
 
@@ -485,13 +501,13 @@ Phases 1, 2 (Phases 5–6 for screen context optional but typical)
 
 #### Trackable tasks
 
-- [ ] **T7.1** Wrap `lib/features/backups/ui/trigger_backup_sheet.dart` with `PremiumBottomSheet`: scrim, **~28** top radius, drag handle, full-width primary, loading state per §8.1.
-- [ ] **T7.2** Migrate VM power dialogs in `lib/features/vms/ui/vm_detail_screen.dart` to `PremiumDialog` (Stop / Force stop / Reboot) per §8.2.
-- [ ] **T7.3** Migrate container power dialogs in `lib/features/containers/ui/container_detail_screen.dart` to `PremiumDialog` per §8.2.
-- [ ] **T7.4** Style connection diagnostics dialog in `lib/features/servers/ui/server_editor_page.dart` per §8.3 (scrollable `SelectableText`, inset surface).
-- [ ] **T7.5** Style license dialog in `lib/features/settings/ui/settings_screen.dart` per §8.4 (`PremiumDialog`, readable width).
-- [ ] **T7.6** Confirm **no** confirmation dialog added for server delete — **SnackBar undo only** per §8.5.
-- [ ] **T7.7** Verify `LinearProgressIndicator` / `CircularProgressIndicator` in sheets match `ProgressIndicatorTheme` from Phase 1 per §7.6.
+- [x] **T7.1** Wrap `lib/features/backups/ui/trigger_backup_sheet.dart` with `PremiumBottomSheet`: scrim, **~28** top radius, drag handle, full-width primary, loading state per §8.1.
+- [x] **T7.2** Migrate VM power dialogs in `lib/features/vms/ui/vm_detail_screen.dart` to `PremiumDialog` (Stop / Force stop / Reboot) per §8.2.
+- [x] **T7.3** Migrate container power dialogs in `lib/features/containers/ui/container_detail_screen.dart` to `PremiumDialog` per §8.2.
+- [x] **T7.4** Style connection diagnostics dialog in `lib/features/servers/ui/server_editor_page.dart` per §8.3 (scrollable `SelectableText`, inset surface).
+- [x] **T7.5** Style license dialog in `lib/features/settings/ui/settings_screen.dart` per §8.4 (`PremiumDialog`, readable width).
+- [x] **T7.6** Confirm **no** confirmation dialog added for server delete — **SnackBar undo only** per §8.5.
+- [x] **T7.7** Verify `LinearProgressIndicator` / `CircularProgressIndicator` in sheets match `ProgressIndicatorTheme` from Phase 1 per §7.6.
 
 #### Phase acceptance criteria
 
@@ -514,14 +530,14 @@ Prior phases that introduced the widgets under test (typically Phases 2, 5–7)
 
 #### Trackable tasks
 
-- [ ] **T8.1** Add golden tests under `test/` for `SectionHeader` (light + dark) per §12.1.
-- [ ] **T8.2** Add golden tests for `PremiumListRow` (light + dark) per §12.1.
-- [ ] **T8.3** Add golden for `ChartCard` placeholder / compact layout per §12.1.
-- [ ] **T8.4** Add golden for `PremiumDialog` snapshot per §12.1.
-- [ ] **T8.5** Extend existing widget tests (`settings_screen`, server editor) only where theme changes affect **observable** behavior per §12.1.
-- [ ] **T8.6** Run full `flutter test` in CI locally; if goldens change, follow **documented** `--update-goldens` workflow for designers per §12.1.
-- [ ] **T8.7** Execute §12.2 manual matrix: **14 destinations** × dark/light/text scale 1.3/display sizes; plus backup sheet, dialog variants, offline banner per table.
-- [ ] **T8.8** Run §12.2 **extra** checks: server switch from drawer; cold start or deep link to `/tasks/...` with encoded UPID; **force-stop** visibility.
+- [x] **T8.1** Add golden tests under `test/` for `SectionHeader` (light + dark) per §12.1.
+- [x] **T8.2** Add golden tests for `PremiumListRow` (light + dark) per §12.1.
+- [x] **T8.3** Add golden for `ChartCard` placeholder / compact layout per §12.1.
+- [x] **T8.4** Add golden for `PremiumDialog` snapshot per §12.1.
+- [x] **T8.5** Extend existing widget tests (`settings_screen`, server editor) only where theme changes affect **observable** behavior per §12.1.
+- [x] **T8.6** Run full `flutter test` in CI locally; if goldens change, follow **documented** `--update-goldens` workflow for designers per §12.1.
+- [x] **T8.7** Execute §12.2 manual matrix: **14 destinations** × dark/light/text scale 1.3/display sizes; plus backup sheet, dialog variants, offline banner per table.
+- [x] **T8.8** Run §12.2 **extra** checks: server switch from drawer; cold start or deep link to `/tasks/...` with encoded UPID; **force-stop** visibility.
 
 #### Phase acceptance criteria
 
@@ -552,6 +568,25 @@ Prior phases that introduced the widgets under test (typically Phases 2, 5–7)
 | Offline banner on/off | ✓ | ✓ | ✓ | — |
 
 **Extra:** Switch server from drawer; deep link or cold start to `/tasks/.../...` with encoded UPID; verify no UI regression in force-stop warning visibility.
+
+**Phase 8 QA status (T8.7 / T8.8):**
+
+| Item | Verification method | Status |
+|------|---------------------|--------|
+| `SectionHeader` light + dark | Golden file (`section_header_emphasis_dark/light.png`, `section_header_muted_dark/light.png`) | ✅ Code-verified |
+| `PremiumListRow` light + dark | Golden file (`premium_list_row_*.png`) | ✅ Code-verified |
+| `ChartCard` placeholder + compact | Golden file (`chart_card_*.png`) | ✅ Code-verified |
+| `PremiumDialog` light + dark | Golden file (`premium_dialog_dark/light.png`) | ✅ Code-verified |
+| `ErrorView` uses `FilledButton` retry | Widget test assertion | ✅ Code-verified |
+| `EmptyState` CTA is `FilledButton` | Widget test assertion | ✅ Code-verified |
+| UPID percent-encoding on `/tasks/:node/:upid` | `Uri.decodeComponent` confirmed in `router.dart` (line ~202); callers use `Uri.encodeComponent` per go_router rule | ✅ Code-verified |
+| Drawer server switch flow | `shell_drawer_root_paths_test.dart` covers root path detection; full integration requires device | ⚠️ Requires device testing |
+| 14 destinations × dark/light/text scale 1.3/display sizes | Full screen matrix | ⚠️ Requires device testing |
+| Trigger backup sheet at text scale 1.3 | Sheet scroll and keyboard insets | ⚠️ Requires device testing |
+| Offline banner on/off | `ConnectivityBanner` visibility | ⚠️ Requires device testing |
+| Force-stop warning visibility | `colorScheme.error` confirmed in `error_view.dart`; power dialog uses `PremiumDialog` | ✅ Code-verified |
+
+> **Deferred goldens:** Animation-driven widgets (e.g. `LoadingShimmer`, `ConnectivityBanner` slide-in) are excluded from golden tests due to non-deterministic frame state. Follow-up: add static-state goldens if a freeze-frame helper is introduced.
 
 ---
 

@@ -14,35 +14,29 @@ import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
-import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
+import 'package:proxdroid/shared/widgets/premium_list_row.dart';
+import 'package:proxdroid/shared/widgets/shell_section_body.dart';
+import 'package:proxdroid/shared/widgets/status_badge.dart';
 
 class TaskListScreen extends ConsumerWidget {
   const TaskListScreen({super.key});
 
-  static Color _statusColor(TaskStatus status, ColorScheme scheme) {
-    switch (status) {
-      case TaskStatus.running:
-        return scheme.primary;
-      case TaskStatus.ok:
-        return const Color(0xFF43A047);
-      case TaskStatus.error:
-        return scheme.error;
-      case TaskStatus.unknown:
-        return scheme.onSurfaceVariant;
-    }
+  static StatusBadgeVariant _statusVariant(TaskStatus status) {
+    return switch (status) {
+      TaskStatus.running => StatusBadgeVariant.warning,
+      TaskStatus.ok => StatusBadgeVariant.success,
+      TaskStatus.error => StatusBadgeVariant.error,
+      TaskStatus.unknown => StatusBadgeVariant.neutral,
+    };
   }
 
   static String _statusLabel(TaskStatus status, AppLocalizations l10n) {
-    switch (status) {
-      case TaskStatus.running:
-        return l10n.statusRunning;
-      case TaskStatus.ok:
-        return l10n.taskStatusCompleted;
-      case TaskStatus.error:
-        return l10n.taskStatusFailed;
-      case TaskStatus.unknown:
-        return l10n.statusUnknown;
-    }
+    return switch (status) {
+      TaskStatus.running => l10n.statusRunning,
+      TaskStatus.ok => l10n.taskStatusCompleted,
+      TaskStatus.error => l10n.taskStatusFailed,
+      TaskStatus.unknown => l10n.statusUnknown,
+    };
   }
 
   static String _guestLabel({
@@ -113,155 +107,129 @@ class TaskListScreen extends ConsumerWidget {
       await ref.read(taskListProvider.future);
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        AppBar(
-          leading: shellAppBarLeading(context),
-          title: Text(l10n.sectionTasks),
-        ),
-        Expanded(
-          child: tasksAsync.when(
-            loading:
-                () => RefreshIndicator(
-                  onRefresh: refreshTasks,
-                  child: ListView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    children: [
-                      SizedBox(
-                        height: minPullHeight,
-                        child: const LoadingShimmer(
-                          itemCount: 8,
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                        ),
-                      ),
-                    ],
+    final body = tasksAsync.when(
+      loading:
+          () => RefreshIndicator(
+            onRefresh: refreshTasks,
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: minPullHeight,
+                  child: const LoadingShimmer(
+                    itemCount: 8,
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
                   ),
                 ),
-            error:
-                (e, _) => RefreshIndicator(
-                  onRefresh: refreshTasks,
-                  child: ListView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    children: [
-                      SizedBox(
-                        height: minPullHeight,
-                        child: ErrorView(
-                          message: proxmoxExceptionMessage(e, l10n),
-                          onRetry:
-                              () =>
-                                  ref.read(taskListProvider.notifier).refresh(),
-                        ),
-                      ),
-                    ],
+              ],
+            ),
+          ),
+      error:
+          (e, _) => RefreshIndicator(
+            onRefresh: refreshTasks,
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: minPullHeight,
+                  child: ErrorView(
+                    message: proxmoxExceptionMessage(e, l10n),
+                    onRetry: () => ref.read(taskListProvider.notifier).refresh(),
                   ),
                 ),
-            data: (tasks) {
-              if (tasks.isEmpty) {
-                return RefreshIndicator(
-                  onRefresh: refreshTasks,
-                  child: ListView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    children: [
-                      SizedBox(
-                        height: minPullHeight,
-                        child: EmptyState(
-                          icon: Icons.task_alt_outlined,
-                          title: l10n.taskListEmptyTitle,
-                          message: l10n.taskListEmptyMessage,
-                        ),
-                      ),
-                    ],
+              ],
+            ),
+          ),
+      data: (tasks) {
+        if (tasks.isEmpty) {
+          return RefreshIndicator(
+            onRefresh: refreshTasks,
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: minPullHeight,
+                  child: EmptyState(
+                    icon: Icons.task_alt_outlined,
+                    title: l10n.taskListEmptyTitle,
+                    message: l10n.taskListEmptyMessage,
                   ),
-                );
+                ),
+              ],
+            ),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: refreshTasks,
+          child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            itemCount: tasks.length,
+            itemBuilder: (context, index) {
+              final task = tasks[index];
+              final vmid = vmidFromProxmoxUpid(task.upid);
+              final guest = _guestLabel(
+                vmid: vmid,
+                taskNode: task.node,
+                vms: vms,
+                containers: containers,
+                l10n: l10n,
+              );
+              final start = task.startTime;
+              String startedText = l10n.valueUnavailable;
+              if (start != null) {
+                final dt = DateTime.fromMillisecondsSinceEpoch(
+                  start * 1000,
+                  isUtc: true,
+                ).toLocal();
+                startedText = DateFormat.yMMMd(locale).add_Hm().format(dt);
               }
+              final durationText =
+                  start != null
+                      ? _formatDurationSeconds(start, task.endTime)
+                      : l10n.valueUnavailable;
 
-              return RefreshIndicator(
-                onRefresh: refreshTasks,
-                child: ListView.separated(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  itemCount: tasks.length,
-                  separatorBuilder:
-                      (context, index) => const Divider(height: 1),
-                  itemBuilder: (context, index) {
-                    final task = tasks[index];
-                    final vmid = vmidFromProxmoxUpid(task.upid);
-                    final guest = _guestLabel(
-                      vmid: vmid,
-                      taskNode: task.node,
-                      vms: vms,
-                      containers: containers,
-                      l10n: l10n,
-                    );
-                    final start = task.startTime;
-                    String startedText = l10n.valueUnavailable;
-                    if (start != null) {
-                      final dt =
-                          DateTime.fromMillisecondsSinceEpoch(
-                            start * 1000,
-                            isUtc: true,
-                          ).toLocal();
-                      startedText = DateFormat.yMMMd(
-                        locale,
-                      ).add_Hm().format(dt);
-                    }
-                    final durationText =
-                        start != null
-                            ? _formatDurationSeconds(start, task.endTime)
-                            : l10n.valueUnavailable;
-                    final statusColor = _statusColor(task.status, scheme);
-
-                    return ListTile(
-                      title: Text(
-                        task.type,
-                        style: Theme.of(context).textTheme.titleSmall,
+              return PremiumListRow(
+                title: Text(
+                  task.type,
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 2),
+                    Text(
+                      '${l10n.taskRowGuest}: $guest',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurface,
                       ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 4),
-                          Text(
-                            '${l10n.taskRowGuest}: $guest',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                          Text(
-                            '${l10n.taskRowStarted}: $startedText · '
-                            '${l10n.taskRowDuration}: $durationText',
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(color: scheme.onSurfaceVariant),
-                          ),
-                        ],
+                    ),
+                    Text(
+                      '${l10n.taskRowStarted}: $startedText · '
+                      '${l10n.taskRowDuration}: $durationText',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
                       ),
-                      trailing: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            _statusLabel(task.status, l10n),
-                            style: Theme.of(
-                              context,
-                            ).textTheme.labelMedium?.copyWith(
-                              color: statusColor,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                      isThreeLine: true,
-                      onTap:
-                          () => context.push(
-                            '/tasks/${Uri.encodeComponent(task.node)}/${Uri.encodeComponent(task.upid)}',
-                          ),
-                    );
-                  },
+                    ),
+                  ],
+                ),
+                trailing: StatusBadge(
+                  label: _statusLabel(task.status, l10n),
+                  variant: _statusVariant(task.status),
+                ),
+                showDividerBelow: index < tasks.length - 1,
+                onTap: () => context.push(
+                  '/tasks/${Uri.encodeComponent(task.node)}/${Uri.encodeComponent(task.upid)}',
                 ),
               );
             },
           ),
-        ),
-      ],
+        );
+      },
     );
+
+    return ShellSectionBody(title: Text(l10n.sectionTasks), body: body);
   }
 }

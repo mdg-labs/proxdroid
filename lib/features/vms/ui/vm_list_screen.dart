@@ -10,6 +10,7 @@ import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
+import 'package:proxdroid/shared/widgets/premium_list_row.dart';
 import 'package:proxdroid/shared/widgets/shell_section_body.dart';
 
 enum _VmStatusFilter { all, running, stopped }
@@ -262,7 +263,8 @@ class _VmListScreenState extends ConsumerState<VmListScreen> {
                         padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
                         child: Card(
                           margin: EdgeInsets.zero,
-                          child: ListTile(
+                          clipBehavior: Clip.antiAlias,
+                          child: PremiumListRow(
                             title: Text(
                               vm.name.isEmpty
                                   ? '${l10n.labelVmid} ${vm.vmid}'
@@ -270,46 +272,37 @@ class _VmListScreenState extends ConsumerState<VmListScreen> {
                             ),
                             subtitle: Text(
                               '${l10n.labelVmid} ${vm.vmid} · ${l10n.entityNode} ${vm.node}',
-                              style: TextStyle(color: scheme.onSurfaceVariant),
                             ),
-                            trailing: Row(
+                            trailing: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.end,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    VmStatusBadge(status: vm.status),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      formatCpuPercent(vm.cpu),
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.labelSmall?.copyWith(
-                                        color: scheme.onSurfaceVariant,
-                                      ),
-                                    ),
-                                    Text(
-                                      formatMemoryRatio(vm.mem, vm.maxMem),
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.labelSmall?.copyWith(
-                                        color: scheme.onSurfaceVariant,
-                                      ),
-                                    ),
-                                  ],
+                                VmStatusBadge(status: vm.status),
+                                const SizedBox(height: 4),
+                                Text(
+                                  formatCpuPercent(vm.cpu),
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.labelSmall?.copyWith(
+                                    color: scheme.onSurfaceVariant,
+                                  ),
                                 ),
-                                Icon(
-                                  Icons.chevron_right,
-                                  color: scheme.onSurfaceVariant,
+                                Text(
+                                  formatMemoryRatio(vm.mem, vm.maxMem),
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.labelSmall?.copyWith(
+                                    color: scheme.onSurfaceVariant,
+                                  ),
                                 ),
                               ],
                             ),
-                            onTap:
-                                () => context.push(
-                                  '/vms/${Uri.encodeComponent(vm.node)}/${Uri.encodeComponent(vm.vmid.toString())}',
-                                ),
+                            showChevron: true,
+                            showDividerBelow: false,
+                            onTap: () => context.push(
+                              '/vms/${Uri.encodeComponent(vm.node)}/${Uri.encodeComponent(vm.vmid.toString())}',
+                            ),
                           ),
                         ),
                       );

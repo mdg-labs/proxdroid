@@ -260,9 +260,17 @@
   "@serverAuthTypeUsernamePassword": {
     "description": "Segment label for username/password authentication."
   },
+  "serverFormIdentitySection": "Identity",
+  "@serverFormIdentitySection": {
+    "description": "Section header for server name, host, and port fields."
+  },
   "serverFormAuthentication": "Authentication",
   "@serverFormAuthentication": {
     "description": "Section title above auth type and credential fields."
+  },
+  "serverFormSecuritySection": "Security",
+  "@serverFormSecuritySection": {
+    "description": "Section header for SSL / certificate options."
   },
   "serverAllowSelfSigned": "Allow self-signed certificate",
   "@serverAllowSelfSigned": {
@@ -967,5 +975,25 @@
   "settingsCouldNotOpenLink": "Could not open link",
   "@settingsCouldNotOpenLink": {
     "description": "Snackbar when url_launcher fails."
+  },
+  "navDashboard": "Dashboard",
+  "@navDashboard": {
+    "description": "Bottom navigation bar label for the Dashboard tab."
+  },
+  "navVMs": "VMs",
+  "@navVMs": {
+    "description": "Bottom navigation bar label for the Virtual Machines tab (abbreviated for space)."
+  },
+  "navContainers": "Containers",
+  "@navContainers": {
+    "description": "Bottom navigation bar label for the LXC Containers tab."
+  },
+  "navTasks": "Tasks",
+  "@navTasks": {
+    "description": "Bottom navigation bar label for the Proxmox Tasks tab."
+  },
+  "navMore": "More",
+  "@navMore": {
+    "description": "Bottom navigation bar label for the More tab, which opens the full navigation drawer."
   }
 }
