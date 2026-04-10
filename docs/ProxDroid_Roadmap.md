@@ -379,26 +379,17 @@ Not in scope for the current **GitHub-only prerelease** path; pick up when targe
   - Open an inclusion request (merge request) at [gitlab.com/fdroid/fdroiddata](https://gitlab.com/fdroid/fdroiddata) — F-Droid maintainers add metadata to their own repo; you do not add metadata to the app repo
   - F-Droid inclusion takes several weeks — submit as early as possible, ideally when the app is in beta
 - [ ] Complete the Play Store Data Safety form (declare what data is collected: credentials stored on-device only, no data sent to third parties)
-- [ ] Sign release APK with upload keystore
-  - Generate keystore file locally
-  - Add `*.jks` and `*.keystore` to `.gitignore` – **never commit the keystore file**
-  - Store keystore as base64-encoded GitHub Actions secret (`KEYSTORE_BASE64`)
-  - Store keystore password, key alias and key password as separate GitHub Actions secrets
-  - Decode and use in `build.yml` via `echo "$KEYSTORE_BASE64" | base64 --decode > upload.jks`
-  - Also generate `key.properties` in CI from secrets (required by the Gradle signing config — without it the build fails even if the keystore file is present). Use `printf` not `echo` — `echo` does not interpret `\n` as newlines in most shells:
-    ```
-    printf "storePassword=%s\nkeyPassword=%s\nkeyAlias=%s\nstoreFile=%s\n" \
-      "$KEYSTORE_PASSWORD" "$KEY_PASSWORD" "$KEY_ALIAS" "../upload.jks" \
-      > android/key.properties
-    ```
-  - Add `key.properties` to `.gitignore` — never commit it
+- [x] Sign release APK with upload keystore (GitHub Actions path — **done**)
+  - Maintainer steps: **`docs/Android_release_signing.md`**
+  - CI: secrets `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_PASSWORD`, `KEY_ALIAS`; decode to `android/proxdroid-release.jks`; `printf` → `android/key.properties`; Gradle reads `android/key.properties` and signs `release` with that keystore (local builds without `key.properties` still use debug signing for convenience)
+  - `*.jks`, `*.keystore`, `key.properties` remain gitignored; template: `android/key.properties.example`
 - [ ] Configure `build.yml` GitHub Action to build **two artifacts** on tag push:
   - Signed AAB (`flutter build appbundle --release`) → for Play Store submission (Play Store requires AAB for new apps; APK is no longer accepted for new app submissions)
   - Signed APK (`flutter build apk --release`) → for GitHub Releases and F-Droid sideload
 - [ ] Submit to Play Store internal testing track first, then production
 
 ### 6.6 GitHub Release (prerelease path — **done** for current scope)
-- [x] **Tag convention:** push tags matching `v*-beta*` (e.g. `v0.1.0-beta.1`) — triggers `build.yml`, creates/updates a GitHub **prerelease** with the release APK attached (unsigned APK; store signing deferred — §6.5). A separate prod release workflow can be added later for stable tags.
+- [x] **Tag convention:** push tags matching `v*-beta*` (e.g. `v0.1.0-beta.1`) — triggers `build.yml`, creates/updates a GitHub **prerelease** with the **release-signed** APK attached (requires Actions secrets in `docs/Android_release_signing.md`; Play/AAB path still §6.5). A separate prod release workflow can be added later for stable tags.
 - [x] **Release notes:** maintain `[Unreleased]` in `CHANGELOG.md` during development; when tagging, promote entries into a version section and paste or summarize into the GitHub release body (do not invent notes from scratch)
 - [x] **README:** download section documents GitHub Releases, tag patterns, and deferred Play/F-Droid; optional `build.yml` status badge
 - [ ] **Prod / stable releases:** add a dedicated workflow (or extend CI) for stable tags such as `v1.0.0` when ready — not required to close Phase 6; beta workflow stays on `v*-beta*` only

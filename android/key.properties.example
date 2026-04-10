@@ -1,0 +1,6 @@
+# Copy to key.properties in this folder (android/) and fill in values.
+# Never commit key.properties or *.jks — see docs/Android_release_signing.md
+storePassword=
+keyPassword=
+keyAlias=upload
+storeFile=proxdroid-release.jks
