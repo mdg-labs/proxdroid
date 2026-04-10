@@ -177,7 +177,15 @@ class _ResourceLineChartCanvas extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final lineBars = _lineBars().where((b) => b.spots.isNotEmpty).toList();
     if (lineBars.isEmpty) {
-      return Center(child: Text(l10n.chartNoData));
+      return DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: scheme.outlineVariant.withValues(alpha: 0.25),
+          ),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: const SizedBox.expand(),
+      );
     }
 
     final minMax = _minMaxY(lineBars);

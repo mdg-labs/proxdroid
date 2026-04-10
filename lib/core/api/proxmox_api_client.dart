@@ -740,7 +740,8 @@ ResourceDataPoint? _resourceDataPointFromRrdRow(dynamic row) {
       return null;
     }
     final cpu = _rrdDouble(m, 'cpu');
-    final mem = _rrdDouble(m, 'mem');
+    // Node rrddata uses 'memused' instead of 'mem' — accept both.
+    final mem = _rrdDouble(m, 'mem') ?? _rrdDouble(m, 'memused');
     final netIn = _rrdDouble(m, 'netin');
     final netOut = _rrdDouble(m, 'netout');
     final diskRead = _rrdDouble(m, 'diskread');
