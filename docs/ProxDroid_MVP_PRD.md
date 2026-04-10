@@ -63,9 +63,8 @@ Proxmox VE is a widely used virtualization platform, especially in the homelab s
 | **HTTP Client** | Dio (with SSL override for self-signed certs) |
 | **Data Models** | Freezed (immutable, code-generated) |
 | **Charts** | fl_chart |
-| **Local Storage** | Hive (non-sensitive data) + flutter_secure_storage (credentials) |
+| **Local Storage** | hive_ce (non-sensitive data) + flutter_secure_storage (credentials) |
 | **CI/CD** | GitHub Actions |
-| **Min Android** | API 26+ (Android 8.0 Oreo) |
 | **Distribution** | Google Play Store + F-Droid + GitHub Releases (APK) |
 
 ### 4.2 API Integration
@@ -172,7 +171,7 @@ No ads. Free. Exclusively voluntary donations:
 
 ## 10. Next Steps
 
-- [x] Tech stack decided (Flutter, Riverpod, Freezed, go_router, Hive + flutter_secure_storage, Dio)
+- [x] Tech stack decided (Flutter, Riverpod, Freezed, go_router, hive_ce + flutter_secure_storage, Dio)
 - [x] App architecture defined → see `ProxDroid_Architecture.md`
 - [x] License finalized: MIT
 - [ ] Create GitHub repository and set up initial Flutter project
@@ -212,8 +211,12 @@ No ads. Free. Exclusively voluntary donations:
 | `go_router` | Navigation | [pub.dev/packages/go_router](https://pub.dev/packages/go_router) |
 | `freezed_annotation` | Immutable data models | [pub.dev/packages/freezed_annotation](https://pub.dev/packages/freezed_annotation) |
 | `fl_chart` | Charts & visualizations | [pub.dev/packages/fl_chart](https://pub.dev/packages/fl_chart) |
-| `hive_flutter` | Local storage (non-sensitive) | [pub.dev/packages/hive_flutter](https://pub.dev/packages/hive_flutter) |
+| `hive_ce_flutter` | Local storage (non-sensitive) – community-maintained Hive fork | [pub.dev/packages/hive_ce_flutter](https://pub.dev/packages/hive_ce_flutter) |
 | `flutter_secure_storage` | Secure credential storage | [pub.dev/packages/flutter_secure_storage](https://pub.dev/packages/flutter_secure_storage) |
+| `connectivity_plus` | Network availability detection | [pub.dev/packages/connectivity_plus](https://pub.dev/packages/connectivity_plus) |
+| `package_info_plus` | App version info for Settings/About screen | [pub.dev/packages/package_info_plus](https://pub.dev/packages/package_info_plus) |
+| `url_launcher` | Open donation and GitHub links from within the app | [pub.dev/packages/url_launcher](https://pub.dev/packages/url_launcher) |
+| `intl` | Date/time formatting for task timestamps and backup dates | [pub.dev/packages/intl](https://pub.dev/packages/intl) |
 
 ### Tools & Infrastructure
 

@@ -130,10 +130,13 @@ lib/
     ├── widgets/
     │   ├── resource_chart.dart       # Reusable chart widget
     │   ├── status_badge.dart
-    │   ├── error_view.dart
-    │   └── loading_shimmer.dart
+    │   ├── error_view.dart           # Error message + retry button
+    │   ├── loading_shimmer.dart
+    │   └── empty_state.dart          # Icon + message for empty lists
     └── constants/
         └── api_endpoints.dart        # All API paths in one place
+    └── providers/
+        └── connectivity_provider.dart # Streams ConnectivityResult; drives offline banner
 ```
 
 ---
@@ -149,16 +152,16 @@ Providers (Riverpod)
         ↓ calls
 Repository (Data Layer)
         ↓ uses
-API Client / Hive Storage
+API Client / Local Storage (hive_ce)
 ```
 
 ### Example: Starting a VM
 
 ```
 vm_detail_screen.dart
-  → ref.read(vmProvider.notifier).startVm(vmid)
-      → VmNotifier calls vm_repository.startVm(vmid)
-          → vmRepository calls proxmox_api_client.post('/nodes/{node}/qemu/{vmid}/status/start')
+  → ref.read(vmProvider.notifier).startVm(node, vmid)   // node required for all Proxmox API calls
+      → VmNotifier calls vm_repository.startVm(node, vmid)
+          → vmRepository calls proxmox_api_client.post('/nodes/$node/qemu/$vmid/status/start')
               → Response: task ID → forwarded to features/tasks/data/task_repository.dart
 ```
 
@@ -244,6 +247,7 @@ if (allowSelfSigned) {
 /                                   → Redirect → /servers or /dashboard
 /servers                            → Server list
 /servers/add                        → Add server
+/servers/edit/:serverId             → Edit server (name, host, port, credentials, SSL toggle)
 /dashboard                          → Node overview (after server selection)
 /vms                                → VM list (all nodes)
 /vms/:node/:vmid                    → VM detail + charts
@@ -275,14 +279,20 @@ class ServerListNotifier extends _$ServerListNotifier {
 }
 ```
 
-### API data (async, auto-refresh)
+### API data (async, cluster-wide)
 ```dart
+// Primary: use GET /cluster/resources for all-nodes VM list (one call, no N-node iteration)
 @riverpod
-Future<List<Vm>> vmList(Ref ref, String node) async {
-  // apiClientProvider is scoped to the currently selectedServerProvider
-  // – switching servers invalidates all API providers automatically
+Future<List<Vm>> allVms(Ref ref) async {
+  final api = ref.watch(apiClientProvider); // watch invalidates when server switches
+  return api.getAllVms(); // calls GET /cluster/resources?type=vm
+}
+
+// Secondary: per-node fetch used only when node context is known (e.g. node detail screens)
+@riverpod
+Future<List<Vm>> nodeVms(Ref ref, String node) async {
   final api = ref.watch(apiClientProvider);
-  return api.getVms(node);
+  return api.getVms(node); // calls GET /nodes/{node}/qemu
 }
 ```
 
@@ -297,6 +307,8 @@ ProxmoxApiClient apiClient(Ref ref) {
   return ProxmoxApiClient(server: server);
 }
 ```
+
+> **Null safety:** On first launch (no servers configured), `selectedServerProvider` holds `null`. `apiClientProvider` should guard against this — either by throwing a typed exception that the UI catches to redirect to `/servers`, or by making `apiClientProvider` return `null` and having all API providers short-circuit gracefully. The recommended approach is to redirect to `/servers` via go_router's `redirect` callback when `selectedServerProvider` is null, so API providers never fire without a server.
 
 ### Connectivity check
 

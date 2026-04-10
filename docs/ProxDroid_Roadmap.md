@@ -17,7 +17,7 @@
 | **Phase 3** | VM & container actions + task viewer | Can start, stop, reboot VMs/containers and track tasks |
 | **Phase 4** | Resource monitoring charts | Full real-time charts for CPU, RAM, network, disk I/O |
 | **Phase 5** | Storage & backup management | Can browse storage and trigger/view backups |
-| **Phase 6** | Polish & release prep | App is stable, polished, and ready for Play Store |
+| **Phase 6** | Polish & release prep | App is stable, polished, and released on Play Store, F-Droid, and GitHub |
 | **Post-MVP** | Extended features | Console, push notifications, homescreen widget |
 
 ---
@@ -42,7 +42,7 @@
 - [ ] Initialize Flutter project (`flutter create proxdroid`)
 - [ ] Remove default counter app boilerplate (`lib/main.dart` content, `test/widget_test.dart`)
 - [ ] Set minimum SDK to Android API 26 in `android/app/build.gradle`
-- [ ] Add all dependencies to `pubspec.yaml` (Riverpod, Dio, Freezed, go_router, Hive, fl_chart, flutter_secure_storage, connectivity_plus, package_info_plus, url_launcher, intl)
+- [ ] Add all dependencies to `pubspec.yaml` (Riverpod, Dio, Freezed, go_router, hive_ce_flutter, fl_chart, flutter_secure_storage, connectivity_plus, package_info_plus, url_launcher, intl)
 - [ ] Run `flutter pub get` and confirm no version conflicts
 - [ ] Set up `build_runner` and confirm code generation works (`dart run build_runner build`)
 
@@ -67,6 +67,8 @@
   - `flutter analyze`
   - `flutter test`
 - [ ] Add workflow: `build.yml` – runs on tags (`v*`)
+  - `flutter pub get`
+  - `dart run build_runner build --delete-conflicting-outputs` (must run before build; generates Freezed/Riverpod code)
   - Build release APK (`flutter build apk --release`)
   - Upload APK as GitHub Release asset
 - [ ] Confirm both workflows pass on a clean run
@@ -110,18 +112,20 @@
 
 ### 1.4 Server Repository & Providers
 - [ ] Implement `ServerRepository` – wraps `ServerStorage`, exposes typed methods
-- [ ] Implement `ServerListNotifier` (Riverpod) – manages list of servers, persists via Hive
-- [ ] Implement `selectedServerProvider` – tracks which server is currently active
-- [ ] Implement `apiClientProvider` – creates `ProxmoxApiClient` for the selected server
+- [ ] Implement `ServerListNotifier` (Riverpod) – manages list of servers, persists via hive_ce
+- [ ] Implement `selectedServerProvider` – tracks which server is currently active; returns `null` when no server is configured
+- [ ] Implement `apiClientProvider` – creates `ProxmoxApiClient` for the selected server; watches (not reads) `selectedServerProvider` so all API providers invalidate on server switch
+- [ ] Implement go_router `redirect` callback: if `selectedServerProvider` is null, redirect all routes to `/servers` so API providers never fire without a server
 
 ### 1.5 Add Server UI
 - [ ] Build `ServerListScreen` – shows all saved servers, empty state with CTA
 - [ ] Build `AddServerScreen` – form with fields: name, host, port (default 8006), auth type toggle, credentials, allow self-signed toggle
 - [ ] Add connection test button – calls `GET /version` (returns PVE version info) and shows success/error feedback
 - [ ] Add server to list on success, show typed error message on failure
-- [ ] Add swipe-to-delete on server list items
-- [ ] Wire up go_router: `/servers` → `ServerListScreen`, `/servers/add` → `AddServerScreen`
-- [ ] Redirect to `/servers` on first launch (no servers saved), else to `/dashboard`
+- [ ] Add swipe-to-delete on server list items with undo snackbar (destructive action)
+- [ ] Add tap-to-edit on server list items → `EditServerScreen` (reuse `AddServerScreen` form, pre-filled)
+- [ ] Wire up go_router: `/servers` → `ServerListScreen`, `/servers/add` → `AddServerScreen`, `/servers/edit/:serverId` → `EditServerScreen`
+- [ ] Redirect to `/servers` on first launch (no servers saved), else to `/dashboard` (handled by go_router `redirect`)
 
 ---
 
@@ -148,9 +152,13 @@
 
 ### 2.3 Repositories & Providers
 - [ ] Implement `NodeRepository` with `getNodes()` and `getNodeStatus(node)`
-- [ ] Implement `VmRepository` with `getVms(node)`
-- [ ] Implement `ContainerRepository` with `getContainers(node)`
-- [ ] Implement async Riverpod providers for node list, VM list, container list
+- [ ] Implement `VmRepository` with:
+  - `getAllVms()` – uses `GET /cluster/resources?type=vm` (primary; call this for list screens)
+  - `getVms(node)` – uses `GET /nodes/{node}/qemu` (secondary; use only when per-node context is required)
+- [ ] Implement `ContainerRepository` with:
+  - `getAllContainers()` – uses `GET /cluster/resources?type=lxc` (primary)
+  - `getContainers(node)` – uses `GET /nodes/{node}/lxc` (secondary)
+- [ ] Implement async Riverpod providers: `allVmsProvider`, `allContainersProvider`, `nodeListProvider`
 - [ ] Add pull-to-refresh support on all list providers
 
 ### 2.4 Dashboard Screen
@@ -210,9 +218,12 @@
 - [ ] Mirror all of the above for `ContainerDetailScreen`
 
 ### 3.4 Task Repository & Providers
-- [ ] Implement `TaskRepository` with `getTasks(node)`, `getTaskStatus(upid)`, `getTaskLog(upid)`
-- [ ] Implement `taskListProvider` – lists all tasks across nodes, sorted by start time (with pagination support)
-- [ ] Implement `taskStatusProvider(upid)` – polls running tasks every 3 seconds
+- [ ] Implement `TaskRepository` with:
+  - `getTasks(node, {int start = 0, int limit = 50})` – paginated; Proxmox has no `/cluster/tasks`, so tasks must be fetched per-node
+  - `getTaskStatus(node, upid)` – node is required for the status endpoint
+  - `getTaskLog(node, upid, {int start = 0, int limit = 500})` – paginated log lines
+- [ ] Implement `taskListProvider` – fetches tasks from all known nodes and merges, sorted by start time descending; uses `nodeListProvider` to enumerate nodes
+- [ ] Implement `taskStatusProvider(node, upid)` – polls running tasks every 3 seconds until status is no longer `running`
 
 ### 3.5 Task Viewer UI
 - [ ] Build `TaskListScreen` – list of all tasks, newest first
@@ -312,7 +323,7 @@
   - **Appearance:** theme toggle (dark/light/system)
   - **About:** app version, GitHub link, license info
   - **Support:** donation links (Ko-fi, GitHub Sponsors)
-- [ ] Wire up theme toggle to persist preference in Hive
+- [ ] Wire up theme toggle to persist preference in hive_ce
 
 ### 6.4 Testing
 - [ ] Unit tests for all repositories (mock API client)
@@ -368,9 +379,11 @@ These are tracked here for planning purposes but are not in scope for v1.0.
 - [ ] Handle authentication and session management for WebSocket connections in both cases
 
 ### Push Notifications
-- [ ] Research Proxmox webhook/notification support (PVE 8.x)
-- [ ] Design notification backend or polling approach
-- [ ] Integrate Firebase Cloud Messaging (FCM) or local notifications
+- [ ] Research Proxmox notification support (PVE 8.1+ has a built-in notification system with webhook targets)
+- [ ] Design notification approach — two options based on distribution target:
+  - **F-Droid-compatible (recommended):** Use polling (background `WorkManager`-style task via `flutter_background_service`) + local notifications (`flutter_local_notifications`) — no proprietary SDK, works on all devices
+  - **Play Store only:** Firebase Cloud Messaging (FCM) via `firebase_messaging` — **not compatible with F-Droid** due to Google Play Services dependency; using FCM would require maintaining two separate build flavors
+- [ ] If supporting both F-Droid and Play Store: implement [UnifiedPush](https://unifiedpush.org) as a push delivery abstraction that supports both FCM (via a re-transmitter) and self-hosted push servers, keeping the app free of proprietary SDK requirements
 
 ### Homescreen Widget
 - [ ] Research Flutter homescreen widget options (`home_widget` package)
