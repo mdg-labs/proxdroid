@@ -407,6 +407,10 @@ Not in scope for the current **GitHub-only prerelease** path; pick up when targe
 - [x] Error surfacing: `proxmoxExceptionMessage` maps exceptions to l10n; avoid showing raw exception text in UI
 - [ ] Review release-facing strings: Play Store listing, Privacy Policy URL — **deferred** with §6.5; in-app About / GitHub-facing copy aligned with ARB where applicable — **ongoing**
 
+### 6.8 UI / visual refactor (**planned — not started**)
+- **Plan:** `ProxDroid_UI_Refactor_Plan.md` (same `docs/` directory as this roadmap) — hybrid ProxMate + Absorb design language; **design-only** (no Proxmox API or client contract changes).
+- [ ] Execute UI refactor per `ProxDroid_UI_Refactor_Plan.md`
+
 ---
 
 ## Post-MVP – Extended Features
