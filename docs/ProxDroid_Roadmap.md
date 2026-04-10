@@ -39,10 +39,11 @@
 - [ ] Set up branch protection on `main` (require PR + CI pass)
 
 ### 0.2 Flutter Project
-- [ ] Initialize Flutter project (`flutter create proxdroid`)
+- [ ] Initialize Flutter project (`flutter create --org com.mdglabs proxdroid`)
+  - This sets the Android application ID to `com.mdglabs.proxdroid` — decide and set this now; it cannot be changed after Play Store submission or F-Droid inclusion
 - [ ] Remove default counter app boilerplate (`lib/main.dart` content, `test/widget_test.dart`)
 - [ ] Set minimum SDK to Android API 26 in `android/app/build.gradle`
-- [ ] Add all dependencies to `pubspec.yaml` (Riverpod, Dio, Freezed, go_router, hive_ce_flutter, fl_chart, flutter_secure_storage, connectivity_plus, package_info_plus, url_launcher, intl)
+- [ ] Add all dependencies to `pubspec.yaml` (Riverpod, Dio, Freezed, go_router, hive_ce + hive_ce_flutter, fl_chart, flutter_secure_storage, connectivity_plus, package_info_plus, url_launcher, intl)
 - [ ] Run `flutter pub get` and confirm no version conflicts
 - [ ] Set up `build_runner` and confirm code generation works (`dart run build_runner build`)
 
@@ -61,12 +62,14 @@
 
 ### 0.5 CI/CD (GitHub Actions)
 - [ ] Add workflow: `ci.yml` – runs on every push/PR to `main`
+  - Pin Flutter version via `subosito/flutter-action` (e.g. `flutter-version: '3.x.x'` or `channel: stable`) — unpinned Flutter causes random CI breakage when Google releases a new version
   - `flutter pub get`
   - `dart format --output=none --set-exit-if-changed .` (fail if code is not formatted)
   - `dart run build_runner build --delete-conflicting-outputs`
   - `flutter analyze`
   - `flutter test`
 - [ ] Add workflow: `build.yml` – runs on tags (`v*`)
+  - Pin same Flutter version as `ci.yml`
   - `flutter pub get`
   - `dart run build_runner build --delete-conflicting-outputs` (must run before build; generates Freezed/Riverpod code)
   - Build release APK (`flutter build apk --release`)
@@ -80,16 +83,16 @@
 **Goal:** The user can add a Proxmox server (by hostname/IP, port, API token or username/password), the app connects to it, authenticates successfully, and stores the configuration locally. Self-signed certificates must work.
 
 ### 1.1 Core Data Models
-- [ ] Implement `Server` model (Freezed) – Hive-persisted fields only: id, name, host, port, authType, allowSelfSigned
+- [ ] Implement `Server` model (Freezed) – hive_ce-persisted fields only: id, name, host, port, authType, allowSelfSigned
   - **Note:** credentials (`apiToken`, `password`) are NOT fields on the `Server` model – they are stored separately in `flutter_secure_storage` keyed by server id, and loaded at runtime when building the `ProxmoxApiClient`
 - [ ] Implement `Node` model (Freezed) – fields: name, status, cpu, maxCpu, mem, maxMem, uptime
 - [ ] Add `ServerAuthType` enum: `apiToken`, `usernamePassword`
 - [ ] Run `build_runner` and confirm generated files are correct
 
 ### 1.2 Local Storage
-- [ ] Add `hive_ce` and `hive_ce_flutter` packages (**not** the unmaintained `hive`/`hive_flutter` — see Architecture §11)
+- [ ] Add `hive_ce` and `hive_ce_flutter` packages (**not** the unmaintained `hive`/`hive_flutter` — see Architecture §11); list both as explicit direct dependencies
 - [ ] Initialize `hive_ce` in `main.dart` for non-sensitive data (server names, hostnames, preferences)
-- [ ] Register Hive adapters for `Server` model (excluding credentials)
+- [ ] Register `TypeAdapter`s for the `Server` model with hive_ce (excluding credentials — credentials live in flutter_secure_storage only)
 - [ ] Initialize `flutter_secure_storage` for sensitive data (API tokens, passwords) – stored encrypted using Android Keystore
 - [ ] Implement `ServerStorage` – methods: `getAll()`, `save()`, `delete()`, `get(id)`
   - Server metadata (name, host, port, authType) → `hive_ce`
@@ -169,6 +172,8 @@
 
 ### 2.5 VM List & Detail
 - [ ] Build `VmListScreen` – filterable list of all VMs across all nodes
+  - Filter dimensions: search by name (text field), filter by status (all / running / stopped), filter by node
+  - Default sort: running VMs first, then alphabetical by name
 - [ ] Each VM row: name, vmid, node name, status badge (color-coded), CPU%, RAM usage
 - [ ] Build `VmDetailScreen` – full details: all resource fields, uptime, node
 - [ ] Add status badge widget (`shared/widgets/status_badge.dart`) – green/red/yellow
@@ -216,6 +221,7 @@
 - [ ] On success: refresh VM status, show snackbar confirmation
 - [ ] On error: show typed error message
 - [ ] Mirror all of the above for `ContainerDetailScreen`
+  - Note: containers have no Pause state (`ContainerStatus` has no `paused`) — do not show a Pause button for LXC containers
 
 ### 3.4 Task Repository & Providers
 - [ ] Implement `TaskRepository` with:
@@ -262,7 +268,7 @@
 - [ ] Add all four charts to `VmDetailScreen` below the status/info section
 - [ ] Add all four charts to `ContainerDetailScreen`
 - [ ] Add node-level CPU and RAM charts to `DashboardScreen` node cards (compact version)
-- [ ] Implement auto-refresh: charts refresh every 30 seconds while screen is active
+- [ ] Implement auto-refresh: charts refresh every 60 seconds while screen is active (rrddata resolution is 60s per point; refreshing faster yields no new data)
 
 ---
 
@@ -293,7 +299,7 @@
 - [ ] Build `BackupListScreen` – list of backup content grouped by VM/CT
 - [ ] Each backup row: VM name, date/time, size, format (vma, tar, etc.)
 - [ ] Add manual backup trigger button (FAB or per-VM action)
-- [ ] Build `TriggerBackupSheet` (bottom sheet) – select storage, compression, mode
+- [ ] Build `TriggerBackupSheet` (bottom sheet) – select storage, compression (zstd / lzo / gzip / none), mode (snapshot / suspend / stop)
 - [ ] On trigger: call vzdump API, navigate to task viewer to track progress
 - [ ] Wire up go_router: `/backups`
 
@@ -309,6 +315,7 @@
 - [ ] Handle network timeout gracefully (with retry option)
 - [ ] Handle session expiry for username/password auth (auto re-authenticate)
 - [ ] Handle empty states on all list screens
+- [ ] Implement persistent offline banner: when `connectivityProvider` reports no network, show a non-dismissible top banner across all screens; auto-dismiss when connectivity is restored
 
 ### 6.2 UX Polish
 - [ ] Add smooth page transitions (go_router transitions)
@@ -343,8 +350,10 @@
 - [ ] Create and host Privacy Policy (required by Play Store for apps handling credentials/network config)
   - Host on GitHub Pages (`https://mdg-labs.github.io/proxdroid/privacy`)
   - Content must declare: credentials stored on-device only, no telemetry, no data sent to third parties
-- [ ] Submit to F-Droid: add `fdroid/metadata/` directory with app metadata; ensure build is reproducible (no proprietary SDKs, no Firebase)
-  - F-Droid inclusion takes time — submit early in the release cycle
+- [ ] Submit to F-Droid:
+  - Ensure build is reproducible (no proprietary SDKs, no Firebase, no Google Play Services)
+  - Open an inclusion request (merge request) at [gitlab.com/fdroid/fdroiddata](https://gitlab.com/fdroid/fdroiddata) — F-Droid maintainers add metadata to their own repo; you do not add metadata to the app repo
+  - F-Droid inclusion takes several weeks — submit as early as possible, ideally when the app is in beta
 - [ ] Complete the Play Store Data Safety form (declare what data is collected: credentials stored on-device only, no data sent to third parties)
 - [ ] Sign release APK with upload keystore
   - Generate keystore file locally

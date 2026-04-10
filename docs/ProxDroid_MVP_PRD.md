@@ -114,7 +114,7 @@ Multi-server support is built into the architecture from day one. Users can add 
 - Dark theme as default, light theme optional
 - Modern, clean UI – Material 3
 - Charts and visualizations instead of plain text tables
-- Fast load times – optimistic UI updates where possible
+- Fast load times – optimistic UI updates for read-only state; **never** for destructive or power actions (start/stop/reboot must reflect actual server state after the task completes)
 - Error messages clear and human-readable (no raw API error output)
 - Simple onboarding – add a server in under 60 seconds
 
@@ -161,7 +161,7 @@ No ads. Free. Exclusively voluntary donations:
 | Risk | Proxmox API changes in future PVE versions may require updates |
 | Risk | Self-signed SSL handling can be complex on older Android versions |
 | Risk | Flutter ecosystem may be limited for certain native Android features |
-| Risk | Credentials (API tokens, passwords) must be stored securely on-device – plain Hive storage is not sufficient; requires `flutter_secure_storage` |
+| Risk | Credentials (API tokens, passwords) must be stored securely on-device – plain hive_ce storage is not encrypted and is not sufficient for credentials; requires `flutter_secure_storage` (Android Keystore-backed) |
 | Risk | Google Play Store requires a Privacy Policy URL for apps that handle credentials and network configuration |
 | Assumption | Users have direct network access to the PVE server (LAN or VPN) |
 | Assumption | Proxmox VE 7.x and 8.x are supported; PVE 6.x is explicitly out of scope |
@@ -224,6 +224,7 @@ No ads. Free. Exclusively voluntary donations:
 |---|---|
 | GitHub Actions Documentation | [docs.github.com/actions](https://docs.github.com/en/actions) |
 | Google Play – Publish an app | [developer.android.com/distribute](https://developer.android.com/distribute/google-play/start) |
+| F-Droid – Inclusion How-To | [f-droid.org/docs/Inclusion_How-To](https://f-droid.org/docs/Inclusion_How-To/) |
 | Riverpod Documentation | [riverpod.dev](https://riverpod.dev) |
 
 ### Project Documents

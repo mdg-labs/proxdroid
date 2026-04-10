@@ -79,7 +79,8 @@ lib/
 │   │   │   └── server_providers.dart
 │   │   └── ui/
 │   │       ├── server_list_screen.dart
-│   │       └── add_server_screen.dart
+│   │       ├── add_server_screen.dart
+│   │       └── edit_server_screen.dart   # Reuses AddServerScreen form, pre-filled
 │   │
 │   ├── dashboard/                    # Node overview & summary
 │   │   ├── data/
@@ -133,8 +134,8 @@ lib/
     │   ├── error_view.dart           # Error message + retry button
     │   ├── loading_shimmer.dart
     │   └── empty_state.dart          # Icon + message for empty lists
-    └── constants/
-        └── api_endpoints.dart        # All API paths in one place
+    ├── constants/
+    │   └── api_endpoints.dart        # All API paths in one place
     └── providers/
         └── connectivity_provider.dart # Streams ConnectivityResult; drives offline banner
 ```
@@ -267,8 +268,13 @@ if (allowSelfSigned) {
 
 ## 9. State Management – Riverpod Patterns
 
-### Server list (persistent, Hive)
+### Server list (persistent, hive_ce)
 ```dart
+// serverStorageProvider lives in core/storage/server_storage.dart
+// and exposes ServerStorage as a Riverpod provider
+@riverpod
+ServerStorage serverStorage(Ref ref) => ServerStorage();
+
 @riverpod
 class ServerListNotifier extends _$ServerListNotifier {
   @override
@@ -326,7 +332,7 @@ sealed class ProxmoxException implements Exception {
 }
 class AuthException extends ProxmoxException { const AuthException(); }
 class NetworkException extends ProxmoxException { const NetworkException(); }
-class TimeoutException extends ProxmoxException { const TimeoutException(); }
+class ApiTimeoutException extends ProxmoxException { const ApiTimeoutException(); } // named ApiTimeoutException to avoid conflict with dart:async TimeoutException
 class ServerException extends ProxmoxException {
   final int statusCode;
   final String? message;
@@ -335,7 +341,7 @@ class ServerException extends ProxmoxException {
 class PermissionException extends ProxmoxException { const PermissionException(); }
 ```
 
-These are translated into human-readable messages in the UI. `TimeoutException` covers both connection and receive timeouts from Dio. `ServerException` carries the HTTP status code so the UI can differentiate 4xx from 5xx errors.
+These are translated into human-readable messages in the UI. `ApiTimeoutException` covers both connection and receive timeouts from Dio. Note: the class is named `ApiTimeoutException` (not `TimeoutException`) to avoid shadowing `dart:async`'s `TimeoutException`. `ServerException` carries the HTTP status code so the UI can differentiate 4xx from 5xx errors.
 
 ---
 
@@ -356,7 +362,8 @@ dependencies:
   freezed_annotation: ^3.x
   json_annotation: ^4.x
   # Storage
-  hive_ce_flutter: ^2.x        # Non-sensitive data (server names, preferences) – use hive_ce, not the unmaintained hive
+  hive_ce: ^2.x                # Core Hive CE API – list as explicit direct dependency (do not rely on transitive)
+  hive_ce_flutter: ^2.x        # Flutter integration for hive_ce (initialisation, path provider)
   flutter_secure_storage: ^9.x # Sensitive data (API tokens, passwords) – encrypted via Android Keystore
   # Charts
   fl_chart: ^0.x
@@ -391,7 +398,7 @@ dev_dependencies:
 | **Phase 4** | Charts (CPU, RAM, network, disk I/O) | Monitoring complete |
 | **Phase 5** | Storage, backup list & manual trigger | MVP feature-complete |
 | **Phase 6** | Polish, error handling, UX details | MVP release-ready |
-| **Post-MVP** | Console, push notifications, homescreen widget | v2.0 |
+| **Post-MVP** | Console, push notifications, homescreen widget, snapshot management, suspend/resume | v2.0 |
 
 ---
 
