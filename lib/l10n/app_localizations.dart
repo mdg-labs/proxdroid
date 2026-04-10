@@ -723,6 +723,168 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'—'**
   String get valueUnavailable;
+
+  /// Dialog button to dismiss without acting.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get actionCancel;
+
+  /// Dialog button to confirm a destructive or important action.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get actionConfirm;
+
+  /// Alert title for graceful shutdown confirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Shut down guest?'**
+  String get powerConfirmStopTitle;
+
+  /// Alert body for graceful shutdown.
+  ///
+  /// In en, this message translates to:
+  /// **'This sends a shutdown signal so the operating system can stop cleanly.'**
+  String get powerConfirmStopBody;
+
+  /// Alert title for immediate power-off.
+  ///
+  /// In en, this message translates to:
+  /// **'Force stop?'**
+  String get powerConfirmForceStopTitle;
+
+  /// Alert body for force stop.
+  ///
+  /// In en, this message translates to:
+  /// **'The guest will be powered off immediately without a clean shutdown.'**
+  String get powerConfirmForceStopBody;
+
+  /// Extra warning in force-stop dialog about data loss.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsaved data may be lost. This is equivalent to pulling the power cord.'**
+  String get powerConfirmForceStopWarning;
+
+  /// Alert title for reboot confirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Reboot guest?'**
+  String get powerConfirmRebootTitle;
+
+  /// Alert body for reboot confirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'The guest will restart. Unsaved work may be lost if applications do not shut down cleanly.'**
+  String get powerConfirmRebootBody;
+
+  /// SnackBar after a power task completes with OK status.
+  ///
+  /// In en, this message translates to:
+  /// **'{actionName} finished successfully.'**
+  String powerActionCompleted(String actionName);
+
+  /// SnackBar or message when Proxmox task status is error.
+  ///
+  /// In en, this message translates to:
+  /// **'The operation finished with an error on the server.'**
+  String get powerActionTaskFailed;
+
+  /// When task polling ends in unknown state.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not confirm the final task status.'**
+  String get powerActionTaskUnknown;
+
+  /// Empty state title for merged task list.
+  ///
+  /// In en, this message translates to:
+  /// **'No tasks'**
+  String get taskListEmptyTitle;
+
+  /// Empty state body for task list.
+  ///
+  /// In en, this message translates to:
+  /// **'No recent tasks were returned for this cluster.'**
+  String get taskListEmptyMessage;
+
+  /// Error when task list fails to load.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load tasks.'**
+  String get taskListLoadError;
+
+  /// Label for resolved VM/CT name or ID in task row.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest'**
+  String get taskRowGuest;
+
+  /// Label for task status in row.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get taskRowStatus;
+
+  /// Label for task start time.
+  ///
+  /// In en, this message translates to:
+  /// **'Started'**
+  String get taskRowStarted;
+
+  /// Label for task duration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get taskRowDuration;
+
+  /// Task finished successfully (terminal ok).
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get taskStatusCompleted;
+
+  /// Task finished with error.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get taskStatusFailed;
+
+  /// Label for node name on task detail.
+  ///
+  /// In en, this message translates to:
+  /// **'Node'**
+  String get taskDetailNodeLabel;
+
+  /// Label for raw UPID on task detail.
+  ///
+  /// In en, this message translates to:
+  /// **'UPID'**
+  String get taskDetailUpidLabel;
+
+  /// Section title for task log output.
+  ///
+  /// In en, this message translates to:
+  /// **'Log'**
+  String get taskDetailLogTitle;
+
+  /// Placeholder while task log is fetched.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading log…'**
+  String get taskDetailLogLoading;
+
+  /// Error when task log request fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load the task log.'**
+  String get taskDetailLogError;
+
+  /// When log endpoint returns no lines.
+  ///
+  /// In en, this message translates to:
+  /// **'No log output.'**
+  String get taskDetailLogEmpty;
 }
 
 class _AppLocalizationsDelegate

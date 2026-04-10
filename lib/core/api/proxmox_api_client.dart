@@ -9,6 +9,7 @@ import 'package:proxdroid/core/models/container.dart';
 import 'package:proxdroid/core/models/node.dart';
 import 'package:proxdroid/core/models/proxmox_json_helpers.dart';
 import 'package:proxdroid/core/models/server.dart';
+import 'package:proxdroid/core/models/task.dart';
 import 'package:proxdroid/core/models/vm.dart';
 import 'package:proxdroid/shared/constants/api_endpoints.dart';
 
@@ -350,6 +351,133 @@ class ProxmoxApiClient {
     }).toList();
   }
 
+  /// `POST /nodes/{node}/qemu/{vmid}/status/start` — returns task UPID.
+  Future<String> startVm(String node, int vmid) =>
+      _postPowerAction(ApiEndpoints.nodeQemuVmStatus(node, vmid, 'start'));
+
+  /// `POST .../status/shutdown` — graceful shutdown; optional [forceStop] and
+  /// [timeout] (seconds) as query params per PVE API.
+  Future<String> shutdownVm(
+    String node,
+    int vmid, {
+    bool? forceStop,
+    int? timeout,
+  }) => _postPowerAction(
+    ApiEndpoints.nodeQemuVmStatus(node, vmid, 'shutdown'),
+    queryParameters: _shutdownQuery(forceStop: forceStop, timeout: timeout),
+  );
+
+  /// `POST .../status/stop` — immediate power-off (force stop).
+  Future<String> stopVm(String node, int vmid) =>
+      _postPowerAction(ApiEndpoints.nodeQemuVmStatus(node, vmid, 'stop'));
+
+  /// `POST .../status/reboot`.
+  Future<String> rebootVm(String node, int vmid) =>
+      _postPowerAction(ApiEndpoints.nodeQemuVmStatus(node, vmid, 'reboot'));
+
+  /// `POST /nodes/{node}/lxc/{ctid}/status/start` — returns task UPID.
+  Future<String> startLxc(String node, int ctid) =>
+      _postPowerAction(ApiEndpoints.nodeLxcCtStatus(node, ctid, 'start'));
+
+  /// `POST .../lxc/.../shutdown` — graceful; optional [forceStop] and
+  /// [timeout] query params.
+  Future<String> shutdownLxc(
+    String node,
+    int ctid, {
+    bool? forceStop,
+    int? timeout,
+  }) => _postPowerAction(
+    ApiEndpoints.nodeLxcCtStatus(node, ctid, 'shutdown'),
+    queryParameters: _shutdownQuery(forceStop: forceStop, timeout: timeout),
+  );
+
+  /// `POST .../lxc/.../stop` — immediate stop.
+  Future<String> stopLxc(String node, int ctid) =>
+      _postPowerAction(ApiEndpoints.nodeLxcCtStatus(node, ctid, 'stop'));
+
+  /// `POST .../lxc/.../reboot`.
+  Future<String> rebootLxc(String node, int ctid) =>
+      _postPowerAction(ApiEndpoints.nodeLxcCtStatus(node, ctid, 'reboot'));
+
+  /// `GET /nodes/{node}/tasks` with pagination.
+  Future<List<Task>> fetchTasksForNode(
+    String node, {
+    int start = 0,
+    int limit = 50,
+  }) async {
+    final response = await _unwrap(
+      _dio.get<Map<String, dynamic>>(
+        ApiEndpoints.nodeTasks(node),
+        queryParameters: <String, dynamic>{'start': start, 'limit': limit},
+      ),
+    );
+    final list = _dataAsList(response.data?['data']);
+    return list.map((dynamic e) {
+      final m = Map<String, dynamic>.from(e as Map);
+      m.putIfAbsent('node', () => node);
+      return Task.fromJson(m);
+    }).toList();
+  }
+
+  /// `GET /nodes/{node}/tasks/{upid}/status`.
+  Future<TaskStatus> fetchTaskStatus(String node, String upid) async {
+    final response = await _unwrap(
+      _dio.get<Map<String, dynamic>>(ApiEndpoints.nodeTaskStatus(node, upid)),
+    );
+    return taskStatusFromApiData(response.data?['data']);
+  }
+
+  /// `GET /nodes/{node}/tasks/{upid}/log` with pagination.
+  Future<List<String>> fetchTaskLog(
+    String node,
+    String upid, {
+    int start = 0,
+    int limit = 500,
+  }) async {
+    final response = await _unwrap(
+      _dio.get<Map<String, dynamic>>(
+        ApiEndpoints.nodeTaskLog(node, upid),
+        queryParameters: <String, dynamic>{'start': start, 'limit': limit},
+      ),
+    );
+    return _taskLogLinesFromData(response.data?['data']);
+  }
+
+  static Map<String, dynamic>? _shutdownQuery({bool? forceStop, int? timeout}) {
+    final q = <String, dynamic>{};
+    if (forceStop != null) {
+      q['forceStop'] = forceStop ? 1 : 0;
+    }
+    if (timeout != null) {
+      q['timeout'] = timeout;
+    }
+    return q.isEmpty ? null : q;
+  }
+
+  Future<String> _postPowerAction(
+    String path, {
+    Map<String, dynamic>? queryParameters,
+  }) async {
+    final response = await _unwrap(
+      _dio.post<Map<String, dynamic>>(path, queryParameters: queryParameters),
+    );
+    return _parsePowerActionUpid(response.data);
+  }
+
+  String _parsePowerActionUpid(Map<String, dynamic>? body) {
+    if (body == null) {
+      throw const ServerException(502, message: 'Empty power action response');
+    }
+    final data = body['data'];
+    if (data is String && data.isNotEmpty) {
+      return data;
+    }
+    throw const ServerException(
+      502,
+      message: 'Invalid power action response (expected UPID string in data)',
+    );
+  }
+
   Future<Response<T>> _unwrap<T>(Future<Response<T>> future) async {
     try {
       return await future;
@@ -368,6 +496,37 @@ List<dynamic> _dataAsList(dynamic data) {
     throw const ServerException(502, message: 'Expected JSON array in data');
   }
   return data;
+}
+
+/// PVE task log `data`: list of `{ "n": int, "t": "line" }` or plain strings.
+List<String> _taskLogLinesFromData(dynamic data) {
+  if (data == null) {
+    throw const ServerException(502, message: 'Invalid task log response');
+  }
+  if (data is! List<dynamic>) {
+    throw const ServerException(
+      502,
+      message: 'Expected JSON array in task log data',
+    );
+  }
+  return data.map(_taskLogLineFromEntry).toList();
+}
+
+String _taskLogLineFromEntry(dynamic entry) {
+  if (entry is String) {
+    return entry;
+  }
+  if (entry is Map) {
+    final t = entry['t'];
+    if (t != null) {
+      return t.toString();
+    }
+    final text = entry['text'];
+    if (text != null) {
+      return text.toString();
+    }
+  }
+  return entry.toString();
 }
 
 /// Flattens PVE node status payload for [Node.fromJson].

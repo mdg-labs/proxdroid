@@ -437,5 +437,119 @@
   "valueUnavailable": "—",
   "@valueUnavailable": {
     "description": "Placeholder when a numeric or text value is missing."
+  },
+  "actionCancel": "Cancel",
+  "@actionCancel": {
+    "description": "Dialog button to dismiss without acting."
+  },
+  "actionConfirm": "Confirm",
+  "@actionConfirm": {
+    "description": "Dialog button to confirm a destructive or important action."
+  },
+  "powerConfirmStopTitle": "Shut down guest?",
+  "@powerConfirmStopTitle": {
+    "description": "Alert title for graceful shutdown confirmation."
+  },
+  "powerConfirmStopBody": "This sends a shutdown signal so the operating system can stop cleanly.",
+  "@powerConfirmStopBody": {
+    "description": "Alert body for graceful shutdown."
+  },
+  "powerConfirmForceStopTitle": "Force stop?",
+  "@powerConfirmForceStopTitle": {
+    "description": "Alert title for immediate power-off."
+  },
+  "powerConfirmForceStopBody": "The guest will be powered off immediately without a clean shutdown.",
+  "@powerConfirmForceStopBody": {
+    "description": "Alert body for force stop."
+  },
+  "powerConfirmForceStopWarning": "Unsaved data may be lost. This is equivalent to pulling the power cord.",
+  "@powerConfirmForceStopWarning": {
+    "description": "Extra warning in force-stop dialog about data loss."
+  },
+  "powerConfirmRebootTitle": "Reboot guest?",
+  "@powerConfirmRebootTitle": {
+    "description": "Alert title for reboot confirmation."
+  },
+  "powerConfirmRebootBody": "The guest will restart. Unsaved work may be lost if applications do not shut down cleanly.",
+  "@powerConfirmRebootBody": {
+    "description": "Alert body for reboot confirmation."
+  },
+  "powerActionCompleted": "{actionName} finished successfully.",
+  "@powerActionCompleted": {
+    "description": "SnackBar after a power task completes with OK status.",
+    "placeholders": {
+      "actionName": {
+        "type": "String",
+        "example": "Start"
+      }
+    }
+  },
+  "powerActionTaskFailed": "The operation finished with an error on the server.",
+  "@powerActionTaskFailed": {
+    "description": "SnackBar or message when Proxmox task status is error."
+  },
+  "powerActionTaskUnknown": "Could not confirm the final task status.",
+  "@powerActionTaskUnknown": {
+    "description": "When task polling ends in unknown state."
+  },
+  "taskListEmptyTitle": "No tasks",
+  "@taskListEmptyTitle": {
+    "description": "Empty state title for merged task list."
+  },
+  "taskListEmptyMessage": "No recent tasks were returned for this cluster.",
+  "@taskListEmptyMessage": {
+    "description": "Empty state body for task list."
+  },
+  "taskListLoadError": "Could not load tasks.",
+  "@taskListLoadError": {
+    "description": "Error when task list fails to load."
+  },
+  "taskRowGuest": "Guest",
+  "@taskRowGuest": {
+    "description": "Label for resolved VM/CT name or ID in task row."
+  },
+  "taskRowStatus": "Status",
+  "@taskRowStatus": {
+    "description": "Label for task status in row."
+  },
+  "taskRowStarted": "Started",
+  "@taskRowStarted": {
+    "description": "Label for task start time."
+  },
+  "taskRowDuration": "Duration",
+  "@taskRowDuration": {
+    "description": "Label for task duration."
+  },
+  "taskStatusCompleted": "OK",
+  "@taskStatusCompleted": {
+    "description": "Task finished successfully (terminal ok)."
+  },
+  "taskStatusFailed": "Error",
+  "@taskStatusFailed": {
+    "description": "Task finished with error."
+  },
+  "taskDetailNodeLabel": "Node",
+  "@taskDetailNodeLabel": {
+    "description": "Label for node name on task detail."
+  },
+  "taskDetailUpidLabel": "UPID",
+  "@taskDetailUpidLabel": {
+    "description": "Label for raw UPID on task detail."
+  },
+  "taskDetailLogTitle": "Log",
+  "@taskDetailLogTitle": {
+    "description": "Section title for task log output."
+  },
+  "taskDetailLogLoading": "Loading log…",
+  "@taskDetailLogLoading": {
+    "description": "Placeholder while task log is fetched."
+  },
+  "taskDetailLogError": "Could not load the task log.",
+  "@taskDetailLogError": {
+    "description": "Error when task log request fails."
+  },
+  "taskDetailLogEmpty": "No log output.",
+  "@taskDetailLogEmpty": {
+    "description": "When log endpoint returns no lines."
   }
 }

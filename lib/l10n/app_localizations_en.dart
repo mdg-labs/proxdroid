@@ -339,4 +339,94 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get valueUnavailable => '—';
+
+  @override
+  String get actionCancel => 'Cancel';
+
+  @override
+  String get actionConfirm => 'Confirm';
+
+  @override
+  String get powerConfirmStopTitle => 'Shut down guest?';
+
+  @override
+  String get powerConfirmStopBody =>
+      'This sends a shutdown signal so the operating system can stop cleanly.';
+
+  @override
+  String get powerConfirmForceStopTitle => 'Force stop?';
+
+  @override
+  String get powerConfirmForceStopBody =>
+      'The guest will be powered off immediately without a clean shutdown.';
+
+  @override
+  String get powerConfirmForceStopWarning =>
+      'Unsaved data may be lost. This is equivalent to pulling the power cord.';
+
+  @override
+  String get powerConfirmRebootTitle => 'Reboot guest?';
+
+  @override
+  String get powerConfirmRebootBody =>
+      'The guest will restart. Unsaved work may be lost if applications do not shut down cleanly.';
+
+  @override
+  String powerActionCompleted(String actionName) {
+    return '$actionName finished successfully.';
+  }
+
+  @override
+  String get powerActionTaskFailed =>
+      'The operation finished with an error on the server.';
+
+  @override
+  String get powerActionTaskUnknown =>
+      'Could not confirm the final task status.';
+
+  @override
+  String get taskListEmptyTitle => 'No tasks';
+
+  @override
+  String get taskListEmptyMessage =>
+      'No recent tasks were returned for this cluster.';
+
+  @override
+  String get taskListLoadError => 'Could not load tasks.';
+
+  @override
+  String get taskRowGuest => 'Guest';
+
+  @override
+  String get taskRowStatus => 'Status';
+
+  @override
+  String get taskRowStarted => 'Started';
+
+  @override
+  String get taskRowDuration => 'Duration';
+
+  @override
+  String get taskStatusCompleted => 'OK';
+
+  @override
+  String get taskStatusFailed => 'Error';
+
+  @override
+  String get taskDetailNodeLabel => 'Node';
+
+  @override
+  String get taskDetailUpidLabel => 'UPID';
+
+  @override
+  String get taskDetailLogTitle => 'Log';
+
+  @override
+  String get taskDetailLogLoading => 'Loading log…';
+
+  @override
+  String get taskDetailLogError => 'Could not load the task log.';
+
+  @override
+  String get taskDetailLogEmpty => 'No log output.';
 }

@@ -188,7 +188,9 @@ GoRouter router(Ref ref) {
               GoRoute(
                 path: ':node/:upid',
                 builder: (BuildContext context, GoRouterState state) {
-                  final node = state.pathParameters['node']!;
+                  final node = Uri.decodeComponent(
+                    state.pathParameters['node']!,
+                  );
                   final upidParam = state.pathParameters['upid']!;
                   final upid = Uri.decodeComponent(upidParam);
                   return TaskDetailScreen(node: node, upid: upid);

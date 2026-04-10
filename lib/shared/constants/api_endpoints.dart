@@ -27,4 +27,33 @@ abstract final class ApiEndpoints {
   /// `GET /nodes/{node}/lxc` — LXCs on a single node.
   static String nodeLxc(String node) =>
       '/nodes/${Uri.encodeComponent(node)}/lxc';
+
+  /// `POST /nodes/{node}/qemu/{vmid}/status/{action}` — [action] is one of
+  /// `start`, `shutdown`, `stop`, `reboot`.
+  static String nodeQemuVmStatus(String node, int vmid, String action) =>
+      '/nodes/${Uri.encodeComponent(node)}/qemu/'
+      '${Uri.encodeComponent(vmid.toString())}/status/'
+      '${Uri.encodeComponent(action)}';
+
+  /// `POST /nodes/{node}/lxc/{ctid}/status/{action}` — [action] is one of
+  /// `start`, `shutdown`, `stop`, `reboot`.
+  static String nodeLxcCtStatus(String node, int ctid, String action) =>
+      '/nodes/${Uri.encodeComponent(node)}/lxc/'
+      '${Uri.encodeComponent(ctid.toString())}/status/'
+      '${Uri.encodeComponent(action)}';
+
+  /// `GET /nodes/{node}/tasks` — optional `start` and `limit` query params.
+  static String nodeTasks(String node) =>
+      '/nodes/${Uri.encodeComponent(node)}/tasks';
+
+  /// `GET /nodes/{node}/tasks/{upid}/status` — [upid] must be URL-encoded.
+  static String nodeTaskStatus(String node, String upid) =>
+      '/nodes/${Uri.encodeComponent(node)}/tasks/'
+      '${Uri.encodeComponent(upid)}/status';
+
+  /// `GET /nodes/{node}/tasks/{upid}/log` — [upid] must be URL-encoded;
+  /// optional `start` and `limit` query params.
+  static String nodeTaskLog(String node, String upid) =>
+      '/nodes/${Uri.encodeComponent(node)}/tasks/'
+      '${Uri.encodeComponent(upid)}/log';
 }

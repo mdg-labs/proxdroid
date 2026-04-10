@@ -10,4 +10,20 @@ class ContainerRepository {
 
   Future<List<Container>> getContainers(String node) =>
       _client.fetchContainersForNode(node);
+
+  Future<String> startContainer(String node, int ctid) =>
+      _client.startLxc(node, ctid);
+
+  Future<String> shutdownContainer(
+    String node,
+    int ctid, {
+    bool? forceStop,
+    int? timeout,
+  }) => _client.shutdownLxc(node, ctid, forceStop: forceStop, timeout: timeout);
+
+  Future<String> stopContainer(String node, int ctid) =>
+      _client.stopLxc(node, ctid);
+
+  Future<String> rebootContainer(String node, int ctid) =>
+      _client.rebootLxc(node, ctid);
 }

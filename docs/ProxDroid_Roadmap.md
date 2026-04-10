@@ -1,6 +1,6 @@
 # ProxDroid – Development Roadmap
 
-**Version:** 0.1 | **Date:** April 2026 | **Status:** Draft (Phase 2 UI complete)
+**Version:** 0.1 | **Date:** April 2026 | **Status:** Draft — Phase 3 complete (VM/LXC power actions; task repository, providers, and viewer UI)
 
 > For architecture decisions and tech stack → see `ProxDroid_Architecture.md`
 > For feature scope and product goals → see `ProxDroid_MVP_PRD.md`
@@ -14,7 +14,7 @@
 | **Phase 0** | Project setup & infrastructure | **Complete** — app ID `com.mdglabs.proxdroid`; CI + shell verified locally |
 | **Phase 1** | API foundation & server management | **Complete** — server config, auth, Hive + secure storage, Dio client, go_router redirects, add/edit server UI |
 | **Phase 2** | Node, VM & container overview | **Complete** — dashboard, VM/LXC lists + detail, shared status badge, l10n |
-| **Phase 3** | VM & container actions + task viewer | Can start, stop, force stop, and reboot VMs/containers and track tasks |
+| **Phase 3** | VM & container actions + task viewer | **Complete** — power actions on detail screens + merged task list, detail log, encoded UPID routes |
 | **Phase 4** | Resource monitoring charts | Full real-time charts for CPU, RAM, network, disk I/O |
 | **Phase 5** | Storage & backup management | Can browse storage and trigger/view backups |
 | **Phase 6** | Polish & release prep | App is stable, polished, and released on Play Store, F-Droid, and GitHub |
@@ -212,50 +212,50 @@
 **Goal:** The user can perform power actions (start, stop, force stop, and reboot) on VMs and containers, and view running and past tasks with their status and log output.
 
 ### 3.1 API Methods
-- [ ] Implement `POST /nodes/{node}/qemu/{vmid}/status/start`
-- [ ] Implement `POST /nodes/{node}/qemu/{vmid}/status/shutdown` → graceful ACPI shutdown; optional `forceStop` param forces an immediate stop if the guest has not shut down within `timeout` seconds
-- [ ] Implement `POST /nodes/{node}/qemu/{vmid}/status/stop` → immediate power-off (Force Stop; no ACPI, equivalent to pulling the power cord)
-- [ ] Implement `POST /nodes/{node}/qemu/{vmid}/status/reboot`
-- [ ] Implement `POST /nodes/{node}/lxc/{ctid}/status/start`
-- [ ] Implement `POST /nodes/{node}/lxc/{ctid}/status/shutdown` → graceful shutdown signal; optional `forceStop` param forces stop after timeout
-- [ ] Implement `POST /nodes/{node}/lxc/{ctid}/status/stop` → immediate stop (Force Stop)
-- [ ] Implement `POST /nodes/{node}/lxc/{ctid}/status/reboot`
-- [ ] Implement `GET /nodes/{node}/tasks` → list of tasks (supports `start` and `limit` query params for pagination — implement pagination from the start)
-- [ ] Implement `GET /nodes/{node}/tasks/{upid}/status` → task status
-- [ ] Implement `GET /nodes/{node}/tasks/{upid}/log` → task log output (also supports `start` and `limit` for pagination)
+- [x] Implement `POST /nodes/{node}/qemu/{vmid}/status/start`
+- [x] Implement `POST /nodes/{node}/qemu/{vmid}/status/shutdown` → graceful ACPI shutdown; optional `forceStop` param forces an immediate stop if the guest has not shut down within `timeout` seconds
+- [x] Implement `POST /nodes/{node}/qemu/{vmid}/status/stop` → immediate power-off (Force Stop; no ACPI, equivalent to pulling the power cord)
+- [x] Implement `POST /nodes/{node}/qemu/{vmid}/status/reboot`
+- [x] Implement `POST /nodes/{node}/lxc/{ctid}/status/start`
+- [x] Implement `POST /nodes/{node}/lxc/{ctid}/status/shutdown` → graceful shutdown signal; optional `forceStop` param forces stop after timeout
+- [x] Implement `POST /nodes/{node}/lxc/{ctid}/status/stop` → immediate stop (Force Stop)
+- [x] Implement `POST /nodes/{node}/lxc/{ctid}/status/reboot`
+- [x] Implement `GET /nodes/{node}/tasks` → list of tasks (supports `start` and `limit` query params for pagination — implement pagination from the start)
+- [x] Implement `GET /nodes/{node}/tasks/{upid}/status` → task status
+- [x] Implement `GET /nodes/{node}/tasks/{upid}/log` → task log output (also supports `start` and `limit` for pagination)
 
 ### 3.2 Data Models
-- [ ] Implement `Task` model in `core/models/task.dart` (Freezed) – upid, node, type, status, startTime, endTime, user
-- [ ] Implement `TaskStatus` enum: `running`, `ok`, `error`, `unknown`
+- [x] Implement `Task` model in `core/models/task.dart` (Freezed) – upid, node, type, status, startTime, endTime, user
+- [x] Implement `TaskStatus` enum: `running`, `ok`, `error`, `unknown`
 
 ### 3.3 Actions in VM/Container Detail
-- [ ] Add action buttons to `VmDetailScreen`: Start, Stop, Force Stop, Reboot
+- [x] Add action buttons to `VmDetailScreen`: Start, Stop, Force Stop, Reboot
   - **Stop** → `POST .../status/shutdown` (sends ACPI shutdown signal – graceful; the OS shuts down cleanly)
   - **Force Stop** → `POST .../status/stop` (immediate power-off, like pulling the power cord – no ACPI signal sent)
-- [ ] Show buttons only when action is valid (e.g. no Start when already running)
-- [ ] Show confirmation dialog before Stop, Force Stop, and Reboot
+- [x] Show buttons only when action is valid (e.g. no Start when already running)
+- [x] Show confirmation dialog before Stop, Force Stop, and Reboot
   - Force Stop dialog must clearly warn that the action is immediate and may cause data loss
-- [ ] On action: show loading indicator, call API, poll task status until complete
-- [ ] On success: refresh VM status, show snackbar confirmation
-- [ ] On error: show typed error message
-- [ ] Mirror all of the above for `ContainerDetailScreen`
+- [x] On action: show loading indicator, call API, poll task status until complete
+- [x] On success: refresh VM status, show snackbar confirmation
+- [x] On error: show typed error message
+- [x] Mirror all of the above for `ContainerDetailScreen`
   - Note: containers have no Pause state (`ContainerStatus` has no `paused`) — do not show a Pause button for LXC containers
 
 ### 3.4 Task Repository & Providers
-- [ ] Implement `TaskRepository` with:
+- [x] Implement `TaskRepository` with:
   - `getTasks(node, {int start = 0, int limit = 50})` – paginated; use `GET /nodes/{node}/tasks` per-node (while Proxmox VE does expose `GET /cluster/tasks`, it returns only recent tasks with limited pagination — the per-node endpoint provides full task history with proper pagination and is the preferred approach for the task viewer)
   - `getTaskStatus(node, upid)` – node is required for the status endpoint
   - `getTaskLog(node, upid, {int start = 0, int limit = 500})` – paginated log lines
-- [ ] Implement `taskListProvider` – fetches tasks from all known nodes and merges, sorted by start time descending; uses `nodeListProvider` to enumerate nodes
-- [ ] Implement `taskStatusProvider(node, upid)` – polls running tasks every 3 seconds until status is no longer `running`
+- [x] Implement `taskListProvider` – fetches tasks from all known nodes and merges, sorted by start time descending; uses `nodeListProvider` to enumerate nodes
+- [x] Implement `taskStatusProvider(node, upid)` – polls running tasks every 3 seconds until status is no longer `running`
 
 ### 3.5 Task Viewer UI
-- [ ] Build `TaskListScreen` – list of all tasks, newest first
-- [ ] Each task row: type, VMID (decoded from UPID), status badge, start time, duration
+- [x] Build `TaskListScreen` – list of all tasks, newest first
+- [x] Each task row: type, VMID (decoded from UPID), status badge, start time, duration
   - Note: `Task.upid` encodes the node, type, PID, and VMID — parse the UPID to extract VMID, then resolve VMID → name via the VM/container list; if the VM no longer exists, fall back to displaying the raw VMID
-- [ ] Color-code status: running (blue), ok (green), error (red)
-- [ ] Build `TaskDetailScreen` – full task log output in monospace font, auto-scroll to bottom
-- [ ] Wire up go_router: `/tasks`, `/tasks/:node/:upid` — **percent-encode** the UPID when pushing the route (`Uri.encodeComponent(upid)`) and decode it in the receiving screen (`Uri.decodeComponent(upidParam)`); see Architecture §8 for the reason (UPIDs contain colons that must not be treated as path separators)
+- [x] Color-code status: running (blue), ok (green), error (red)
+- [x] Build `TaskDetailScreen` – full task log output in monospace font, auto-scroll to bottom
+- [x] Wire up go_router: `/tasks`, `/tasks/:node/:upid` — **percent-encode** the UPID when pushing the route (`Uri.encodeComponent(upid)`) and decode it in the receiving screen (`Uri.decodeComponent(upidParam)`); see Architecture §8 for the reason (UPIDs contain colons that must not be treated as path separators)
 
 ---
 
