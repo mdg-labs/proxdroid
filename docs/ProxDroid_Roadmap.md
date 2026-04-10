@@ -152,32 +152,32 @@
 **Goal:** After connecting to a server, the user can see all nodes with their resource usage, and browse a full list of VMs and LXC containers with live status indicators.
 
 ### 2.1 API Methods
-- [ ] Implement `GET /nodes` → list of nodes
-- [ ] Implement `GET /nodes/{node}/status` → node resource details
-- [ ] Implement `GET /cluster/resources` → all VMs, containers, and nodes in a single call (preferred for list screens and dashboard summary; avoids N per-node requests)
+- [x] Implement `GET /nodes` → list of nodes
+- [x] Implement `GET /nodes/{node}/status` → node resource details
+- [x] Implement `GET /cluster/resources` → all VMs, containers, and nodes in a single call (preferred for list screens and dashboard summary; avoids N per-node requests)
   - Supports `?type=vm`, `?type=lxc`, `?type=node` filters
   - Use this as the primary source for `VmListScreen`, `ContainerListScreen`, and the cluster summary in `DashboardScreen`
-- [ ] Implement `GET /nodes/{node}/qemu` → list of VMs for a single node (used when per-node context is needed)
-- [ ] Implement `GET /nodes/{node}/lxc` → list of containers for a single node
-- [ ] Add all relevant API endpoint constants to `shared/constants/api_endpoints.dart` (including `GET /version` for connection test and `GET /cluster/resources`)
+- [x] Implement `GET /nodes/{node}/qemu` → list of VMs for a single node (used when per-node context is needed)
+- [x] Implement `GET /nodes/{node}/lxc` → list of containers for a single node
+- [x] Add all relevant API endpoint constants to `shared/constants/api_endpoints.dart` (including `GET /version` for connection test and `GET /cluster/resources`)
 
 ### 2.2 Data Models
-- [ ] Extend `Node` model with all relevant fields from API response
-- [ ] Implement `Vm` model in `core/models/vm.dart` (Freezed) – vmid (int), name, status (VmStatus), node, cpu, maxMem, mem, maxDisk, disk, uptime
-- [ ] Implement `Container` model in `core/models/container.dart` (Freezed) – same fields as `Vm` but status uses `ContainerStatus` (not `VmStatus`), add `ostype`
-- [ ] Implement `VmStatus` enum: `running`, `stopped`, `paused`, `unknown`
-- [ ] Implement `ContainerStatus` enum: `running`, `stopped`, `unknown` (LXC has no paused state — do **not** reuse `VmStatus` for containers)
+- [x] Extend `Node` model with all relevant fields from API response
+- [x] Implement `Vm` model in `core/models/vm.dart` (Freezed) – vmid (int), name, status (VmStatus), node, cpu, maxMem, mem, maxDisk, disk, uptime
+- [x] Implement `Container` model in `core/models/container.dart` (Freezed) – same fields as `Vm` but status uses `ContainerStatus` (not `VmStatus`), add `ostype`
+- [x] Implement `VmStatus` enum: `running`, `stopped`, `paused`, `unknown`
+- [x] Implement `ContainerStatus` enum: `running`, `stopped`, `unknown` (LXC has no paused state — do **not** reuse `VmStatus` for containers)
 
 ### 2.3 Repositories & Providers
-- [ ] Implement `NodeRepository` with `getNodes()` and `getNodeStatus(node)`
-- [ ] Implement `VmRepository` with:
+- [x] Implement `NodeRepository` with `getNodes()` and `getNodeStatus(node)`
+- [x] Implement `VmRepository` with:
   - `getAllVms()` – uses `GET /cluster/resources?type=vm` (primary; call this for list screens)
   - `getVms(node)` – uses `GET /nodes/{node}/qemu` (secondary; use only when per-node context is required)
-- [ ] Implement `ContainerRepository` with:
+- [x] Implement `ContainerRepository` with:
   - `getAllContainers()` – uses `GET /cluster/resources?type=lxc` (primary)
   - `getContainers(node)` – uses `GET /nodes/{node}/lxc` (secondary)
-- [ ] Implement async Riverpod providers: `allVmsProvider`, `allContainersProvider`, `nodeListProvider`
-- [ ] Add pull-to-refresh support on all list providers
+- [x] Implement async Riverpod providers: `allVmsProvider`, `allContainersProvider`, `nodeListProvider`
+- [x] Add pull-to-refresh support on all list providers
 
 ### 2.4 Dashboard Screen
 - [ ] Build `DashboardScreen` – shows all nodes in cards

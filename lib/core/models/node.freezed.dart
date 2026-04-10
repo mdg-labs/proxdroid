@@ -11,30 +11,33 @@ part of 'node.dart';
 
 // dart format off
 T _$identity<T>(T value) => value;
+
 /// @nodoc
 mixin _$Node {
 
- String get name; String? get status; double? get cpu; int? get maxCpu; int? get mem; int? get maxMem; int? get uptime;
+@JsonKey(name: 'node') String get name; String? get status;@JsonKey(fromJson: proxmoxDouble) double? get cpu;@JsonKey(name: 'maxcpu', fromJson: proxmoxInt) int? get maxCpu;@JsonKey(fromJson: proxmoxInt) int? get mem;@JsonKey(name: 'maxmem', fromJson: proxmoxInt) int? get maxMem;@JsonKey(fromJson: proxmoxInt) int? get disk;@JsonKey(name: 'maxdisk', fromJson: proxmoxInt) int? get maxDisk;@JsonKey(fromJson: proxmoxInt) int? get uptime;@JsonKey(name: 'ssl_fingerprint') String? get sslFingerprint; String? get level;
 /// Create a copy of Node
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 $NodeCopyWith<Node> get copyWith => _$NodeCopyWithImpl<Node>(this as Node, _$identity);
 
+  /// Serializes this Node to a JSON map.
+  Map<String, dynamic> toJson();
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Node&&(identical(other.name, name) || other.name == name)&&(identical(other.status, status) || other.status == status)&&(identical(other.cpu, cpu) || other.cpu == cpu)&&(identical(other.maxCpu, maxCpu) || other.maxCpu == maxCpu)&&(identical(other.mem, mem) || other.mem == mem)&&(identical(other.maxMem, maxMem) || other.maxMem == maxMem)&&(identical(other.uptime, uptime) || other.uptime == uptime));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Node&&(identical(other.name, name) || other.name == name)&&(identical(other.status, status) || other.status == status)&&(identical(other.cpu, cpu) || other.cpu == cpu)&&(identical(other.maxCpu, maxCpu) || other.maxCpu == maxCpu)&&(identical(other.mem, mem) || other.mem == mem)&&(identical(other.maxMem, maxMem) || other.maxMem == maxMem)&&(identical(other.disk, disk) || other.disk == disk)&&(identical(other.maxDisk, maxDisk) || other.maxDisk == maxDisk)&&(identical(other.uptime, uptime) || other.uptime == uptime)&&(identical(other.sslFingerprint, sslFingerprint) || other.sslFingerprint == sslFingerprint)&&(identical(other.level, level) || other.level == level));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,status,cpu,maxCpu,mem,maxMem,uptime);
+int get hashCode => Object.hash(runtimeType,name,status,cpu,maxCpu,mem,maxMem,disk,maxDisk,uptime,sslFingerprint,level);
 
 @override
 String toString() {
-  return 'Node(name: $name, status: $status, cpu: $cpu, maxCpu: $maxCpu, mem: $mem, maxMem: $maxMem, uptime: $uptime)';
+  return 'Node(name: $name, status: $status, cpu: $cpu, maxCpu: $maxCpu, mem: $mem, maxMem: $maxMem, disk: $disk, maxDisk: $maxDisk, uptime: $uptime, sslFingerprint: $sslFingerprint, level: $level)';
 }
 
 
@@ -45,7 +48,7 @@ abstract mixin class $NodeCopyWith<$Res>  {
   factory $NodeCopyWith(Node value, $Res Function(Node) _then) = _$NodeCopyWithImpl;
 @useResult
 $Res call({
- String name, String? status, double? cpu, int? maxCpu, int? mem, int? maxMem, int? uptime
+@JsonKey(name: 'node') String name, String? status,@JsonKey(fromJson: proxmoxDouble) double? cpu,@JsonKey(name: 'maxcpu', fromJson: proxmoxInt) int? maxCpu,@JsonKey(fromJson: proxmoxInt) int? mem,@JsonKey(name: 'maxmem', fromJson: proxmoxInt) int? maxMem,@JsonKey(fromJson: proxmoxInt) int? disk,@JsonKey(name: 'maxdisk', fromJson: proxmoxInt) int? maxDisk,@JsonKey(fromJson: proxmoxInt) int? uptime,@JsonKey(name: 'ssl_fingerprint') String? sslFingerprint, String? level
 });
 
 
@@ -62,7 +65,7 @@ class _$NodeCopyWithImpl<$Res>
 
 /// Create a copy of Node
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? status = freezed,Object? cpu = freezed,Object? maxCpu = freezed,Object? mem = freezed,Object? maxMem = freezed,Object? uptime = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? status = freezed,Object? cpu = freezed,Object? maxCpu = freezed,Object? mem = freezed,Object? maxMem = freezed,Object? disk = freezed,Object? maxDisk = freezed,Object? uptime = freezed,Object? sslFingerprint = freezed,Object? level = freezed,}) {
   return _then(_self.copyWith(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
@@ -70,8 +73,12 @@ as String?,cpu: freezed == cpu ? _self.cpu : cpu // ignore: cast_nullable_to_non
 as double?,maxCpu: freezed == maxCpu ? _self.maxCpu : maxCpu // ignore: cast_nullable_to_non_nullable
 as int?,mem: freezed == mem ? _self.mem : mem // ignore: cast_nullable_to_non_nullable
 as int?,maxMem: freezed == maxMem ? _self.maxMem : maxMem // ignore: cast_nullable_to_non_nullable
+as int?,disk: freezed == disk ? _self.disk : disk // ignore: cast_nullable_to_non_nullable
+as int?,maxDisk: freezed == maxDisk ? _self.maxDisk : maxDisk // ignore: cast_nullable_to_non_nullable
 as int?,uptime: freezed == uptime ? _self.uptime : uptime // ignore: cast_nullable_to_non_nullable
-as int?,
+as int?,sslFingerprint: freezed == sslFingerprint ? _self.sslFingerprint : sslFingerprint // ignore: cast_nullable_to_non_nullable
+as String?,level: freezed == level ? _self.level : level // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -153,10 +160,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name,  String? status,  double? cpu,  int? maxCpu,  int? mem,  int? maxMem,  int? uptime)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'node')  String name,  String? status, @JsonKey(fromJson: proxmoxDouble)  double? cpu, @JsonKey(name: 'maxcpu', fromJson: proxmoxInt)  int? maxCpu, @JsonKey(fromJson: proxmoxInt)  int? mem, @JsonKey(name: 'maxmem', fromJson: proxmoxInt)  int? maxMem, @JsonKey(fromJson: proxmoxInt)  int? disk, @JsonKey(name: 'maxdisk', fromJson: proxmoxInt)  int? maxDisk, @JsonKey(fromJson: proxmoxInt)  int? uptime, @JsonKey(name: 'ssl_fingerprint')  String? sslFingerprint,  String? level)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Node() when $default != null:
-return $default(_that.name,_that.status,_that.cpu,_that.maxCpu,_that.mem,_that.maxMem,_that.uptime);case _:
+return $default(_that.name,_that.status,_that.cpu,_that.maxCpu,_that.mem,_that.maxMem,_that.disk,_that.maxDisk,_that.uptime,_that.sslFingerprint,_that.level);case _:
   return orElse();
 
 }
@@ -174,10 +181,10 @@ return $default(_that.name,_that.status,_that.cpu,_that.maxCpu,_that.mem,_that.m
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name,  String? status,  double? cpu,  int? maxCpu,  int? mem,  int? maxMem,  int? uptime)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'node')  String name,  String? status, @JsonKey(fromJson: proxmoxDouble)  double? cpu, @JsonKey(name: 'maxcpu', fromJson: proxmoxInt)  int? maxCpu, @JsonKey(fromJson: proxmoxInt)  int? mem, @JsonKey(name: 'maxmem', fromJson: proxmoxInt)  int? maxMem, @JsonKey(fromJson: proxmoxInt)  int? disk, @JsonKey(name: 'maxdisk', fromJson: proxmoxInt)  int? maxDisk, @JsonKey(fromJson: proxmoxInt)  int? uptime, @JsonKey(name: 'ssl_fingerprint')  String? sslFingerprint,  String? level)  $default,) {final _that = this;
 switch (_that) {
 case _Node():
-return $default(_that.name,_that.status,_that.cpu,_that.maxCpu,_that.mem,_that.maxMem,_that.uptime);}
+return $default(_that.name,_that.status,_that.cpu,_that.maxCpu,_that.mem,_that.maxMem,_that.disk,_that.maxDisk,_that.uptime,_that.sslFingerprint,_that.level);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -191,10 +198,10 @@ return $default(_that.name,_that.status,_that.cpu,_that.maxCpu,_that.mem,_that.m
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name,  String? status,  double? cpu,  int? maxCpu,  int? mem,  int? maxMem,  int? uptime)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'node')  String name,  String? status, @JsonKey(fromJson: proxmoxDouble)  double? cpu, @JsonKey(name: 'maxcpu', fromJson: proxmoxInt)  int? maxCpu, @JsonKey(fromJson: proxmoxInt)  int? mem, @JsonKey(name: 'maxmem', fromJson: proxmoxInt)  int? maxMem, @JsonKey(fromJson: proxmoxInt)  int? disk, @JsonKey(name: 'maxdisk', fromJson: proxmoxInt)  int? maxDisk, @JsonKey(fromJson: proxmoxInt)  int? uptime, @JsonKey(name: 'ssl_fingerprint')  String? sslFingerprint,  String? level)?  $default,) {final _that = this;
 switch (_that) {
 case _Node() when $default != null:
-return $default(_that.name,_that.status,_that.cpu,_that.maxCpu,_that.mem,_that.maxMem,_that.uptime);case _:
+return $default(_that.name,_that.status,_that.cpu,_that.maxCpu,_that.mem,_that.maxMem,_that.disk,_that.maxDisk,_that.uptime,_that.sslFingerprint,_that.level);case _:
   return null;
 
 }
@@ -203,19 +210,23 @@ return $default(_that.name,_that.status,_that.cpu,_that.maxCpu,_that.mem,_that.m
 }
 
 /// @nodoc
-
+@JsonSerializable()
 
 class _Node implements Node {
-  const _Node({required this.name, this.status, this.cpu, this.maxCpu, this.mem, this.maxMem, this.uptime});
-  
+  const _Node({@JsonKey(name: 'node') required this.name, this.status, @JsonKey(fromJson: proxmoxDouble) this.cpu, @JsonKey(name: 'maxcpu', fromJson: proxmoxInt) this.maxCpu, @JsonKey(fromJson: proxmoxInt) this.mem, @JsonKey(name: 'maxmem', fromJson: proxmoxInt) this.maxMem, @JsonKey(fromJson: proxmoxInt) this.disk, @JsonKey(name: 'maxdisk', fromJson: proxmoxInt) this.maxDisk, @JsonKey(fromJson: proxmoxInt) this.uptime, @JsonKey(name: 'ssl_fingerprint') this.sslFingerprint, this.level});
+  factory _Node.fromJson(Map<String, dynamic> json) => _$NodeFromJson(json);
 
-@override final  String name;
+@override@JsonKey(name: 'node') final  String name;
 @override final  String? status;
-@override final  double? cpu;
-@override final  int? maxCpu;
-@override final  int? mem;
-@override final  int? maxMem;
-@override final  int? uptime;
+@override@JsonKey(fromJson: proxmoxDouble) final  double? cpu;
+@override@JsonKey(name: 'maxcpu', fromJson: proxmoxInt) final  int? maxCpu;
+@override@JsonKey(fromJson: proxmoxInt) final  int? mem;
+@override@JsonKey(name: 'maxmem', fromJson: proxmoxInt) final  int? maxMem;
+@override@JsonKey(fromJson: proxmoxInt) final  int? disk;
+@override@JsonKey(name: 'maxdisk', fromJson: proxmoxInt) final  int? maxDisk;
+@override@JsonKey(fromJson: proxmoxInt) final  int? uptime;
+@override@JsonKey(name: 'ssl_fingerprint') final  String? sslFingerprint;
+@override final  String? level;
 
 /// Create a copy of Node
 /// with the given fields replaced by the non-null parameter values.
@@ -223,20 +234,23 @@ class _Node implements Node {
 @pragma('vm:prefer-inline')
 _$NodeCopyWith<_Node> get copyWith => __$NodeCopyWithImpl<_Node>(this, _$identity);
 
-
+@override
+Map<String, dynamic> toJson() {
+  return _$NodeToJson(this, );
+}
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Node&&(identical(other.name, name) || other.name == name)&&(identical(other.status, status) || other.status == status)&&(identical(other.cpu, cpu) || other.cpu == cpu)&&(identical(other.maxCpu, maxCpu) || other.maxCpu == maxCpu)&&(identical(other.mem, mem) || other.mem == mem)&&(identical(other.maxMem, maxMem) || other.maxMem == maxMem)&&(identical(other.uptime, uptime) || other.uptime == uptime));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Node&&(identical(other.name, name) || other.name == name)&&(identical(other.status, status) || other.status == status)&&(identical(other.cpu, cpu) || other.cpu == cpu)&&(identical(other.maxCpu, maxCpu) || other.maxCpu == maxCpu)&&(identical(other.mem, mem) || other.mem == mem)&&(identical(other.maxMem, maxMem) || other.maxMem == maxMem)&&(identical(other.disk, disk) || other.disk == disk)&&(identical(other.maxDisk, maxDisk) || other.maxDisk == maxDisk)&&(identical(other.uptime, uptime) || other.uptime == uptime)&&(identical(other.sslFingerprint, sslFingerprint) || other.sslFingerprint == sslFingerprint)&&(identical(other.level, level) || other.level == level));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,status,cpu,maxCpu,mem,maxMem,uptime);
+int get hashCode => Object.hash(runtimeType,name,status,cpu,maxCpu,mem,maxMem,disk,maxDisk,uptime,sslFingerprint,level);
 
 @override
 String toString() {
-  return 'Node(name: $name, status: $status, cpu: $cpu, maxCpu: $maxCpu, mem: $mem, maxMem: $maxMem, uptime: $uptime)';
+  return 'Node(name: $name, status: $status, cpu: $cpu, maxCpu: $maxCpu, mem: $mem, maxMem: $maxMem, disk: $disk, maxDisk: $maxDisk, uptime: $uptime, sslFingerprint: $sslFingerprint, level: $level)';
 }
 
 
@@ -247,7 +261,7 @@ abstract mixin class _$NodeCopyWith<$Res> implements $NodeCopyWith<$Res> {
   factory _$NodeCopyWith(_Node value, $Res Function(_Node) _then) = __$NodeCopyWithImpl;
 @override @useResult
 $Res call({
- String name, String? status, double? cpu, int? maxCpu, int? mem, int? maxMem, int? uptime
+@JsonKey(name: 'node') String name, String? status,@JsonKey(fromJson: proxmoxDouble) double? cpu,@JsonKey(name: 'maxcpu', fromJson: proxmoxInt) int? maxCpu,@JsonKey(fromJson: proxmoxInt) int? mem,@JsonKey(name: 'maxmem', fromJson: proxmoxInt) int? maxMem,@JsonKey(fromJson: proxmoxInt) int? disk,@JsonKey(name: 'maxdisk', fromJson: proxmoxInt) int? maxDisk,@JsonKey(fromJson: proxmoxInt) int? uptime,@JsonKey(name: 'ssl_fingerprint') String? sslFingerprint, String? level
 });
 
 
@@ -264,7 +278,7 @@ class __$NodeCopyWithImpl<$Res>
 
 /// Create a copy of Node
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? status = freezed,Object? cpu = freezed,Object? maxCpu = freezed,Object? mem = freezed,Object? maxMem = freezed,Object? uptime = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? status = freezed,Object? cpu = freezed,Object? maxCpu = freezed,Object? mem = freezed,Object? maxMem = freezed,Object? disk = freezed,Object? maxDisk = freezed,Object? uptime = freezed,Object? sslFingerprint = freezed,Object? level = freezed,}) {
   return _then(_Node(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
@@ -272,8 +286,12 @@ as String?,cpu: freezed == cpu ? _self.cpu : cpu // ignore: cast_nullable_to_non
 as double?,maxCpu: freezed == maxCpu ? _self.maxCpu : maxCpu // ignore: cast_nullable_to_non_nullable
 as int?,mem: freezed == mem ? _self.mem : mem // ignore: cast_nullable_to_non_nullable
 as int?,maxMem: freezed == maxMem ? _self.maxMem : maxMem // ignore: cast_nullable_to_non_nullable
+as int?,disk: freezed == disk ? _self.disk : disk // ignore: cast_nullable_to_non_nullable
+as int?,maxDisk: freezed == maxDisk ? _self.maxDisk : maxDisk // ignore: cast_nullable_to_non_nullable
 as int?,uptime: freezed == uptime ? _self.uptime : uptime // ignore: cast_nullable_to_non_nullable
-as int?,
+as int?,sslFingerprint: freezed == sslFingerprint ? _self.sslFingerprint : sslFingerprint // ignore: cast_nullable_to_non_nullable
+as String?,level: freezed == level ? _self.level : level // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

@@ -1,17 +1,33 @@
+// ignore_for_file: invalid_annotation_target
+// @JsonKey on Freezed factory parameters is supported by code generation.
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'node.freezed.dart';
+import 'package:proxdroid/core/models/proxmox_json_helpers.dart';
 
-/// Cluster node summary; values are filled from the Proxmox API in Phase 2.
+part 'node.freezed.dart';
+part 'node.g.dart';
+
+/// Cluster node: [GET /nodes], [GET /nodes/{node}/status], or `type=node` rows
+/// from [GET /cluster/resources].
+///
+/// [name] maps from Proxmox `node`. For [GET /nodes/{node}/status], the API client
+/// injects `node` and flattens `memory` / `rootfs` / `cpuinfo` before [fromJson].
 @freezed
 sealed class Node with _$Node {
   const factory Node({
-    required String name,
+    @JsonKey(name: 'node') required String name,
     String? status,
-    double? cpu,
-    int? maxCpu,
-    int? mem,
-    int? maxMem,
-    int? uptime,
+    @JsonKey(fromJson: proxmoxDouble) double? cpu,
+    @JsonKey(name: 'maxcpu', fromJson: proxmoxInt) int? maxCpu,
+    @JsonKey(fromJson: proxmoxInt) int? mem,
+    @JsonKey(name: 'maxmem', fromJson: proxmoxInt) int? maxMem,
+    @JsonKey(fromJson: proxmoxInt) int? disk,
+    @JsonKey(name: 'maxdisk', fromJson: proxmoxInt) int? maxDisk,
+    @JsonKey(fromJson: proxmoxInt) int? uptime,
+    @JsonKey(name: 'ssl_fingerprint') String? sslFingerprint,
+    String? level,
   }) = _Node;
+
+  factory Node.fromJson(Map<String, dynamic> json) => _$NodeFromJson(json);
 }

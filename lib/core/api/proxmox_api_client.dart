@@ -5,7 +5,11 @@ import 'package:dio/io.dart';
 
 import 'package:proxdroid/core/api/api_exceptions.dart';
 import 'package:proxdroid/core/api/api_interceptors.dart';
+import 'package:proxdroid/core/models/container.dart';
+import 'package:proxdroid/core/models/node.dart';
+import 'package:proxdroid/core/models/proxmox_json_helpers.dart';
 import 'package:proxdroid/core/models/server.dart';
+import 'package:proxdroid/core/models/vm.dart';
 import 'package:proxdroid/shared/constants/api_endpoints.dart';
 
 /// Parsed `GET /version` payload (`data` object).
@@ -249,6 +253,103 @@ class ProxmoxApiClient {
     return ProxmoxVersion.fromDataJson(data);
   }
 
+  /// `GET /nodes` — cluster node list (online/offline, fingerprint, …).
+  Future<List<Node>> fetchNodes() async {
+    final response = await _unwrap(
+      _dio.get<Map<String, dynamic>>(ApiEndpoints.nodes),
+    );
+    final list = _dataAsList(response.data?['data']);
+    return list.map((e) {
+      final m = Map<String, dynamic>.from(e as Map);
+      return Node.fromJson(m);
+    }).toList();
+  }
+
+  /// `GET /nodes/{node}/status` — CPU, memory, uptime, etc.
+  ///
+  /// Normalizes nested `memory`, `rootfs`, and `cpuinfo` into flat keys expected
+  /// by [Node.fromJson], and sets `node` to [node].
+  Future<Node> fetchNodeStatus(String node) async {
+    final response = await _unwrap(
+      _dio.get<Map<String, dynamic>>(ApiEndpoints.nodeStatus(node)),
+    );
+    final body = response.data;
+    final raw = body?['data'];
+    if (raw is! Map<String, dynamic>) {
+      throw const ServerException(502, message: 'Invalid node status response');
+    }
+    return Node.fromJson(_normalizeNodeStatusJson(raw, node));
+  }
+
+  /// `GET /cluster/resources?type=node` — node rows (resource view).
+  Future<List<Node>> fetchClusterResourceNodes() async {
+    final response = await _unwrap(
+      _dio.get<Map<String, dynamic>>(
+        ApiEndpoints.clusterResources,
+        queryParameters: const {'type': 'node'},
+      ),
+    );
+    final list = _dataAsList(response.data?['data']);
+    return list.map((e) {
+      final m = Map<String, dynamic>.from(e as Map);
+      return Node.fromJson(m);
+    }).toList();
+  }
+
+  /// `GET /cluster/resources?type=vm` — all QEMU guests cluster-wide.
+  Future<List<Vm>> fetchAllVms() async {
+    final response = await _unwrap(
+      _dio.get<Map<String, dynamic>>(
+        ApiEndpoints.clusterResources,
+        queryParameters: const {'type': 'vm'},
+      ),
+    );
+    final list = _dataAsList(response.data?['data']);
+    return list.map((e) {
+      final m = Map<String, dynamic>.from(e as Map);
+      return Vm.fromClusterResourcesItem(m);
+    }).toList();
+  }
+
+  /// `GET /nodes/{node}/qemu` — VMs on one node.
+  Future<List<Vm>> fetchVmsForNode(String node) async {
+    final response = await _unwrap(
+      _dio.get<Map<String, dynamic>>(ApiEndpoints.nodeQemu(node)),
+    );
+    final list = _dataAsList(response.data?['data']);
+    return list.map((e) {
+      final m = Map<String, dynamic>.from(e as Map);
+      return Vm.fromQemuListRow(m, node: node);
+    }).toList();
+  }
+
+  /// `GET /cluster/resources?type=lxc` — all LXCs cluster-wide.
+  Future<List<Container>> fetchAllContainers() async {
+    final response = await _unwrap(
+      _dio.get<Map<String, dynamic>>(
+        ApiEndpoints.clusterResources,
+        queryParameters: const {'type': 'lxc'},
+      ),
+    );
+    final list = _dataAsList(response.data?['data']);
+    return list.map((e) {
+      final m = Map<String, dynamic>.from(e as Map);
+      return Container.fromClusterResourcesItem(m);
+    }).toList();
+  }
+
+  /// `GET /nodes/{node}/lxc` — containers on one node.
+  Future<List<Container>> fetchContainersForNode(String node) async {
+    final response = await _unwrap(
+      _dio.get<Map<String, dynamic>>(ApiEndpoints.nodeLxc(node)),
+    );
+    final list = _dataAsList(response.data?['data']);
+    return list.map((e) {
+      final m = Map<String, dynamic>.from(e as Map);
+      return Container.fromLxcListRow(m, node: node);
+    }).toList();
+  }
+
   Future<Response<T>> _unwrap<T>(Future<Response<T>> future) async {
     try {
       return await future;
@@ -260,4 +361,39 @@ class ProxmoxApiClient {
       throw mapDioException(e);
     }
   }
+}
+
+List<dynamic> _dataAsList(dynamic data) {
+  if (data is! List<dynamic>) {
+    throw const ServerException(502, message: 'Expected JSON array in data');
+  }
+  return data;
+}
+
+/// Flattens PVE node status payload for [Node.fromJson].
+Map<String, dynamic> _normalizeNodeStatusJson(
+  Map<String, dynamic> data,
+  String nodeName,
+) {
+  final out = Map<String, dynamic>.from(data);
+  out['node'] = nodeName;
+
+  final memory = data['memory'];
+  if (memory is Map) {
+    out['mem'] ??= proxmoxInt(memory['used']);
+    out['maxmem'] ??= proxmoxInt(memory['total']);
+  }
+
+  final rootfs = data['rootfs'];
+  if (rootfs is Map) {
+    out['disk'] ??= proxmoxInt(rootfs['used']);
+    out['maxdisk'] ??= proxmoxInt(rootfs['total']);
+  }
+
+  if (out['maxcpu'] == null && data['cpuinfo'] is Map<String, dynamic>) {
+    final ci = data['cpuinfo'] as Map<String, dynamic>;
+    out['maxcpu'] = proxmoxInt(ci['cpus']);
+  }
+
+  return out;
 }
