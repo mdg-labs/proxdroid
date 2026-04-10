@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:proxdroid/features/settings/providers/settings_providers.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
-import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
+import 'package:proxdroid/shared/widgets/shell_section_body.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 const _githubRepoUrl = 'https://github.com/mdg-labs/proxdroid';
@@ -51,138 +51,110 @@ class SettingsScreen extends ConsumerWidget {
     final themeMode = ref.watch(appThemeModeProvider);
     final packageInfoAsync = ref.watch(packageInfoProvider);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        AppBar(
-          leading: shellAppBarLeading(context),
-          title: Text(l10n.sectionSettings),
-        ),
-        Expanded(
-          child: ListView(
-            padding: const EdgeInsets.only(bottom: 24),
-            children: [
-              _SectionHeader(
-                title: l10n.settingsAppearanceSection,
-                colorScheme: scheme,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                child: SegmentedButton<ThemeMode>(
-                  segments: [
-                    ButtonSegment<ThemeMode>(
-                      value: ThemeMode.dark,
-                      label: Text(l10n.settingsThemeDark),
-                      icon: const Icon(Icons.dark_mode_outlined),
-                    ),
-                    ButtonSegment<ThemeMode>(
-                      value: ThemeMode.light,
-                      label: Text(l10n.settingsThemeLight),
-                      icon: const Icon(Icons.light_mode_outlined),
-                    ),
-                    ButtonSegment<ThemeMode>(
-                      value: ThemeMode.system,
-                      label: Text(l10n.settingsThemeSystem),
-                      icon: const Icon(Icons.brightness_auto_outlined),
-                    ),
-                  ],
-                  selected: {themeMode},
-                  onSelectionChanged: (Set<ThemeMode> selected) {
-                    final mode = selected.first;
-                    ref.read(appThemeModeProvider.notifier).setThemeMode(mode);
-                  },
-                ),
-              ),
-              const Divider(height: 1),
-              _SectionHeader(
-                title: l10n.settingsTroubleshootingSection,
-                colorScheme: scheme,
-              ),
-              SwitchListTile(
-                title: Text(l10n.settingsVerboseConnectionErrors),
-                subtitle: Text(l10n.settingsVerboseConnectionErrorsSubtitle),
-                value: ref.watch(verboseConnectionErrorsProvider),
-                onChanged: (v) {
-                  ref
-                      .read(verboseConnectionErrorsProvider.notifier)
-                      .setEnabled(v);
-                },
-              ),
-              const Divider(height: 1),
-              _SectionHeader(
-                title: l10n.settingsAboutSection,
-                colorScheme: scheme,
-              ),
-              packageInfoAsync.when(
-                data:
-                    (PackageInfo info) => ListTile(
-                      title: Text(l10n.settingsVersion),
-                      subtitle: Text(
-                        l10n.settingsVersionSubtitle(
-                          info.version,
-                          info.buildNumber,
-                        ),
-                      ),
-                    ),
-                loading:
-                    () => ListTile(
-                      title: Text(l10n.settingsVersion),
-                      subtitle: Text(l10n.settingsLoading),
-                    ),
-                error:
-                    (Object error, StackTrace stackTrace) => ListTile(
-                      title: Text(l10n.settingsVersion),
-                      subtitle: Text(l10n.settingsVersionUnavailable),
-                    ),
-              ),
-              ListTile(
-                title: Text(l10n.settingsSourceCode),
-                subtitle: Text(_githubRepoUrl),
-                trailing: Icon(
-                  Icons.open_in_new,
-                  color: scheme.onSurfaceVariant,
-                ),
-                onTap: () => _openUrl(context, _githubRepoUrl),
-              ),
-              ListTile(
-                title: Text(l10n.settingsLicenseTitle),
-                subtitle: Text(l10n.settingsLicenseTileSubtitle),
-                trailing: Icon(
-                  Icons.chevron_right,
-                  color: scheme.onSurfaceVariant,
-                ),
-                onTap: () => _showLicenseDialog(context),
-              ),
-              const Divider(height: 1),
-              _SectionHeader(
-                title: l10n.settingsSupportSection,
-                colorScheme: scheme,
-              ),
-              ListTile(
-                title: Text(l10n.settingsSupportKofi),
-                subtitle: Text(_kofiUrl),
-                trailing: Icon(
-                  Icons.open_in_new,
-                  color: scheme.onSurfaceVariant,
-                ),
-                onTap: () => _openUrl(context, _kofiUrl),
-              ),
-              ListTile(
-                title: Text(l10n.settingsSupportGithubSponsors),
-                subtitle: Text(_githubSponsorsUrl),
-                trailing: Icon(
-                  Icons.open_in_new,
-                  color: scheme.onSurfaceVariant,
-                ),
-                onTap: () => _openUrl(context, _githubSponsorsUrl),
-              ),
-            ],
+    return ShellSectionBody(
+      title: Text(l10n.sectionSettings),
+      body: ListView(
+        padding: const EdgeInsets.only(bottom: 24),
+        children: [
+          _SectionHeader(
+            title: l10n.settingsAppearanceSection,
+            colorScheme: scheme,
           ),
-        ),
-      ],
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: SegmentedButton<ThemeMode>(
+              segments: [
+                ButtonSegment<ThemeMode>(
+                  value: ThemeMode.dark,
+                  label: Text(l10n.settingsThemeDark),
+                  icon: const Icon(Icons.dark_mode_outlined),
+                ),
+                ButtonSegment<ThemeMode>(
+                  value: ThemeMode.light,
+                  label: Text(l10n.settingsThemeLight),
+                  icon: const Icon(Icons.light_mode_outlined),
+                ),
+                ButtonSegment<ThemeMode>(
+                  value: ThemeMode.system,
+                  label: Text(l10n.settingsThemeSystem),
+                  icon: const Icon(Icons.brightness_auto_outlined),
+                ),
+              ],
+              selected: {themeMode},
+              onSelectionChanged: (Set<ThemeMode> selected) {
+                final mode = selected.first;
+                ref.read(appThemeModeProvider.notifier).setThemeMode(mode);
+              },
+            ),
+          ),
+          const Divider(height: 1),
+          _SectionHeader(
+            title: l10n.settingsTroubleshootingSection,
+            colorScheme: scheme,
+          ),
+          SwitchListTile(
+            title: Text(l10n.settingsVerboseConnectionErrors),
+            subtitle: Text(l10n.settingsVerboseConnectionErrorsSubtitle),
+            value: ref.watch(verboseConnectionErrorsProvider),
+            onChanged: (v) {
+              ref.read(verboseConnectionErrorsProvider.notifier).setEnabled(v);
+            },
+          ),
+          const Divider(height: 1),
+          _SectionHeader(title: l10n.settingsAboutSection, colorScheme: scheme),
+          packageInfoAsync.when(
+            data:
+                (PackageInfo info) => ListTile(
+                  title: Text(l10n.settingsVersion),
+                  subtitle: Text(
+                    l10n.settingsVersionSubtitle(
+                      info.version,
+                      info.buildNumber,
+                    ),
+                  ),
+                ),
+            loading:
+                () => ListTile(
+                  title: Text(l10n.settingsVersion),
+                  subtitle: Text(l10n.settingsLoading),
+                ),
+            error:
+                (Object error, StackTrace stackTrace) => ListTile(
+                  title: Text(l10n.settingsVersion),
+                  subtitle: Text(l10n.settingsVersionUnavailable),
+                ),
+          ),
+          ListTile(
+            title: Text(l10n.settingsSourceCode),
+            subtitle: Text(_githubRepoUrl),
+            trailing: Icon(Icons.open_in_new, color: scheme.onSurfaceVariant),
+            onTap: () => _openUrl(context, _githubRepoUrl),
+          ),
+          ListTile(
+            title: Text(l10n.settingsLicenseTitle),
+            subtitle: Text(l10n.settingsLicenseTileSubtitle),
+            trailing: Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
+            onTap: () => _showLicenseDialog(context),
+          ),
+          const Divider(height: 1),
+          _SectionHeader(
+            title: l10n.settingsSupportSection,
+            colorScheme: scheme,
+          ),
+          ListTile(
+            title: Text(l10n.settingsSupportKofi),
+            subtitle: Text(_kofiUrl),
+            trailing: Icon(Icons.open_in_new, color: scheme.onSurfaceVariant),
+            onTap: () => _openUrl(context, _kofiUrl),
+          ),
+          ListTile(
+            title: Text(l10n.settingsSupportGithubSponsors),
+            subtitle: Text(_githubSponsorsUrl),
+            trailing: Icon(Icons.open_in_new, color: scheme.onSurfaceVariant),
+            onTap: () => _openUrl(context, _githubSponsorsUrl),
+          ),
+        ],
+      ),
     );
   }
 }

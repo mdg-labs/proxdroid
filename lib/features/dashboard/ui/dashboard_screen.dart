@@ -13,7 +13,7 @@ import 'package:proxdroid/features/vms/providers/vm_providers.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
-import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
+import 'package:proxdroid/shared/widgets/shell_section_body.dart';
 import 'package:proxdroid/shared/widgets/resource_chart.dart';
 import 'package:proxdroid/shared/widgets/status_badge.dart';
 
@@ -51,63 +51,47 @@ class DashboardScreen extends ConsumerWidget {
 
     if (nodesAsync.hasError || vmsAsync.hasError || containersAsync.hasError) {
       final err = nodesAsync.error ?? vmsAsync.error ?? containersAsync.error!;
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          AppBar(
-            leading: shellAppBarLeading(context),
-            title: Text(l10n.sectionDashboard),
-          ),
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: pullRefresh,
-              child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                children: [
-                  SizedBox(
-                    height: minPullHeight,
-                    child: ErrorView(
-                      message: proxmoxExceptionMessage(err, l10n),
-                      onRetry: () => _refreshAll(ref),
-                    ),
-                  ),
-                ],
+      return ShellSectionBody(
+        title: Text(l10n.sectionDashboard),
+        body: RefreshIndicator(
+          onRefresh: pullRefresh,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            children: [
+              SizedBox(
+                height: minPullHeight,
+                child: ErrorView(
+                  message: proxmoxExceptionMessage(err, l10n),
+                  onRetry: () => _refreshAll(ref),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       );
     }
 
     if (!nodesAsync.hasValue ||
         !vmsAsync.hasValue ||
         !containersAsync.hasValue) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          AppBar(
-            leading: shellAppBarLeading(context),
-            title: Text(l10n.sectionDashboard),
-          ),
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: pullRefresh,
-              child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                children: [
-                  SizedBox(
-                    height: minPullHeight,
-                    child: const LoadingShimmer(
-                      itemCount: 6,
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                    ),
-                  ),
-                ],
+      return ShellSectionBody(
+        title: Text(l10n.sectionDashboard),
+        body: RefreshIndicator(
+          onRefresh: pullRefresh,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            children: [
+              SizedBox(
+                height: minPullHeight,
+                child: const LoadingShimmer(
+                  itemCount: 6,
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       );
     }
 
@@ -124,51 +108,96 @@ class DashboardScreen extends ConsumerWidget {
             .length;
 
     if (nodes.isEmpty) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          AppBar(
-            leading: shellAppBarLeading(context),
-            title: Text(l10n.sectionDashboard),
-          ),
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: pullRefresh,
-              child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                children: [
-                  SizedBox(
-                    height: minPullHeight,
-                    child: EmptyState(
-                      icon: Icons.dns_outlined,
-                      title: l10n.dashboardEmptyNodesTitle,
-                      message: l10n.dashboardEmptyNodesMessage,
-                    ),
-                  ),
-                ],
+      return ShellSectionBody(
+        title: Text(l10n.sectionDashboard),
+        body: RefreshIndicator(
+          onRefresh: pullRefresh,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            children: [
+              SizedBox(
+                height: minPullHeight,
+                child: EmptyState(
+                  icon: Icons.dns_outlined,
+                  title: l10n.dashboardEmptyNodesTitle,
+                  message: l10n.dashboardEmptyNodesMessage,
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        AppBar(
-          leading: shellAppBarLeading(context),
-          title: Text(l10n.sectionDashboard),
-        ),
-        Expanded(
-          child: RefreshIndicator(
-            onRefresh: pullRefresh,
-            child: CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: [
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                  sliver: SliverToBoxAdapter(
+    return ShellSectionBody(
+      title: Text(l10n.sectionDashboard),
+      body: RefreshIndicator(
+        onRefresh: pullRefresh,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              sliver: SliverToBoxAdapter(
+                child: Card(
+                  margin: EdgeInsets.zero,
+                  color: scheme.primaryContainer,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.dashboardClusterSummary,
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleLarge?.copyWith(
+                            color: scheme.onPrimaryContainer,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        _SummaryRow(
+                          label: l10n.dashboardSummaryTotalVms,
+                          value: '${vms.length}',
+                          labelColor: scheme.onPrimaryContainer.withValues(
+                            alpha: 0.9,
+                          ),
+                          valueColor: scheme.onPrimaryContainer,
+                        ),
+                        _SummaryRow(
+                          label: l10n.dashboardSummaryRunningVms,
+                          value: '$runningVms',
+                          labelColor: scheme.onPrimaryContainer.withValues(
+                            alpha: 0.9,
+                          ),
+                          valueColor: scheme.onPrimaryContainer,
+                        ),
+                        _SummaryRow(
+                          label: l10n.dashboardSummaryTotalContainers,
+                          value: '${containers.length}',
+                          labelColor: scheme.onPrimaryContainer.withValues(
+                            alpha: 0.9,
+                          ),
+                          valueColor: scheme.onPrimaryContainer,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.all(16),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final node = nodes[index];
+                  final online = _nodeOnline(node);
+                  final cpuFrac = nodeCpuFraction(node.cpu, node.maxCpu);
+                  final memFrac = memoryFraction(node.mem, node.maxMem);
+
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
                     child: Card(
                       margin: EdgeInsets.zero,
                       child: Padding(
@@ -176,166 +205,126 @@ class DashboardScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: scheme.primaryContainer.withValues(
+                                      alpha: 0.35,
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Icon(
+                                    Icons.dns_rounded,
+                                    color: scheme.primary,
+                                    size: 24,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    node.name,
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                  ),
+                                ),
+                                StatusBadge(
+                                  label:
+                                      online
+                                          ? l10n.statusOnline
+                                          : l10n.statusOffline,
+                                  variant:
+                                      online
+                                          ? StatusBadgeVariant.success
+                                          : StatusBadgeVariant.error,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
                             Text(
-                              l10n.dashboardClusterSummary,
-                              style: Theme.of(context).textTheme.titleMedium,
+                              '${l10n.metricUptime}: ${formatUptimeSeconds(node.uptime)}',
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(color: scheme.onSurfaceVariant),
                             ),
                             const SizedBox(height: 12),
-                            _SummaryRow(
-                              label: l10n.dashboardSummaryTotalVms,
-                              value: '${vms.length}',
+                            Text(
+                              l10n.metricCpu,
+                              style: Theme.of(context).textTheme.labelMedium,
                             ),
-                            _SummaryRow(
-                              label: l10n.dashboardSummaryRunningVms,
-                              value: '$runningVms',
+                            const SizedBox(height: 4),
+                            if (cpuFrac != null)
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(4),
+                                child: LinearProgressIndicator(
+                                  value: cpuFrac,
+                                  minHeight: 8,
+                                  color: scheme.primary,
+                                  backgroundColor:
+                                      scheme.surfaceContainerHighest,
+                                ),
+                              )
+                            else
+                              Text(
+                                l10n.valueUnavailable,
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(color: scheme.onSurfaceVariant),
+                              ),
+                            if (cpuFrac != null) ...[
+                              const SizedBox(height: 4),
+                              Text(
+                                formatCpuPercent(cpuFrac),
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(color: scheme.onSurfaceVariant),
+                              ),
+                            ],
+                            const SizedBox(height: 12),
+                            Text(
+                              l10n.metricMemory,
+                              style: Theme.of(context).textTheme.labelMedium,
                             ),
-                            _SummaryRow(
-                              label: l10n.dashboardSummaryTotalContainers,
-                              value: '${containers.length}',
-                            ),
+                            const SizedBox(height: 4),
+                            if (memFrac != null)
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(4),
+                                child: LinearProgressIndicator(
+                                  value: memFrac,
+                                  minHeight: 8,
+                                  color: scheme.primary,
+                                  backgroundColor:
+                                      scheme.surfaceContainerHighest,
+                                ),
+                              )
+                            else
+                              Text(
+                                l10n.valueUnavailable,
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(color: scheme.onSurfaceVariant),
+                              ),
+                            if (memFrac != null) ...[
+                              const SizedBox(height: 4),
+                              Text(
+                                formatMemoryRatio(node.mem, node.maxMem),
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(color: scheme.onSurfaceVariant),
+                              ),
+                            ],
+                            if (online) ...[
+                              const SizedBox(height: 16),
+                              _NodeRrdSparklines(nodeName: node.name),
+                            ],
                           ],
                         ),
                       ),
                     ),
-                  ),
-                ),
-                SliverPadding(
-                  padding: const EdgeInsets.all(16),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      final node = nodes[index];
-                      final online = _nodeOnline(node);
-                      final cpuFrac = nodeCpuFraction(node.cpu, node.maxCpu);
-                      final memFrac = memoryFraction(node.mem, node.maxMem);
-
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Card(
-                          margin: EdgeInsets.zero,
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        node.name,
-                                        style:
-                                            Theme.of(
-                                              context,
-                                            ).textTheme.titleMedium,
-                                      ),
-                                    ),
-                                    StatusBadge(
-                                      label:
-                                          online
-                                              ? l10n.statusOnline
-                                              : l10n.statusOffline,
-                                      variant:
-                                          online
-                                              ? StatusBadgeVariant.success
-                                              : StatusBadgeVariant.error,
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  '${l10n.metricUptime}: ${formatUptimeSeconds(node.uptime)}',
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.bodySmall?.copyWith(
-                                    color: scheme.onSurfaceVariant,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  l10n.metricCpu,
-                                  style:
-                                      Theme.of(context).textTheme.labelMedium,
-                                ),
-                                const SizedBox(height: 4),
-                                if (cpuFrac != null)
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(4),
-                                    child: LinearProgressIndicator(
-                                      value: cpuFrac,
-                                      minHeight: 8,
-                                    ),
-                                  )
-                                else
-                                  Text(
-                                    l10n.valueUnavailable,
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.bodySmall?.copyWith(
-                                      color: scheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                if (cpuFrac != null) ...[
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    formatCpuPercent(cpuFrac),
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.bodySmall?.copyWith(
-                                      color: scheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ],
-                                const SizedBox(height: 12),
-                                Text(
-                                  l10n.metricMemory,
-                                  style:
-                                      Theme.of(context).textTheme.labelMedium,
-                                ),
-                                const SizedBox(height: 4),
-                                if (memFrac != null)
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(4),
-                                    child: LinearProgressIndicator(
-                                      value: memFrac,
-                                      minHeight: 8,
-                                    ),
-                                  )
-                                else
-                                  Text(
-                                    l10n.valueUnavailable,
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.bodySmall?.copyWith(
-                                      color: scheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                if (memFrac != null) ...[
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    formatMemoryRatio(node.mem, node.maxMem),
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.bodySmall?.copyWith(
-                                      color: scheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ],
-                                if (online) ...[
-                                  const SizedBox(height: 16),
-                                  _NodeRrdSparklines(nodeName: node.name),
-                                ],
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    }, childCount: nodes.length),
-                  ),
-                ),
-              ],
+                  );
+                }, childCount: nodes.length),
+              ),
             ),
-          ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
@@ -485,31 +474,45 @@ class _NodeRrdSparklines extends ConsumerWidget {
 }
 
 class _SummaryRow extends StatelessWidget {
-  const _SummaryRow({required this.label, required this.value});
+  const _SummaryRow({
+    required this.label,
+    required this.value,
+    this.labelColor,
+    this.valueColor,
+  });
 
   final String label;
   final String value;
+  final Color? labelColor;
+  final Color? valueColor;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final labelStyle =
+        labelColor != null
+            ? Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: labelColor)
+            : Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant);
+    final valueStyle =
+        valueColor != null
+            ? Theme.of(context).textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: valueColor,
+            )
+            : Theme.of(
+              context,
+            ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600);
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
-          ),
-          Text(
-            value,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
-          ),
+          Text(label, style: labelStyle),
+          Text(value, style: valueStyle),
         ],
       ),
     );

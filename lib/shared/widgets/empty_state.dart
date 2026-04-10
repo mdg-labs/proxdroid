@@ -26,8 +26,12 @@ class EmptyState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 64, color: scheme.onSurfaceVariant),
-            const SizedBox(height: 16),
+            CircleAvatar(
+              radius: 40,
+              backgroundColor: scheme.primaryContainer.withValues(alpha: 0.65),
+              child: Icon(icon, size: 40, color: scheme.onPrimaryContainer),
+            ),
+            const SizedBox(height: 20),
             Text(
               title,
               textAlign: TextAlign.center,

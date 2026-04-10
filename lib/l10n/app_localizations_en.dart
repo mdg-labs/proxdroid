@@ -12,6 +12,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'ProxDroid';
 
   @override
+  String get appDrawerSubtitle => 'Proxmox cluster client';
+
+  @override
+  String get drawerSectionInfrastructure => 'Infrastructure';
+
+  @override
+  String get drawerSectionOperations => 'Operations';
+
+  @override
   String get offlineBannerMessage =>
       'No network connection. Some actions may not work until you are back online.';
 

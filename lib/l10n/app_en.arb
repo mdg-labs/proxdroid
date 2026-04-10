@@ -4,6 +4,18 @@
   "@appTitle": {
     "description": "Application title shown in the system UI (e.g. task switcher, launcher label)."
   },
+  "appDrawerSubtitle": "Proxmox cluster client",
+  "@appDrawerSubtitle": {
+    "description": "Short tagline under the app name in the navigation drawer."
+  },
+  "drawerSectionInfrastructure": "Infrastructure",
+  "@drawerSectionInfrastructure": {
+    "description": "Navigation drawer group label for servers, dashboard, VMs, containers, storage."
+  },
+  "drawerSectionOperations": "Operations",
+  "@drawerSectionOperations": {
+    "description": "Navigation drawer group label for backups, tasks, settings."
+  },
   "offlineBannerMessage": "No network connection. Some actions may not work until you are back online.",
   "@offlineBannerMessage": {
     "description": "Persistent banner when the device has no connectivity (Phase 6.1)."

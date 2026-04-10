@@ -100,6 +100,24 @@ abstract class AppLocalizations {
   /// **'ProxDroid'**
   String get appTitle;
 
+  /// Short tagline under the app name in the navigation drawer.
+  ///
+  /// In en, this message translates to:
+  /// **'Proxmox cluster client'**
+  String get appDrawerSubtitle;
+
+  /// Navigation drawer group label for servers, dashboard, VMs, containers, storage.
+  ///
+  /// In en, this message translates to:
+  /// **'Infrastructure'**
+  String get drawerSectionInfrastructure;
+
+  /// Navigation drawer group label for backups, tasks, settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Operations'**
+  String get drawerSectionOperations;
+
   /// Persistent banner when the device has no connectivity (Phase 6.1).
   ///
   /// In en, this message translates to:

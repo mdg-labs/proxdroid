@@ -2,6 +2,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:proxdroid/features/servers/providers/server_providers.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/providers/connectivity_provider.dart';
 
@@ -52,32 +53,39 @@ class AppShell extends ConsumerWidget {
           if (showOffline)
             Material(
               color: scheme.errorContainer,
-              elevation: 0,
-              child: SafeArea(
-                bottom: false,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 10,
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.wifi_off,
-                        color: scheme.onErrorContainer,
-                        size: 22,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          l10n.offlineBannerMessage,
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: scheme.onErrorContainer,
+              elevation: 1,
+              shadowColor: scheme.shadow,
+              surfaceTintColor: Colors.transparent,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(12),
+                ),
+                child: SafeArea(
+                  bottom: false,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.wifi_off,
+                          color: scheme.onErrorContainer,
+                          size: 22,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            l10n.offlineBannerMessage,
+                            style: textTheme.bodyMedium?.copyWith(
+                              color: scheme.onErrorContainer,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -104,13 +112,9 @@ class AppShell extends ConsumerWidget {
           }
         },
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(28, 16, 16, 10),
-            child: Text(
-              l10n.appTitle,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-          ),
+          _DrawerBrandingHeader(),
+          const Divider(height: 1),
+          _DrawerSectionLabel(text: l10n.drawerSectionInfrastructure),
           NavigationDrawerDestination(
             icon: const Icon(Icons.dns_outlined),
             selectedIcon: const Icon(Icons.dns),
@@ -136,6 +140,7 @@ class AppShell extends ConsumerWidget {
             selectedIcon: const Icon(Icons.storage),
             label: Text(l10n.entityStorage),
           ),
+          _DrawerSectionLabel(text: l10n.drawerSectionOperations),
           NavigationDrawerDestination(
             icon: const Icon(Icons.backup_outlined),
             selectedIcon: const Icon(Icons.backup),
@@ -151,6 +156,103 @@ class AppShell extends ConsumerWidget {
             selectedIcon: const Icon(Icons.settings),
             label: Text(l10n.sectionSettings),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DrawerSectionLabel extends StatelessWidget {
+  const _DrawerSectionLabel({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(28, 12, 16, 4),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: scheme.onSurfaceVariant,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+}
+
+class _DrawerBrandingHeader extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final server = ref.watch(selectedServerProvider);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 16, 16, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                backgroundColor: scheme.primaryContainer,
+                foregroundColor: scheme.onPrimaryContainer,
+                child: const Icon(Icons.dns_rounded),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l10n.appTitle, style: textTheme.titleLarge),
+                    const SizedBox(height: 2),
+                    Text(
+                      l10n.appDrawerSubtitle,
+                      style: textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (server != null) ...[
+            const SizedBox(height: 12),
+            InkWell(
+              onTap: () {
+                Navigator.of(context).pop();
+                context.go('/servers');
+              },
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+                child: Row(
+                  children: [
+                    Icon(Icons.link_rounded, size: 18, color: scheme.primary),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        server.name,
+                        style: textTheme.labelLarge?.copyWith(
+                          color: scheme.primary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Icon(Icons.chevron_right, size: 20, color: scheme.outline),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

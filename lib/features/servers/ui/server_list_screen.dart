@@ -8,7 +8,7 @@ import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
-import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
+import 'package:proxdroid/shared/widgets/shell_section_body.dart';
 
 class ServerListScreen extends ConsumerWidget {
   const ServerListScreen({super.key});
@@ -169,29 +169,15 @@ class ServerListScreen extends ConsumerWidget {
       ),
     );
 
-    return Stack(
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            AppBar(
-              leading: shellAppBarLeading(context),
-              title: Text(l10n.sectionServers),
-            ),
-            Expanded(child: body),
-          ],
-        ),
-        Positioned(
-          right: 16,
-          bottom: 16,
-          child: FloatingActionButton(
-            heroTag: 'servers_list_fab',
-            tooltip: l10n.serversFabAddTooltip,
-            onPressed: () => context.push('/servers/add'),
-            child: const Icon(Icons.add),
-          ),
-        ),
-      ],
+    return ShellSectionBody(
+      title: Text(l10n.sectionServers),
+      body: body,
+      floatingActionButton: FloatingActionButton(
+        heroTag: 'servers_list_fab',
+        tooltip: l10n.serversFabAddTooltip,
+        onPressed: () => context.push('/servers/add'),
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

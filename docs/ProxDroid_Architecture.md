@@ -307,6 +307,12 @@ if (allowSelfSigned) {
 
 > **UPID encoding in routes:** Proxmox UPIDs contain colons and other characters that are not safe in raw URL path segments (example: `UPID:node:0000ABCD:00000001:5F3E45A2:qmstart:100:root@pam:`). When constructing the `/tasks/:node/:upid` route, **percent-encode** the UPID before pushing to go_router (e.g. `Uri.encodeComponent(upid)`), and decode it in the receiving screen (`Uri.decodeComponent(upidParam)`). Without encoding, the colons in the UPID will be misinterpreted as path separators and navigation will fail.
 
+### UI shell and theme (Material 3)
+
+- **`AppShell`** (`lib/app/app_shell.dart`): `Scaffold` with `NavigationDrawer`. Drawer includes a branding header (avatar, app title, localized subtitle), optional **active server** row (`selectedServerProvider`) that navigates to `/servers`, `Divider`, section labels (**Infrastructure** / **Operations** from ARB), then the eight destinations. Offline banner uses light elevation and rounded bottom corners.
+- **`ShellSectionBody`** (`lib/shared/widgets/shell_section_body.dart`): Reusable **AppBar + Expanded(body)** for shell routes; optional **FAB** via `Stack` (used on server list). Prefer this for new section screens; body padding stays inside scroll/sliver children where pull-to-refresh applies.
+- **`AppTheme`** (`lib/app/theme/app_theme.dart`): Shared **card** shape (16px radius, elevation 0, `surfaceContainerHighest`), **filled inputs** with rounded borders, **list tile** shape/padding, **filled/text buttons**, **segmented** shape hint, **app bar** with `scrolledUnderElevation` on scroll.
+
 ---
 
 ## 9. State Management – Riverpod Patterns
