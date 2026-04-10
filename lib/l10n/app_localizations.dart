@@ -291,6 +291,276 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Placeholder — {name}'**
   String debugScreenBody(String name);
+
+  /// Button label to retry a failed load.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get actionRetry;
+
+  /// Button label to save server configuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get actionSave;
+
+  /// Button to verify Proxmox connectivity via GET /version.
+  ///
+  /// In en, this message translates to:
+  /// **'Test connection'**
+  String get actionTestConnection;
+
+  /// SnackBar action to undo a destructive operation.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get actionUndo;
+
+  /// Button to leave a screen after an error or missing entity.
+  ///
+  /// In en, this message translates to:
+  /// **'Go back'**
+  String get actionGoBack;
+
+  /// Tooltip for the server list floating action button.
+  ///
+  /// In en, this message translates to:
+  /// **'Add server'**
+  String get serversFabAddTooltip;
+
+  /// Title when no Proxmox servers are configured.
+  ///
+  /// In en, this message translates to:
+  /// **'No servers yet'**
+  String get serversEmptyTitle;
+
+  /// Body text for empty server list.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a server to connect to your Proxmox cluster.'**
+  String get serversEmptyMessage;
+
+  /// CTA button on empty server list.
+  ///
+  /// In en, this message translates to:
+  /// **'Add server'**
+  String get serversEmptyCta;
+
+  /// Generic error when server list fails to load.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load servers.'**
+  String get serversLoadError;
+
+  /// SnackBar after swipe-to-delete on a server.
+  ///
+  /// In en, this message translates to:
+  /// **'Server removed'**
+  String get serverDeletedSnackbar;
+
+  /// Label for the friendly server name field.
+  ///
+  /// In en, this message translates to:
+  /// **'Display name'**
+  String get serverFieldName;
+
+  /// Hint for display name field.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Home lab'**
+  String get serverFieldNameHint;
+
+  /// Label for hostname or IP (HTTPS only, no scheme).
+  ///
+  /// In en, this message translates to:
+  /// **'Host'**
+  String get serverFieldHost;
+
+  /// Hint for host field.
+  ///
+  /// In en, this message translates to:
+  /// **'proxmox.example.com or 192.168.1.10'**
+  String get serverFieldHostHint;
+
+  /// Label for HTTPS API port.
+  ///
+  /// In en, this message translates to:
+  /// **'Port'**
+  String get serverFieldPort;
+
+  /// Label for full PVE API token value.
+  ///
+  /// In en, this message translates to:
+  /// **'API token'**
+  String get serverFieldApiToken;
+
+  /// Hint format for API token.
+  ///
+  /// In en, this message translates to:
+  /// **'USER@REALM!TOKENID=SECRET'**
+  String get serverFieldApiTokenHint;
+
+  /// Label for Proxmox username (e.g. root@pam).
+  ///
+  /// In en, this message translates to:
+  /// **'User name'**
+  String get serverFieldUsername;
+
+  /// Hint for username field.
+  ///
+  /// In en, this message translates to:
+  /// **'root@pam'**
+  String get serverFieldUsernameHint;
+
+  /// Label for password field.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get serverFieldPassword;
+
+  /// Segment label for API token authentication.
+  ///
+  /// In en, this message translates to:
+  /// **'API token'**
+  String get serverAuthTypeApiToken;
+
+  /// Segment label for username/password authentication.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get serverAuthTypeUsernamePassword;
+
+  /// Section title above auth type and credential fields.
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication'**
+  String get serverFormAuthentication;
+
+  /// Switch label to trust self-signed TLS certificates.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow self-signed certificate'**
+  String get serverAllowSelfSigned;
+
+  /// Validation when host is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a host name or IP address.'**
+  String get serverHostErrorEmpty;
+
+  /// Validation when host contains http://.
+  ///
+  /// In en, this message translates to:
+  /// **'Do not include http://. The app always uses HTTPS.'**
+  String get serverHostErrorHttp;
+
+  /// Validation when host contains https://.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the host without https:// (scheme is added automatically).'**
+  String get serverHostErrorHttps;
+
+  /// Validation when port is not a valid integer in range.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid port number (1–65535).'**
+  String get serverPortErrorInvalid;
+
+  /// Validation when display name is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a display name.'**
+  String get serverNameErrorEmpty;
+
+  /// Validation when API token is required but empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your API token.'**
+  String get serverApiTokenErrorEmpty;
+
+  /// Validation when username is required but empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your Proxmox user name.'**
+  String get serverUsernameErrorEmpty;
+
+  /// Validation when password is required on add.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your password.'**
+  String get serverPasswordErrorEmpty;
+
+  /// Hint on edit when password optional.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave blank to keep the current password.'**
+  String get serverPasswordLeaveBlankHint;
+
+  /// Hint on edit when API token optional.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave blank to keep the current token.'**
+  String get serverApiTokenLeaveBlankHint;
+
+  /// Shown when edit route id does not exist.
+  ///
+  /// In en, this message translates to:
+  /// **'This server was not found.'**
+  String get serverNotFound;
+
+  /// Error loading server metadata for edit screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open this server for editing.'**
+  String get serverEditLoadError;
+
+  /// Mapped message for AuthException.
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication failed. Check your token or password.'**
+  String get errorProxmoxAuth;
+
+  /// Mapped message for NetworkException.
+  ///
+  /// In en, this message translates to:
+  /// **'Network error. Check the host, port, and connectivity.'**
+  String get errorProxmoxNetwork;
+
+  /// Mapped message for ApiTimeoutException.
+  ///
+  /// In en, this message translates to:
+  /// **'The request timed out. Try again.'**
+  String get errorProxmoxTimeout;
+
+  /// Mapped message for PermissionException.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission denied for this account.'**
+  String get errorProxmoxPermission;
+
+  /// Mapped message for ServerException.
+  ///
+  /// In en, this message translates to:
+  /// **'Server returned HTTP {statusCode}.'**
+  String errorProxmoxServer(int statusCode);
+
+  /// Fallback for unexpected errors.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Try again.'**
+  String get errorProxmoxUnknown;
+
+  /// SnackBar after successful GET /version.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected. Proxmox version {version}.'**
+  String serverConnectionTestSuccess(String version);
+
+  /// Shown while connection test runs.
+  ///
+  /// In en, this message translates to:
+  /// **'Testing connection…'**
+  String get serverConnectionTestInProgress;
 }
 
 class _AppLocalizationsDelegate

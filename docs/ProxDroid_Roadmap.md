@@ -12,7 +12,7 @@
 | Phase | Focus | Exit Criteria |
 |---|---|---|
 | **Phase 0** | Project setup & infrastructure | **Complete** — app ID `com.mdglabs.proxdroid`; CI + shell verified locally |
-| **Phase 1** | API foundation & server management | Can authenticate and connect to a live PVE instance |
+| **Phase 1** | API foundation & server management | **Complete** — server config, auth, Hive + secure storage, Dio client, go_router redirects, add/edit server UI |
 | **Phase 2** | Node, VM & container overview | Can view all nodes, VMs and containers with live status |
 | **Phase 3** | VM & container actions + task viewer | Can start, stop, force stop, and reboot VMs/containers and track tasks |
 | **Phase 4** | Resource monitoring charts | Full real-time charts for CPU, RAM, network, disk I/O |
@@ -93,54 +93,57 @@
 **Goal:** The user can add a Proxmox server (by hostname/IP, port, API token or username/password), the app connects to it, authenticates successfully, and stores the configuration locally. Self-signed certificates must work.
 
 ### 1.1 Core Data Models
-- [ ] Implement `Server` model in `core/models/server.dart` (Freezed) – hive_ce-persisted fields only: id, name, host, port, authType, allowSelfSigned
+- [x] Implement `Server` model in `core/models/server.dart` (Freezed) – hive_ce-persisted fields only: id, name, host, port, authType, allowSelfSigned
   - **Note:** credentials (`apiToken`, `password`) are NOT fields on the `Server` model – they are stored separately in `flutter_secure_storage` keyed by server id, and loaded at runtime when building the `ProxmoxApiClient`
-- [ ] Implement `Node` model in `core/models/node.dart` (Freezed) – fields: name, status, cpu, maxCpu, mem, maxMem, uptime
-- [ ] Add `ServerAuthType` enum: `apiToken`, `usernamePassword`
-- [ ] Run `build_runner` and confirm generated files are correct
+- [x] Implement `Node` model in `core/models/node.dart` (Freezed) – fields: name, status, cpu, maxCpu, mem, maxMem, uptime
+- [x] Add `ServerAuthType` enum: `apiToken`, `usernamePassword`
+- [x] Run `build_runner` and confirm generated files are correct
 
 ### 1.2 Local Storage
-- [ ] Confirm `hive_ce` and `hive_ce_flutter` are listed in `pubspec.yaml` (added in Phase 0.2 — **not** the unmaintained `hive`/`hive_flutter`; see Architecture §11); Phase 1 task is initialization and adapter registration, not adding the dependency
-- [ ] Initialize `hive_ce` in `main.dart` for non-sensitive data (server names, hostnames, preferences)
-- [ ] Register `TypeAdapter`s for the `Server` model with hive_ce (excluding credentials — credentials live in flutter_secure_storage only)
-- [ ] Initialize `flutter_secure_storage` for sensitive data (API tokens, passwords) – stored encrypted using Android Keystore
-- [ ] Implement `ServerStorage` – methods: `getAll()`, `save()`, `delete()`, `get(id)`
+- [x] Confirm `hive_ce` and `hive_ce_flutter` are listed in `pubspec.yaml` (added in Phase 0.2 — **not** the unmaintained `hive`/`hive_flutter`; see Architecture §11); Phase 1 task is initialization and adapter registration, not adding the dependency
+- [x] Initialize `hive_ce` in `main.dart` for non-sensitive data (server names, hostnames, preferences)
+- [x] Register `TypeAdapter`s for the `Server` model with hive_ce (excluding credentials — credentials live in flutter_secure_storage only)
+- [x] Initialize `flutter_secure_storage` for sensitive data (API tokens, passwords) – stored encrypted using Android Keystore
+- [x] Implement `ServerStorage` – methods: `getAll()`, `save()`, `delete()`, `get(id)`
   - Server metadata (name, host, port, authType) → `hive_ce`
   - Credentials (apiToken, password) → `flutter_secure_storage`, keyed by server id
-- [ ] Write unit tests for `ServerStorage`
+- [x] Write unit tests for `ServerStorage`
 
 ### 1.3 Proxmox API Client
-- [ ] Implement `ProxmoxApiClient` with Dio
-- [ ] Add `BaseOptions`: base URL (`https://$host:$port/api2/json`), timeouts (connect: 10s, receive: 30s)
-- [ ] Implement SSL override using `IOHttpClientAdapter` + `createHttpClient` (Dio v5 API) for self-signed certs
+- [x] Implement `ProxmoxApiClient` with Dio
+- [x] Add `BaseOptions`: base URL (`https://$host:$port/api2/json`), timeouts (connect: 10s, receive: 30s)
+- [x] Implement SSL override using `IOHttpClientAdapter` + `createHttpClient` (Dio v5 API) for self-signed certs
   - **Do not use** `DefaultHttpClientAdapter` – that is the Dio v4 API and was removed in v5
-- [ ] Enforce HTTPS-only: validate in `AddServerScreen` that the host does not contain `http://` and surface a clear error if it does (Android API 28+ blocks cleartext HTTP at OS level with cryptic errors)
-- [ ] Implement `ApiInterceptor` for:
+- [x] Enforce HTTPS-only: validate in `AddServerScreen` / `ServerEditorPage` that the host does not contain `http://` or `https://` and surface a clear error if it does (Android API 28+ blocks cleartext HTTP at OS level with cryptic errors) — **Phase 1.5** (client already rejects `http://` in host when building the base URL)
+- [x] Implement `ApiInterceptor` for:
   - Attaching auth headers on every request (API token or ticket cookie)
   - Catching Dio errors and converting to typed `ProxmoxException` (`AuthException`, `NetworkException`, `ApiTimeoutException`, `ServerException`, `PermissionException`) — note `ApiTimeoutException`, not `TimeoutException`, to avoid conflict with `dart:async`
-- [ ] Implement API Token auth: attach `Authorization: PVEAPIToken=...` header
-- [ ] Implement Username/Password auth: POST `/access/ticket` → store ticket + CSRFPreventionToken, refresh on expiry
-- [ ] Expose `ProxmoxApiClient` as a Riverpod provider (scoped to selected server)
-- [ ] Write unit tests for auth logic (mock Dio)
+  - *Implementation:* `ProxmoxAuthInterceptor` + `ProxmoxErrorInterceptor` in `lib/core/api/api_interceptors.dart`
+- [x] Implement API Token auth: attach `Authorization: PVEAPIToken=...` header
+- [x] Implement Username/Password auth: POST `/access/ticket` → store ticket + CSRFPreventionToken, refresh on expiry
+- [x] Expose `ProxmoxApiClient` as a Riverpod provider (scoped to selected server) — **Phase 1.4** with `selectedServerProvider` / `apiClientProvider`
+- [x] Write unit tests for auth logic (mock Dio)
+
+> API path constants: `lib/shared/constants/api_endpoints.dart` (`version`, `accessTicket`). Phase 1.5 connection test: `ProxmoxApiClient.fetchVersion()`.
 
 ### 1.4 Server Repository & Providers
-- [ ] Implement `ServerRepository` – wraps `ServerStorage`, exposes typed methods
-- [ ] Implement `ServerListNotifier` (Riverpod) – manages list of servers, persists via hive_ce
-- [ ] Implement `selectedServerProvider` – tracks which server is currently active; returns `null` when no server is configured
-- [ ] Implement `apiClientProvider` – creates `ProxmoxApiClient` for the selected server; watches (not reads) `selectedServerProvider` so all API providers invalidate on server switch
-- [ ] Wire go_router `refreshListenable` so the `redirect` callback re-executes whenever `selectedServerProvider` changes (see Architecture §9 for pattern options); without this, adding the first server will not automatically re-route to `/dashboard`
-- [ ] For MVP: implement `selectedServerProvider` as a `StateProvider` defaulting to `servers.first`; add a comment noting that a full `Notifier`-based implementation with persisted selection ID is the recommended upgrade once multi-server switching is a priority
-- [ ] Implement go_router `redirect` callback: if `selectedServerProvider` is null, redirect **API-requiring routes** (e.g. `/dashboard`, `/vms`, `/containers`, `/storage`, `/backups`, `/tasks`) to `/servers`; the routes `/servers`, `/servers/add`, `/servers/edit/:serverId`, and `/settings` must remain accessible without a configured server (otherwise onboarding is impossible)
+- [x] Implement `ServerRepository` – wraps `ServerStorage`, exposes typed methods
+- [x] Implement `ServerListNotifier` (Riverpod) – manages list of servers, persists via hive_ce
+- [x] Implement `selectedServerProvider` – tracks which server is currently active; returns `null` when no server is configured
+- [x] Implement `apiClientProvider` – creates `ProxmoxApiClient` for the selected server; watches (not reads) `selectedServerProvider` so all API providers invalidate on server switch
+- [x] Wire go_router `refreshListenable` so the `redirect` callback re-executes whenever `selectedServerProvider` changes (see Architecture §9 for pattern options); without this, adding the first server will not automatically re-route to `/dashboard`
+- [x] For MVP: implement `selectedServerProvider` as a `StateProvider` defaulting to `servers.first`; add a comment noting that a full `Notifier`-based implementation with persisted selection ID is the recommended upgrade once multi-server switching is a priority
+- [x] Implement go_router `redirect` callback: if `selectedServerProvider` is null, redirect **API-requiring routes** (e.g. `/dashboard`, `/vms`, `/containers`, `/storage`, `/backups`, `/tasks`) to `/servers`; the routes `/servers`, `/servers/add`, `/servers/edit/:serverId`, and `/settings` must remain accessible without a configured server (otherwise onboarding is impossible)
 
 ### 1.5 Add Server UI
-- [ ] Build `ServerListScreen` – shows all saved servers, empty state with CTA
-- [ ] Build `AddServerScreen` – form with fields: name, host, port (default 8006), auth type toggle, credentials, allow self-signed toggle
-- [ ] Add connection test button – calls `GET /version` (returns PVE version info) and shows success/error feedback
-- [ ] Add server to list on success, show typed error message on failure
-- [ ] Add swipe-to-delete on server list items with undo snackbar (destructive action)
-- [ ] Add tap-to-edit on server list items → `EditServerScreen` (reuse `AddServerScreen` form, pre-filled)
-- [ ] Wire up go_router: `/servers` → `ServerListScreen`, `/servers/add` → `AddServerScreen`, `/servers/edit/:serverId` → `EditServerScreen`
-- [ ] Redirect to `/servers` on first launch (no servers saved), else to `/dashboard` (handled by go_router `redirect`)
+- [x] Build `ServerListScreen` – shows all saved servers, empty state with CTA
+- [x] Build `AddServerScreen` – form with fields: name, host, port (default 8006), auth type toggle, credentials, allow self-signed toggle
+- [x] Add connection test button – calls `GET /version` (returns PVE version info) and shows success/error feedback
+- [x] Add server to list on success, show typed error message on failure
+- [x] Add swipe-to-delete on server list items with undo snackbar (destructive action)
+- [x] Add tap-to-edit on server list items → `EditServerScreen` (reuse `AddServerScreen` form, pre-filled)
+- [x] Wire up go_router: `/servers` → `ServerListScreen`, `/servers/add` → `AddServerScreen`, `/servers/edit/:serverId` → `EditServerScreen`
+- [x] Redirect to `/servers` on first launch (no servers saved), else to `/dashboard` (handled by go_router `redirect`)
 
 ---
 

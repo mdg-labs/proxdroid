@@ -108,4 +108,150 @@ class AppLocalizationsEn extends AppLocalizations {
   String debugScreenBody(String name) {
     return 'Placeholder — $name';
   }
+
+  @override
+  String get actionRetry => 'Retry';
+
+  @override
+  String get actionSave => 'Save';
+
+  @override
+  String get actionTestConnection => 'Test connection';
+
+  @override
+  String get actionUndo => 'Undo';
+
+  @override
+  String get actionGoBack => 'Go back';
+
+  @override
+  String get serversFabAddTooltip => 'Add server';
+
+  @override
+  String get serversEmptyTitle => 'No servers yet';
+
+  @override
+  String get serversEmptyMessage =>
+      'Add a server to connect to your Proxmox cluster.';
+
+  @override
+  String get serversEmptyCta => 'Add server';
+
+  @override
+  String get serversLoadError => 'Could not load servers.';
+
+  @override
+  String get serverDeletedSnackbar => 'Server removed';
+
+  @override
+  String get serverFieldName => 'Display name';
+
+  @override
+  String get serverFieldNameHint => 'e.g. Home lab';
+
+  @override
+  String get serverFieldHost => 'Host';
+
+  @override
+  String get serverFieldHostHint => 'proxmox.example.com or 192.168.1.10';
+
+  @override
+  String get serverFieldPort => 'Port';
+
+  @override
+  String get serverFieldApiToken => 'API token';
+
+  @override
+  String get serverFieldApiTokenHint => 'USER@REALM!TOKENID=SECRET';
+
+  @override
+  String get serverFieldUsername => 'User name';
+
+  @override
+  String get serverFieldUsernameHint => 'root@pam';
+
+  @override
+  String get serverFieldPassword => 'Password';
+
+  @override
+  String get serverAuthTypeApiToken => 'API token';
+
+  @override
+  String get serverAuthTypeUsernamePassword => 'Password';
+
+  @override
+  String get serverFormAuthentication => 'Authentication';
+
+  @override
+  String get serverAllowSelfSigned => 'Allow self-signed certificate';
+
+  @override
+  String get serverHostErrorEmpty => 'Enter a host name or IP address.';
+
+  @override
+  String get serverHostErrorHttp =>
+      'Do not include http://. The app always uses HTTPS.';
+
+  @override
+  String get serverHostErrorHttps =>
+      'Enter the host without https:// (scheme is added automatically).';
+
+  @override
+  String get serverPortErrorInvalid => 'Enter a valid port number (1–65535).';
+
+  @override
+  String get serverNameErrorEmpty => 'Enter a display name.';
+
+  @override
+  String get serverApiTokenErrorEmpty => 'Enter your API token.';
+
+  @override
+  String get serverUsernameErrorEmpty => 'Enter your Proxmox user name.';
+
+  @override
+  String get serverPasswordErrorEmpty => 'Enter your password.';
+
+  @override
+  String get serverPasswordLeaveBlankHint =>
+      'Leave blank to keep the current password.';
+
+  @override
+  String get serverApiTokenLeaveBlankHint =>
+      'Leave blank to keep the current token.';
+
+  @override
+  String get serverNotFound => 'This server was not found.';
+
+  @override
+  String get serverEditLoadError => 'Could not open this server for editing.';
+
+  @override
+  String get errorProxmoxAuth =>
+      'Authentication failed. Check your token or password.';
+
+  @override
+  String get errorProxmoxNetwork =>
+      'Network error. Check the host, port, and connectivity.';
+
+  @override
+  String get errorProxmoxTimeout => 'The request timed out. Try again.';
+
+  @override
+  String get errorProxmoxPermission => 'Permission denied for this account.';
+
+  @override
+  String errorProxmoxServer(int statusCode) {
+    return 'Server returned HTTP $statusCode.';
+  }
+
+  @override
+  String get errorProxmoxUnknown => 'Something went wrong. Try again.';
+
+  @override
+  String serverConnectionTestSuccess(String version) {
+    return 'Connected. Proxmox version $version.';
+  }
+
+  @override
+  String get serverConnectionTestInProgress => 'Testing connection…';
 }

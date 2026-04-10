@@ -137,5 +137,197 @@
         "example": "Server list"
       }
     }
+  },
+  "actionRetry": "Retry",
+  "@actionRetry": {
+    "description": "Button label to retry a failed load."
+  },
+  "actionSave": "Save",
+  "@actionSave": {
+    "description": "Button label to save server configuration."
+  },
+  "actionTestConnection": "Test connection",
+  "@actionTestConnection": {
+    "description": "Button to verify Proxmox connectivity via GET /version."
+  },
+  "actionUndo": "Undo",
+  "@actionUndo": {
+    "description": "SnackBar action to undo a destructive operation."
+  },
+  "actionGoBack": "Go back",
+  "@actionGoBack": {
+    "description": "Button to leave a screen after an error or missing entity."
+  },
+  "serversFabAddTooltip": "Add server",
+  "@serversFabAddTooltip": {
+    "description": "Tooltip for the server list floating action button."
+  },
+  "serversEmptyTitle": "No servers yet",
+  "@serversEmptyTitle": {
+    "description": "Title when no Proxmox servers are configured."
+  },
+  "serversEmptyMessage": "Add a server to connect to your Proxmox cluster.",
+  "@serversEmptyMessage": {
+    "description": "Body text for empty server list."
+  },
+  "serversEmptyCta": "Add server",
+  "@serversEmptyCta": {
+    "description": "CTA button on empty server list."
+  },
+  "serversLoadError": "Could not load servers.",
+  "@serversLoadError": {
+    "description": "Generic error when server list fails to load."
+  },
+  "serverDeletedSnackbar": "Server removed",
+  "@serverDeletedSnackbar": {
+    "description": "SnackBar after swipe-to-delete on a server."
+  },
+  "serverFieldName": "Display name",
+  "@serverFieldName": {
+    "description": "Label for the friendly server name field."
+  },
+  "serverFieldNameHint": "e.g. Home lab",
+  "@serverFieldNameHint": {
+    "description": "Hint for display name field."
+  },
+  "serverFieldHost": "Host",
+  "@serverFieldHost": {
+    "description": "Label for hostname or IP (HTTPS only, no scheme)."
+  },
+  "serverFieldHostHint": "proxmox.example.com or 192.168.1.10",
+  "@serverFieldHostHint": {
+    "description": "Hint for host field."
+  },
+  "serverFieldPort": "Port",
+  "@serverFieldPort": {
+    "description": "Label for HTTPS API port."
+  },
+  "serverFieldApiToken": "API token",
+  "@serverFieldApiToken": {
+    "description": "Label for full PVE API token value."
+  },
+  "serverFieldApiTokenHint": "USER@REALM!TOKENID=SECRET",
+  "@serverFieldApiTokenHint": {
+    "description": "Hint format for API token."
+  },
+  "serverFieldUsername": "User name",
+  "@serverFieldUsername": {
+    "description": "Label for Proxmox username (e.g. root@pam)."
+  },
+  "serverFieldUsernameHint": "root@pam",
+  "@serverFieldUsernameHint": {
+    "description": "Hint for username field."
+  },
+  "serverFieldPassword": "Password",
+  "@serverFieldPassword": {
+    "description": "Label for password field."
+  },
+  "serverAuthTypeApiToken": "API token",
+  "@serverAuthTypeApiToken": {
+    "description": "Segment label for API token authentication."
+  },
+  "serverAuthTypeUsernamePassword": "Password",
+  "@serverAuthTypeUsernamePassword": {
+    "description": "Segment label for username/password authentication."
+  },
+  "serverFormAuthentication": "Authentication",
+  "@serverFormAuthentication": {
+    "description": "Section title above auth type and credential fields."
+  },
+  "serverAllowSelfSigned": "Allow self-signed certificate",
+  "@serverAllowSelfSigned": {
+    "description": "Switch label to trust self-signed TLS certificates."
+  },
+  "serverHostErrorEmpty": "Enter a host name or IP address.",
+  "@serverHostErrorEmpty": {
+    "description": "Validation when host is empty."
+  },
+  "serverHostErrorHttp": "Do not include http://. The app always uses HTTPS.",
+  "@serverHostErrorHttp": {
+    "description": "Validation when host contains http://."
+  },
+  "serverHostErrorHttps": "Enter the host without https:// (scheme is added automatically).",
+  "@serverHostErrorHttps": {
+    "description": "Validation when host contains https://."
+  },
+  "serverPortErrorInvalid": "Enter a valid port number (1–65535).",
+  "@serverPortErrorInvalid": {
+    "description": "Validation when port is not a valid integer in range."
+  },
+  "serverNameErrorEmpty": "Enter a display name.",
+  "@serverNameErrorEmpty": {
+    "description": "Validation when display name is empty."
+  },
+  "serverApiTokenErrorEmpty": "Enter your API token.",
+  "@serverApiTokenErrorEmpty": {
+    "description": "Validation when API token is required but empty."
+  },
+  "serverUsernameErrorEmpty": "Enter your Proxmox user name.",
+  "@serverUsernameErrorEmpty": {
+    "description": "Validation when username is required but empty."
+  },
+  "serverPasswordErrorEmpty": "Enter your password.",
+  "@serverPasswordErrorEmpty": {
+    "description": "Validation when password is required on add."
+  },
+  "serverPasswordLeaveBlankHint": "Leave blank to keep the current password.",
+  "@serverPasswordLeaveBlankHint": {
+    "description": "Hint on edit when password optional."
+  },
+  "serverApiTokenLeaveBlankHint": "Leave blank to keep the current token.",
+  "@serverApiTokenLeaveBlankHint": {
+    "description": "Hint on edit when API token optional."
+  },
+  "serverNotFound": "This server was not found.",
+  "@serverNotFound": {
+    "description": "Shown when edit route id does not exist."
+  },
+  "serverEditLoadError": "Could not open this server for editing.",
+  "@serverEditLoadError": {
+    "description": "Error loading server metadata for edit screen."
+  },
+  "errorProxmoxAuth": "Authentication failed. Check your token or password.",
+  "@errorProxmoxAuth": {
+    "description": "Mapped message for AuthException."
+  },
+  "errorProxmoxNetwork": "Network error. Check the host, port, and connectivity.",
+  "@errorProxmoxNetwork": {
+    "description": "Mapped message for NetworkException."
+  },
+  "errorProxmoxTimeout": "The request timed out. Try again.",
+  "@errorProxmoxTimeout": {
+    "description": "Mapped message for ApiTimeoutException."
+  },
+  "errorProxmoxPermission": "Permission denied for this account.",
+  "@errorProxmoxPermission": {
+    "description": "Mapped message for PermissionException."
+  },
+  "errorProxmoxServer": "Server returned HTTP {statusCode}.",
+  "@errorProxmoxServer": {
+    "description": "Mapped message for ServerException.",
+    "placeholders": {
+      "statusCode": {
+        "type": "int",
+        "example": "500"
+      }
+    }
+  },
+  "errorProxmoxUnknown": "Something went wrong. Try again.",
+  "@errorProxmoxUnknown": {
+    "description": "Fallback for unexpected errors."
+  },
+  "serverConnectionTestSuccess": "Connected. Proxmox version {version}.",
+  "@serverConnectionTestSuccess": {
+    "description": "SnackBar after successful GET /version.",
+    "placeholders": {
+      "version": {
+        "type": "String",
+        "example": "8.2.4"
+      }
+    }
+  },
+  "serverConnectionTestInProgress": "Testing connection…",
+  "@serverConnectionTestInProgress": {
+    "description": "Shown while connection test runs."
   }
 }
