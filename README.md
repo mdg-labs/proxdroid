@@ -59,6 +59,10 @@ flutter run
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup, code style, PR process, and commit conventions.
 
+### HTTPS proxies and Cloudflare Tunnel
+
+The app uses Proxmox’s JSON API at **`/api2/json/`**. If you use a reverse proxy or Cloudflare Tunnel, that path must reach Proxmox (see [CONTRIBUTING.md](CONTRIBUTING.md)). For clearer errors when adding a server, use **Settings → Troubleshooting → Verbose connection errors**.
+
 ---
 
 ## License

@@ -5,7 +5,9 @@ import 'package:proxdroid/core/api/api_exceptions.dart';
 import 'package:proxdroid/core/api/proxmox_api_client.dart';
 import 'package:proxdroid/core/models/server.dart';
 import 'package:proxdroid/core/storage/server_storage.dart';
+import 'package:proxdroid/core/utils/proxmox_login.dart';
 import 'package:proxdroid/features/servers/providers/server_providers.dart';
+import 'package:proxdroid/features/settings/providers/settings_providers.dart';
 import 'package:proxdroid/features/servers/ui/proxmox_exception_messages.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
@@ -13,6 +15,10 @@ import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
 import 'package:uuid/uuid.dart';
 
 const int _kDefaultProxmoxPort = 8006;
+
+const String _realmPam = 'pam';
+const String _realmPve = 'pve';
+const String _realmOther = 'other';
 
 /// Add or edit server form (shared). [existingServer] null ⇒ add.
 class ServerEditorPage extends ConsumerStatefulWidget {
@@ -32,6 +38,10 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
   final _tokenController = TextEditingController();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _customRealmController = TextEditingController();
+
+  /// Dropdown value: [_realmPam], [_realmPve], or [_realmOther].
+  String _realmDropdownValue = _realmPam;
 
   ServerAuthType _authType = ServerAuthType.apiToken;
   bool _allowSelfSigned = false;
@@ -39,6 +49,7 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
   bool _testingConnection = false;
   bool _saving = false;
 
+  /// Stored `login@realm` from secure storage (for edit password/username logic).
   String _initialUsername = '';
 
   bool get _isEdit => widget.existingServer != null;
@@ -69,9 +80,18 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
     if (existing.authType == ServerAuthType.usernamePassword) {
       final creds = await storage.readUsernamePassword(existing.id);
       if (!mounted) return;
+      final stored = creds?.username ?? '';
+      final (login, realm) = parseProxmoxLoginIdForForm(stored);
       setState(() {
-        _usernameController.text = creds?.username ?? '';
-        _initialUsername = creds?.username ?? '';
+        _usernameController.text = login;
+        _initialUsername = stored;
+        if (isPresetRealm(realm)) {
+          _realmDropdownValue = realm;
+          _customRealmController.clear();
+        } else {
+          _realmDropdownValue = _realmOther;
+          _customRealmController.text = realm;
+        }
         _credentialsLoaded = true;
       });
     } else {
@@ -88,6 +108,7 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
     _tokenController.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
+    _customRealmController.dispose();
     super.dispose();
   }
 
@@ -114,6 +135,90 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
     return p;
   }
 
+  String? _effectiveRealmString(AppLocalizations l10n) {
+    switch (_realmDropdownValue) {
+      case _realmPam:
+        return _realmPam;
+      case _realmPve:
+        return _realmPve;
+      case _realmOther:
+        final c = _customRealmController.text.trim();
+        if (c.isEmpty) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(l10n.serverRealmErrorEmpty)));
+          return null;
+        }
+        if (c.contains(' ') || c.contains('@')) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(l10n.serverRealmErrorInvalid)));
+          return null;
+        }
+        return c;
+      default:
+        return _realmPam;
+    }
+  }
+
+  String? _composeLoginForConnectionTest(AppLocalizations l10n) {
+    final u = _usernameController.text.trim();
+    if (u.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.serverUsernameErrorEmpty)));
+      return null;
+    }
+    if (u.contains('@')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.serverUsernameErrorContainsAt)),
+      );
+      return null;
+    }
+    final realm = _effectiveRealmString(l10n);
+    if (realm == null) return null;
+    try {
+      return buildProxmoxLoginId(u, realm);
+    } on ArgumentError {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.serverRealmErrorInvalid)));
+      return null;
+    }
+  }
+
+  void _maybeShowConnectionDiagnostics(Object error) {
+    if (!ref.read(verboseConnectionErrorsProvider)) return;
+    if (!context.mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+    showDialog<void>(
+      context: context,
+      builder:
+          (ctx) => AlertDialog(
+            title: Text(l10n.connectionDiagnosticsTitle),
+            content: SingleChildScrollView(
+              child: SelectableText(proxmoxExceptionDiagnosticsText(error)),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: Text(l10n.actionClose),
+              ),
+            ],
+          ),
+    );
+  }
+
+  /// Call only after [FormState.validate] succeeds for username/password auth.
+  String _composeLoginFromFormFields() {
+    final u = _usernameController.text.trim();
+    final realm =
+        _realmDropdownValue == _realmOther
+            ? _customRealmController.text.trim()
+            : _realmDropdownValue;
+    return buildProxmoxLoginId(u, realm);
+  }
+
   Future<void> _testConnection() async {
     final l10n = AppLocalizations.of(context)!;
     FocusScope.of(context).unfocus();
@@ -138,7 +243,7 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
     final existingId = widget.existingServer?.id;
 
     String? apiToken;
-    String? username;
+    String? loginIdForPassword;
     String? password;
 
     if (_authType == ServerAuthType.apiToken) {
@@ -157,19 +262,12 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
         return;
       }
     } else {
-      username = _usernameController.text.trim();
-      if (username.isEmpty) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.serverUsernameErrorEmpty)),
-          );
-        }
-        return;
-      }
+      loginIdForPassword = _composeLoginForConnectionTest(l10n);
+      if (loginIdForPassword == null) return;
       var resolvedPassword = _passwordController.text;
       if (resolvedPassword.isEmpty && existingId != null) {
         final creds = await storage.readUsernamePassword(existingId);
-        if (creds != null && creds.username == username) {
+        if (creds != null && creds.username == loginIdForPassword) {
           resolvedPassword = creds.password;
         }
       }
@@ -200,14 +298,16 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
         allowSelfSigned: _allowSelfSigned,
       );
 
-      final client =
-          _authType == ServerAuthType.apiToken
-              ? ProxmoxApiClient(server: testServer, apiToken: apiToken!)
-              : ProxmoxApiClient(
-                server: testServer,
-                username: username!,
-                password: password!,
-              );
+      final ProxmoxApiClient client;
+      if (_authType == ServerAuthType.apiToken) {
+        client = ProxmoxApiClient(server: testServer, apiToken: apiToken!);
+      } else {
+        client = ProxmoxApiClient(
+          server: testServer,
+          username: loginIdForPassword!,
+          password: password!,
+        );
+      }
 
       final version = await client.fetchVersion();
       if (!mounted) return;
@@ -221,16 +321,19 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(proxmoxExceptionMessage(e, l10n))));
+      _maybeShowConnectionDiagnostics(e);
     } on ArgumentError {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(l10n.serverHostErrorHttps)));
-    } catch (_) {
+      _maybeShowConnectionDiagnostics('ArgumentError: invalid host');
+    } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(l10n.errorProxmoxUnknown)));
+      _maybeShowConnectionDiagnostics(e);
     } finally {
       if (mounted) {
         setState(() => _testingConnection = false);
@@ -278,20 +381,21 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
         return;
       }
     } else {
-      username = _usernameController.text.trim();
-      if (username.isEmpty) {
+      late final String composedLogin;
+      try {
+        composedLogin = _composeLoginFromFormFields();
+      } on ArgumentError {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(l10n.serverUsernameErrorEmpty)));
+        ).showSnackBar(SnackBar(content: Text(l10n.serverRealmErrorInvalid)));
         return;
       }
       final p = _passwordController.text;
       if (_isEdit) {
         password = p.isEmpty ? null : p;
-        if (username == _initialUsername) {
-          username = null;
-        }
+        username = composedLogin == _initialUsername ? null : composedLogin;
       } else {
+        username = composedLogin;
         password = p;
         if (password.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -313,6 +417,12 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
             password: password,
           );
       if (mounted) context.pop();
+    } on ProxmoxException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(proxmoxExceptionMessage(e, l10n))),
+        );
+      }
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(
@@ -477,6 +587,13 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
                     },
                   ),
                 ] else ...[
+                  Text(
+                    l10n.serverLoginComposeHint,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
                   TextFormField(
                     controller: _usernameController,
                     decoration: InputDecoration(
@@ -490,9 +607,63 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
                       if (v == null || v.trim().isEmpty) {
                         return l10n.serverUsernameErrorEmpty;
                       }
+                      if (v.contains('@')) {
+                        return l10n.serverUsernameErrorContainsAt;
+                      }
                       return null;
                     },
                   ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    // Controlled after async load; `initialValue` only applies on first build.
+                    // ignore: deprecated_member_use
+                    value: _realmDropdownValue,
+                    decoration: InputDecoration(
+                      labelText: l10n.serverFieldRealm,
+                      border: const OutlineInputBorder(),
+                    ),
+                    items: [
+                      DropdownMenuItem(
+                        value: _realmPam,
+                        child: Text(l10n.serverRealmPam),
+                      ),
+                      DropdownMenuItem(
+                        value: _realmPve,
+                        child: Text(l10n.serverRealmPve),
+                      ),
+                      DropdownMenuItem(
+                        value: _realmOther,
+                        child: Text(l10n.serverRealmOther),
+                      ),
+                    ],
+                    onChanged: (v) {
+                      if (v == null) return;
+                      setState(() => _realmDropdownValue = v);
+                    },
+                  ),
+                  if (_realmDropdownValue == _realmOther) ...[
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _customRealmController,
+                      decoration: InputDecoration(
+                        labelText: l10n.serverFieldRealmCustom,
+                        hintText: l10n.serverFieldRealmCustomHint,
+                        border: const OutlineInputBorder(),
+                      ),
+                      textInputAction: TextInputAction.next,
+                      autocorrect: false,
+                      validator: (v) {
+                        if (_realmDropdownValue != _realmOther) return null;
+                        if (v == null || v.trim().isEmpty) {
+                          return l10n.serverRealmErrorEmpty;
+                        }
+                        if (v.contains(' ') || v.contains('@')) {
+                          return l10n.serverRealmErrorInvalid;
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _passwordController,

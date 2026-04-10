@@ -38,6 +38,19 @@ void main() {
     expect(repo2.getThemeMode(), ThemeMode.system);
   });
 
+  test('verbose connection errors default false', () {
+    final repo = AppSettingsRepository(box: box);
+    expect(repo.getVerboseConnectionErrors(), false);
+  });
+
+  test('setVerboseConnectionErrors roundtrips', () async {
+    final repo = AppSettingsRepository(box: box);
+    await repo.setVerboseConnectionErrors(true);
+    expect(repo.getVerboseConnectionErrors(), true);
+    await repo.setVerboseConnectionErrors(false);
+    expect(repo.getVerboseConnectionErrors(), false);
+  });
+
   test('themeModeFromStorage maps stored strings', () {
     expect(
       AppSettingsRepository.themeModeFromStorage('light'),

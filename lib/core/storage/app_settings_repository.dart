@@ -5,11 +5,14 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_settings_repository.g.dart';
 
-/// Hive box name for app preferences (theme only; no credentials).
+/// Hive box name for app preferences (theme, diagnostics toggles; no credentials).
 const String kSettingsHiveBoxName = 'settings';
 
 /// Hive key for persisted [ThemeMode] string value.
 const String kThemeModeStorageKey = 'themeMode';
+
+/// Hive key: `'true'` / `'false'` for connection-test diagnostics dialog.
+const String kVerboseConnectionErrorsKey = 'verboseConnectionErrors';
 
 const String _valueDark = 'dark';
 const String _valueLight = 'light';
@@ -28,6 +31,14 @@ class AppSettingsRepository {
 
   Future<void> setThemeMode(ThemeMode mode) async {
     await _box.put(kThemeModeStorageKey, themeModeToStorage(mode));
+  }
+
+  /// When true, a failed "Test connection" shows an extra technical dialog.
+  bool getVerboseConnectionErrors() =>
+      _box.get(kVerboseConnectionErrorsKey) == 'true';
+
+  Future<void> setVerboseConnectionErrors(bool value) async {
+    await _box.put(kVerboseConnectionErrorsKey, value ? 'true' : 'false');
   }
 
   /// Parses stored theme string; unknown or null → [ThemeMode.dark].

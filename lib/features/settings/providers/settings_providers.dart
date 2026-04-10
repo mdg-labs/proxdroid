@@ -23,3 +23,18 @@ class AppThemeMode extends _$AppThemeMode {
     state = mode;
   }
 }
+
+/// When true, a failed server "Test connection" shows a technical [AlertDialog].
+@Riverpod(keepAlive: true)
+class VerboseConnectionErrors extends _$VerboseConnectionErrors {
+  @override
+  bool build() =>
+      ref.watch(appSettingsRepositoryProvider).getVerboseConnectionErrors();
+
+  Future<void> setEnabled(bool value) async {
+    await ref
+        .read(appSettingsRepositoryProvider)
+        .setVerboseConnectionErrors(value);
+    state = value;
+  }
+}

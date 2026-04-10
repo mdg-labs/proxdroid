@@ -98,6 +98,21 @@ class SettingsScreen extends ConsumerWidget {
               ),
               const Divider(height: 1),
               _SectionHeader(
+                title: l10n.settingsTroubleshootingSection,
+                colorScheme: scheme,
+              ),
+              SwitchListTile(
+                title: Text(l10n.settingsVerboseConnectionErrors),
+                subtitle: Text(l10n.settingsVerboseConnectionErrorsSubtitle),
+                value: ref.watch(verboseConnectionErrorsProvider),
+                onChanged: (v) {
+                  ref
+                      .read(verboseConnectionErrorsProvider.notifier)
+                      .setEnabled(v);
+                },
+              ),
+              const Divider(height: 1),
+              _SectionHeader(
                 title: l10n.settingsAboutSection,
                 colorScheme: scheme,
               ),

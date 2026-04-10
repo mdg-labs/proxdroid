@@ -334,6 +334,7 @@
 - [x] Handle session expiry for username/password auth (auto re-authenticate) — wired in `ProxmoxAuthInterceptor` (Phase 1+); verified unchanged in Phase 6
 - [x] Handle empty states on all list screens
 - [x] Implement persistent offline banner: when `connectivityProvider` reports no network, show a non-dismissible top banner across all screens; auto-dismiss when connectivity is restored
+- [x] Connection diagnostics: surface Proxmox/Dio `message` in snackbars; realm selector (`user@realm`) on server form; Settings toggle for verbose connection-test dialog; HTML/proxy detection in error mapping; docs for `/api2/json` behind reverse proxies
 
 ### 6.2 UX Polish
 - [x] Add smooth page transitions (go_router transitions)

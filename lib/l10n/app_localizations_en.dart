@@ -177,7 +177,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get serverFieldUsername => 'User name';
 
   @override
-  String get serverFieldUsernameHint => 'root@pam';
+  String get serverFieldUsernameHint => 'e.g. root';
 
   @override
   String get serverFieldPassword => 'Password';
@@ -213,6 +213,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get serverApiTokenErrorEmpty => 'Enter your API token.';
+
+  @override
+  String get serverFieldRealm => 'Realm';
+
+  @override
+  String get serverRealmPam => 'Linux PAM (pam)';
+
+  @override
+  String get serverRealmPve => 'Proxmox VE (pve)';
+
+  @override
+  String get serverRealmOther => 'Other…';
+
+  @override
+  String get serverFieldRealmCustom => 'Custom realm';
+
+  @override
+  String get serverFieldRealmCustomHint => 'e.g. ldap';
+
+  @override
+  String get serverRealmErrorEmpty => 'Enter a realm.';
+
+  @override
+  String get serverRealmErrorInvalid => 'Realm must not contain spaces or @.';
+
+  @override
+  String get serverLoginComposeHint => 'Sign-in uses login@realm (set below).';
+
+  @override
+  String get serverUsernameErrorContainsAt =>
+      'Enter only the login name here. Choose the realm below.';
 
   @override
   String get serverUsernameErrorEmpty => 'Enter your Proxmox user name.';
@@ -255,6 +286,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorProxmoxUnknown => 'Something went wrong. Try again.';
+
+  @override
+  String errorProxmoxTechnicalDetails(String detail) {
+    return '$detail';
+  }
 
   @override
   String serverConnectionTestSuccess(String version) {
@@ -610,6 +646,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsAppearanceSection => 'Appearance';
+
+  @override
+  String get settingsTroubleshootingSection => 'Troubleshooting';
+
+  @override
+  String get settingsVerboseConnectionErrors => 'Verbose connection errors';
+
+  @override
+  String get settingsVerboseConnectionErrorsSubtitle =>
+      'After a failed connection test, show technical details in a dialog (types, messages, HTTP status). Passwords are never shown.';
+
+  @override
+  String get connectionDiagnosticsTitle => 'Connection diagnostics';
 
   @override
   String get settingsThemeDark => 'Dark';

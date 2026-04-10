@@ -48,4 +48,19 @@ void main() {
       expect(repo.getThemeMode(), ThemeMode.dark);
     },
   );
+
+  test('VerboseConnectionErrors toggles repository flag', () async {
+    final repo = AppSettingsRepository(box: box);
+    final container = ProviderContainer(
+      overrides: [appSettingsRepositoryProvider.overrideWithValue(repo)],
+    );
+    addTearDown(container.dispose);
+
+    expect(container.read(verboseConnectionErrorsProvider), false);
+    await container
+        .read(verboseConnectionErrorsProvider.notifier)
+        .setEnabled(true);
+    expect(container.read(verboseConnectionErrorsProvider), true);
+    expect(repo.getVerboseConnectionErrors(), true);
+  });
 }

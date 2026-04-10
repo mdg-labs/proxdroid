@@ -421,7 +421,7 @@ abstract class AppLocalizations {
   /// Hint for username field.
   ///
   /// In en, this message translates to:
-  /// **'root@pam'**
+  /// **'e.g. root'**
   String get serverFieldUsernameHint;
 
   /// Label for password field.
@@ -489,6 +489,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter your API token.'**
   String get serverApiTokenErrorEmpty;
+
+  /// Proxmox auth realm (pam, pve, ldap, …).
+  ///
+  /// In en, this message translates to:
+  /// **'Realm'**
+  String get serverFieldRealm;
+
+  /// Preset realm label for pam.
+  ///
+  /// In en, this message translates to:
+  /// **'Linux PAM (pam)'**
+  String get serverRealmPam;
+
+  /// Preset realm label for pve.
+  ///
+  /// In en, this message translates to:
+  /// **'Proxmox VE (pve)'**
+  String get serverRealmPve;
+
+  /// Custom realm option in dropdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Other…'**
+  String get serverRealmOther;
+
+  /// Label for text field when realm is Other.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom realm'**
+  String get serverFieldRealmCustom;
+
+  /// Hint for custom realm.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. ldap'**
+  String get serverFieldRealmCustomHint;
+
+  /// Validator when custom realm is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a realm.'**
+  String get serverRealmErrorEmpty;
+
+  /// Validator for custom realm characters.
+  ///
+  /// In en, this message translates to:
+  /// **'Realm must not contain spaces or @.'**
+  String get serverRealmErrorInvalid;
+
+  /// Helper under username/realm for password auth.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign-in uses login@realm (set below).'**
+  String get serverLoginComposeHint;
+
+  /// Validator when user types @ in login field.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter only the login name here. Choose the realm below.'**
+  String get serverUsernameErrorContainsAt;
 
   /// Validation when username is required but empty.
   ///
@@ -561,6 +621,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Something went wrong. Try again.'**
   String get errorProxmoxUnknown;
+
+  /// Second line after summary; detail may be English from Proxmox, Dio, or a proxy.
+  ///
+  /// In en, this message translates to:
+  /// **'{detail}'**
+  String errorProxmoxTechnicalDetails(String detail);
 
   /// SnackBar after successful GET /version.
   ///
@@ -1215,6 +1281,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Appearance'**
   String get settingsAppearanceSection;
+
+  /// Settings section: connection diagnostics and advanced options.
+  ///
+  /// In en, this message translates to:
+  /// **'Troubleshooting'**
+  String get settingsTroubleshootingSection;
+
+  /// Toggle: show a technical dialog after a failed Test connection.
+  ///
+  /// In en, this message translates to:
+  /// **'Verbose connection errors'**
+  String get settingsVerboseConnectionErrors;
+
+  /// Subtitle for verbose connection errors toggle.
+  ///
+  /// In en, this message translates to:
+  /// **'After a failed connection test, show technical details in a dialog (types, messages, HTTP status). Passwords are never shown.'**
+  String get settingsVerboseConnectionErrorsSubtitle;
+
+  /// AlertDialog title after failed test when verbose is on.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection diagnostics'**
+  String get connectionDiagnosticsTitle;
 
   /// Theme option: dark mode.
   ///

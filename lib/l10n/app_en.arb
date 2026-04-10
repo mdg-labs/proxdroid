@@ -232,7 +232,7 @@
   "@serverFieldUsername": {
     "description": "Label for Proxmox username (e.g. root@pam)."
   },
-  "serverFieldUsernameHint": "root@pam",
+  "serverFieldUsernameHint": "e.g. root",
   "@serverFieldUsernameHint": {
     "description": "Hint for username field."
   },
@@ -279,6 +279,46 @@
   "serverApiTokenErrorEmpty": "Enter your API token.",
   "@serverApiTokenErrorEmpty": {
     "description": "Validation when API token is required but empty."
+  },
+  "serverFieldRealm": "Realm",
+  "@serverFieldRealm": {
+    "description": "Proxmox auth realm (pam, pve, ldap, …)."
+  },
+  "serverRealmPam": "Linux PAM (pam)",
+  "@serverRealmPam": {
+    "description": "Preset realm label for pam."
+  },
+  "serverRealmPve": "Proxmox VE (pve)",
+  "@serverRealmPve": {
+    "description": "Preset realm label for pve."
+  },
+  "serverRealmOther": "Other…",
+  "@serverRealmOther": {
+    "description": "Custom realm option in dropdown."
+  },
+  "serverFieldRealmCustom": "Custom realm",
+  "@serverFieldRealmCustom": {
+    "description": "Label for text field when realm is Other."
+  },
+  "serverFieldRealmCustomHint": "e.g. ldap",
+  "@serverFieldRealmCustomHint": {
+    "description": "Hint for custom realm."
+  },
+  "serverRealmErrorEmpty": "Enter a realm.",
+  "@serverRealmErrorEmpty": {
+    "description": "Validator when custom realm is empty."
+  },
+  "serverRealmErrorInvalid": "Realm must not contain spaces or @.",
+  "@serverRealmErrorInvalid": {
+    "description": "Validator for custom realm characters."
+  },
+  "serverLoginComposeHint": "Sign-in uses login@realm (set below).",
+  "@serverLoginComposeHint": {
+    "description": "Helper under username/realm for password auth."
+  },
+  "serverUsernameErrorContainsAt": "Enter only the login name here. Choose the realm below.",
+  "@serverUsernameErrorContainsAt": {
+    "description": "Validator when user types @ in login field."
   },
   "serverUsernameErrorEmpty": "Enter your Proxmox user name.",
   "@serverUsernameErrorEmpty": {
@@ -333,6 +373,16 @@
   "errorProxmoxUnknown": "Something went wrong. Try again.",
   "@errorProxmoxUnknown": {
     "description": "Fallback for unexpected errors."
+  },
+  "errorProxmoxTechnicalDetails": "{detail}",
+  "@errorProxmoxTechnicalDetails": {
+    "description": "Second line after summary; detail may be English from Proxmox, Dio, or a proxy.",
+    "placeholders": {
+      "detail": {
+        "type": "String",
+        "example": "Connection refused"
+      }
+    }
   },
   "serverConnectionTestSuccess": "Connected. Proxmox version {version}.",
   "@serverConnectionTestSuccess": {
@@ -815,6 +865,22 @@
   "settingsAppearanceSection": "Appearance",
   "@settingsAppearanceSection": {
     "description": "Settings section: theme / display."
+  },
+  "settingsTroubleshootingSection": "Troubleshooting",
+  "@settingsTroubleshootingSection": {
+    "description": "Settings section: connection diagnostics and advanced options."
+  },
+  "settingsVerboseConnectionErrors": "Verbose connection errors",
+  "@settingsVerboseConnectionErrors": {
+    "description": "Toggle: show a technical dialog after a failed Test connection."
+  },
+  "settingsVerboseConnectionErrorsSubtitle": "After a failed connection test, show technical details in a dialog (types, messages, HTTP status). Passwords are never shown.",
+  "@settingsVerboseConnectionErrorsSubtitle": {
+    "description": "Subtitle for verbose connection errors toggle."
+  },
+  "connectionDiagnosticsTitle": "Connection diagnostics",
+  "@connectionDiagnosticsTitle": {
+    "description": "AlertDialog title after failed test when verbose is on."
   },
   "settingsThemeDark": "Dark",
   "@settingsThemeDark": {

@@ -87,6 +87,14 @@ chore: bump flutter_riverpod to 3.1.0
 
 ---
 
+## Reverse proxies, Cloudflare Tunnel, and `/api2/json`
+
+ProxDroid talks to Proxmox over **`https://<host>:<port>/api2/json/`** (same JSON API as the web UI). Any reverse proxy, TLS terminator, or **Cloudflare Tunnel** in front of the node must forward **`/api2/json/*`** to the same backend as the Proxmox web interface—not only static HTML or the root path.
+
+If connection tests fail with a message about **HTML instead of JSON**, the tunnel or ingress rules are likely not routing the API. In the app, enable **Settings → Troubleshooting → Verbose connection errors** to see more detail after a failed **Test connection**.
+
+---
+
 ## Integration tests / live PVE
 
 End-to-end tests live under `integration_test/` (see `integration_test/app_test.dart`). Tag each test with `tags: ['integration']` on `testWidgets` so you can run them selectively with `--tags integration`.

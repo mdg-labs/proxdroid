@@ -19,8 +19,21 @@ ProxmoxException mapDioException(DioException e) {
     case DioExceptionType.connectionError:
       return NetworkException(e.message);
     case DioExceptionType.badResponse:
-      final code = e.response?.statusCode ?? 0;
-      final msg = _messageFromResponse(e.response?.data);
+      final resp = e.response;
+      final rawData = resp?.data;
+      final contentType =
+          resp?.headers.value('content-type')?.toLowerCase() ?? '';
+      if (rawData is String &&
+          (rawData.trimLeft().startsWith('<') ||
+              contentType.contains('text/html'))) {
+        return const NetworkException(
+          'Received HTML instead of the Proxmox API JSON. '
+          'Ensure your reverse proxy or Cloudflare tunnel forwards paths under '
+          '/api2/json/ to Proxmox.',
+        );
+      }
+      final code = resp?.statusCode ?? 0;
+      final msg = _messageFromResponse(rawData);
       if (code == 401) {
         return AuthException(msg);
       }

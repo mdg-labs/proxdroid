@@ -41,5 +41,25 @@ final appThemeModeProvider = NotifierProvider<AppThemeMode, ThemeMode>.internal(
 );
 
 typedef _$AppThemeMode = Notifier<ThemeMode>;
+String _$verboseConnectionErrorsHash() =>
+    r'd521bf5f075cb99202eab64be295285cf970c4db';
+
+/// When true, a failed server "Test connection" shows a technical [AlertDialog].
+///
+/// Copied from [VerboseConnectionErrors].
+@ProviderFor(VerboseConnectionErrors)
+final verboseConnectionErrorsProvider =
+    NotifierProvider<VerboseConnectionErrors, bool>.internal(
+      VerboseConnectionErrors.new,
+      name: r'verboseConnectionErrorsProvider',
+      debugGetCreateSourceHash:
+          const bool.fromEnvironment('dart.vm.product')
+              ? null
+              : _$verboseConnectionErrorsHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$VerboseConnectionErrors = Notifier<bool>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
