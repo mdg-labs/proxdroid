@@ -14,7 +14,7 @@
 | **Phase 0** | Project setup & infrastructure | App builds, CI passes, empty shell runs on device |
 | **Phase 1** | API foundation & server management | Can authenticate and connect to a live PVE instance |
 | **Phase 2** | Node, VM & container overview | Can view all nodes, VMs and containers with live status |
-| **Phase 3** | VM & container actions + task viewer | Can start, stop, reboot VMs/containers and track tasks |
+| **Phase 3** | VM & container actions + task viewer | Can start, stop, force stop, and reboot VMs/containers and track tasks |
 | **Phase 4** | Resource monitoring charts | Full real-time charts for CPU, RAM, network, disk I/O |
 | **Phase 5** | Storage & backup management | Can browse storage and trigger/view backups |
 | **Phase 6** | Polish & release prep | App is stable, polished, and released on Play Store, F-Droid, and GitHub |
@@ -37,13 +37,14 @@
 - [ ] Add GitHub PR template: `.github/pull_request_template.md`
 - [ ] Add `.gitignore` for Flutter/Dart (include `*.jks`, `*.keystore`, `key.properties`)
 - [ ] Set up branch protection on `main` (require PR + CI pass)
+- [ ] Create `.cursor/rules/` directory with rule files enforcing project architecture, Riverpod patterns, Freezed usage, feature-first folder structure, go_router conventions, Proxmox API patterns, and naming conventions (see `ProxDroid_Architecture.md` §3 Cursor IDE Rules for full list)
 
 ### 0.2 Flutter Project
 - [ ] Initialize Flutter project (`flutter create --org com.mdglabs proxdroid`)
   - This sets the Android application ID to `com.mdglabs.proxdroid` — decide and set this now; it cannot be changed after Play Store submission or F-Droid inclusion
 - [ ] Remove default counter app boilerplate (`lib/main.dart` content, `test/widget_test.dart`)
 - [ ] Set minimum SDK to Android API 26 in `android/app/build.gradle`
-- [ ] Add all dependencies to `pubspec.yaml` (Riverpod, Dio, Freezed, go_router, hive_ce + hive_ce_flutter, fl_chart, flutter_secure_storage, connectivity_plus, package_info_plus, url_launcher, intl)
+- [ ] Add all dependencies to `pubspec.yaml` (Riverpod, Dio, Freezed, go_router, hive_ce + hive_ce_flutter, fl_chart, flutter_secure_storage, connectivity_plus, package_info_plus, url_launcher, intl, flutter_localizations); set `flutter: generate: true` in `pubspec.yaml`; add `l10n.yaml` at project root
 - [ ] Run `flutter pub get` and confirm no version conflicts
 - [ ] Set up `build_runner` and confirm code generation works (`dart run build_runner build`)
 
@@ -52,11 +53,16 @@
 - [ ] Add placeholder `// TODO` files in each feature folder so the structure is visible in git
 - [ ] Set up `app/theme/app_colors.dart` with initial dark theme color palette
 - [ ] Set up `app/theme/app_theme.dart` with `ThemeData` for dark (default) and light
+- [ ] Create `lib/l10n/` directory with initial `app_en.arb` file containing Proxmox-aligned UI string keys for entities (Node, VirtualMachine, Container, Storage, Task, Backup), actions (start, stop, forceStop, reboot), status values (running, stopped, paused, unknown, online, offline), resource metrics (cpu, memory, disk, network, uptime), and UI sections (dashboard, settings, about, servers)
+- [ ] Add `l10n.yaml` at project root (`arb-dir: lib/l10n`, `template-arb-file: app_en.arb`, `output-localization-file: app_localizations.dart`)
+- [ ] Run `flutter gen-l10n` and confirm `AppLocalizations` is generated without errors
 
 ### 0.4 App Skeleton
 - [ ] Set up `main.dart` with `ProviderScope` wrapping the app
 - [ ] Set up `app/app.dart` as root `MaterialApp.router` with go_router
+  - Once `flutter gen-l10n` has run in Phase 0.3, add the generated import to `app.dart`: `import 'package:flutter_gen/gen_l10n/app_localizations.dart';` (exact path follows `l10n.yaml` defaults and `flutter gen-l10n` output); then wire `localizationsDelegates: AppLocalizations.localizationsDelegates` and `supportedLocales: AppLocalizations.supportedLocales` into `MaterialApp.router`
 - [ ] Set up `app/router.dart` with placeholder routes for all screens
+  - Note: the `/` root redirect behavior (→ `/servers` or `/dashboard` based on `selectedServerProvider`) is scaffolded as a placeholder here; the full redirect logic is wired in **Phase 1.4** once `selectedServerProvider` is implemented
 - [ ] Create empty placeholder screens for: servers, dashboard, VMs, containers, storage, backups, tasks, settings
 - [ ] Confirm app launches and navigates between placeholder screens
 
@@ -90,7 +96,7 @@
 - [ ] Run `build_runner` and confirm generated files are correct
 
 ### 1.2 Local Storage
-- [ ] Add `hive_ce` and `hive_ce_flutter` packages (**not** the unmaintained `hive`/`hive_flutter` — see Architecture §11); list both as explicit direct dependencies
+- [ ] Confirm `hive_ce` and `hive_ce_flutter` are listed in `pubspec.yaml` (added in Phase 0.2 — **not** the unmaintained `hive`/`hive_flutter`; see Architecture §11); Phase 1 task is initialization and adapter registration, not adding the dependency
 - [ ] Initialize `hive_ce` in `main.dart` for non-sensitive data (server names, hostnames, preferences)
 - [ ] Register `TypeAdapter`s for the `Server` model with hive_ce (excluding credentials — credentials live in flutter_secure_storage only)
 - [ ] Initialize `flutter_secure_storage` for sensitive data (API tokens, passwords) – stored encrypted using Android Keystore
@@ -118,7 +124,9 @@
 - [ ] Implement `ServerListNotifier` (Riverpod) – manages list of servers, persists via hive_ce
 - [ ] Implement `selectedServerProvider` – tracks which server is currently active; returns `null` when no server is configured
 - [ ] Implement `apiClientProvider` – creates `ProxmoxApiClient` for the selected server; watches (not reads) `selectedServerProvider` so all API providers invalidate on server switch
-- [ ] Implement go_router `redirect` callback: if `selectedServerProvider` is null, redirect all routes to `/servers` so API providers never fire without a server
+- [ ] Wire go_router `refreshListenable` so the `redirect` callback re-executes whenever `selectedServerProvider` changes (see Architecture §9 for pattern options); without this, adding the first server will not automatically re-route to `/dashboard`
+- [ ] For MVP: implement `selectedServerProvider` as a `StateProvider` defaulting to `servers.first`; add a comment noting that a full `Notifier`-based implementation with persisted selection ID is the recommended upgrade once multi-server switching is a priority
+- [ ] Implement go_router `redirect` callback: if `selectedServerProvider` is null, redirect **API-requiring routes** (e.g. `/dashboard`, `/vms`, `/containers`, `/storage`, `/backups`, `/tasks`) to `/servers`; the routes `/servers`, `/servers/add`, `/servers/edit/:serverId`, and `/settings` must remain accessible without a configured server (otherwise onboarding is impossible)
 
 ### 1.5 Add Server UI
 - [ ] Build `ServerListScreen` – shows all saved servers, empty state with CTA
@@ -193,14 +201,16 @@
 
 ## Phase 3 – VM & Container Actions + Task Viewer
 
-**Goal:** The user can perform power actions (start, stop, reboot) on VMs and containers, and view running and past tasks with their status and log output.
+**Goal:** The user can perform power actions (start, stop, force stop, and reboot) on VMs and containers, and view running and past tasks with their status and log output.
 
 ### 3.1 API Methods
 - [ ] Implement `POST /nodes/{node}/qemu/{vmid}/status/start`
-- [ ] Implement `POST /nodes/{node}/qemu/{vmid}/status/stop` (graceful, with optional `forceStop=1` body param)
+- [ ] Implement `POST /nodes/{node}/qemu/{vmid}/status/shutdown` → graceful ACPI shutdown; optional `forceStop` param forces an immediate stop if the guest has not shut down within `timeout` seconds
+- [ ] Implement `POST /nodes/{node}/qemu/{vmid}/status/stop` → immediate power-off (Force Stop; no ACPI, equivalent to pulling the power cord)
 - [ ] Implement `POST /nodes/{node}/qemu/{vmid}/status/reboot`
 - [ ] Implement `POST /nodes/{node}/lxc/{ctid}/status/start`
-- [ ] Implement `POST /nodes/{node}/lxc/{ctid}/status/stop` (graceful, with optional `forceStop=1` body param)
+- [ ] Implement `POST /nodes/{node}/lxc/{ctid}/status/shutdown` → graceful shutdown signal; optional `forceStop` param forces stop after timeout
+- [ ] Implement `POST /nodes/{node}/lxc/{ctid}/status/stop` → immediate stop (Force Stop)
 - [ ] Implement `POST /nodes/{node}/lxc/{ctid}/status/reboot`
 - [ ] Implement `GET /nodes/{node}/tasks` → list of tasks (supports `start` and `limit` query params for pagination — implement pagination from the start)
 - [ ] Implement `GET /nodes/{node}/tasks/{upid}/status` → task status
@@ -212,8 +222,8 @@
 
 ### 3.3 Actions in VM/Container Detail
 - [ ] Add action buttons to `VmDetailScreen`: Start, Stop, Force Stop, Reboot
-  - **Stop** → `POST .../status/stop` (sends ACPI shutdown signal – graceful)
-  - **Force Stop** → `POST .../status/stop` with `forceStop=1` body param (immediate kill)
+  - **Stop** → `POST .../status/shutdown` (sends ACPI shutdown signal – graceful; the OS shuts down cleanly)
+  - **Force Stop** → `POST .../status/stop` (immediate power-off, like pulling the power cord – no ACPI signal sent)
 - [ ] Show buttons only when action is valid (e.g. no Start when already running)
 - [ ] Show confirmation dialog before Stop, Force Stop, and Reboot
   - Force Stop dialog must clearly warn that the action is immediate and may cause data loss
@@ -225,7 +235,7 @@
 
 ### 3.4 Task Repository & Providers
 - [ ] Implement `TaskRepository` with:
-  - `getTasks(node, {int start = 0, int limit = 50})` – paginated; Proxmox has no `/cluster/tasks`, so tasks must be fetched per-node
+  - `getTasks(node, {int start = 0, int limit = 50})` – paginated; use `GET /nodes/{node}/tasks` per-node (while Proxmox VE does expose `GET /cluster/tasks`, it returns only recent tasks with limited pagination — the per-node endpoint provides full task history with proper pagination and is the preferred approach for the task viewer)
   - `getTaskStatus(node, upid)` – node is required for the status endpoint
   - `getTaskLog(node, upid, {int start = 0, int limit = 500})` – paginated log lines
 - [ ] Implement `taskListProvider` – fetches tasks from all known nodes and merges, sorted by start time descending; uses `nodeListProvider` to enumerate nodes
@@ -237,7 +247,7 @@
   - Note: `Task.upid` encodes the node, type, PID, and VMID — parse the UPID to extract VMID, then resolve VMID → name via the VM/container list; if the VM no longer exists, fall back to displaying the raw VMID
 - [ ] Color-code status: running (blue), ok (green), error (red)
 - [ ] Build `TaskDetailScreen` – full task log output in monospace font, auto-scroll to bottom
-- [ ] Wire up go_router: `/tasks`, `/tasks/:node/:upid`
+- [ ] Wire up go_router: `/tasks`, `/tasks/:node/:upid` — **percent-encode** the UPID when pushing the route (`Uri.encodeComponent(upid)`) and decode it in the receiving screen (`Uri.decodeComponent(upidParam)`); see Architecture §8 for the reason (UPIDs contain colons that must not be treated as path separators)
 
 ---
 
@@ -249,11 +259,11 @@
 - [ ] Implement `GET /nodes/{node}/qemu/{vmid}/rrddata` – historical resource data (timeframe: hour/day/week)
 - [ ] Implement `GET /nodes/{node}/lxc/{ctid}/rrddata` – same for containers
 - [ ] Implement `GET /nodes/{node}/rrddata` – node-level resource data
-- [ ] Support `timeframe` parameter: `hour`, `day`, `week`, `month`, `year` (expose `hour`, `day`, `week`, `month` in the UI timeframe selector; `year` is optional)
+- [ ] Support `timeframe` parameter: `hour`, `day`, `week`, `month` — expose all four in the UI timeframe selector; `year` is **not** exposed in the MVP UI (API supports it but granularity is too low to be useful on a small screen) and is **not** included in the `ChartTimeframe` enum
 
 ### 4.2 Chart Data Models
 - [ ] Implement `ResourceDataPoint` model in `core/models/resource_data_point.dart` (Freezed) – fields: timestamp, cpu, mem, netIn, netOut, diskRead, diskWrite
-- [ ] Implement `ChartTimeframe` enum in same file: `hour`, `day`, `week`, `month`
+- [ ] Implement `ChartTimeframe` enum in same file: `hour`, `day`, `week`, `month` (year is intentionally excluded — see §4.1)
 
 ### 4.3 Chart Widgets
 - [ ] Implement reusable `ResourceLineChart` widget (`shared/widgets/resource_chart.dart`)
@@ -378,6 +388,13 @@
 - [ ] Write release notes from `CHANGELOG.md` (do not write from scratch — `CHANGELOG.md` should have been maintained throughout development)
 - [ ] Attach signed APK to GitHub Release
 - [ ] Update `README.md` with download badges (Play Store + F-Droid + GitHub Releases)
+
+### 6.7 Localization & Terminology Review
+- [ ] Audit all screens for hard-coded UI strings — move any remaining strings to `lib/l10n/app_en.arb`
+- [ ] Verify all ARB keys use Proxmox-aligned terminology (Node, Virtual Machine, Container, Storage, Task, Backup — consistent with Proxmox web UI labels)
+- [ ] Run `flutter gen-l10n` and confirm clean generation with no missing keys
+- [ ] Verify all `ProxmoxException` error messages are surfaced via localized strings (not hard-coded in the exception class)
+- [ ] Review release-facing strings: Play Store listing description, Privacy Policy URL, in-app About screen — ensure consistency with ARB keys
 
 ---
 

@@ -36,6 +36,24 @@ This document defines the technical architecture of ProxDroid. All decisions fol
 | Local Storage | **hive_ce** + **flutter_secure_storage** | hive_ce (community-maintained Hive fork) for non-sensitive data; flutter_secure_storage for credentials (Android Keystore) |
 | Code Generation | **build_runner** + **riverpod_generator** | Required for Freezed + Riverpod Generator |
 | CI/CD | **GitHub Actions** | Free for open source |
+| Localization | **flutter_localizations** + **intl** + ARB files + gen_l10n | Official Flutter i18n approach; ARB files under `lib/l10n/`; `gen_l10n` generates type-safe `AppLocalizations` class |
+| IDE / Rules | **Cursor** + `.cursor/rules/` | Rule files enforce Riverpod patterns, Freezed usage, feature-first folder layout, go_router conventions, naming conventions, and API client patterns; prevents agent drift during AI-assisted development |
+
+### Cursor IDE Rules (`.cursor/rules/`)
+
+Cursor rule files live under `.cursor/rules/` at the repository root. Each rule file enforces a specific domain:
+
+| Rule file | Enforces |
+|---|---|
+| `flutter-dart-style.mdc` | `dart format`; feature-first folder layout matching §4; file naming (`*_screen.dart`, `*_repository.dart`, `*_providers.dart`, `*_notifier.dart`) |
+| `riverpod.mdc` | Code-gen (`@riverpod`); `ref.watch` (never `ref.read`) for `selectedServerProvider` in `apiClientProvider`; async notifier vs FutureProvider conventions; provider file placement under `features/*/providers/` |
+| `freezed-json.mdc` | Freezed + json_serializable for API models; `part` file order; no mutable API models; sealed exception pattern from §10 |
+| `go-router.mdc` | Route paths match §8 table; typed path params (`:node`, `:vmid`, `:ctid`, `:upid`, `:serverId`, `:storage`); redirect rules for null `selectedServerProvider` |
+| `proxmox-api.mdc` | HTTPS-only validation; Dio v5 `IOHttpClientAdapter` only (no v4); auth header formats; `GET /cluster/resources` preference over per-node list calls |
+| `hive-secure-storage.mdc` | Credentials only in `flutter_secure_storage`; metadata in hive_ce; no credentials on the `Server` Freezed model |
+| `ui-patterns.mdc` | Optimistic UI only for non-destructive reads (see PRD §6); Material 3; shared widget locations (`shared/widgets/`) |
+
+> These rules are created in **Phase 0** of the Roadmap (see `ProxDroid_Roadmap.md` §Phase 0.1).
 
 ---
 
@@ -127,18 +145,29 @@ lib/
 │       └── ui/
 │           └── settings_screen.dart
 │
-└── shared/
-    ├── widgets/
-    │   ├── resource_chart.dart       # Reusable chart widget
-    │   ├── status_badge.dart
-    │   ├── error_view.dart           # Error message + retry button
-    │   ├── loading_shimmer.dart
-    │   └── empty_state.dart          # Icon + message for empty lists
-    ├── constants/
-    │   └── api_endpoints.dart        # All API paths in one place
-    └── providers/
-        └── connectivity_provider.dart # Streams ConnectivityResult; drives offline banner
+├── shared/
+│   ├── widgets/
+│   │   ├── resource_chart.dart       # Reusable chart widget
+│   │   ├── status_badge.dart
+│   │   ├── error_view.dart           # Error message + retry button
+│   │   ├── loading_shimmer.dart
+│   │   └── empty_state.dart          # Icon + message for empty lists
+│   ├── constants/
+│   │   └── api_endpoints.dart        # All API paths in one place
+│   └── providers/
+│       └── connectivity_provider.dart # Streams ConnectivityResult; drives offline banner
+│
+└── l10n/
+    └── app_en.arb            # English ARB file — base locale; Proxmox-aligned UI label keys
 ```
+
+> **`l10n.yaml`** lives at the **project root** (same level as `pubspec.yaml`) and configures `gen_l10n`:
+> ```yaml
+> arb-dir: lib/l10n
+> template-arb-file: app_en.arb
+> output-localization-file: app_localizations.dart
+> ```
+> Enable code generation: set `flutter: generate: true` in `pubspec.yaml`.
 
 ---
 
@@ -196,6 +225,8 @@ enum VmStatus { running, stopped, paused, unknown }
 // LXC containers do not have a paused state — use a separate enum to avoid exposing an invalid state
 enum ContainerStatus { running, stopped, unknown }
 ```
+
+> **Post-MVP note:** `VmStatus` will be extended with a `suspended` state when the Suspend/Resume feature is implemented (see Roadmap Post-MVP). `ContainerStatus` will not change — LXC containers do not support suspend.
 
 Core models: `Server`, `Node`, `Vm`, `Container`, `Task`, `BackupJob`, `BackupContent`, `Storage`, `ResourceDataPoint`
 
@@ -266,6 +297,8 @@ if (allowSelfSigned) {
 
 > **Note:** All Proxmox API calls require both `node` and the resource ID. Routes include `:node` to keep all navigation self-contained without relying on provider state for the node lookup.
 
+> **UPID encoding in routes:** Proxmox UPIDs contain colons and other characters that are not safe in raw URL path segments (example: `UPID:node:0000ABCD:00000001:5F3E45A2:qmstart:100:root@pam:`). When constructing the `/tasks/:node/:upid` route, **percent-encode** the UPID before pushing to go_router (e.g. `Uri.encodeComponent(upid)`), and decode it in the receiving screen (`Uri.decodeComponent(upidParam)`). Without encoding, the colons in the UPID will be misinterpreted as path separators and navigation will fail.
+
 ---
 
 ## 9. State Management – Riverpod Patterns
@@ -315,6 +348,8 @@ final selectedServerProvider = StateProvider<Server?>((ref) {
 });
 ```
 
+> **Implementation note — preserving user selection:** The `StateProvider` shown above watches `serverListNotifierProvider`. In Riverpod, this means the provider **rebuilds** whenever the server list changes (add, remove, edit). On every rebuild, state resets to `servers.first`, discarding any explicit selection the user made. For MVP with a short server list this is acceptable, but the correct production pattern is: (1) persist the **selected server ID** (not the full object) in hive_ce; (2) implement `selectedServerProvider` as a `@riverpod class` `Notifier<Server?>` that loads the persisted ID on `build()`, falls back to `servers.first` if the persisted ID is not in the list, and persists the new ID when the user explicitly switches servers.
+
 ### Server-switching invalidation (how it works)
 
 `apiClientProvider` watches `selectedServerProvider`. When the user switches servers, `selectedServerProvider` emits a new value, Riverpod rebuilds `apiClientProvider`, and because every API data provider `watch`es `apiClientProvider`, they are all invalidated and rebuilt in turn. This chain only works if `apiClientProvider` uses `ref.watch` — never `ref.read` — for `selectedServerProvider`.
@@ -327,7 +362,9 @@ ProxmoxApiClient apiClient(Ref ref) {
 }
 ```
 
-> **Null safety:** On first launch (no servers configured), `selectedServerProvider` holds `null`. `apiClientProvider` should guard against this — either by throwing a typed exception that the UI catches to redirect to `/servers`, or by making `apiClientProvider` return `null` and having all API providers short-circuit gracefully. The recommended approach is to redirect to `/servers` via go_router's `redirect` callback when `selectedServerProvider` is null, so API providers never fire without a server.
+> **go_router `redirect` refresh:** go_router's `redirect` callback runs on navigation events but does **not** automatically re-execute when Riverpod state changes. To ensure `redirect` re-runs when `selectedServerProvider` changes (e.g. after the user adds the first server), wire go_router's **`refreshListenable`** parameter to a `ChangeNotifier` that notifies whenever `selectedServerProvider` emits. The recommended pattern is to expose the `GoRouter` instance as a Riverpod **`@riverpod` provider** that watches `selectedServerProvider`: when the provider rebuilds (server added/switched), the `GoRouter` instance is recreated with the updated redirect logic. Alternatively, use a `ChangeNotifier` subclass that calls `notifyListeners()` inside a `ref.listen` on `selectedServerProvider`, and pass it as `GoRouter(refreshListenable: ...)`. Without this wiring, the redirect fires correctly during navigation events but will not automatically re-route when the server state changes between navigations (e.g. first server saved with no pending navigation).
+
+> **Null safety:** On first launch (no servers configured), `selectedServerProvider` holds `null`. `apiClientProvider` should guard against this — either by throwing a typed exception that the UI catches to redirect to `/servers`, or by making `apiClientProvider` return `null` and having all API providers short-circuit gracefully. The recommended approach is to redirect **API-requiring routes** (e.g. `/dashboard`, `/vms`, `/containers`, `/storage`, `/backups`, `/tasks`) to `/servers` via go_router's `redirect` callback when `selectedServerProvider` is null, so API providers never fire without a server. The routes `/servers`, `/servers/add`, `/servers/edit/:serverId`, and `/settings` must remain accessible with a null server — otherwise onboarding is impossible.
 
 ### Connectivity check
 
@@ -361,6 +398,10 @@ These are translated into human-readable messages in the UI. `ApiTimeoutExceptio
 ## 11. pubspec.yaml – Dependencies
 
 ```yaml
+flutter:
+  uses-material-design: true
+  generate: true               # Required for gen_l10n to generate AppLocalizations from lib/l10n/app_en.arb
+
 dependencies:
   flutter:
     sdk: flutter
@@ -377,14 +418,17 @@ dependencies:
   # Storage
   hive_ce: ^2.x                # Core Hive CE API – list as explicit direct dependency (do not rely on transitive)
   hive_ce_flutter: ^2.x        # Flutter integration for hive_ce (initialisation, path provider)
-  flutter_secure_storage: ^9.x # Sensitive data (API tokens, passwords) – encrypted via Android Keystore
+  flutter_secure_storage: ^9.x # Sensitive data (API tokens, passwords) – encrypted via Android Keystore; verify current major at implementation (was 9.x → 10.x transition exists)
   # Charts
-  fl_chart: ^0.x
+  fl_chart: ^0.66.0            # Charts & visualizations — verify latest stable at implementation
   # Utilities
   connectivity_plus: ^6.x      # Network availability detection; drives offline banner + API call gating
-  package_info_plus: ^8.x      # Show app version in Settings/About
+  package_info_plus: ^8.x      # Show app version in Settings/About; verify current major at implementation
   url_launcher: ^6.x           # Open donation links, GitHub URL from the app
-  intl: ^0.x                   # Date/time formatting (task timestamps, backup dates) – not used for full i18n
+  intl: ^0.20.0                 # Date/time formatting AND generated app localizations (flutter_localizations + ARB + gen_l10n)
+  # Localization
+  flutter_localizations:       # SDK package — included with Flutter; not on pub.dev
+    sdk: flutter
 
 dev_dependencies:
   build_runner: ^2.x
@@ -407,7 +451,7 @@ dev_dependencies:
 | **Phase 0** | Repo, Flutter project, CI/CD skeleton | Everything runs, empty app skeleton |
 | **Phase 1** | API client, auth (token + password), SSL, add server | Can connect to a PVE instance |
 | **Phase 2** | Node overview, VM/container list & status | Basic monitoring working |
-| **Phase 3** | VM/container start/stop/reboot, task viewer | First real management actions |
+| **Phase 3** | VM/container start/stop/force stop/reboot, task viewer | First real management actions |
 | **Phase 4** | Charts (CPU, RAM, network, disk I/O) | Monitoring complete |
 | **Phase 5** | Storage, backup list & manual trigger | MVP feature-complete |
 | **Phase 6** | Polish, error handling, UX details | MVP release-ready |

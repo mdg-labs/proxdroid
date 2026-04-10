@@ -33,12 +33,13 @@ Proxmox VE is a widely used virtualization platform, especially in the homelab s
 
 ### 3.1 Primary Goals (MVP)
 
-- Full VM and container management (start, stop, reboot, status)
+- Full VM and container management (start, stop, force stop, reboot, status)
 - Resource monitoring with real-time charts (CPU, RAM, network, disk I/O)
 - Storage overview, backup list, and manual backup trigger
 - Multi-server support from day one
 - Modern dark-theme UI with charts and visualizations
 - Reliable Proxmox REST API integration including self-signed certificate support
+- Localization-ready UI: all user-visible strings externalized via Flutter ARB files and `gen_l10n`; English as the base locale; UI terminology aligned with Proxmox VE web UI (Node, Virtual Machine, Container, Storage, Task, Backup, etc.)
 
 ### 3.2 Secondary Goals (Post-MVP)
 
@@ -66,6 +67,7 @@ Proxmox VE is a widely used virtualization platform, especially in the homelab s
 | **Local Storage** | hive_ce (non-sensitive data) + flutter_secure_storage (credentials) |
 | **CI/CD** | GitHub Actions |
 | **Distribution** | Google Play Store + F-Droid + GitHub Releases (APK) |
+| **Localization** | flutter_localizations (SDK) + intl + ARB files + gen_l10n |
 
 ### 4.2 API Integration
 
@@ -119,6 +121,7 @@ Multi-server support is built into the architecture from day one. Users can add 
 - Fast load times – optimistic UI updates for read-only state; **never** for destructive or power actions (start/stop/reboot must reflect actual server state after the task completes)
 - Error messages clear and human-readable (no raw API error output)
 - Simple onboarding – add a server in under 60 seconds
+- Localization-ready by default: all user-visible strings defined in ARB files (`lib/l10n/app_en.arb`); no hard-coded copy in widgets; UI labels follow Proxmox VE terminology for consistency with the Proxmox web UI
 
 ---
 
@@ -219,7 +222,10 @@ No ads. Free. Exclusively voluntary donations:
 | `connectivity_plus` | Network availability detection | [pub.dev/packages/connectivity_plus](https://pub.dev/packages/connectivity_plus) |
 | `package_info_plus` | App version info for Settings/About screen | [pub.dev/packages/package_info_plus](https://pub.dev/packages/package_info_plus) |
 | `url_launcher` | Open donation and GitHub links from within the app | [pub.dev/packages/url_launcher](https://pub.dev/packages/url_launcher) |
-| `intl` | Date/time formatting for task timestamps and backup dates | [pub.dev/packages/intl](https://pub.dev/packages/intl) |
+| `intl` | Date/time formatting and generated app localizations (via `flutter_localizations` + ARB files + `gen_l10n`) | [pub.dev/packages/intl](https://pub.dev/packages/intl) |
+| `flutter_localizations` | SDK package for Material and Cupertino localization delegates (included with Flutter SDK, not a pub.dev package) | [docs.flutter.dev/accessibility-and-localization/internationalization](https://docs.flutter.dev/accessibility-and-localization/internationalization) |
+
+> **Development tooling:** Cursor IDE rules live under `.cursor/rules/` in the repository root and enforce project architecture, Riverpod patterns, Freezed usage, feature-first folder structure, go_router conventions, and naming conventions. These are set up in Phase 0 of the Roadmap.
 
 ### Tools & Infrastructure
 
