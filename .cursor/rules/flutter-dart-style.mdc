@@ -1,7 +1,7 @@
 ---
 description: Flutter/Dart code style, file naming, and folder structure conventions
-globs: ["lib/**/*.dart"]
-alwaysApply: true
+globs: lib/**/*.dart
+alwaysApply: false
 ---
 
 # Flutter & Dart Style

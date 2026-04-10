@@ -24,10 +24,17 @@ responsibilities are:
 - Read all relevant docs in full before spawning any sub-agent
 - Plan the full sequence of sub-agents before starting
 - Spawn sub-agents sequentially by default; sub-agents MAY be spawned simultaneously only when each sub-agent operates on a completely different set of files with no overlap
-- After each sub-agent completes, explicitly verify the output against the
-  success criteria defined in the prompt
-- If verification fails, re-spawn the sub-agent with a corrected prompt —
-  never attempt to fix the issue itself
+- After each sub-agent completes, **verify the output for real** — do not trust
+  the sub-agent’s summary alone. Use concrete checks (read files, `grep` for
+  required strings, list directories, run the same commands CI would run when
+  applicable, e.g. `flutter analyze`, `dart format --output=none --set-exit-if-changed .`)
+- If verification is uncertain, error-prone, or security- or config-sensitive,
+  spawn a **read-only verification sub-agent** whose only job is to confirm the
+  checklist against the filesystem and report pass/fail with evidence (file
+  paths + excerpts). That verifier must not modify any files.
+- If verification fails, re-spawn the **implementation** sub-agent with a
+  corrected prompt — never attempt to fix the issue itself (or accept “done”
+  without passing verification)
 - Keep a running mental checklist of what has been completed and what remains
 - After all sub-agents complete, do a final pass to confirm the overall
   outcome matches the original task
@@ -86,15 +93,27 @@ sub-agent completes. Must be checkable without running the app.
 
 ## Verification Protocol
 
-After each sub-agent completes, check:
+After each sub-agent completes, check (using the repo and tools, not memory):
 
-1. **Completeness** — Were all steps in the prompt executed?
+1. **Completeness** — Were all steps in the prompt executed? (evidence: files
+   exist, expected paths touched, commands would succeed.)
 2. **Correctness** — Does the output match the success criteria exactly?
 3. **Scope** — Did the sub-agent stay within its defined constraints?
 4. **Consistency** — Is the output consistent with project docs?
+5. **Config sanity** — For Cursor rules and CI YAML: frontmatter is valid;
+   **never** combine `alwaysApply: true` with `globs` (pick one: global
+   `alwaysApply: true` *without* globs, or `alwaysApply: false` *with* globs so
+   file-scoped rules attach correctly).
 
-If any check fails: do NOT proceed. Re-spawn the same sub-agent with an
-updated prompt that addresses the specific failure.
+**Verifier sub-agent (when needed):** Same five prompt sections as any other
+sub-agent. Task in one sentence: e.g. “Read-only verify Phase 0.2 deliverables
+against the success criteria.” Steps: list exact paths to open, strings or
+values that must be present, and commands to run. Constraints: **no file writes,
+no shell mutations** (read and report only). Success criteria: a checklist with
+pass/fail per item and citations (path + line or command output).
+
+If any check fails: do NOT proceed. Re-spawn the **implementation** sub-agent
+with an updated prompt that addresses the specific failure.
 
 ---
 
@@ -103,7 +122,9 @@ updated prompt that addresses the specific failure.
 1. The orchestrator never touches files directly — not even "just to fix a typo"
 2. Every sub-agent prompt includes all five required sections
 3. Sub-agents always read source docs themselves — never rely on the orchestrator's summary
-4. Verification happens after every sub-agent without exception
-5. A failed verification always results in a re-spawn, never a manual fix
+4. Verification happens after every sub-agent without exception — including
+   substantive checks or a read-only verifier sub-agent when appropriate
+5. A failed verification always results in a re-spawn of the **implementation**
+   sub-agent, never a manual fix by the orchestrator
 6. Sub-agent scope is defined before spawning — never adjusted mid-task
 7. Parallel sub-agents are only allowed when their file scopes are fully non-overlapping — if there is any doubt about file overlap, spawn sequentially

@@ -1,6 +1,7 @@
 ---
 description: UI patterns, Material 3, shared widgets, optimistic UI rules, and localization
-globs: ["lib/**/*.dart"]
+globs: lib/**/*.dart
+alwaysApply: false
 ---
 
 # UI Patterns

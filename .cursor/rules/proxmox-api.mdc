@@ -1,7 +1,7 @@
 ---
 description: Proxmox REST API client patterns, HTTPS enforcement, and Dio v5 conventions
-globs: ["lib/**/*.dart"]
-alwaysApply: true
+globs: lib/**/*.dart
+alwaysApply: false
 ---
 
 # Proxmox API Conventions

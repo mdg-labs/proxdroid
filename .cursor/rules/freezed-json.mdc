@@ -1,7 +1,7 @@
 ---
 description: Freezed and json_serializable conventions for API models
-globs: ["lib/**/*.dart"]
-alwaysApply: true
+globs: lib/**/*.dart
+alwaysApply: false
 ---
 
 # Freezed & JSON Conventions

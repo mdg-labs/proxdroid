@@ -1,7 +1,7 @@
 ---
 description: go_router route definitions, redirect rules, and UPID encoding conventions
-globs: ["lib/**/*.dart"]
-alwaysApply: true
+globs: lib/**/*.dart
+alwaysApply: false
 ---
 
 # go_router Conventions

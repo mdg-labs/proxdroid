@@ -1,7 +1,7 @@
 ---
 description: Storage separation rules — credentials in flutter_secure_storage, metadata in hive_ce
-globs: ["lib/**/*.dart"]
-alwaysApply: true
+globs: lib/**/*.dart
+alwaysApply: false
 ---
 
 # Hive & Secure Storage Conventions

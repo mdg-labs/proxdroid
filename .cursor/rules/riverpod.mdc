@@ -1,7 +1,7 @@
 ---
 description: Riverpod patterns, code-gen conventions, and provider placement rules
-globs: ["lib/**/*.dart"]
-alwaysApply: true
+globs: lib/**/*.dart
+alwaysApply: false
 ---
 
 # Riverpod Conventions
