@@ -83,7 +83,7 @@
   - `dart run build_runner build --delete-conflicting-outputs` (must run before build; generates Freezed/Riverpod code)
   - `flutter gen-l10n`
   - Build release APK (`flutter build apk --release`)
-  - Upload APK as GitHub Release asset
+  - Upload as GitHub Release asset named `proxdroid-<tag>.apk` (e.g. `proxdroid-v1.0.0-beta.1.apk`)
 - [x] Confirm both workflows pass on a clean run (verified locally: `flutter pub get`, format check, `build_runner`, `gen-l10n`, `flutter analyze`, `flutter test` — all exit 0; first GitHub Actions run should still be watched by maintainers)
 
 ---

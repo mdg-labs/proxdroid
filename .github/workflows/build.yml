@@ -30,8 +30,12 @@ jobs:
       - run: flutter gen-l10n
       - run: flutter build apk --release
 
+      # Friendly asset name: proxdroid-<tag>.apk (matches git tag, e.g. proxdroid-v1.0.0-beta.1.apk).
+      - name: Name release APK
+        run: cp build/app/outputs/flutter-apk/app-release.apk "proxdroid-${{ github.ref_name }}.apk"
+
       - name: Upload APK to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           prerelease: true
-          files: build/app/outputs/flutter-apk/app-release.apk
+          files: proxdroid-${{ github.ref_name }}.apk
