@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-beta.1] - 2026-04-10
+
+First public **beta** prerelease on GitHub Releases (APK via CI).
+
 ### Added
 
 - Persistent offline banner when the device has no network connectivity (`connectivity_plus`).
