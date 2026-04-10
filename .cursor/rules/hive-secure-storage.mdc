@@ -1,0 +1,61 @@
+---
+description: Storage separation rules — credentials in flutter_secure_storage, metadata in hive_ce
+globs: ["lib/**/*.dart"]
+alwaysApply: true
+---
+
+# Hive & Secure Storage Conventions
+
+## Credentials Must Use flutter_secure_storage
+
+API tokens and passwords must **only** ever be stored in `flutter_secure_storage`,
+which is backed by the Android Keystore. This is a hard security requirement.
+
+**Never** store credentials (API tokens, passwords, session tickets) in:
+- `hive_ce` boxes
+- `SharedPreferences`
+- Any file-based storage
+
+Credentials are stored keyed by server ID and loaded at runtime when
+constructing `ProxmoxApiClient`.
+
+## Server Freezed Model: No Credential Fields
+
+The `Server` Freezed model must not include credential fields. It stores only
+non-sensitive metadata:
+
+```dart
+@freezed
+class Server with _$Server {
+  const factory Server({
+    required String id,
+    required String name,
+    required String host,
+    required int port,
+    required ServerAuthType authType,
+    required bool allowSelfSigned,
+  }) = _Server;
+  // No apiToken field. No password field. Credentials live in flutter_secure_storage.
+}
+```
+
+## Storage Separation at a Glance
+
+| Data | Storage |
+|---|---|
+| Server name, host, port, authType, allowSelfSigned | `hive_ce` |
+| API token, username/password | `flutter_secure_storage` (keyed by server ID) |
+| Active session ticket + CSRF token (username/password auth) | In-memory only — never persisted |
+| User preferences (theme) | `hive_ce` |
+
+## Loading Credentials at Runtime
+
+Credentials are fetched from `flutter_secure_storage` by server ID when
+building the `ProxmoxApiClient`. They are never stored on the `Server` object
+after loading.
+
+```dart
+final token = await _secureStorage.read(key: 'apiToken_${server.id}');
+final client = ProxmoxApiClient(server: server, apiToken: token);
+// token is not written back to the Server model
+```

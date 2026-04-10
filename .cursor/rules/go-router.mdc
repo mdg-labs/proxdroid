@@ -1,0 +1,79 @@
+---
+description: go_router route definitions, redirect rules, and UPID encoding conventions
+globs: ["lib/**/*.dart"]
+alwaysApply: true
+---
+
+# go_router Conventions
+
+## Route Paths
+
+Route paths must match the table in `docs/ProxDroid_Architecture.md §8`:
+
+```
+/                          → redirect → /servers or /dashboard
+/servers                   → Server list
+/servers/add               → Add server
+/servers/edit/:serverId    → Edit server
+/dashboard                 → Node overview
+/vms                       → VM list
+/vms/:node/:vmid           → VM detail + charts
+/containers                → Container list
+/containers/:node/:ctid    → Container detail
+/storage                   → Storage overview
+/storage/:node/:storage    → Storage detail
+/backups                   → Backup list
+/tasks                     → Task viewer
+/tasks/:node/:upid         → Task detail + log
+/settings                  → Settings
+```
+
+Do not invent new top-level routes. Add sub-routes only when they match a
+feature screen in the roadmap.
+
+## Typed Path Parameters
+
+Use these exact parameter names — other names will break downstream code that
+extracts them by name:
+
+- `:node` — Proxmox node name
+- `:vmid` — VM ID (integer, but passed as string in the path)
+- `:ctid` — Container ID
+- `:upid` — Task UPID (must be percent-encoded — see below)
+- `:serverId` — Local server UUID
+- `:storage` — Storage pool name
+
+## Redirect: Null selectedServerProvider
+
+The go_router `redirect` callback must redirect API-requiring routes to
+`/servers` when `selectedServerProvider` is null (no server configured):
+
+API-requiring routes (redirect to `/servers` when server is null):
+`/dashboard`, `/vms`, `/containers`, `/storage`, `/backups`, `/tasks`
+
+Always-accessible routes (must work without a configured server):
+`/servers`, `/servers/add`, `/servers/edit/:serverId`, `/settings`
+
+Without this redirect, API providers fire without a server and crash.
+
+## UPID Percent-Encoding
+
+Proxmox UPIDs contain colons (e.g. `UPID:node:0000ABCD:00000001:5F3E45A2:qmstart:100:root@pam:`).
+Raw colons in a URL path segment are interpreted as path separators by go_router
+and will cause navigation to fail.
+
+When pushing `/tasks/:node/:upid`, always percent-encode the UPID:
+
+```dart
+// Pushing the route — encode the UPID
+context.push('/tasks/$node/${Uri.encodeComponent(upid)}');
+```
+
+When receiving the UPID in the destination screen, decode it:
+
+```dart
+// In TaskDetailScreen — decode the param
+final upid = Uri.decodeComponent(state.pathParameters['upid']!);
+```
+
+Never push a raw UPID into the URL path without encoding.

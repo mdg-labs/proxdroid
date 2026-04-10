@@ -1,0 +1,75 @@
+---
+description: Proxmox REST API client patterns, HTTPS enforcement, and Dio v5 conventions
+globs: ["lib/**/*.dart"]
+alwaysApply: true
+---
+
+# Proxmox API Conventions
+
+## HTTPS Only
+
+Always use HTTPS. The app must never initiate an HTTP connection to a PVE server.
+
+Validate in the Add Server form that the host input does not contain `http://`.
+Display a clear, human-readable error if it does. Android API 28+ blocks
+cleartext HTTP at the OS level with cryptic errors — catching this early in the
+UI provides far better UX. Do not add `android:usesCleartextTraffic` to the
+manifest.
+
+## Dio v5: IOHttpClientAdapter
+
+For self-signed certificate override, use Dio v5's `IOHttpClientAdapter` with
+the `createHttpClient` callback. **Never** use `DefaultHttpClientAdapter` —
+that is the Dio v4 API and was removed in v5.
+
+```dart
+import 'dart:io';
+import 'package:dio/dio.dart';
+import 'package:dio/io.dart'; // required for IOHttpClientAdapter
+
+if (allowSelfSigned) {
+  dio.httpClientAdapter = IOHttpClientAdapter(
+    createHttpClient: () {
+      final client = HttpClient();
+      client.badCertificateCallback = (cert, host, port) => true;
+      return client;
+    },
+  );
+}
+```
+
+## Preferred API Calls for List Screens
+
+Use `GET /cluster/resources` (with `?type=vm` or `?type=lxc`) for all VM and
+container list screens. This returns all resources across all nodes in a single
+call and is substantially more efficient than iterating per-node.
+
+```
+GET /cluster/resources?type=vm   — all VMs across all nodes (preferred)
+GET /cluster/resources?type=lxc  — all containers across all nodes (preferred)
+```
+
+Only fall back to per-node endpoints when per-node context is explicitly
+required (e.g. a screen scoped to a single node):
+
+```
+GET /nodes/{node}/qemu           — VMs on a specific node only
+GET /nodes/{node}/lxc            — containers on a specific node only
+```
+
+Never iterate all nodes and make N per-node list calls when a cluster-wide
+endpoint exists.
+
+## API Path Constants
+
+All API path strings must be defined as constants in
+`shared/constants/api_endpoints.dart`. Never hard-code path strings inline in
+repository files.
+
+```dart
+// Correct
+await _dio.get(ApiEndpoints.clusterResources, queryParameters: {'type': 'vm'});
+
+// Wrong
+await _dio.get('/cluster/resources', queryParameters: {'type': 'vm'});
+```

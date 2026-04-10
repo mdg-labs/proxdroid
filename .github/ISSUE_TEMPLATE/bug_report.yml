@@ -1,0 +1,76 @@
+name: Bug Report
+description: Report a bug or unexpected behavior in ProxDroid
+labels: ["bug"]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: Title
+      description: A short, descriptive title for the bug
+      placeholder: "e.g. App crashes when switching servers"
+    validations:
+      required: true
+
+  - type: input
+    id: flutter_version
+    attributes:
+      label: Flutter Version
+      description: Run `flutter --version` and paste the output
+      placeholder: "e.g. Flutter 3.19.0"
+    validations:
+      required: true
+
+  - type: input
+    id: android_version
+    attributes:
+      label: Android Version
+      description: Android version of the device or emulator
+      placeholder: "e.g. Android 14 (API 34)"
+    validations:
+      required: true
+
+  - type: input
+    id: pve_version
+    attributes:
+      label: Proxmox VE Version
+      description: PVE version of the server you are connecting to
+      placeholder: "e.g. PVE 8.1.4"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Step-by-step instructions to reproduce the bug
+      placeholder: |
+        1. Go to '...'
+        2. Tap '...'
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What you expected to happen
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Paste any relevant logs or stack traces (optional)
+      render: shell
+    validations:
+      required: false

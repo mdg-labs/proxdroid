@@ -28,16 +28,16 @@
 
 ### 0.1 Repository
 - [ ] Create GitHub repository (`proxdroid`)
-- [ ] Add `README.md` with project description, status badge, setup instructions, download links
-- [ ] Add `LICENSE` file — **MIT** (already decided, see `ProxDroid_MVP_PRD.md` §7.1)
-- [ ] Add `CHANGELOG.md` following [Keep a Changelog](https://keepachangelog.com) format — maintain incrementally, do not write from scratch at release
-- [ ] Add `CONTRIBUTING.md` — how to set up the project locally, code style guide, PR process, commit message conventions
-- [ ] Add `CODE_OF_CONDUCT.md` — use the [Contributor Covenant](https://www.contributor-covenant.org) v2.1 template
-- [ ] Add GitHub issue templates in `.github/ISSUE_TEMPLATE/`: `bug_report.yml`, `feature_request.yml`
-- [ ] Add GitHub PR template: `.github/pull_request_template.md`
-- [ ] Add `.gitignore` for Flutter/Dart (include `*.jks`, `*.keystore`, `key.properties`)
+- [x] Add `README.md` with project description, status badge, setup instructions, download links
+- [x] Add `LICENSE` file — **MIT** (already decided, see `ProxDroid_MVP_PRD.md` §7.1)
+- [x] Add `CHANGELOG.md` following [Keep a Changelog](https://keepachangelog.com) format — maintain incrementally, do not write from scratch at release
+- [x] Add `CONTRIBUTING.md` — how to set up the project locally, code style guide, PR process, commit message conventions
+- [x] Add `CODE_OF_CONDUCT.md` — use the [Contributor Covenant](https://www.contributor-covenant.org) v2.1 template
+- [x] Add GitHub issue templates in `.github/ISSUE_TEMPLATE/`: `bug_report.yml`, `feature_request.yml`
+- [x] Add GitHub PR template: `.github/pull_request_template.md`
+- [x] Add `.gitignore` for Flutter/Dart (include `*.jks`, `*.keystore`, `key.properties`)
 - [ ] Set up branch protection on `main` (require PR + CI pass)
-- [ ] Create `.cursor/rules/` directory with rule files enforcing project architecture, Riverpod patterns, Freezed usage, feature-first folder structure, go_router conventions, Proxmox API patterns, and naming conventions (see `ProxDroid_Architecture.md` §3 Cursor IDE Rules for full list)
+- [x] Create `.cursor/rules/` directory with rule files enforcing project architecture, Riverpod patterns, Freezed usage, feature-first folder structure, go_router conventions, Proxmox API patterns, and naming conventions (see `ProxDroid_Architecture.md` §3 Cursor IDE Rules for full list)
 
 ### 0.2 Flutter Project
 - [ ] Initialize Flutter project (`flutter create --org com.mdglabs proxdroid`)

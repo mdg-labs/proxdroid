@@ -1,0 +1,77 @@
+---
+description: Freezed and json_serializable conventions for API models
+globs: ["lib/**/*.dart"]
+alwaysApply: true
+---
+
+# Freezed & JSON Conventions
+
+## All API Response Models Must Use Freezed + json_serializable
+
+Every data model that is deserialized from the Proxmox REST API must use both
+`@freezed` and `fromJson`/`toJson` via `json_serializable`.
+
+```dart
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'vm.freezed.dart';
+part 'vm.g.dart';
+
+@freezed
+class Vm with _$Vm {
+  const factory Vm({
+    required int vmid,
+    required String name,
+    required VmStatus status,
+    required String node,
+    double? cpu,
+    int? maxMem,
+    int? mem,
+    int? uptime,
+  }) = _Vm;
+
+  factory Vm.fromJson(Map<String, dynamic> json) => _$VmFromJson(json);
+}
+```
+
+## part Directive Order
+
+Always declare both `part` directives in this order:
+
+```dart
+part 'filename.freezed.dart';
+part 'filename.g.dart';
+```
+
+Never omit either part file. Missing a part file causes a build_runner error.
+
+## No Mutable Fields on API Models
+
+Freezed models are immutable. Never add non-final fields or setters to a
+Freezed class. Use `copyWith` for all updates.
+
+## Error Handling: Use the Sealed ProxmoxException Hierarchy
+
+All errors thrown from repositories must use the sealed `ProxmoxException`
+hierarchy defined in `core/api/api_exceptions.dart`:
+
+- `AuthException` — authentication failures
+- `NetworkException` — connectivity issues
+- `ApiTimeoutException` — connection or receive timeout (named to avoid shadowing `dart:async TimeoutException`)
+- `ServerException(statusCode, {message})` — HTTP 4xx/5xx responses
+- `PermissionException` — 403 / insufficient permissions
+
+**Never** throw a raw `DioException` from a repository. Always catch it in the
+repository layer and rethrow as the appropriate `ProxmoxException` subtype.
+
+```dart
+// Correct
+try {
+  final response = await _dio.get('/nodes');
+  return response.data;
+} on DioException catch (e) {
+  throw _mapDioException(e); // converts to ProxmoxException subtype
+}
+
+// Wrong — never let DioException escape the repository
+```

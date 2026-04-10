@@ -23,7 +23,7 @@ responsibilities are:
 ### What the orchestrator MUST do
 - Read all relevant docs in full before spawning any sub-agent
 - Plan the full sequence of sub-agents before starting
-- Spawn sub-agents one at a time in strict sequential order
+- Spawn sub-agents sequentially by default; sub-agents MAY be spawned simultaneously only when each sub-agent operates on a completely different set of files with no overlap
 - After each sub-agent completes, explicitly verify the output against the
   success criteria defined in the prompt
 - If verification fails, re-spawn the sub-agent with a corrected prompt —
@@ -73,6 +73,7 @@ sub-agent completes. Must be checkable without running the app.
 
 - **One concern per sub-agent.** A sub-agent that creates data models does
   not also set up routing.
+- **Parallel sub-agents must operate on non-overlapping files.** Two sub-agents may be spawned simultaneously only if their file scopes are completely disjoint — no file may be touched by more than one concurrently running sub-agent.
 - **Sub-agents read their own context.** The orchestrator does not summarize
   or paraphrase docs. Sub-agents are explicitly instructed to read source
   documents themselves.
@@ -105,3 +106,4 @@ updated prompt that addresses the specific failure.
 4. Verification happens after every sub-agent without exception
 5. A failed verification always results in a re-spawn, never a manual fix
 6. Sub-agent scope is defined before spawning — never adjusted mid-task
+7. Parallel sub-agents are only allowed when their file scopes are fully non-overlapping — if there is any doubt about file overlap, spawn sequentially

@@ -1,0 +1,37 @@
+name: Feature Request
+description: Suggest a new feature or improvement for ProxDroid
+labels: ["enhancement"]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: Title
+      description: A short, descriptive title for the feature request
+      placeholder: "e.g. Add snapshot management for VMs"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Description
+      description: Describe the problem or limitation this feature would solve
+      placeholder: "e.g. Currently there is no way to manage VM snapshots from the app..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you would like to see
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Describe any alternative solutions or features you have considered
+    validations:
+      required: false

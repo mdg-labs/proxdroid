@@ -1,0 +1,44 @@
+---
+description: Flutter/Dart code style, file naming, and folder structure conventions
+globs: ["lib/**/*.dart"]
+alwaysApply: true
+---
+
+# Flutter & Dart Style
+
+## Formatting
+
+Always run `dart format .` before committing. CI enforces this with
+`dart format --output=none --set-exit-if-changed .` and will fail if code is
+not formatted.
+
+## Folder Structure
+
+Use the **feature-first** folder layout defined in `docs/ProxDroid_Architecture.md §4`.
+Every feature lives under `lib/features/<feature>/` with three sub-folders:
+
+```
+lib/features/<feature>/
+├── data/          # Repository and data-source classes
+├── providers/     # Riverpod provider files
+└── ui/            # Screens, widgets specific to this feature
+```
+
+Shared widgets go in `lib/shared/widgets/`.
+Shared constants go in `lib/shared/constants/`.
+Core infrastructure (API client, base models, storage) goes in `lib/core/`.
+
+## File Naming Conventions
+
+| File type | Suffix |
+|---|---|
+| Screen (full-page route widget) | `*_screen.dart` |
+| Repository | `*_repository.dart` |
+| Riverpod provider file | `*_providers.dart` |
+| Riverpod notifier class | `*_notifier.dart` |
+
+## Separation of Concerns
+
+- **Never** put UI code (widgets, BuildContext, theme) in data/repository files.
+- **Never** put API calls, Hive access, or business logic in UI files — these belong in repositories and are accessed via providers.
+- UI reads Riverpod state; UI never mutates state directly.

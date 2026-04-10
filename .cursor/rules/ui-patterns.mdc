@@ -1,0 +1,62 @@
+---
+description: UI patterns, Material 3, shared widgets, optimistic UI rules, and localization
+globs: ["lib/**/*.dart"]
+---
+
+# UI Patterns
+
+## Material 3
+
+Use Material 3 (`useMaterial3: true` in `ThemeData`). Dark theme is the
+default. Light theme is optional and user-toggled.
+
+## Shared Widgets
+
+All reusable UI components must live in `lib/shared/widgets/`. Do not duplicate
+widget logic across features — extract into shared widgets.
+
+## Required State Widgets
+
+Every list screen and data-loading screen must handle all three states:
+
+| State | Widget to use |
+|---|---|
+| Loading | `LoadingShimmer` (`shared/widgets/loading_shimmer.dart`) |
+| Error | `ErrorView` (`shared/widgets/error_view.dart`) — message + retry button |
+| Empty list | `EmptyState` (`shared/widgets/empty_state.dart`) — icon + message |
+
+Never show a blank screen during loading. Never show a raw exception string to
+the user. Always provide a retry action on error screens.
+
+## Optimistic UI Rules
+
+Optimistic UI (updating the displayed state before the server confirms the
+action) is **only** allowed for non-destructive reads.
+
+**Never** use optimistic UI for power actions:
+- Start VM / container
+- Stop VM / container
+- Force Stop VM / container
+- Reboot VM / container
+- Backup trigger
+
+Power actions must reflect actual server state after the Proxmox task completes.
+Always poll task status and update the UI only when the task status is `ok` or
+`error`.
+
+## Localization
+
+All user-visible strings must be defined as keys in `lib/l10n/app_en.arb` and
+accessed via the generated `AppLocalizations` class. **Never** hard-code display
+strings in widgets.
+
+```dart
+// Correct
+Text(AppLocalizations.of(context)!.vmStatusRunning)
+
+// Wrong — hard-coded string in widget
+Text('Running')
+```
+
+UI labels must follow Proxmox VE terminology for consistency with the Proxmox
+web UI: Node, Virtual Machine, Container, Storage, Task, Backup, etc.

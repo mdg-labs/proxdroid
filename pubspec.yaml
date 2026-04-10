@@ -1,19 +1,56 @@
 name: proxdroid
-description: "A new Flutter project."
+description: "A modern, open-source Android client for Proxmox Virtual Environment (PVE)."
 publish_to: 'none'
 version: 0.1.0+1
 
 environment:
-  sdk: ^3.11.4
+  sdk: ^3.7.0
 
 dependencies:
   flutter:
+    sdk: flutter
+
+  # State management
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+
+  # Navigation
+  go_router: ^14.8.1
+
+  # HTTP
+  dio: ^5.8.0+1
+
+  # Data models
+  freezed_annotation: ^3.0.0
+  json_annotation: ^4.9.0
+
+  # Storage
+  hive_ce: ^2.10.1
+  hive_ce_flutter: ^2.2.0
+  flutter_secure_storage: ^9.2.4
+
+  # Charts
+  fl_chart: ^0.70.2
+
+  # Utilities
+  connectivity_plus: ^6.1.3
+  package_info_plus: ^8.3.0
+  url_launcher: ^6.3.1
+  intl: ^0.20.0
+
+  # Localization
+  flutter_localizations:
     sdk: flutter
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  build_runner: ^2.4.15
+  riverpod_generator: ^2.6.5
+  freezed: ^3.0.0
+  json_serializable: ^6.9.4
 
 flutter:
   uses-material-design: true
+  generate: true

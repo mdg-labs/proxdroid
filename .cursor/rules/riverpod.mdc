@@ -1,0 +1,82 @@
+---
+description: Riverpod patterns, code-gen conventions, and provider placement rules
+globs: ["lib/**/*.dart"]
+alwaysApply: true
+---
+
+# Riverpod Conventions
+
+## Always Use Code Generation
+
+Every provider must use the `@riverpod` annotation from `riverpod_annotation`.
+Do not use `Provider(...)`, `StateProvider(...)`, etc. directly — always use
+the code-gen equivalents (`@riverpod` function for functional providers,
+`@riverpod class` extending `_$NotifierName` for notifiers).
+
+```dart
+// Correct: code-gen provider
+@riverpod
+Future<List<Vm>> allVms(Ref ref) async {
+  final api = ref.watch(apiClientProvider);
+  return api.getAllVms();
+}
+
+// Wrong: manual provider — do not use
+final allVmsProvider = FutureProvider<List<Vm>>((ref) async { ... });
+```
+
+## ref.watch vs ref.read for selectedServerProvider
+
+In `apiClientProvider`, always use `ref.watch` (never `ref.read`) for
+`selectedServerProvider`. This is critical: it ensures that when the user
+switches servers, `apiClientProvider` is rebuilt and all downstream API
+providers are invalidated automatically.
+
+```dart
+@riverpod
+ProxmoxApiClient apiClient(Ref ref) {
+  final server = ref.watch(selectedServerProvider); // watch — not read
+  return ProxmoxApiClient(server: server);
+}
+```
+
+If `ref.read` is used instead, server-switching will silently use stale data.
+
+## AsyncNotifier for Async State
+
+Use `AsyncNotifier` (via `@riverpod class ... extends _$...`) for state that
+loads async data on `build()`. Use a plain `@riverpod` function (FutureProvider)
+for read-only async data with no mutations.
+
+```dart
+@riverpod
+class VmListNotifier extends _$VmListNotifier {
+  @override
+  Future<List<Vm>> build() => ref.watch(vmRepositoryProvider).getAllVms();
+
+  Future<void> refresh() => ref.invalidateSelf();
+}
+```
+
+## Provider File Placement
+
+All provider files must live under `features/*/providers/` or
+`shared/providers/`. Never define providers in screen files or repository files.
+
+## Handling AsyncValue in the UI
+
+Never expose raw `AsyncValue` to child widgets. Always handle all three states
+(loading, error, data) in the screen or top-level widget, then pass typed data
+to children:
+
+```dart
+// Correct
+final vmsAsync = ref.watch(allVmsProvider);
+return vmsAsync.when(
+  loading: () => const LoadingShimmer(),
+  error: (e, _) => ErrorView(message: e.toString(), onRetry: () => ref.invalidate(allVmsProvider)),
+  data: (vms) => VmList(vms: vms),
+);
+
+// Wrong — never pass AsyncValue<List<Vm>> to a child widget
+```
