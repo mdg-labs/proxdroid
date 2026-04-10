@@ -126,8 +126,12 @@ GoRouter router(Ref ref) {
               GoRoute(
                 path: ':node/:vmid',
                 builder: (BuildContext context, GoRouterState state) {
-                  final node = state.pathParameters['node']!;
-                  final vmid = state.pathParameters['vmid']!;
+                  final node = Uri.decodeComponent(
+                    state.pathParameters['node']!,
+                  );
+                  final vmid = Uri.decodeComponent(
+                    state.pathParameters['vmid']!,
+                  );
                   return VmDetailScreen(node: node, vmid: vmid);
                 },
               ),
@@ -142,8 +146,12 @@ GoRouter router(Ref ref) {
               GoRoute(
                 path: ':node/:ctid',
                 builder: (BuildContext context, GoRouterState state) {
-                  final node = state.pathParameters['node']!;
-                  final ctid = state.pathParameters['ctid']!;
+                  final node = Uri.decodeComponent(
+                    state.pathParameters['node']!,
+                  );
+                  final ctid = Uri.decodeComponent(
+                    state.pathParameters['ctid']!,
+                  );
                   return ContainerDetailScreen(node: node, ctid: ctid);
                 },
               ),

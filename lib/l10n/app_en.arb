@@ -329,5 +329,113 @@
   "serverConnectionTestInProgress": "Testing connection…",
   "@serverConnectionTestInProgress": {
     "description": "Shown while connection test runs."
+  },
+  "dashboardClusterSummary": "Cluster summary",
+  "@dashboardClusterSummary": {
+    "description": "Title for the dashboard summary card."
+  },
+  "dashboardSummaryTotalVms": "Total VMs",
+  "@dashboardSummaryTotalVms": {
+    "description": "Label for total VM count on dashboard."
+  },
+  "dashboardSummaryRunningVms": "Running VMs",
+  "@dashboardSummaryRunningVms": {
+    "description": "Label for running (including paused) VM count."
+  },
+  "dashboardSummaryTotalContainers": "Total containers",
+  "@dashboardSummaryTotalContainers": {
+    "description": "Label for total LXC container count."
+  },
+  "dashboardEmptyNodesTitle": "No nodes",
+  "@dashboardEmptyNodesTitle": {
+    "description": "Empty state when cluster returns no node resources."
+  },
+  "dashboardEmptyNodesMessage": "No node data was returned for this server.",
+  "@dashboardEmptyNodesMessage": {
+    "description": "Body for empty dashboard node list."
+  },
+  "filterAll": "All",
+  "@filterAll": {
+    "description": "Filter option meaning no restriction."
+  },
+  "filterByNode": "Node",
+  "@filterByNode": {
+    "description": "Label for node filter dropdown."
+  },
+  "filterByStatus": "Status",
+  "@filterByStatus": {
+    "description": "Label for status filter dropdown."
+  },
+  "filterRunning": "Running",
+  "@filterRunning": {
+    "description": "Status filter: running (VMs include paused)."
+  },
+  "filterStopped": "Stopped",
+  "@filterStopped": {
+    "description": "Status filter: stopped only."
+  },
+  "searchVmsHint": "Search by name",
+  "@searchVmsHint": {
+    "description": "Hint for VM list search field."
+  },
+  "searchContainersHint": "Search by name",
+  "@searchContainersHint": {
+    "description": "Hint for container list search field."
+  },
+  "vmListEmptyTitle": "No virtual machines",
+  "@vmListEmptyTitle": {
+    "description": "Empty VM list title."
+  },
+  "vmListEmptyMessage": "No VMs were returned for this cluster.",
+  "@vmListEmptyMessage": {
+    "description": "Empty VM list body."
+  },
+  "containerListEmptyTitle": "No containers",
+  "@containerListEmptyTitle": {
+    "description": "Empty container list title."
+  },
+  "containerListEmptyMessage": "No LXC containers were returned for this cluster.",
+  "@containerListEmptyMessage": {
+    "description": "Empty container list body."
+  },
+  "listFilteredEmptyTitle": "No matches",
+  "@listFilteredEmptyTitle": {
+    "description": "When filters exclude every row."
+  },
+  "listFilteredEmptyMessage": "Try changing search or filters.",
+  "@listFilteredEmptyMessage": {
+    "description": "Hint when filtered list is empty."
+  },
+  "vmNotFoundTitle": "VM not found",
+  "@vmNotFoundTitle": {
+    "description": "Detail screen when VM id or route is invalid."
+  },
+  "vmNotFoundMessage": "This VM is not in the current list. Go back and refresh the list.",
+  "@vmNotFoundMessage": {
+    "description": "Body when VM cannot be resolved."
+  },
+  "containerNotFoundTitle": "Container not found",
+  "@containerNotFoundTitle": {
+    "description": "Detail screen when container id or route is invalid."
+  },
+  "containerNotFoundMessage": "This container is not in the current list. Go back and refresh the list.",
+  "@containerNotFoundMessage": {
+    "description": "Body when container cannot be resolved."
+  },
+  "labelVmid": "VM ID",
+  "@labelVmid": {
+    "description": "Label for QEMU guest ID."
+  },
+  "labelCtid": "CT ID",
+  "@labelCtid": {
+    "description": "Label for LXC container ID."
+  },
+  "labelContainerOsType": "OS type",
+  "@labelContainerOsType": {
+    "description": "Label for LXC ostype field."
+  },
+  "valueUnavailable": "—",
+  "@valueUnavailable": {
+    "description": "Placeholder when a numeric or text value is missing."
   }
 }

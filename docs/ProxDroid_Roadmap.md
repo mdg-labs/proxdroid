@@ -1,6 +1,6 @@
 # ProxDroid – Development Roadmap
 
-**Version:** 0.1 | **Date:** April 2026 | **Status:** Draft
+**Version:** 0.1 | **Date:** April 2026 | **Status:** Draft (Phase 2 UI complete)
 
 > For architecture decisions and tech stack → see `ProxDroid_Architecture.md`
 > For feature scope and product goals → see `ProxDroid_MVP_PRD.md`
@@ -13,7 +13,7 @@
 |---|---|---|
 | **Phase 0** | Project setup & infrastructure | **Complete** — app ID `com.mdglabs.proxdroid`; CI + shell verified locally |
 | **Phase 1** | API foundation & server management | **Complete** — server config, auth, Hive + secure storage, Dio client, go_router redirects, add/edit server UI |
-| **Phase 2** | Node, VM & container overview | Can view all nodes, VMs and containers with live status |
+| **Phase 2** | Node, VM & container overview | **Complete** — dashboard, VM/LXC lists + detail, shared status badge, l10n |
 | **Phase 3** | VM & container actions + task viewer | Can start, stop, force stop, and reboot VMs/containers and track tasks |
 | **Phase 4** | Resource monitoring charts | Full real-time charts for CPU, RAM, network, disk I/O |
 | **Phase 5** | Storage & backup management | Can browse storage and trigger/view backups |
@@ -180,30 +180,30 @@
 - [x] Add pull-to-refresh support on all list providers
 
 ### 2.4 Dashboard Screen
-- [ ] Build `DashboardScreen` – shows all nodes in cards
-- [ ] Each node card: name, online/offline badge, CPU usage bar, RAM usage bar, uptime
-- [ ] Show cluster-wide summary at top (total VMs, running VMs, total containers)
-- [ ] Handle loading state (shimmer), error state (retry button), empty state
-- [ ] Wire up go_router: `/dashboard` → `DashboardScreen`
+- [x] Build `DashboardScreen` – shows all nodes in cards
+- [x] Each node card: name, online/offline badge, CPU usage bar, RAM usage bar, uptime
+- [x] Show cluster-wide summary at top (total VMs, running VMs, total containers)
+- [x] Handle loading state (shimmer), error state (retry button), empty state
+- [x] Wire up go_router: `/dashboard` → `DashboardScreen`
 
 ### 2.5 VM List & Detail
-- [ ] Build `VmListScreen` – filterable list of all VMs across all nodes
+- [x] Build `VmListScreen` – filterable list of all VMs across all nodes
   - Filter dimensions: search by name (text field), filter by status (all / running / stopped), filter by node
   - Default sort: running VMs first, then alphabetical by name
-- [ ] Each VM row: name, vmid, node name, status badge (color-coded), CPU%, RAM usage
-- [ ] Build `VmDetailScreen` – full details: all resource fields, uptime, node
-- [ ] Add status badge widget (`shared/widgets/status_badge.dart`) – green/red/yellow
-- [ ] Wire up go_router: `/vms` → `VmListScreen`, `/vms/:node/:vmid` → `VmDetailScreen`
+- [x] Each VM row: name, vmid, node name, status badge (color-coded), CPU%, RAM usage
+- [x] Build `VmDetailScreen` – full details: all resource fields, uptime, node
+- [x] Add status badge widget (`shared/widgets/status_badge.dart`) – green/red/yellow
+- [x] Wire up go_router: `/vms` → `VmListScreen`, `/vms/:node/:vmid` → `VmDetailScreen`
 
 ### 2.6 Container List & Detail
-- [ ] Build `ContainerListScreen` – same structure and filter dimensions as VM list (search by name, filter by status, filter by node; default sort: running first)
-- [ ] Build `ContainerDetailScreen` – same structure as VM detail
-- [ ] Wire up go_router: `/containers`, `/containers/:node/:ctid`
+- [x] Build `ContainerListScreen` – same structure and filter dimensions as VM list (search by name, filter by status, filter by node; default sort: running first)
+- [x] Build `ContainerDetailScreen` – same structure as VM detail
+- [x] Wire up go_router: `/containers`, `/containers/:node/:ctid`
 
 ### 2.7 Shared Widgets
-- [ ] Implement `LoadingShimmer` widget for list placeholders
-- [ ] Implement `ErrorView` widget with message + retry button
-- [ ] Implement `EmptyState` widget with icon + message
+- [x] Implement `LoadingShimmer` widget for list placeholders
+- [x] Implement `ErrorView` widget with message + retry button
+- [x] Implement `EmptyState` widget with icon + message
 
 ---
 

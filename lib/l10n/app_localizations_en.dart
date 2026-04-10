@@ -254,4 +254,89 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get serverConnectionTestInProgress => 'Testing connection…';
+
+  @override
+  String get dashboardClusterSummary => 'Cluster summary';
+
+  @override
+  String get dashboardSummaryTotalVms => 'Total VMs';
+
+  @override
+  String get dashboardSummaryRunningVms => 'Running VMs';
+
+  @override
+  String get dashboardSummaryTotalContainers => 'Total containers';
+
+  @override
+  String get dashboardEmptyNodesTitle => 'No nodes';
+
+  @override
+  String get dashboardEmptyNodesMessage =>
+      'No node data was returned for this server.';
+
+  @override
+  String get filterAll => 'All';
+
+  @override
+  String get filterByNode => 'Node';
+
+  @override
+  String get filterByStatus => 'Status';
+
+  @override
+  String get filterRunning => 'Running';
+
+  @override
+  String get filterStopped => 'Stopped';
+
+  @override
+  String get searchVmsHint => 'Search by name';
+
+  @override
+  String get searchContainersHint => 'Search by name';
+
+  @override
+  String get vmListEmptyTitle => 'No virtual machines';
+
+  @override
+  String get vmListEmptyMessage => 'No VMs were returned for this cluster.';
+
+  @override
+  String get containerListEmptyTitle => 'No containers';
+
+  @override
+  String get containerListEmptyMessage =>
+      'No LXC containers were returned for this cluster.';
+
+  @override
+  String get listFilteredEmptyTitle => 'No matches';
+
+  @override
+  String get listFilteredEmptyMessage => 'Try changing search or filters.';
+
+  @override
+  String get vmNotFoundTitle => 'VM not found';
+
+  @override
+  String get vmNotFoundMessage =>
+      'This VM is not in the current list. Go back and refresh the list.';
+
+  @override
+  String get containerNotFoundTitle => 'Container not found';
+
+  @override
+  String get containerNotFoundMessage =>
+      'This container is not in the current list. Go back and refresh the list.';
+
+  @override
+  String get labelVmid => 'VM ID';
+
+  @override
+  String get labelCtid => 'CT ID';
+
+  @override
+  String get labelContainerOsType => 'OS type';
+
+  @override
+  String get valueUnavailable => '—';
 }

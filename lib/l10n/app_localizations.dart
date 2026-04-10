@@ -561,6 +561,168 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Testing connection…'**
   String get serverConnectionTestInProgress;
+
+  /// Title for the dashboard summary card.
+  ///
+  /// In en, this message translates to:
+  /// **'Cluster summary'**
+  String get dashboardClusterSummary;
+
+  /// Label for total VM count on dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Total VMs'**
+  String get dashboardSummaryTotalVms;
+
+  /// Label for running (including paused) VM count.
+  ///
+  /// In en, this message translates to:
+  /// **'Running VMs'**
+  String get dashboardSummaryRunningVms;
+
+  /// Label for total LXC container count.
+  ///
+  /// In en, this message translates to:
+  /// **'Total containers'**
+  String get dashboardSummaryTotalContainers;
+
+  /// Empty state when cluster returns no node resources.
+  ///
+  /// In en, this message translates to:
+  /// **'No nodes'**
+  String get dashboardEmptyNodesTitle;
+
+  /// Body for empty dashboard node list.
+  ///
+  /// In en, this message translates to:
+  /// **'No node data was returned for this server.'**
+  String get dashboardEmptyNodesMessage;
+
+  /// Filter option meaning no restriction.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get filterAll;
+
+  /// Label for node filter dropdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Node'**
+  String get filterByNode;
+
+  /// Label for status filter dropdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get filterByStatus;
+
+  /// Status filter: running (VMs include paused).
+  ///
+  /// In en, this message translates to:
+  /// **'Running'**
+  String get filterRunning;
+
+  /// Status filter: stopped only.
+  ///
+  /// In en, this message translates to:
+  /// **'Stopped'**
+  String get filterStopped;
+
+  /// Hint for VM list search field.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by name'**
+  String get searchVmsHint;
+
+  /// Hint for container list search field.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by name'**
+  String get searchContainersHint;
+
+  /// Empty VM list title.
+  ///
+  /// In en, this message translates to:
+  /// **'No virtual machines'**
+  String get vmListEmptyTitle;
+
+  /// Empty VM list body.
+  ///
+  /// In en, this message translates to:
+  /// **'No VMs were returned for this cluster.'**
+  String get vmListEmptyMessage;
+
+  /// Empty container list title.
+  ///
+  /// In en, this message translates to:
+  /// **'No containers'**
+  String get containerListEmptyTitle;
+
+  /// Empty container list body.
+  ///
+  /// In en, this message translates to:
+  /// **'No LXC containers were returned for this cluster.'**
+  String get containerListEmptyMessage;
+
+  /// When filters exclude every row.
+  ///
+  /// In en, this message translates to:
+  /// **'No matches'**
+  String get listFilteredEmptyTitle;
+
+  /// Hint when filtered list is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Try changing search or filters.'**
+  String get listFilteredEmptyMessage;
+
+  /// Detail screen when VM id or route is invalid.
+  ///
+  /// In en, this message translates to:
+  /// **'VM not found'**
+  String get vmNotFoundTitle;
+
+  /// Body when VM cannot be resolved.
+  ///
+  /// In en, this message translates to:
+  /// **'This VM is not in the current list. Go back and refresh the list.'**
+  String get vmNotFoundMessage;
+
+  /// Detail screen when container id or route is invalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Container not found'**
+  String get containerNotFoundTitle;
+
+  /// Body when container cannot be resolved.
+  ///
+  /// In en, this message translates to:
+  /// **'This container is not in the current list. Go back and refresh the list.'**
+  String get containerNotFoundMessage;
+
+  /// Label for QEMU guest ID.
+  ///
+  /// In en, this message translates to:
+  /// **'VM ID'**
+  String get labelVmid;
+
+  /// Label for LXC container ID.
+  ///
+  /// In en, this message translates to:
+  /// **'CT ID'**
+  String get labelCtid;
+
+  /// Label for LXC ostype field.
+  ///
+  /// In en, this message translates to:
+  /// **'OS type'**
+  String get labelContainerOsType;
+
+  /// Placeholder when a numeric or text value is missing.
+  ///
+  /// In en, this message translates to:
+  /// **'—'**
+  String get valueUnavailable;
 }
 
 class _AppLocalizationsDelegate
