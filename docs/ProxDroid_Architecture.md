@@ -271,7 +271,7 @@ if (allowSelfSigned) {
 
 > **HTTPS enforcement:** The app enforces HTTPS-only connections. At the "Add Server" form level, validate that the host input does not include an `http://` scheme and display a clear error if it does. Android API 28+ blocks cleartext HTTP at the OS level, producing cryptic errors — catching this early in the UI is far better UX. No `android:usesCleartextTraffic` override is needed or wanted.
 
-> **Key API efficiency:** Use `GET /cluster/resources` (with optional `?type=vm` or `?type=lxc`) to retrieve all VMs and containers across all nodes in a single call. This is substantially more efficient than iterating `GET /nodes/{node}/qemu` and `GET /nodes/{node}/lxc` per node, and is the preferred approach for populating list screens and the dashboard summary.
+> **Key API efficiency:** Use `GET /cluster/resources` to retrieve VMs and containers cluster-wide in one call (preferred over iterating per-node `qemu` / `lxc` lists). VMs use `?type=vm` and map rows with `type: qemu`. Containers normally use `?type=lxc`; some gateways only allow query `type` in `{ vm, storage, node, sdn }` — the client then retries with `?type=vm` and keeps rows where the resource `type` field is `lxc`.
 
 **Auth flow:**
 1. API Token → `Authorization: PVEAPIToken=USER@REALM!TOKENID=UUID` header — stateless, no expiry
@@ -300,6 +300,8 @@ if (allowSelfSigned) {
 /tasks/:node/:upid                  → Task detail + log output
 /settings                           → Settings
 ```
+
+> **Shell AppBar leading:** On section roots (`/vms`, `/dashboard`, `/servers`, …) the app bar shows the drawer (hamburger). On nested routes (`/servers/add`, `/vms/:node/:vmid`, …) it shows back. The implementation keys off `GoRouterState.uri.path` and `isShellDrawerRootPath` — not `GoRouter.canPop()`, which can stay true on section roots after redirects or pops and would incorrectly show only the back affordance.
 
 > **Note:** All Proxmox API calls require both `node` and the resource ID. Routes include `:node` to keep all navigation self-contained without relying on provider state for the node lookup.
 

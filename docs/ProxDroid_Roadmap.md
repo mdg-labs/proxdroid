@@ -174,7 +174,7 @@
   - `getAllVms()` – uses `GET /cluster/resources?type=vm` (primary; call this for list screens)
   - `getVms(node)` – uses `GET /nodes/{node}/qemu` (secondary; use only when per-node context is required)
 - [x] Implement `ContainerRepository` with:
-  - `getAllContainers()` – uses `GET /cluster/resources?type=lxc` (primary)
+  - `getAllContainers()` – uses `GET /cluster/resources?type=lxc` when accepted; otherwise falls back to `?type=vm` and filters `lxc` rows (some API surfaces reject `type=lxc` in the query enum)
   - `getContainers(node)` – uses `GET /nodes/{node}/lxc` (secondary)
 - [x] Implement async Riverpod providers: `allVmsProvider`, `allContainersProvider`, `nodeListProvider`
 - [x] Add pull-to-refresh support on all list providers

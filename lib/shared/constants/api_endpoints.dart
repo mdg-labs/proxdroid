@@ -16,8 +16,10 @@ abstract final class ApiEndpoints {
   static String nodeStatus(String node) =>
       '/nodes/${Uri.encodeComponent(node)}/status';
 
-  /// `GET /cluster/resources` — nodes, VMs, LXCs, storage, etc. (optional
-  /// `type` query: `vm`, `lxc`, `node`, …).
+  /// `GET /cluster/resources` — nodes, guests, storage, etc. (optional `type`
+  /// query). Some gateways only allow `type` in `{ vm, storage, node, sdn }`;
+  /// container list code tries `type=lxc` first, then `type=vm` plus client-side
+  /// filter for `lxc` rows.
   static const String clusterResources = '/cluster/resources';
 
   /// `GET /nodes/{node}/qemu` — VMs on a single node.

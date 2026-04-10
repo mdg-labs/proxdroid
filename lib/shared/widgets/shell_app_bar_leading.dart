@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:proxdroid/shared/routing/shell_drawer_root_paths.dart';
 
-/// [AppBar.leading] for shell routes: opens drawer at root, pops when stacked.
+/// [AppBar.leading] for shell routes: drawer on section roots, back on nested
+/// routes ([isShellDrawerRootPath]). Do not use [GoRouter.canPop] — it can stay
+/// true on section roots after redirects or pops, which hides the drawer.
 Widget? shellAppBarLeading(BuildContext context) {
-  if (context.canPop()) {
+  final path = GoRouterState.of(context).uri.path;
+  if (isShellDrawerRootPath(path)) {
     return IconButton(
-      icon: const Icon(Icons.arrow_back),
-      onPressed: () => context.pop(),
+      icon: const Icon(Icons.menu),
+      onPressed: () => Scaffold.of(context).openDrawer(),
     );
   }
   return IconButton(
-    icon: const Icon(Icons.menu),
-    onPressed: () => Scaffold.of(context).openDrawer(),
+    icon: const Icon(Icons.arrow_back),
+    onPressed: () => context.pop(),
   );
 }

@@ -300,7 +300,10 @@ class ProxmoxApiClient {
     }).toList();
   }
 
-  /// `GET /cluster/resources?type=vm` — all QEMU guests cluster-wide.
+  /// `GET /cluster/resources?type=vm` — QEMU guests cluster-wide.
+  ///
+  /// Some API versions return only `type: qemu` rows; others return mixed guest
+  /// kinds under `type=vm` — only map rows with `type: qemu`.
   Future<List<Vm>> fetchAllVms() async {
     final response = await _unwrap(
       _dio.get<Map<String, dynamic>>(
@@ -309,10 +312,14 @@ class ProxmoxApiClient {
       ),
     );
     final list = _dataAsList(response.data?['data']);
-    return list.map((e) {
+    final out = <Vm>[];
+    for (final e in list) {
       final m = Map<String, dynamic>.from(e as Map);
-      return Vm.fromClusterResourcesItem(m);
-    }).toList();
+      if (m['type'] == 'qemu') {
+        out.add(Vm.fromClusterResourcesItem(m));
+      }
+    }
+    return out;
   }
 
   /// `GET /nodes/{node}/qemu` — VMs on one node.
@@ -327,19 +334,58 @@ class ProxmoxApiClient {
     }).toList();
   }
 
-  /// `GET /cluster/resources?type=lxc` — all LXCs cluster-wide.
+  /// `GET /cluster/resources?type=lxc` — all LXCs cluster-wide (legacy filter).
+  ///
+  /// Newer gateways only allow `type` in `{ vm, storage, node, sdn }`. On HTTP 400
+  /// indicating `lxc` is not a valid filter, falls back to `type=vm` and keeps
+  /// rows with `type: lxc`.
   Future<List<Container>> fetchAllContainers() async {
+    try {
+      final response = await _unwrap(
+        _dio.get<Map<String, dynamic>>(
+          ApiEndpoints.clusterResources,
+          queryParameters: const {'type': 'lxc'},
+        ),
+      );
+      return _containersFromClusterResourcesData(response.data?['data']);
+    } on ServerException catch (e) {
+      if (_clusterResourcesQueryRejectedForLxc(e)) {
+        return _fetchAllContainersViaVmGuestFilter();
+      }
+      rethrow;
+    }
+  }
+
+  Future<List<Container>> _fetchAllContainersViaVmGuestFilter() async {
     final response = await _unwrap(
       _dio.get<Map<String, dynamic>>(
         ApiEndpoints.clusterResources,
-        queryParameters: const {'type': 'lxc'},
+        queryParameters: const {'type': 'vm'},
       ),
     );
     final list = _dataAsList(response.data?['data']);
+    final out = <Container>[];
+    for (final e in list) {
+      final m = Map<String, dynamic>.from(e as Map);
+      if (m['type'] == 'lxc') {
+        out.add(Container.fromClusterResourcesItem(m));
+      }
+    }
+    return out;
+  }
+
+  List<Container> _containersFromClusterResourcesData(dynamic data) {
+    final list = _dataAsList(data);
     return list.map((e) {
       final m = Map<String, dynamic>.from(e as Map);
       return Container.fromClusterResourcesItem(m);
     }).toList();
+  }
+
+  bool _clusterResourcesQueryRejectedForLxc(ServerException e) {
+    if (e.statusCode != 400) return false;
+    final msg = e.message?.toLowerCase() ?? '';
+    return msg.contains('lxc') && msg.contains('enum');
   }
 
   /// `GET /nodes/{node}/lxc` — containers on one node.

@@ -19,6 +19,13 @@ void main() {
           'maxmem': 1073741824,
           'mem': 536870912,
         },
+        <String, dynamic>{
+          'type': 'lxc',
+          'vmid': 200,
+          'name': 'ct1',
+          'status': 'running',
+          'node': 'n1',
+        },
       ]),
     ]);
 
