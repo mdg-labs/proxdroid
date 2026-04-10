@@ -366,7 +366,7 @@
 
 Not in scope for the current **GitHub-only prerelease** path; pick up when targeting store listing. Checklist below unchanged for future work.
 
-- [ ] Create app icons (launcher icon, adaptive icon for Android)
+- [x] Create app icons (launcher icon, adaptive icon for Android) — PNG sources in `assets/icon/`; `flutter_launcher_icons` generates Android mipmaps + adaptive layers and iOS `AppIcon.appiconset`
 - [ ] Create Play Store screenshots (at least 4, phone + tablet)
 - [ ] Write Play Store listing: short description, full description, keywords
 - [ ] Set up Google Play Console, create app entry
