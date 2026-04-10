@@ -8,10 +8,7 @@ void main() {
   });
 
   test('buildProxmoxLoginId rejects @ in login', () {
-    expect(
-      () => buildProxmoxLoginId('a@b', 'pam'),
-      throwsArgumentError,
-    );
+    expect(() => buildProxmoxLoginId('a@b', 'pam'), throwsArgumentError);
   });
 
   test('parseProxmoxLoginIdForForm splits user@realm', () {
