@@ -8,7 +8,7 @@ Execution roadmap: §11
 Scope: Hybrid **ProxMate-style** grouped lists (true black, inset cards, section headers, blue nav/CTA accents) + **Absorb-style** premium dark touches (high corner radius, muted gold/tan secondary accent, pill highlights, generous padding, rounded iconography)
 ```
 
-> **Non-goals (explicit):** No Proxmox API or repository contract changes; no removal or hiding of existing features; navigation *destinations* and data flows stay the same unless an optional shell experiment is clearly labeled optional. This document is **design-system and UI-structure** guidance only.
+> **Non-goals (explicit):** No Proxmox API or repository contract changes; no removal or hiding of existing features; navigation *destinations* and data flows stay the same except for the **mandatory Phase 4** hybrid shell (§4.2), which must preserve all `go_router` paths and deep links. This document is **design-system and UI-structure** guidance only.
 
 > **Reference visuals:** Place and maintain comparison screenshots under [`docs/references/screenshots/`](references/screenshots/) (canonical path; folder may be empty in-repo — populate with ProxMate / Absorb / competitor references as available).
 
@@ -118,14 +118,14 @@ Build or refactor toward these **shared** widgets (names indicative — final na
 - **`lib/app/router.dart`:** `ShellRoute` wraps all destinations; each route uses `_fadeShellPage` (250ms fade).
 - **`lib/app/app_shell.dart`:** `Scaffold` with `Column`: optional **offline banner** → `Expanded(child: child)`. **NavigationDrawer** with branding header, **Infrastructure** / **Operations** section labels, eight destinations (`/servers` … `/settings`). Active server shortcut row → `/servers`.
 
-### 4.2 Recommendation: **hybrid shell (optional phase)**
+### 4.2 Recommendation: **hybrid shell (Phase 4)**
 
 | Layer | Recommendation |
 |-------|----------------|
 | **Keep** | `NavigationDrawer` as **full menu** (server switch, all sections, settings) — best for 8+ destinations and Proxmox “many surfaces” model. |
-| **Add (optional)** | **Bottom navigation** with **4–5 primary tabs** (e.g. Dashboard, VMs, Containers, Tasks, More) where **More** opens drawer or a hub — matches reference mobile apps and reduces drawer friction for daily tasks. |
+| **Add (Phase 4)** | **Bottom navigation** with **4–5 primary tabs** (e.g. Dashboard, VMs, Containers, Tasks, More) where **More** opens drawer or a hub — matches reference mobile apps and reduces drawer friction for daily tasks; **required** for this refactor (§11.5). |
 | **Risk** | Duplicate selection state (drawer index vs bottom index); must sync highlight with `currentPath`. Deep links (`/storage/...`) should still open correct stack; **do not** break go_router paths. |
-| **Migration** | Phase A: tokens + banner; Phase B: introduce `NavigationBar` only if design sign-off; use `StatefulShellRoute` or a single `Scaffold` with `bottomNavigationBar` + `child` — **research go_router 14+ patterns** before coding. |
+| **Migration** | Phase A: tokens + banner; Phase B: introduce `NavigationBar` per Phase 4; use `StatefulShellRoute` or a single `Scaffold` with `bottomNavigationBar` + `child` — **research go_router 14+ patterns** before coding. |
 
 **Offline banner:** Retint from `errorContainer` to a dedicated token (e.g. `surfaceContainerHigh` + amber outline + warning icon) if “offline” should not read as hard error; maintain **non-dismissible**, rounded bottom, safe area; ensure contrast on true black.
 
@@ -285,11 +285,11 @@ All routes from `lib/app/router.dart` under the shell. **Server add/edit** share
 
 ## 11. Implementation phases (ordered)
 
-Section **§11** is the execution roadmap: phased objectives, **trackable** `- [ ]` tasks, and **Phase acceptance criteria** for verification. Check boxes in-repo as work completes, or mirror each task to issues/Linear with the same ID. Phases run **sequentially** unless marked **OPTIONAL** — optional work must not block merge of earlier phases. The former high-level dependency overview is folded into **Depends on** under each phase below.
+Section **§11** is the execution roadmap: phased objectives, **trackable** `- [ ]` tasks, and **Phase acceptance criteria** for verification. Check boxes in-repo as work completes, or mirror each task to issues/Linear with the same ID. Phases **1–8** run **sequentially** in listed order; **Phase 4** (bottom navigation / hybrid shell, §11.5) is **mandatory** and completes after Phases **1–3** — it must not be skipped or deferred past the refactor’s shell milestone. Ad-hoc optional work outside these phases must not block merge of required phases. The former high-level dependency overview is folded into **Depends on** under each phase below.
 
 ### 11.1 How to use this roadmap
 
-Treat each phase as a shippable slice: complete tasks in order where dependencies exist, run `flutter analyze` (and tests when listed) before calling the phase done. **Phase acceptance criteria** are objective checks the team can run without guessing; document any intentional exceptions (e.g. scaffold `#0A0A0A` instead of `#000000`) in code comments or this file. For human passes, use **§12** (goldens + manual matrix). Optional **Phase 4** may be skipped entirely or scheduled after Phase 8 if experimentation should not affect the main line.
+Treat each phase as a shippable slice: complete tasks in order where dependencies exist, run `flutter analyze` (and tests when listed) before calling the phase done. **Phase acceptance criteria** are objective checks the team can run without guessing; document any intentional exceptions (e.g. scaffold `#0A0A0A` instead of `#000000`) in code comments or this file. For human passes, use **§12** (goldens + manual matrix). **Phase 4** is **mandatory**: implement the §4.2 hybrid (`NavigationBar` + full drawer) with synchronized selection and preserved routes **after** Phases 1–3 and **before** treating later phases as complete for the refactor’s navigation shell.
 
 ### 11.2 Phase 1 — Theme tokens, `ColorScheme`, and global Material themes
 
@@ -303,14 +303,14 @@ Establish true-black-first dark theme, blue/gold role split, and global `ThemeDa
 
 #### Trackable tasks
 
-- [ ] **T1.1** Extend `lib/app/theme/app_colors.dart` with semantic aliases (`scaffoldPureBlack`, `premiumAccent`, `navigationAccent`, and success/warning helpers aligned with §2.1 and §7.4).
-- [ ] **T1.2** Update `lib/app/theme/app_theme.dart` dark `ColorScheme`: scaffold **true black** `#000000` or documented `#0A0A0A` OLED exception; `primary` blue; `secondary`/`tertiary` muted gold/tan per §2.1.
-- [ ] **T1.3** Add or extend theme components in `app_theme.dart`: `NavigationDrawerThemeData`, `DialogTheme`, `BottomSheetThemeData`, `SnackBarThemeData`, `ProgressIndicatorTheme`, `ChipTheme` / `SegmentedButtonTheme` per §3.
-- [ ] **T1.4** Map light mode surfaces and contrast adjustments per §10 (grouped grey scaffold, white cards, darker blue / adjusted gold on white).
-- [ ] **T1.5** Keep `ThemeData(useMaterial3: true)`; note any deliberate non-defaults in comments or this plan.
-- [ ] **T1.6** Run `flutter analyze` after theme edits; fix or file issues for any new analyzer errors in `lib/app/theme/`.
-- [ ] **T1.7** Verify WCAG-minded contrast for `onSurface`, `onSurfaceVariant`, and gold accent on scaffold (record chosen hex values or tool used).
-- [ ] **T1.8** Confirm Settings-driven `ThemeMode` persistence still applies cleanly with new schemes (`settings_screen.dart` / existing theme notifier).
+- [x] **T1.1** Extend `lib/app/theme/app_colors.dart` with semantic aliases (`scaffoldPureBlack`, `premiumAccent`, `navigationAccent`, and success/warning helpers aligned with §2.1 and §7.4).
+- [x] **T1.2** Update `lib/app/theme/app_theme.dart` dark `ColorScheme`: scaffold **true black** `#000000` or documented `#0A0A0A` OLED exception; `primary` blue; `secondary`/`tertiary` muted gold/tan per §2.1.
+- [x] **T1.3** Add or extend theme components in `app_theme.dart`: `NavigationDrawerThemeData`, `DialogTheme`, `BottomSheetThemeData`, `SnackBarThemeData`, `ProgressIndicatorTheme`, `ChipTheme` / `SegmentedButtonTheme` per §3.
+- [x] **T1.4** Map light mode surfaces and contrast adjustments per §10 (grouped grey scaffold, white cards, darker blue / adjusted gold on white).
+- [x] **T1.5** Keep `ThemeData(useMaterial3: true)`; note any deliberate non-defaults in comments or this plan.
+- [x] **T1.6** Run `flutter analyze` after theme edits; fix or file issues for any new analyzer errors in `lib/app/theme/`.
+- [x] **T1.7** Verify WCAG-minded contrast for `onSurface`, `onSurfaceVariant`, and gold accent on scaffold (record chosen hex values or tool used).
+- [x] **T1.8** Confirm Settings-driven `ThemeMode` persistence still applies cleanly with new schemes (`settings_screen.dart` / existing theme notifier).
 
 #### Phase acceptance criteria
 
@@ -333,16 +333,16 @@ Phase 1
 
 #### Trackable tasks
 
-- [ ] **T2.1** Add `lib/shared/widgets/grouped_section.dart` implementing `GroupedSection` (vertical rhythm + optional header slot) per §3.
-- [ ] **T2.2** Extract/unify `SectionHeader` from `lib/features/settings/ui/settings_screen.dart` into a shared widget; use shared `SectionHeader` for drawer section labels where specified in §3 / §6.1.
-- [ ] **T2.3** Implement `InsetGroupedList` / `PremiumListRow` under `lib/shared/widgets/` (inset dividers, leading/title/subtitle/trailing/chevron) per §3.
-- [ ] **T2.4** Implement `IconBadgeAvatar` per §3; update `lib/shared/widgets/empty_state.dart` to use it per §7.3.
-- [ ] **T2.5** Update `lib/shared/widgets/loading_shimmer.dart` — rounded rects (~16), shimmer contrast tuned for true black per §7.1.
-- [ ] **T2.6** Update `lib/shared/widgets/error_view.dart` — primary retry as blue `FilledButton`, layout optional illustration per §7.2.
-- [ ] **T2.7** Update `lib/shared/widgets/status_badge.dart` — semantic colors via extended tokens; contrast on `#000000` per §7.4.
-- [ ] **T2.8** Add `PremiumDialog` and `PremiumBottomSheet` wrappers (shared location under `lib/shared/widgets/`) per §3.
-- [ ] **T2.9** Align global snackbar appearance with §7.5 via `SnackBarThemeData` and any call-site tweaks needed for floating/radius/action color.
-- [ ] **T2.10** Implement or theme pill-style controls (`PillTabBar` / `SegmentedPill` or themed `SegmentedButton`) for reuse in Settings and chart timeframes per §3 / §9.
+- [x] **T2.1** Add `lib/shared/widgets/grouped_section.dart` implementing `GroupedSection` (vertical rhythm + optional header slot) per §3.
+- [x] **T2.2** Extract/unify `SectionHeader` from `lib/features/settings/ui/settings_screen.dart` into a shared widget; use shared `SectionHeader` for drawer section labels where specified in §3 / §6.1.
+- [x] **T2.3** Implement `InsetGroupedList` / `PremiumListRow` under `lib/shared/widgets/` (inset dividers, leading/title/subtitle/trailing/chevron) per §3.
+- [x] **T2.4** Implement `IconBadgeAvatar` per §3; update `lib/shared/widgets/empty_state.dart` to use it per §7.3.
+- [x] **T2.5** Update `lib/shared/widgets/loading_shimmer.dart` — rounded rects (~16), shimmer contrast tuned for true black per §7.1.
+- [x] **T2.6** Update `lib/shared/widgets/error_view.dart` — primary retry as blue `FilledButton`, layout optional illustration per §7.2.
+- [x] **T2.7** Update `lib/shared/widgets/status_badge.dart` — semantic colors via extended tokens; contrast on `#000000` per §7.4.
+- [x] **T2.8** Add `PremiumDialog` and `PremiumBottomSheet` wrappers (shared location under `lib/shared/widgets/`) per §3.
+- [x] **T2.9** Align global snackbar appearance with §7.5 via `SnackBarThemeData` and any call-site tweaks needed for floating/radius/action color.
+- [x] **T2.10** Implement or theme pill-style controls (`PillTabBar` / `SegmentedPill` or themed `SegmentedButton`) for reuse in Settings and chart timeframes per §3 / §9.
 
 #### Phase acceptance criteria
 
@@ -369,7 +369,7 @@ Phases 1, 2
 - [ ] **T3.2** Evolve offline banner to dedicated styling / `ConnectivityBanner` (from §3): retint per §4.2 (non-dismissible, rounded bottom, safe area, optional amber/warning semantics vs `errorContainer`).
 - [ ] **T3.3** Refresh drawer branding header block to match premium card language per §6.1.
 - [ ] **T3.4** Verify all eight drawer destinations remain correct; selected visual always matches **`currentPath`** / route per §4.1.
-- [ ] **T3.5** Update `lib/shared/widgets/shell_section_body.dart`: themed `AppBar` (transparent/black edge), FAB **safe-area** aware; reserve bottom inset if Phase 4 later adds nav bar per §6.2.
+- [ ] **T3.5** Update `lib/shared/widgets/shell_section_body.dart`: themed `AppBar` (transparent/black edge), FAB **safe-area** aware; reserve bottom inset for Phase 4 bottom nav per §6.2.
 - [ ] **T3.6** Confirm `lib/shared/widgets/shell_app_bar_leading.dart` drawer-vs-back behavior unchanged per §6.3 and Architecture §8.
 - [ ] **T3.7** Manually verify offline state appears within **~1s** of simulated connectivity loss where the app already detects offline (no layout jump when banner toggles per §6.1).
 
@@ -382,11 +382,11 @@ Phases 1, 2
 - `flutter analyze` exits **0** for `lib/app/app_shell.dart` and touched shell widgets.
 - Leading logic still path-correct after visual-only changes.
 
-### 11.5 Phase 4 (OPTIONAL) — Bottom navigation / `StatefulShellRoute` spike
+### 11.5 Phase 4 — Bottom navigation / `StatefulShellRoute`
 
 #### Objective
 
-Evaluate optional bottom navigation (4–5 tabs + More → drawer) and `StatefulShellRoute` (or equivalent) **without** breaking existing `go_router` paths or deep links.
+**Ship** the §4.2 hybrid shell: **bottom navigation** (4–5 tabs + More → drawer or hub) integrated with `StatefulShellRoute` (or an equivalent documented pattern) so the app delivers a **non-throwaway** bottom nav experience. **Document** the chosen tab→route mapping and any hybrid details in this plan or a linked PR. **Do not** break existing `go_router` paths or deep links.
 
 #### Depends on
 
@@ -395,20 +395,19 @@ Phases 1–3 (complete theme + primitives + shell refresh first)
 #### Trackable tasks
 
 - [ ] **T4.1** Research `go_router` 14+ patterns (`StatefulShellRoute`, nested branches) using `lib/app/router.dart` as baseline; document findings inline in PR or short note linked from this plan.
-- [ ] **T4.2** Build **throwaway or feature-flagged** prototype: `NavigationBar` + drawer hybrid per §4.2 table; avoid shipping duplicate confusing state without design sign-off.
-- [ ] **T4.3** Validate deep links (e.g. `/storage/:node/:storage`, `/tasks/:node/:upid`) still resolve correctly with the prototype.
-- [ ] **T4.4** If deferred, record **“no ship”** decision and rationale in this document’s appendix or the spike PR (no orphan branches).
-- [ ] **T4.5** If proceeding, synchronize bottom-bar highlight with **`currentPath`** per §4.2 risk list.
+- [ ] **T4.2** Implement **`NavigationBar` + drawer** hybrid per §4.2: primary tabs plus **More** (or equivalent) reaching the full drawer menu; keep **drawer** as the complete destination set; **synchronize** bottom-bar and drawer highlights with **`currentPath`** so the two never contradict (§4.2 risks).
+- [ ] **T4.3** Validate deep links (e.g. `/storage/:node/:storage`, `/tasks/:node/:upid`) still resolve correctly with the integrated shell; run `flutter analyze` on touched router/shell code.
+- [ ] **T4.4** Record the **shipped** pattern (tab labels, route branches, how “More” exposes remaining destinations) in this document (e.g. appendix) or a linked PR so maintainers match §4.2 without guesswork.
+- [ ] **T4.5** Verify bottom-bar selection updates on navigation (including deep links and drawer picks) so it always reflects **`currentPath`** per §4.2.
 - [ ] **T4.6** Confirm **no** Proxmox API or repository contract changes and **no** removal of drawer as full menu per §4.2 “Keep” row.
 
 #### Phase acceptance criteria
 
-- Spike **does not merge** path-breaking behavior; `lib/app/router.dart` public paths remain valid or changes are explicitly approved and documented.
-- Documented outcome: **ship**, **defer**, or **reject** with reasons (verifiable link or plan edit).
-- If UI is shown: bottom selection and drawer selection **cannot contradict** `currentPath` in a smoke test of primary flows.
+- **No** path-breaking behavior is merged; `lib/app/router.dart` public paths remain valid or changes are explicitly approved and documented.
+- A **shipped** (integrated in the main app, not prototype-only or throwaway) bottom navigation experience meets §4.2: **NavigationBar** (or documented equivalent) plus **full** drawer; bottom and drawer selection **cannot contradict** `currentPath` in smoke tests of primary flows.
 - Deep link manual checks pass for at least **storage** and **encoded UPID task** routes per §12.2 extra note.
-- `flutter analyze` exits **0** on any code committed for the spike.
-- Prototype labeled **optional** in UI changelog or internal notes so testers know baseline may omit bottom nav.
+- `flutter analyze` exits **0** on committed shell/router code for this phase.
+- Shipped hybrid pattern is **documented** (plan edit or link) for QA and future work.
 
 ### 11.6 Phase 5 — List screens (grouped lists, shell parity)
 
@@ -418,7 +417,7 @@ Migrate server, VM, container, storage, backup, and task **lists**, plus **`/set
 
 #### Depends on
 
-Phases 1, 2 (Phase 3 recommended for consistent shell chrome)
+Phases 1–4 (Phase 3 for consistent shell chrome; Phase 4 mandatory for bottom nav per §11.5)
 
 #### Trackable tasks
 

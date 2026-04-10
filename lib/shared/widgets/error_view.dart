@@ -20,7 +20,16 @@ class ErrorView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 48, color: scheme.error),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: scheme.surfaceContainerHigh,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Icon(Icons.error_outline, size: 48, color: scheme.error),
+              ),
+            ),
             const SizedBox(height: 16),
             Text(
               message,

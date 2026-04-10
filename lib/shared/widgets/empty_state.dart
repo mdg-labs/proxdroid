@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:proxdroid/shared/widgets/icon_badge_avatar.dart';
+
 /// Icon, title, optional detail text, and optional action (e.g. CTA button).
 class EmptyState extends StatelessWidget {
   const EmptyState({
@@ -26,11 +28,7 @@ class EmptyState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircleAvatar(
-              radius: 40,
-              backgroundColor: scheme.primaryContainer.withValues(alpha: 0.65),
-              child: Icon(icon, size: 40, color: scheme.onPrimaryContainer),
-            ),
+            IconBadgeAvatar(icon: icon),
             const SizedBox(height: 20),
             Text(
               title,

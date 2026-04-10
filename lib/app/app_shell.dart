@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:proxdroid/features/servers/providers/server_providers.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/providers/connectivity_provider.dart';
+import 'package:proxdroid/shared/widgets/section_header.dart';
 
 bool _connectivityLooksOffline(List<ConnectivityResult> results) {
   if (results.isEmpty) {
@@ -114,7 +115,10 @@ class AppShell extends ConsumerWidget {
         children: [
           _DrawerBrandingHeader(),
           const Divider(height: 1),
-          _DrawerSectionLabel(text: l10n.drawerSectionInfrastructure),
+          SectionHeader(
+            title: l10n.drawerSectionInfrastructure,
+            variant: SectionHeaderVariant.muted,
+          ),
           NavigationDrawerDestination(
             icon: const Icon(Icons.dns_outlined),
             selectedIcon: const Icon(Icons.dns),
@@ -140,7 +144,10 @@ class AppShell extends ConsumerWidget {
             selectedIcon: const Icon(Icons.storage),
             label: Text(l10n.entityStorage),
           ),
-          _DrawerSectionLabel(text: l10n.drawerSectionOperations),
+          SectionHeader(
+            title: l10n.drawerSectionOperations,
+            variant: SectionHeaderVariant.muted,
+          ),
           NavigationDrawerDestination(
             icon: const Icon(Icons.backup_outlined),
             selectedIcon: const Icon(Icons.backup),
@@ -157,28 +164,6 @@ class AppShell extends ConsumerWidget {
             label: Text(l10n.sectionSettings),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _DrawerSectionLabel extends StatelessWidget {
-  const _DrawerSectionLabel({required this.text});
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(28, 12, 16, 4),
-      child: Text(
-        text,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          color: scheme.onSurfaceVariant,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 0.5,
-        ),
       ),
     );
   }

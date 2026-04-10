@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:proxdroid/app/theme/app_colors.dart';
+
 /// Semantic style for [StatusBadge] (Material 3–friendly; success/warning/error
 /// use distinct hues — labels must be passed from l10n by the caller).
 enum StatusBadgeVariant { success, warning, error, neutral }
@@ -16,7 +18,7 @@ class StatusBadge extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: style.background,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -46,13 +48,25 @@ _BadgeColors _styleFor(BuildContext context, StatusBadgeVariant variant) {
   switch (variant) {
     case StatusBadgeVariant.success:
       return _BadgeColors(
-        background: isDark ? const Color(0xFF1B4332) : const Color(0xFFE8F5E9),
-        foreground: isDark ? const Color(0xFF95D5B2) : const Color(0xFF1B4332),
+        background:
+            isDark
+                ? AppColors.darkStatusSuccessBackground
+                : AppColors.lightStatusSuccessBackground,
+        foreground:
+            isDark
+                ? AppColors.darkStatusSuccessForeground
+                : AppColors.lightStatusSuccessForeground,
       );
     case StatusBadgeVariant.warning:
       return _BadgeColors(
-        background: isDark ? const Color(0xFF5C4A00) : const Color(0xFFFFF8E1),
-        foreground: isDark ? const Color(0xFFFFE082) : const Color(0xFF5C4A00),
+        background:
+            isDark
+                ? AppColors.darkStatusWarningBackground
+                : AppColors.lightStatusWarningBackground,
+        foreground:
+            isDark
+                ? AppColors.darkStatusWarningForeground
+                : AppColors.lightStatusWarningForeground,
       );
     case StatusBadgeVariant.error:
       return _BadgeColors(

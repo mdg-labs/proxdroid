@@ -5,6 +5,7 @@ import 'package:proxdroid/core/models/resource_data_point.dart';
 import 'package:proxdroid/core/utils/formatters.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
+import 'package:proxdroid/shared/widgets/pill_segmented.dart';
 
 /// Which metric(s) [ResourceLineChart] plots.
 enum ResourceChartMetric { cpu, memory, network, diskIo }
@@ -24,17 +25,17 @@ class ChartTimeframeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children:
-          ChartTimeframe.values.map((tf) {
-            return ChoiceChip(
-              label: Text(_label(tf)),
-              selected: tf == selected,
-              onSelected: (_) => onChanged(tf),
-            );
-          }).toList(),
+    return PillSegmentedButton<ChartTimeframe>(
+      padding: EdgeInsets.zero,
+      segments: [
+        for (final tf in ChartTimeframe.values)
+          ButtonSegment<ChartTimeframe>(value: tf, label: Text(_label(tf))),
+      ],
+      selected: {selected},
+      onSelectionChanged: (Set<ChartTimeframe> next) {
+        if (next.isEmpty) return;
+        onChanged(next.first);
+      },
     );
   }
 
