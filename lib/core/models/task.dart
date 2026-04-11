@@ -106,9 +106,13 @@ TaskStatus taskStatusFromApiData(dynamic data) {
 
 /// Derives a JSON value for [Task.status] from a [GET /nodes/{node}/tasks] row.
 ///
-/// Order matches [taskStatusFromApiData]: in-flight rows use `status` only;
-/// for terminal rows, non-OK `exitstatus` overrides `stopped`→OK; then
-/// `TASK ERROR` in `type`; then plain `status` string mapping.
+/// PVE list rows differ from [GET …/tasks/{upid}/status]:
+/// - Archive lines store the outcome in `status` only (no `exitstatus` on the
+///   list schema). Values come from [PVE::UPID::read_status]: `OK`,
+///   `WARNINGS: N`, `unexpected status`, or the **message body** after
+///   `TASK ERROR:` (e.g. `VM is locked`) — not the operation `type`.
+/// - Some proxies or versions may still send `exitstatus`; treat like the
+///   status endpoint when present.
 Object? readTaskStatusJsonValue(Map json, String key) {
   final statusRaw = json['status'];
   final typeStr = proxmoxString(json['type']);
@@ -127,9 +131,36 @@ Object? readTaskStatusJsonValue(Map json, String key) {
     return 'error';
   }
 
-  final statusStr = statusRaw?.toString().trim().toLowerCase();
-  if (statusStr == 'stopped') {
+  final statusNorm = statusRaw?.toString().trim().toLowerCase() ?? '';
+  if (statusNorm == 'stopped') {
     return 'ok';
+  }
+
+  // Archive / list outcome strings (see PVE::UPID::read_status).
+  if (statusNorm == 'ok') {
+    return 'ok';
+  }
+  if (RegExp(r'^warnings:\s*\d+$').hasMatch(statusNorm)) {
+    return 'ok';
+  }
+  if (statusNorm.contains('task error')) {
+    return 'error';
+  }
+  if (statusNorm == 'unexpected status') {
+    return statusRaw;
+  }
+  if (statusNorm == 'unknown') {
+    return statusRaw;
+  }
+
+  final parsed = taskStatusFromApiString(statusRaw);
+  if (parsed != TaskStatus.unknown) {
+    return statusRaw;
+  }
+
+  // Non-empty free-form `status` is an error message from the task log.
+  if (statusNorm.isNotEmpty) {
+    return 'error';
   }
 
   return statusRaw;

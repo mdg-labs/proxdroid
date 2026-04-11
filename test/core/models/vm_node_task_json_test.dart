@@ -135,6 +135,69 @@ void main() {
       };
       expect(Task.fromJson(map).status, TaskStatus.error);
     });
+
+    test(
+      'fromJson list row: PVE index status is error body only (no exitstatus)',
+      () {
+        final map = <String, dynamic>{
+          'upid': 'UPID:pve:1:2:3:vzdump:100:root@pam:',
+          'node': 'pve',
+          'type': 'vzdump',
+          'status': 'VM is locked',
+          'starttime': 1700000000,
+          'user': 'root@pam',
+        };
+        expect(Task.fromJson(map).status, TaskStatus.error);
+      },
+    );
+
+    test('fromJson list row: status OK (archive) → Completed', () {
+      final map = <String, dynamic>{
+        'upid': 'UPID:pve:1:2:3:vzdump:100:root@pam:',
+        'node': 'pve',
+        'type': 'vzdump',
+        'status': 'OK',
+        'starttime': 1700000000,
+        'user': 'root@pam',
+      };
+      expect(Task.fromJson(map).status, TaskStatus.ok);
+    });
+
+    test('fromJson list row: status WARNINGS → Completed', () {
+      final map = <String, dynamic>{
+        'upid': 'UPID:pve:1:2:3:vzdump:100:root@pam:',
+        'node': 'pve',
+        'type': 'vzdump',
+        'status': 'WARNINGS: 2',
+        'starttime': 1700000000,
+        'user': 'root@pam',
+      };
+      expect(Task.fromJson(map).status, TaskStatus.ok);
+    });
+
+    test('fromJson list row: unexpected status → Unknown', () {
+      final map = <String, dynamic>{
+        'upid': 'UPID:pve:1:2:3:vzdump:100:root@pam:',
+        'node': 'pve',
+        'type': 'vzdump',
+        'status': 'unexpected status',
+        'starttime': 1700000000,
+        'user': 'root@pam',
+      };
+      expect(Task.fromJson(map).status, TaskStatus.unknown);
+    });
+
+    test('fromJson list row: literal unknown status → Unknown', () {
+      final map = <String, dynamic>{
+        'upid': 'UPID:pve:1:2:3:vzdump:100:root@pam:',
+        'node': 'pve',
+        'type': 'vzdump',
+        'status': 'unknown',
+        'starttime': 1700000000,
+        'user': 'root@pam',
+      };
+      expect(Task.fromJson(map).status, TaskStatus.unknown);
+    });
   });
 
   group('taskStatusFromApiData', () {
