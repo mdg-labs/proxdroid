@@ -37,7 +37,7 @@ This document defines the technical architecture of ProxDroid. All decisions fol
 | Code Generation | **build_runner** + **riverpod_generator** | Required for Freezed + Riverpod Generator |
 | CI/CD | **GitHub Actions** | Free for open source |
 | Localization | **flutter_localizations** + **intl** + ARB files + gen_l10n | Official Flutter i18n approach; ARB files under `lib/l10n/`; `gen_l10n` generates type-safe `AppLocalizations` class |
-| IDE / Rules | **Cursor** + `.cursor/rules/` | Rule files enforce Riverpod patterns, Freezed usage, feature-first folder layout, go_router conventions, naming conventions, and API client patterns; prevents agent drift during AI-assisted development |
+| IDE / Rules | **Cursor** + `.cursor/rules/` | Rule files enforce Riverpod patterns, Freezed usage, feature-first layout, go_router conventions, naming, API client patterns, local CI parity after edits, and roadmap updates; see §3 “Cursor IDE Rules” table |
 
 ### Cursor IDE Rules (`.cursor/rules/`)
 
@@ -52,6 +52,9 @@ Cursor rule files live under `.cursor/rules/` at the repository root. Each rule 
 | `proxmox-api.mdc` | HTTPS-only validation; Dio v5 `IOHttpClientAdapter` only (no v4); auth header formats; `GET /cluster/resources` preference over per-node list calls |
 | `hive-secure-storage.mdc` | Credentials only in `flutter_secure_storage`; metadata in hive_ce; no credentials on the `Server` Freezed model |
 | `ui-patterns.mdc` | Optimistic UI only for non-destructive reads (see PRD §6); Material 3; shared widget locations (`shared/widgets/`) |
+| `ci-local-verification.mdc` | After substantive edits, run the same steps as `.github/workflows/ci.yml` (`pub get`, format check, `build_runner`, `gen-l10n`, `analyze`, `test`) until all pass |
+| `update-plan-files.mdc` | Keep `docs/ProxDroid_Roadmap.md` (and related plans) aligned with completed work |
+| `orchestrator-only.mdc` | Optional workflow: delegation mode only — see rule preamble (default single-agent sessions use `ci-local-verification.mdc`) |
 
 > These rules are created in **Phase 0** of the Roadmap (see `ProxDroid_Roadmap.md` §Phase 0.1).
 
@@ -316,7 +319,7 @@ if (allowSelfSigned) {
 
 ### UI shell and theme (Material 3)
 
-- **`AppShell`** (`lib/app/app_shell.dart`): `Scaffold` with `NavigationDrawer`. Drawer includes a branding header (avatar, app title, localized subtitle), optional **active server** row (`selectedServerProvider`) that navigates to `/servers`, `Divider`, section labels (**Infrastructure** / **Operations** from ARB), then the eight destinations. Offline banner uses light elevation and rounded bottom corners.
+- **`AppShell`** (`lib/app/app_shell.dart`): `Scaffold` with `NavigationBar` + `NavigationDrawer` (More opens drawer). Drawer includes a branding header (avatar, app title, localized subtitle), optional **active server** row (`selectedServerProvider`) that navigates to `/servers`, section labels (**Infrastructure** / **Operations** from ARB), then **seven** drawer destinations (Dashboard, VMs, Containers, Storage, Backups, Tasks, Settings — no duplicate **Servers** row; `/servers` is also linked from **Settings** above Appearance). Offline banner uses light elevation and rounded bottom corners.
 - **`ShellSectionBody`** (`lib/shared/widgets/shell_section_body.dart`): Reusable **AppBar + Expanded(body)** for shell routes; optional **FAB** via `Stack` (used on server list). Prefer this for new section screens; body padding stays inside scroll/sliver children where pull-to-refresh applies.
 - **`AppTheme`** (`lib/app/theme/app_theme.dart`): Shared **card** shape (16px radius, elevation 0, `surfaceContainerHighest`), **filled inputs** with rounded borders, **list tile** shape/padding, **filled/text buttons**, **segmented** shape hint, **app bar** with `scrolledUnderElevation` on scroll.
 

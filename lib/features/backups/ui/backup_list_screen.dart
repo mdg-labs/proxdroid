@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:proxdroid/core/models/container.dart' as px;
+import 'package:proxdroid/core/models/proxmox_guest_tag.dart';
 import 'package:proxdroid/core/models/task.dart' as pve;
 import 'package:proxdroid/core/models/vm.dart';
 import 'package:proxdroid/core/utils/formatters.dart';
@@ -15,6 +16,8 @@ import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
+import 'package:proxdroid/shared/providers/proxmox_tag_colors_provider.dart';
+import 'package:proxdroid/shared/widgets/proxmox_tag_widgets.dart';
 import 'package:proxdroid/shared/widgets/section_header.dart';
 import 'package:proxdroid/shared/widgets/shell_section_body.dart';
 
@@ -38,6 +41,21 @@ class BackupListScreen extends ConsumerWidget {
       ref.read(allVmsProvider.future),
       ref.read(allContainersProvider.future),
     ]);
+  }
+
+  static List<ProxmoxGuestTag> _guestTagsForVmid(
+    int? vmid,
+    List<Vm> vms,
+    List<px.Container> cts,
+  ) {
+    if (vmid == null) return const [];
+    for (final v in vms) {
+      if (v.vmid == vmid) return v.tags;
+    }
+    for (final c in cts) {
+      if (c.vmid == vmid) return c.tags;
+    }
+    return const [];
   }
 
   static String _guestName(
@@ -66,6 +84,9 @@ class BackupListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
+    final tagColorMap =
+        ref.watch(proxmoxTagColorsProvider).valueOrNull ??
+        const <String, String>{};
 
     final jobsAsync = ref.watch(backupJobsProvider);
     final filesAsync = ref.watch(clusterBackupContentProvider);
@@ -228,8 +249,23 @@ class BackupListScreen extends ConsumerWidget {
                   final vmid = sortedKeys[i];
                   final entries = byVmid[vmid]!;
                   final title = _guestName(vmid, vms, cts, l10n);
+                  final guestTags = _guestTagsForVmid(vmid, vms, cts);
                   return ExpansionTile(
-                    title: Text(title),
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(title),
+                        if (guestTags.isNotEmpty) ...[
+                          const SizedBox(height: 6),
+                          ProxmoxTagRow(
+                            tags: guestTags,
+                            clusterTagHexByLabel: tagColorMap,
+                            density: ProxmoxTagDensity.compact,
+                            spacing: 5,
+                          ),
+                        ],
+                      ],
+                    ),
                     subtitle: Text(
                       l10n.entityBackup,
                       style: TextStyle(color: scheme.onSurfaceVariant),
@@ -269,8 +305,23 @@ class BackupListScreen extends ConsumerWidget {
                   final t = vzTasks[i];
                   final vmid = vmidFromProxmoxUpid(t.upid);
                   final guest = _guestName(vmid, vms, cts, l10n);
+                  final guestTags = _guestTagsForVmid(vmid, vms, cts);
                   return ListTile(
-                    title: Text(guest),
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(guest),
+                        if (guestTags.isNotEmpty) ...[
+                          const SizedBox(height: 6),
+                          ProxmoxTagRow(
+                            tags: guestTags,
+                            clusterTagHexByLabel: tagColorMap,
+                            density: ProxmoxTagDensity.compact,
+                            spacing: 5,
+                          ),
+                        ],
+                      ],
+                    ),
                     subtitle: Text(
                       '${t.type} · ${_statusLine(t, l10n)}',
                       style: TextStyle(color: scheme.onSurfaceVariant),

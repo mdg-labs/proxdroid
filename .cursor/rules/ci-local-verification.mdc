@@ -1,0 +1,28 @@
+---
+description: After code changes, run the same checks as GitHub CI and finish only when all pass.
+alwaysApply: true
+---
+
+# Local CI parity before “done”
+
+After **substantive** edits (Dart/Flutter code, generated sources, `pubspec.yaml`, `*.arb`, router/shell, or anything that could affect analyze, tests, or codegen), run the **same sequence** as [`.github/workflows/ci.yml`](.github/workflows/ci.yml) (`analyze-test` job), from the repo root:
+
+```bash
+flutter pub get
+dart format --output=none --set-exit-if-changed .
+dart run build_runner build --delete-conflicting-outputs
+flutter gen-l10n
+flutter analyze
+flutter test
+```
+
+## Agent expectations
+
+1. **Run the full chain** (not only `flutter analyze`) unless the change is truly documentation-only (e.g. only `docs/*.md` or `README` with no code or config impact)—then at minimum confirm nothing else was touched.
+2. If **format** fails, apply `dart format .` (or format touched paths), then re-run the chain from `dart format --output=none --set-exit-if-changed .` onward.
+3. If **build_runner** or **gen-l10n** updates generated files, commit-worthy outputs must be consistent; re-run analyze and test after regenerating.
+4. **Do not treat the task as complete** while any step exits non-zero. Fix failures, then re-run until **all steps pass**.
+
+## Flutter version
+
+CI uses Flutter **3.41.6** stable (see `ci.yml`). Prefer matching that version locally when diagnosing CI-only failures.

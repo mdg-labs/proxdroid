@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:proxdroid/core/models/container.dart' as px;
+import 'package:proxdroid/core/models/proxmox_guest_tag.dart';
 import 'package:proxdroid/core/models/storage.dart';
 import 'package:proxdroid/core/models/vm.dart';
 import 'package:proxdroid/features/backups/providers/backup_providers.dart';
@@ -10,7 +11,9 @@ import 'package:proxdroid/features/servers/ui/proxmox_exception_messages.dart';
 import 'package:proxdroid/features/storage/providers/storage_providers.dart';
 import 'package:proxdroid/features/vms/providers/vm_providers.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
+import 'package:proxdroid/shared/providers/proxmox_tag_colors_provider.dart';
 import 'package:proxdroid/shared/widgets/premium_modals.dart';
+import 'package:proxdroid/shared/widgets/proxmox_tag_widgets.dart';
 
 /// Target guest for a manual vzdump (VM or LXC).
 class BackupGuestTarget {
@@ -102,6 +105,23 @@ class _TriggerBackupSheetState extends ConsumerState<TriggerBackupSheet> {
         ),
       ],
     );
+  }
+
+  List<ProxmoxGuestTag> _tagsForGuestTarget(
+    BackupGuestTarget t,
+    List<Vm> vms,
+    List<px.Container> cts,
+  ) {
+    if (t.isLxc) {
+      for (final c in cts) {
+        if (c.node == t.node && c.vmid == t.vmid) return c.tags;
+      }
+    } else {
+      for (final v in vms) {
+        if (v.node == t.node && v.vmid == t.vmid) return v.tags;
+      }
+    }
+    return const [];
   }
 
   List<BackupGuestTarget> _buildGuests(List<Vm> vms, List<px.Container> cts) {
@@ -215,6 +235,9 @@ class _TriggerBackupSheetState extends ConsumerState<TriggerBackupSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final tagColorMap =
+        ref.watch(proxmoxTagColorsProvider).valueOrNull ??
+        const <String, String>{};
     final vmsAsync = ref.watch(allVmsProvider);
     final ctsAsync = ref.watch(allContainersProvider);
     final storageAsync = ref.watch(allClusterStorageProvider);
@@ -234,7 +257,9 @@ class _TriggerBackupSheetState extends ConsumerState<TriggerBackupSheet> {
     } else if (!vmsAsync.hasValue || !ctsAsync.hasValue) {
       inner = const LinearProgressIndicator();
     } else {
-      final guests = _buildGuests(vmsAsync.requireValue, ctsAsync.requireValue);
+      final vms = vmsAsync.requireValue;
+      final cts = ctsAsync.requireValue;
+      final guests = _buildGuests(vms, cts);
       final guestVal = _effectiveGuest(guests);
 
       inner = Column(
@@ -247,17 +272,28 @@ class _TriggerBackupSheetState extends ConsumerState<TriggerBackupSheet> {
               label: l10n.backupFieldGuest,
               value: guestVal,
               items:
-                  guests
-                      .map(
-                        (x) => DropdownMenuItem(
-                          value: x,
-                          child: Text(
-                            x.displayLabel,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      )
-                      .toList(),
+                  guests.map((x) {
+                    final tags = _tagsForGuestTarget(x, vms, cts);
+                    return DropdownMenuItem<BackupGuestTarget>(
+                      value: x,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(x.displayLabel, overflow: TextOverflow.ellipsis),
+                          if (tags.isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            ProxmoxTagRow(
+                              tags: tags,
+                              clusterTagHexByLabel: tagColorMap,
+                              density: ProxmoxTagDensity.compact,
+                              spacing: 4,
+                            ),
+                          ],
+                        ],
+                      ),
+                    );
+                  }).toList(),
               onChanged:
                   _busy
                       ? null

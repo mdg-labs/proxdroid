@@ -27,12 +27,8 @@ final class ProxmoxGuestTag {
           other.iconKey == iconKey;
 
   @override
-  int get hashCode => Object.hash(
-    label,
-    inlineBackgroundHex,
-    inlineForegroundHex,
-    iconKey,
-  );
+  int get hashCode =>
+      Object.hash(label, inlineBackgroundHex, inlineForegroundHex, iconKey);
 }
 
 bool _isPropertyOnlySegment(String segment) {
@@ -73,7 +69,11 @@ String? _normalizeHexColor(String? raw) => proxmoxNormalizeHexColor(raw);
 /// Parses one merged segment (e.g. `prod` or `prod;color=EE00FF;icon=computer`).
 ProxmoxGuestTag parseSingleGuestTagSegment(String segment) {
   final parts =
-      segment.split(';').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+      segment
+          .split(';')
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty)
+          .toList();
   if (parts.isEmpty) {
     return const ProxmoxGuestTag(label: '');
   }
@@ -114,9 +114,16 @@ List<ProxmoxGuestTag> parseProxmoxGuestTagsString(String raw) {
   final trimmed = raw.trim();
   if (trimmed.isEmpty) return const [];
   final pieces =
-      trimmed.split(';').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+      trimmed
+          .split(';')
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty)
+          .toList();
   final merged = mergeProxmoxTagSegments(pieces);
-  return merged.map(parseSingleGuestTagSegment).where((t) => t.label.isNotEmpty).toList();
+  return merged
+      .map(parseSingleGuestTagSegment)
+      .where((t) => t.label.isNotEmpty)
+      .toList();
 }
 
 List<ProxmoxGuestTag> guestTagsFromJson(Object? json) {

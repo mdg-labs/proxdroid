@@ -1491,6 +1491,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'More'**
   String get navMore;
+
+  /// Section title for Proxmox guest tags on VM / container detail screens.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get sectionGuestTags;
 }
 
 class _AppLocalizationsDelegate

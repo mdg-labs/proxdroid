@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:proxdroid/app/theme/app_theme.dart';
 import 'package:proxdroid/core/models/container.dart' as px;
+import 'package:proxdroid/core/models/proxmox_guest_tag.dart';
 import 'package:proxdroid/core/models/task.dart';
 import 'package:proxdroid/core/models/vm.dart';
 import 'package:proxdroid/core/utils/upid_parser.dart';
@@ -12,10 +13,12 @@ import 'package:proxdroid/features/servers/ui/proxmox_exception_messages.dart';
 import 'package:proxdroid/features/tasks/providers/task_providers.dart';
 import 'package:proxdroid/features/vms/providers/vm_providers.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
+import 'package:proxdroid/shared/providers/proxmox_tag_colors_provider.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
 import 'package:proxdroid/shared/widgets/shell_section_body.dart';
+import 'package:proxdroid/shared/widgets/proxmox_tag_widgets.dart';
 import 'package:proxdroid/shared/widgets/status_badge.dart';
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -88,6 +91,28 @@ class TaskListScreen extends ConsumerWidget {
       }
     }
     return '$vmid';
+  }
+
+  static List<ProxmoxGuestTag> _guestTagsForTask({
+    required int? vmid,
+    required String taskNode,
+    required List<Vm> vms,
+    required List<px.Container> containers,
+  }) {
+    if (vmid == null) return const [];
+    for (final v in vms) {
+      if (v.vmid == vmid && v.node == taskNode) return v.tags;
+    }
+    for (final c in containers) {
+      if (c.vmid == vmid && c.node == taskNode) return c.tags;
+    }
+    for (final v in vms) {
+      if (v.vmid == vmid) return v.tags;
+    }
+    for (final c in containers) {
+      if (c.vmid == vmid) return c.tags;
+    }
+    return const [];
   }
 
   static String _formatDuration(int startSec, int? endSec) {
@@ -171,6 +196,9 @@ class TaskListScreen extends ConsumerWidget {
     final vms = ref.watch(allVmsProvider).valueOrNull ?? const <Vm>[];
     final containers =
         ref.watch(allContainersProvider).valueOrNull ?? const <px.Container>[];
+    final tagColorMap =
+        ref.watch(proxmoxTagColorsProvider).valueOrNull ??
+        const <String, String>{};
     final minPullHeight = MediaQuery.sizeOf(context).height * 0.5;
 
     Future<void> refreshTasks() async {
@@ -283,6 +311,12 @@ class TaskListScreen extends ConsumerWidget {
                       containers: containers,
                       l10n: l10n,
                     );
+                    final guestTags = _guestTagsForTask(
+                      vmid: vmid,
+                      taskNode: task.node,
+                      vms: vms,
+                      containers: containers,
+                    );
                     final start = task.startTime;
                     String startedText = l10n.valueUnavailable;
                     if (start != null) {
@@ -303,6 +337,8 @@ class TaskListScreen extends ConsumerWidget {
                       child: _TaskTile(
                         task: task,
                         guest: guest,
+                        guestTags: guestTags,
+                        clusterTagHexByLabel: tagColorMap,
                         startedText: startedText,
                         durationText: durationText,
                         statusVariant: _statusVariant(task.status),
@@ -428,6 +464,8 @@ class _TaskTile extends StatelessWidget {
   const _TaskTile({
     required this.task,
     required this.guest,
+    required this.guestTags,
+    required this.clusterTagHexByLabel,
     required this.startedText,
     required this.durationText,
     required this.statusVariant,
@@ -440,6 +478,8 @@ class _TaskTile extends StatelessWidget {
 
   final Task task;
   final String guest;
+  final List<ProxmoxGuestTag> guestTags;
+  final Map<String, String> clusterTagHexByLabel;
   final String startedText;
   final String durationText;
   final StatusBadgeVariant statusVariant;
@@ -488,6 +528,15 @@ class _TaskTile extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    if (guestTags.isNotEmpty) ...[
+                      const SizedBox(height: 5),
+                      ProxmoxTagRow(
+                        tags: guestTags,
+                        clusterTagHexByLabel: clusterTagHexByLabel,
+                        density: ProxmoxTagDensity.compact,
+                        spacing: 5,
+                      ),
+                    ],
                     const SizedBox(height: 2),
                     Row(
                       children: [

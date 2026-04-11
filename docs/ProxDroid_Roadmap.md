@@ -207,6 +207,7 @@
 - [x] Implement `LoadingShimmer` widget for list placeholders
 - [x] Implement `ErrorView` widget with message + retry button
 - [x] Implement `EmptyState` widget with icon + message
+- [x] Proxmox guest tags: `tags` field on `Vm` / `Container`, `tag-colors` from `GET /version` via `proxmoxTagColorsProvider`, `ProxmoxTagBadge` / `ProxmoxTagRow` on VM+LXC list/detail, backup file groups + recent vzdump tasks, task list, manual backup guest picker
 
 ---
 

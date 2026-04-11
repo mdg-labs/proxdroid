@@ -25,7 +25,8 @@ lib/features/<feature>/
 ```
 
 Shared widgets go in `lib/shared/widgets/`.
-Shared constants go in `lib/shared/constants/`.
+Shared constants go in `lib/shared/constants/` (e.g. `api_endpoints.dart`).
+Shared routing helpers go in `lib/shared/routing/` (e.g. shell drawer root paths).
 Core infrastructure (API client, base models, storage) goes in `lib/core/`.
 
 ## File Naming Conventions

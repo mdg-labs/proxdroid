@@ -17,12 +17,14 @@ import 'package:proxdroid/features/backups/ui/trigger_backup_sheet.dart';
 import 'package:proxdroid/features/servers/ui/proxmox_exception_messages.dart';
 import 'package:proxdroid/features/tasks/providers/task_providers.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
+import 'package:proxdroid/shared/providers/proxmox_tag_colors_provider.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
 import 'package:proxdroid/shared/widgets/icon_badge_avatar.dart';
 import 'package:proxdroid/shared/widgets/labeled_row.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
 import 'package:proxdroid/shared/widgets/premium_modals.dart';
+import 'package:proxdroid/shared/widgets/proxmox_tag_widgets.dart';
 import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
 
 class ContainerDetailScreen extends ConsumerStatefulWidget {
@@ -291,6 +293,9 @@ class _ContainerDetailScreenState extends ConsumerState<ContainerDetailScreen> {
         final ct = found;
         final title =
             ct.name.isEmpty ? '${l10n.labelCtid} ${ct.vmid}' : ct.name;
+        final tagColors =
+            ref.watch(proxmoxTagColorsProvider).valueOrNull ??
+            const <String, String>{};
 
         final canStart =
             ct.status == px.ContainerStatus.stopped ||
@@ -384,6 +389,22 @@ class _ContainerDetailScreenState extends ConsumerState<ContainerDetailScreen> {
                                   ),
                                   const SizedBox(height: 8),
                                   ContainerStatusBadge(status: ct.status),
+                                  if (ct.tags.isNotEmpty) ...[
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      l10n.sectionGuestTags,
+                                      style: tt.labelSmall?.copyWith(
+                                        color: scheme.onSurfaceVariant,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    ProxmoxTagRow(
+                                      tags: ct.tags,
+                                      clusterTagHexByLabel: tagColors,
+                                      density: ProxmoxTagDensity.comfortable,
+                                    ),
+                                  ],
                                 ],
                               ),
                             ),

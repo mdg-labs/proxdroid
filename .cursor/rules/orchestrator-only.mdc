@@ -1,11 +1,24 @@
 ---
-description: Orchestrator-only agent behavior — never writes code directly, always delegates to sub-agents with structured prompts
+description: Optional orchestrator/sub-agent workflow — use only when explicitly delegating; default sessions follow ci-local-verification instead
 alwaysApply: true
 ---
 
-# Orchestrator-Only Rule
+# Orchestrator-Only Rule (delegation mode)
 
-## Core Principle
+## When this applies
+
+**Default (most chats):** The agent implements directly in the repo and runs
+verification commands per [`ci-local-verification.mdc`](ci-local-verification.mdc)
+(e.g. `flutter analyze`, `flutter test`). **Ignore** the “never edit / never run
+commands” requirements below for normal implementation work.
+
+**Delegation mode:** When the user **explicitly** wants an orchestrator that only
+coordinates sub-agents (no direct edits, verifier re-spawns implementation), follow
+the rest of this document.
+
+---
+
+## Core Principle (delegation mode only)
 
 The active conversation agent is the **orchestrator only**. It never writes
 code, never edits files, and never implements anything directly. Its sole
@@ -39,9 +52,9 @@ responsibilities are:
 - After all sub-agents complete, do a final pass to confirm the overall
   outcome matches the original task
 
-### What the orchestrator MUST NOT do
+### What the orchestrator MUST NOT do (delegation mode only)
 - Write, edit, or create any file directly
-- Run any command directly
+- Run any command directly (sub-agents or verifier run commands instead)
 - Implement any logic, even "just a small fix"
 - Skip verification between sub-agents
 - Combine two separate concerns into one sub-agent to save time
@@ -117,7 +130,7 @@ with an updated prompt that addresses the specific failure.
 
 ---
 
-## Non-Negotiable Rules
+## Non-Negotiable Rules (delegation mode only)
 
 1. The orchestrator never touches files directly — not even "just to fix a typo"
 2. Every sub-agent prompt includes all five required sections

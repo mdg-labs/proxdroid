@@ -757,4 +757,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get navMore => 'More';
+
+  @override
+  String get sectionGuestTags => 'Tags';
 }

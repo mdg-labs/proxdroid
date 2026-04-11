@@ -16,10 +16,7 @@ void main() {
     test('parses tag-colors map of hex strings', () {
       final v = ProxmoxVersion.fromDataJson(<String, dynamic>{
         'version': '8',
-        'tag-colors': <String, dynamic>{
-          'Prod': 'ff00aa',
-          'web': '#112233',
-        },
+        'tag-colors': <String, dynamic>{'Prod': 'ff00aa', 'web': '#112233'},
       });
       expect(v.tagBackgroundHexByTagLabel['prod'], 'FF00AA');
       expect(v.tagBackgroundHexByTagLabel['web'], '112233');
@@ -28,9 +25,7 @@ void main() {
     test('parses tag-style name:bg:fg string values', () {
       final v = ProxmoxVersion.fromDataJson(<String, dynamic>{
         'version': '8',
-        'tag-colors': <String, dynamic>{
-          'x': 'ignoredname:ABCDEF:000000',
-        },
+        'tag-colors': <String, dynamic>{'x': 'ignoredname:ABCDEF:000000'},
       });
       expect(v.tagBackgroundHexByTagLabel['x'], 'ABCDEF');
     });

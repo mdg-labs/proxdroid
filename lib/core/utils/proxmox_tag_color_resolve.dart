@@ -38,10 +38,7 @@ Color contrastingForegroundOn(Color background) {
   return luminance > 0.55 ? const Color(0xFF121212) : const Color(0xFFF5F5F5);
 }
 
-Color resolveProxmoxTagForegroundColor(
-  ProxmoxGuestTag tag,
-  Color background,
-) {
+Color resolveProxmoxTagForegroundColor(ProxmoxGuestTag tag, Color background) {
   final inline = proxmoxNormalizeHexColor(tag.inlineForegroundHex);
   if (inline != null) {
     return _hexToColor(inline);

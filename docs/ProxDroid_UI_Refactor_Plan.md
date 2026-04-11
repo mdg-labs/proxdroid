@@ -116,13 +116,13 @@ Build or refactor toward these **shared** widgets (names indicative — final na
 ### 4.1 Current behavior (authoritative)
 
 - **`lib/app/router.dart`:** `ShellRoute` wraps all destinations; each route uses `_fadeShellPage` (250ms fade).
-- **`lib/app/app_shell.dart`:** `Scaffold` with `Column`: optional **offline banner** → `Expanded(child: child)`. **NavigationDrawer** with branding header, **Infrastructure** / **Operations** section labels, eight destinations (`/servers` … `/settings`). Active server shortcut row → `/servers`.
+- **`lib/app/app_shell.dart`:** `Scaffold` with `Column`: optional **offline banner** → `Expanded(child: child)`. **NavigationBar** + **NavigationDrawer** (More opens drawer); branding header, **Infrastructure** / **Operations** section labels, **seven** drawer destinations (Dashboard … Settings; `/servers` via header chip and **Settings** row, not duplicated under Infrastructure). Active server shortcut row → `/servers`.
 
 ### 4.2 Recommendation: **hybrid shell (Phase 4)**
 
 | Layer | Recommendation |
 |-------|----------------|
-| **Keep** | `NavigationDrawer` as **full menu** (server switch, all sections, settings) — best for 8+ destinations and Proxmox “many surfaces” model. |
+| **Keep** | `NavigationDrawer` as **full menu** (section list + settings; server list via header / Settings) — fits Proxmox “many surfaces” without duplicating Servers in the drawer. |
 | **Add (Phase 4)** | **Bottom navigation** with **4–5 primary tabs** (e.g. Dashboard, VMs, Containers, Tasks, More) where **More** opens drawer or a hub — matches reference mobile apps and reduces drawer friction for daily tasks; **required** for this refactor (§11.5). |
 | **Risk** | Duplicate selection state (drawer index vs bottom index); must sync highlight with `currentPath`. Deep links (`/storage/...`) should still open correct stack; **do not** break go_router paths. |
 | **Migration** | Phase A: tokens + banner; Phase B: introduce `NavigationBar` per Phase 4; use `StatefulShellRoute` or a single `Scaffold` with `bottomNavigationBar` + `child` — **research go_router 14+ patterns** before coding. |
@@ -368,7 +368,7 @@ Phases 1, 2
 - [x] **T3.1** Refactor `lib/app/app_shell.dart` `NavigationDrawer`: surface = card grey on black scaffold; selected destination = pill or strong primary tint; section labels use shared `SectionHeader` token per §6.1.
 - [x] **T3.2** Evolve offline banner to dedicated styling / `ConnectivityBanner` (from §3): retint per §4.2 (non-dismissible, rounded bottom, safe area, optional amber/warning semantics vs `errorContainer`).
 - [x] **T3.3** Refresh drawer branding header block to match premium card language per §6.1.
-- [x] **T3.4** Verify all eight drawer destinations remain correct; selected visual always matches **`currentPath`** / route per §4.1.
+- [x] **T3.4** Verify all seven drawer destinations remain correct; selected visual always matches **`currentPath`** / route per §4.1 (`/servers` → drawer `selectedIndex` null).
 - [x] **T3.5** Update `lib/shared/widgets/shell_section_body.dart`: themed `AppBar` (transparent/black edge), FAB **safe-area** aware; reserve bottom inset for Phase 4 bottom nav per §6.2.
 - [x] **T3.6** Confirm `lib/shared/widgets/shell_app_bar_leading.dart` drawer-vs-back behavior unchanged per §6.3 and Architecture §8.
 - [x] **T3.7** Manually verify offline state appears within **~1s** of simulated connectivity loss where the app already detects offline (no layout jump when banner toggles per §6.1).

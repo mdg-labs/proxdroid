@@ -68,10 +68,7 @@ String? _tagColorValueToHex(Object? value) {
   }
   if (value is Map) {
     final nested =
-        value['color'] ??
-        value['background'] ??
-        value['bg'] ??
-        value['value'];
+        value['color'] ?? value['background'] ?? value['bg'] ?? value['value'];
     return _tagColorValueToHex(nested);
   }
   return null;

@@ -53,7 +53,7 @@ Freezed class. Use `copyWith` for all updates.
 ## Error Handling: Use the Sealed ProxmoxException Hierarchy
 
 All errors thrown from repositories must use the sealed `ProxmoxException`
-hierarchy defined in `core/api/api_exceptions.dart`:
+hierarchy defined in `lib/core/api/api_exceptions.dart`:
 
 - `AuthException` — authentication failures
 - `NetworkException` — connectivity issues

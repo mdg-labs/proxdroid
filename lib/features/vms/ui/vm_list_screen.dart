@@ -9,9 +9,11 @@ import 'package:proxdroid/features/servers/ui/proxmox_exception_messages.dart';
 import 'package:proxdroid/features/vms/providers/vm_providers.dart';
 import 'package:proxdroid/features/vms/ui/widgets/vm_status_badge.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
+import 'package:proxdroid/shared/providers/proxmox_tag_colors_provider.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
+import 'package:proxdroid/shared/widgets/proxmox_tag_widgets.dart';
 import 'package:proxdroid/shared/widgets/shell_section_body.dart';
 
 enum _VmStatusFilter { all, running, stopped }
@@ -85,6 +87,9 @@ class _VmListScreenState extends ConsumerState<VmListScreen> {
     final scheme = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
     final async = ref.watch(allVmsProvider);
+    final tagColorMap =
+        ref.watch(proxmoxTagColorsProvider).valueOrNull ??
+        const <String, String>{};
     final minPullHeight = MediaQuery.sizeOf(context).height * 0.5;
 
     Future<void> refreshVms() async {
@@ -290,6 +295,7 @@ class _VmListScreenState extends ConsumerState<VmListScreen> {
                           child: _VmListTile(
                             vm: vm,
                             accent: accent,
+                            clusterTagHexByLabel: tagColorMap,
                             l10n: l10n,
                             scheme: scheme,
                             tt: tt,
@@ -319,6 +325,7 @@ class _VmListTile extends StatelessWidget {
   const _VmListTile({
     required this.vm,
     required this.accent,
+    required this.clusterTagHexByLabel,
     required this.l10n,
     required this.scheme,
     required this.tt,
@@ -327,6 +334,7 @@ class _VmListTile extends StatelessWidget {
 
   final Vm vm;
   final Color accent;
+  final Map<String, String> clusterTagHexByLabel;
   final AppLocalizations l10n;
   final ColorScheme scheme;
   final TextTheme tt;
@@ -398,6 +406,15 @@ class _VmListTile extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
+                      if (vm.tags.isNotEmpty) ...[
+                        const SizedBox(height: 6),
+                        ProxmoxTagRow(
+                          tags: vm.tags,
+                          clusterTagHexByLabel: clusterTagHexByLabel,
+                          density: ProxmoxTagDensity.compact,
+                          spacing: 5,
+                        ),
+                      ],
                       const SizedBox(height: 5),
                       Row(
                         children: [

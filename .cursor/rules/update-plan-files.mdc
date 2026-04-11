@@ -16,7 +16,7 @@ After completing any task, check whether the work done affects any plan or roadm
 - Mark completed checklist items with `[x]` (was `[ ]`)
 - Update phase status labels (e.g. `In Progress`, `Complete`) when a phase milestone is reached
 - Add newly discovered tasks or sub-tasks that emerged during implementation
-- Update the `**Status:**` frontmatter field if the overall document status changes
+- Update the roadmap opening **Status:** line (see `docs/ProxDroid_Roadmap.md` line 3) when overall status changes — the roadmap is plain Markdown, not YAML frontmatter
 
 ## When to Update
 

@@ -37,10 +37,9 @@ void main() {
 
   group('mergeProxmoxTagSegments', () {
     test('property-only attaches to previous', () {
-      expect(
-        mergeProxmoxTagSegments(['a', 'color=112233']),
-        ['a;color=112233'],
-      );
+      expect(mergeProxmoxTagSegments(['a', 'color=112233']), [
+        'a;color=112233',
+      ]);
     });
   });
 }

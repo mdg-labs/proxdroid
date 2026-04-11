@@ -19,10 +19,12 @@ import 'package:proxdroid/features/vms/ui/widgets/memory_chart.dart';
 import 'package:proxdroid/features/vms/ui/widgets/network_chart.dart';
 import 'package:proxdroid/features/vms/ui/widgets/vm_status_badge.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
+import 'package:proxdroid/shared/providers/proxmox_tag_colors_provider.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
 import 'package:proxdroid/shared/widgets/premium_modals.dart';
+import 'package:proxdroid/shared/widgets/proxmox_tag_widgets.dart';
 import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
 
 class VmDetailScreen extends ConsumerStatefulWidget {
@@ -283,6 +285,9 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
         final vm = found;
         final title =
             vm.name.isEmpty ? '${l10n.labelVmid} ${vm.vmid}' : vm.name;
+        final tagColors =
+            ref.watch(proxmoxTagColorsProvider).valueOrNull ??
+            const <String, String>{};
 
         final canStart =
             vm.status == VmStatus.stopped || vm.status == VmStatus.unknown;
@@ -331,7 +336,12 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
                       padding: const EdgeInsets.all(AppSpacing.lg),
                       children: [
                         // ── Hero header ───────────────────────────────────
-                        _VmHeroHeader(vm: vm, title: title, l10n: l10n),
+                        _VmHeroHeader(
+                          vm: vm,
+                          title: title,
+                          l10n: l10n,
+                          clusterTagHexByLabel: tagColors,
+                        ),
                         const SizedBox(height: AppSpacing.lg),
 
                         // ── Power actions ────────────────────────────────
@@ -450,11 +460,13 @@ class _VmHeroHeader extends StatelessWidget {
     required this.vm,
     required this.title,
     required this.l10n,
+    required this.clusterTagHexByLabel,
   });
 
   final Vm vm;
   final String title;
   final AppLocalizations l10n;
+  final Map<String, String> clusterTagHexByLabel;
 
   Color _statusColor(VmStatus status) => switch (status) {
     VmStatus.running => AppColors.darkStatusSuccessForeground,
@@ -516,6 +528,22 @@ class _VmHeroHeader extends StatelessWidget {
                     fontSize: 12,
                   ),
                 ),
+                if (vm.tags.isNotEmpty) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    l10n.sectionGuestTags,
+                    style: tt.labelSmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  ProxmoxTagRow(
+                    tags: vm.tags,
+                    clusterTagHexByLabel: clusterTagHexByLabel,
+                    density: ProxmoxTagDensity.comfortable,
+                  ),
+                ],
               ],
             ),
           ),

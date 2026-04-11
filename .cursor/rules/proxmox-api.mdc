@@ -10,11 +10,11 @@ alwaysApply: false
 
 Always use HTTPS. The app must never initiate an HTTP connection to a PVE server.
 
-Validate in the Add Server form that the host input does not contain `http://`.
-Display a clear, human-readable error if it does. Android API 28+ blocks
-cleartext HTTP at the OS level with cryptic errors — catching this early in the
-UI provides far better UX. Do not add `android:usesCleartextTraffic` to the
-manifest.
+Validate in the Add/Edit Server form (`ServerEditorPage`) that the host input
+does not contain `http://` or `https://` (the client builds the HTTPS base URL
+from host + port). Surface a clear error for either. Android API 28+ blocks
+cleartext HTTP at the OS level with cryptic errors. Do not add
+`android:usesCleartextTraffic` to the manifest.
 
 ## Dio v5: IOHttpClientAdapter
 

@@ -7,10 +7,12 @@ import 'package:proxdroid/features/containers/providers/container_providers.dart
 import 'package:proxdroid/features/containers/ui/widgets/container_status_badge.dart';
 import 'package:proxdroid/features/servers/ui/proxmox_exception_messages.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
+import 'package:proxdroid/shared/providers/proxmox_tag_colors_provider.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
 import 'package:proxdroid/shared/widgets/premium_list_row.dart';
+import 'package:proxdroid/shared/widgets/proxmox_tag_widgets.dart';
 import 'package:proxdroid/shared/widgets/shell_section_body.dart';
 
 enum _ContainerStatusFilter { all, running, stopped }
@@ -74,6 +76,9 @@ class _ContainerListScreenState extends ConsumerState<ContainerListScreen> {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final async = ref.watch(allContainersProvider);
+    final tagColorMap =
+        ref.watch(proxmoxTagColorsProvider).valueOrNull ??
+        const <String, String>{};
     final minPullHeight = MediaQuery.sizeOf(context).height * 0.5;
 
     Future<void> refreshContainers() async {
@@ -267,8 +272,23 @@ class _ContainerListScreenState extends ConsumerState<ContainerListScreen> {
                                   ? '${l10n.labelCtid} ${ct.vmid}'
                                   : ct.name,
                             ),
-                            subtitle: Text(
-                              '${l10n.labelCtid} ${ct.vmid} · ${l10n.entityNode} ${ct.node}',
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  '${l10n.labelCtid} ${ct.vmid} · ${l10n.entityNode} ${ct.node}',
+                                ),
+                                if (ct.tags.isNotEmpty) ...[
+                                  const SizedBox(height: 6),
+                                  ProxmoxTagRow(
+                                    tags: ct.tags,
+                                    clusterTagHexByLabel: tagColorMap,
+                                    density: ProxmoxTagDensity.compact,
+                                    spacing: 5,
+                                  ),
+                                ],
+                              ],
                             ),
                             trailing: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
