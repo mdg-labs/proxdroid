@@ -7,16 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-beta.15] - 2026-04-11
+
+### Added
+
+- Preferences screen with default chart timeframe settings.
+- Proxmox guest tags integrated into UI components with localization updates.
+- Server management enhancements using tags and related UI updates.
+- Node detail screen and routing updates.
+- App icon on the settings screen.
+- Enhanced task status handling and presentation on the task list screen.
+
 ### Changed
 
 - GitHub Actions: `build.yml` now runs on push to **`beta`** or **`main`** when
   **`pubspec.yaml`** changes; CI creates `v<version>` if missing, publishes
   **beta** pre-releases or **main** stable **draft** releases (see `README.md`).
+- Simplified dashboard screen layout.
 
 ### Internal
 
+- Bumped version to `1.0.0-beta.15+1` in `pubspec.yaml`.
 - `dart format` on several UI files; removed unused `Theme` locals; `SectionHeader`
   tests and muted goldens aligned with uppercase muted titles and `onSurfaceVariant` alpha.
+- Documentation: refreshed `CHANGELOG.md` for CI changes, removed obsolete changelog ideas
+  document, clarified changelog guidance for Cursor rules and hooks.
 
 ## [1.0.0-beta.14] - 2026-04-11
 
@@ -146,7 +161,8 @@ First public **beta** prerelease on GitHub Releases (APK via CI).
 - GitHub Actions: release workflow runs only on beta prerelease tags (`v*-beta*`) and
   publishes GitHub **prereleases** with the release APK.
 
-[Unreleased]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.14...HEAD
+[Unreleased]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.15...HEAD
+[1.0.0-beta.15]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.14...v1.0.0-beta.15
 [1.0.0-beta.14]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.13%2B1...v1.0.0-beta.14
 [1.0.0-beta.13+1]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.11...v1.0.0-beta.13%2B1
 [1.0.0-beta.11]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.10...v1.0.0-beta.11
