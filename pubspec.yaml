@@ -58,6 +58,8 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
+  assets:
+    - assets/icon/proxdroid_icon_foreground.png
 
 flutter_launcher_icons:
   android: true

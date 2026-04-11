@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:proxdroid/app/theme/app_theme.dart';
 import 'package:proxdroid/features/settings/providers/settings_providers.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/widgets/grouped_section.dart';
@@ -55,6 +56,35 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.only(bottom: 24),
         children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.sm,
+              AppSpacing.lg,
+              AppSpacing.xl,
+            ),
+            child: Column(
+              children: [
+                Image.asset(
+                  'assets/icon/proxdroid_icon_foreground.png',
+                  width: 88,
+                  height: 88,
+                  filterQuality: FilterQuality.medium,
+                  semanticLabel: l10n.appTitle,
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  l10n.appTitle,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: -0.25,
+                    color: scheme.onSurface,
+                  ),
+                ),
+              ],
+            ),
+          ),
           GroupedSection(
             topSpacing: 0,
             header: SectionHeader(title: l10n.settingsAppearanceSection),
