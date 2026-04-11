@@ -18,7 +18,7 @@ class ContainerStatusBadge extends StatelessWidget {
         l10n.statusRunning,
       ),
       px.ContainerStatus.stopped => (
-        StatusBadgeVariant.error,
+        StatusBadgeVariant.stopped,
         l10n.statusStopped,
       ),
       px.ContainerStatus.unknown => (

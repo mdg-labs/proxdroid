@@ -35,22 +35,26 @@ class SectionHeader extends StatelessWidget {
         fontWeight: FontWeight.w600,
       ),
       SectionHeaderVariant.muted => textTheme.labelSmall?.copyWith(
-        color: scheme.onSurfaceVariant,
-        fontWeight: FontWeight.w600,
-        letterSpacing: 0.5,
+        color: scheme.onSurfaceVariant.withValues(alpha: 0.65),
+        fontWeight: FontWeight.w700,
+        fontSize: 10,
+        letterSpacing: 1.4,
       ),
     };
 
     final EdgeInsets padding = switch (variant) {
       SectionHeaderVariant.emphasis => const EdgeInsets.fromLTRB(16, 20, 16, 8),
-      SectionHeaderVariant.muted => const EdgeInsets.fromLTRB(28, 12, 16, 4),
+      SectionHeaderVariant.muted => const EdgeInsets.fromLTRB(24, 18, 16, 6),
     };
+
+    final displayTitle =
+        variant == SectionHeaderVariant.muted ? title.toUpperCase() : title;
 
     return Padding(
       padding: padding,
       child: Row(
         children: [
-          Expanded(child: Text(title, style: baseStyle)),
+          Expanded(child: Text(displayTitle, style: baseStyle)),
           if (trailing != null) trailing!,
         ],
       ),

@@ -2,6 +2,18 @@ import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
 
+/// Consistent spacing scale — use these instead of magic numbers in widgets.
+///
+/// All values are multiples of 4 (4-point grid), matching Material 3 guidance.
+abstract final class AppSpacing {
+  static const double xs  =  4.0;
+  static const double sm  =  8.0;
+  static const double md  = 12.0;
+  static const double lg  = 16.0;
+  static const double xl  = 24.0;
+  static const double xxl = 32.0;
+}
+
 /// Application [ThemeData] for dark (default) and light Material 3 themes.
 ///
 /// **Scaffold (T1.2):** Dark canvas uses [AppColors.scaffoldPureBlack] (`#000000`).
@@ -121,16 +133,61 @@ abstract final class AppTheme {
         surfaceTintColor: colorScheme.surfaceTint,
       ),
       drawerTheme: DrawerThemeData(
-        backgroundColor: colorScheme.surface,
+        backgroundColor: colorScheme.surfaceContainerLow,
         surfaceTintColor: Colors.transparent,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.horizontal(right: Radius.circular(20)),
         ),
       ),
       navigationDrawerTheme: NavigationDrawerThemeData(
-        backgroundColor: colorScheme.surface,
-        indicatorColor: colorScheme.primary.withValues(alpha: 0.38),
+        backgroundColor: colorScheme.surfaceContainerLow,
+        surfaceTintColor: Colors.transparent,
+        indicatorColor: colorScheme.primary.withValues(alpha: 0.18),
         indicatorShape: pillShape,
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          final selected = states.contains(WidgetState.selected);
+          return TextStyle(
+            fontSize: 14,
+            fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+            color: selected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+          );
+        }),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          final selected = states.contains(WidgetState.selected);
+          return IconThemeData(
+            size: 22,
+            color: selected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+          );
+        }),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: scaffoldBackground,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.transparent,
+        elevation: 0,
+        height: 64,
+        indicatorColor: colorScheme.primary.withValues(alpha: 0.14),
+        indicatorShape: const StadiumBorder(),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          final selected = states.contains(WidgetState.selected);
+          return TextStyle(
+            fontSize: 11,
+            fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
+            color: selected
+                ? colorScheme.primary
+                : colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+            letterSpacing: 0.1,
+          );
+        }),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          final selected = states.contains(WidgetState.selected);
+          return IconThemeData(
+            size: 22,
+            color: selected
+                ? colorScheme.primary
+                : colorScheme.onSurfaceVariant.withValues(alpha: 0.65),
+          );
+        }),
       ),
       dialogTheme: DialogThemeData(
         backgroundColor: colorScheme.surfaceContainerHigh,

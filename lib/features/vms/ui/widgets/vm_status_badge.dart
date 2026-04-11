@@ -14,7 +14,7 @@ class VmStatusBadge extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final (variant, label) = switch (status) {
       VmStatus.running => (StatusBadgeVariant.success, l10n.statusRunning),
-      VmStatus.stopped => (StatusBadgeVariant.error, l10n.statusStopped),
+      VmStatus.stopped => (StatusBadgeVariant.stopped, l10n.statusStopped),
       VmStatus.paused => (StatusBadgeVariant.warning, l10n.statusPaused),
       VmStatus.unknown => (StatusBadgeVariant.neutral, l10n.statusUnknown),
     };

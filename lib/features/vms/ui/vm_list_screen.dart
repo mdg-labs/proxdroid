@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:proxdroid/app/theme/app_colors.dart';
+import 'package:proxdroid/app/theme/app_theme.dart';
 import 'package:proxdroid/core/models/vm.dart';
 import 'package:proxdroid/core/utils/formatters.dart';
 import 'package:proxdroid/features/servers/ui/proxmox_exception_messages.dart';
@@ -10,7 +12,6 @@ import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
-import 'package:proxdroid/shared/widgets/premium_list_row.dart';
 import 'package:proxdroid/shared/widgets/shell_section_body.dart';
 
 enum _VmStatusFilter { all, running, stopped }
@@ -37,48 +38,50 @@ class _VmListScreenState extends ConsumerState<VmListScreen> {
   int _compareVm(Vm a, Vm b) {
     final aActive = a.status == VmStatus.running || a.status == VmStatus.paused;
     final bActive = b.status == VmStatus.running || b.status == VmStatus.paused;
-    if (aActive != bActive) {
-      return aActive ? -1 : 1;
-    }
+    if (aActive != bActive) return aActive ? -1 : 1;
     return a.name.toLowerCase().compareTo(b.name.toLowerCase());
   }
 
   List<Vm> _applyFilters(List<Vm> vms) {
     var out = List<Vm>.from(vms);
-
     final q = _searchQuery.trim().toLowerCase();
     if (q.isNotEmpty) {
       out = out.where((v) => v.name.toLowerCase().contains(q)).toList();
     }
-
     switch (_statusFilter) {
       case _VmStatusFilter.all:
         break;
       case _VmStatusFilter.running:
-        out =
-            out
-                .where(
-                  (v) =>
-                      v.status == VmStatus.running ||
-                      v.status == VmStatus.paused,
-                )
-                .toList();
+        out = out
+            .where(
+              (v) =>
+                  v.status == VmStatus.running || v.status == VmStatus.paused,
+            )
+            .toList();
       case _VmStatusFilter.stopped:
         out = out.where((v) => v.status == VmStatus.stopped).toList();
     }
-
     if (_nodeFilter != null) {
       out = out.where((v) => v.node == _nodeFilter).toList();
     }
-
     out.sort(_compareVm);
     return out;
+  }
+
+  Color _vmStatusAccent(VmStatus status) {
+    return switch (status) {
+      VmStatus.running => AppColors.darkStatusSuccessForeground,
+      VmStatus.paused => AppColors.darkStatusWarningForeground,
+      VmStatus.stopped => AppColors.darkStatusStoppedForeground,
+      VmStatus.unknown => AppColors.darkStatusStoppedForeground,
+    };
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
     final async = ref.watch(allVmsProvider);
     final minPullHeight = MediaQuery.sizeOf(context).height * 0.5;
 
@@ -90,39 +93,36 @@ class _VmListScreenState extends ConsumerState<VmListScreen> {
     return ShellSectionBody(
       title: Text(l10n.sectionVms),
       body: async.when(
-        loading:
-            () => RefreshIndicator(
-              onRefresh: refreshVms,
-              child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                children: [
-                  SizedBox(
-                    height: minPullHeight,
-                    child: const LoadingShimmer(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                    ),
-                  ),
-                ],
+        loading: () => RefreshIndicator(
+          onRefresh: refreshVms,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            children: [
+              SizedBox(
+                height: minPullHeight,
+                child: const LoadingShimmer(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                ),
               ),
-            ),
-        error:
-            (e, _) => RefreshIndicator(
-              onRefresh: refreshVms,
-              child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                children: [
-                  SizedBox(
-                    height: minPullHeight,
-                    child: ErrorView(
-                      message: proxmoxExceptionMessage(e, l10n),
-                      onRetry:
-                          () => ref.read(allVmsProvider.notifier).refresh(),
-                    ),
-                  ),
-                ],
+            ],
+          ),
+        ),
+        error: (e, _) => RefreshIndicator(
+          onRefresh: refreshVms,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            children: [
+              SizedBox(
+                height: minPullHeight,
+                child: ErrorView(
+                  message: proxmoxExceptionMessage(e, l10n),
+                  onRetry: () => ref.read(allVmsProvider.notifier).refresh(),
+                ),
               ),
-            ),
+            ],
+          ),
+        ),
         data: (vms) {
           if (vms.isEmpty) {
             return RefreshIndicator(
@@ -151,101 +151,113 @@ class _VmListScreenState extends ConsumerState<VmListScreen> {
             child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
+                // ── Search + filters ─────────────────────────────────────
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    AppSpacing.sm,
+                    AppSpacing.lg,
+                    AppSpacing.sm,
+                  ),
                   sliver: SliverToBoxAdapter(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        TextField(
+                        // Search bar
+                        SearchBar(
                           controller: _searchController,
-                          decoration: InputDecoration(
-                            hintText: l10n.searchVmsHint,
-                            prefixIcon: const Icon(Icons.search),
-                            isDense: true,
+                          hintText: l10n.searchVmsHint,
+                          leading: Icon(
+                            Icons.search,
+                            color: scheme.onSurfaceVariant,
+                            size: 20,
                           ),
+                          trailing: _searchQuery.isNotEmpty
+                              ? [
+                                  IconButton(
+                                    icon: const Icon(Icons.close, size: 18),
+                                    onPressed: () => setState(() {
+                                      _searchController.clear();
+                                      _searchQuery = '';
+                                    }),
+                                  ),
+                                ]
+                              : null,
                           onChanged: (v) => setState(() => _searchQuery = v),
+                          elevation: const WidgetStatePropertyAll(0),
+                          backgroundColor: WidgetStatePropertyAll(
+                            scheme.surfaceContainerHighest,
+                          ),
+                          shape: WidgetStatePropertyAll(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: BorderSide(
+                                color: scheme.outlineVariant,
+                              ),
+                            ),
+                          ),
+                          padding: const WidgetStatePropertyAll(
+                            EdgeInsets.symmetric(horizontal: 12),
+                          ),
+                          textStyle: WidgetStatePropertyAll(
+                            tt.bodyMedium?.copyWith(color: scheme.onSurface),
+                          ),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: AppSpacing.md),
+                        // Status filter chips
                         Row(
                           children: [
                             Expanded(
-                              child: InputDecorator(
-                                decoration: InputDecoration(
-                                  labelText: l10n.filterByStatus,
-                                  isDense: true,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 8,
+                              child: SegmentedButton<_VmStatusFilter>(
+                                style: ButtonStyle(
+                                  visualDensity: VisualDensity.compact,
+                                  textStyle: WidgetStatePropertyAll(
+                                    tt.labelSmall,
+                                  ),
+                                  padding: const WidgetStatePropertyAll(
+                                    EdgeInsets.symmetric(horizontal: 8),
                                   ),
                                 ),
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton<_VmStatusFilter>(
-                                    isExpanded: true,
-                                    value: _statusFilter,
-                                    items: [
-                                      DropdownMenuItem(
-                                        value: _VmStatusFilter.all,
-                                        child: Text(l10n.filterAll),
-                                      ),
-                                      DropdownMenuItem(
-                                        value: _VmStatusFilter.running,
-                                        child: Text(l10n.filterRunning),
-                                      ),
-                                      DropdownMenuItem(
-                                        value: _VmStatusFilter.stopped,
-                                        child: Text(l10n.filterStopped),
-                                      ),
-                                    ],
-                                    onChanged: (v) {
-                                      if (v != null) {
-                                        setState(() => _statusFilter = v);
-                                      }
-                                    },
+                                segments: [
+                                  ButtonSegment(
+                                    value: _VmStatusFilter.all,
+                                    label: Text(l10n.filterAll),
                                   ),
-                                ),
+                                  ButtonSegment(
+                                    value: _VmStatusFilter.running,
+                                    label: Text(l10n.filterRunning),
+                                  ),
+                                  ButtonSegment(
+                                    value: _VmStatusFilter.stopped,
+                                    label: Text(l10n.filterStopped),
+                                  ),
+                                ],
+                                selected: {_statusFilter},
+                                onSelectionChanged: (s) =>
+                                    setState(() => _statusFilter = s.first),
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: InputDecorator(
-                                decoration: InputDecoration(
-                                  labelText: l10n.filterByNode,
-                                  isDense: true,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 8,
-                                  ),
-                                ),
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton<String?>(
-                                    isExpanded: true,
-                                    value: _nodeFilter,
-                                    items: [
-                                      DropdownMenuItem<String?>(
-                                        value: null,
-                                        child: Text(l10n.filterAll),
-                                      ),
-                                      ...nodes.map(
-                                        (n) => DropdownMenuItem(
-                                          value: n,
-                                          child: Text(n),
-                                        ),
-                                      ),
-                                    ],
-                                    onChanged: (v) {
-                                      setState(() => _nodeFilter = v);
-                                    },
-                                  ),
-                                ),
+                            if (nodes.length > 1) ...[
+                              const SizedBox(width: AppSpacing.sm),
+                              _NodeDropdown(
+                                nodes: nodes,
+                                selected: _nodeFilter,
+                                allLabel: l10n.filterAll,
+                                filterByNodeLabel: l10n.filterByNode,
+                                onChanged: (v) =>
+                                    setState(() => _nodeFilter = v),
+                                scheme: scheme,
+                                tt: tt,
                               ),
-                            ),
+                            ],
                           ],
                         ),
                       ],
                     ),
                   ),
                 ),
+
+                // ── VM list ───────────────────────────────────────────────
                 if (filtered.isEmpty)
                   SliverFillRemaining(
                     hasScrollBody: false,
@@ -256,63 +268,261 @@ class _VmListScreenState extends ConsumerState<VmListScreen> {
                     ),
                   )
                 else
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      final vm = filtered[index];
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-                        child: Card(
-                          margin: EdgeInsets.zero,
-                          clipBehavior: Clip.antiAlias,
-                          child: PremiumListRow(
-                            title: Text(
-                              vm.name.isEmpty
-                                  ? '${l10n.labelVmid} ${vm.vmid}'
-                                  : vm.name,
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.lg,
+                      0,
+                      AppSpacing.lg,
+                      AppSpacing.lg,
+                    ),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final vm = filtered[index];
+                          final accent = _vmStatusAccent(vm.status);
+                          return Padding(
+                            padding: const EdgeInsets.only(
+                              bottom: AppSpacing.sm,
                             ),
-                            subtitle: Text(
-                              '${l10n.labelVmid} ${vm.vmid} · ${l10n.entityNode} ${vm.node}',
+                            child: _VmListTile(
+                              vm: vm,
+                              accent: accent,
+                              l10n: l10n,
+                              scheme: scheme,
+                              tt: tt,
+                              onTap: () => context.push(
+                                '/vms/${Uri.encodeComponent(vm.node)}/${Uri.encodeComponent(vm.vmid.toString())}',
+                              ),
                             ),
-                            trailing: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                VmStatusBadge(status: vm.status),
-                                const SizedBox(height: 4),
-                                Text(
-                                  formatCpuPercent(vm.cpu),
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.labelSmall?.copyWith(
-                                    color: scheme.onSurfaceVariant,
-                                  ),
-                                ),
-                                Text(
-                                  formatMemoryRatio(vm.mem, vm.maxMem),
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.labelSmall?.copyWith(
-                                    color: scheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            showChevron: true,
-                            showDividerBelow: false,
-                            onTap:
-                                () => context.push(
-                                  '/vms/${Uri.encodeComponent(vm.node)}/${Uri.encodeComponent(vm.vmid.toString())}',
-                                ),
-                          ),
-                        ),
-                      );
-                    }, childCount: filtered.length),
+                          );
+                        },
+                        childCount: filtered.length,
+                      ),
+                    ),
                   ),
               ],
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// VM list tile
+// ────────────────────────────────────────────────────────────────────────────
+
+class _VmListTile extends StatelessWidget {
+  const _VmListTile({
+    required this.vm,
+    required this.accent,
+    required this.l10n,
+    required this.scheme,
+    required this.tt,
+    required this.onTap,
+  });
+
+  final Vm vm;
+  final Color accent;
+  final AppLocalizations l10n;
+  final ColorScheme scheme;
+  final TextTheme tt;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final name =
+        vm.name.isEmpty ? '${l10n.labelVmid} ${vm.vmid}' : vm.name;
+
+    return Material(
+      color: scheme.surfaceContainerHighest,
+      borderRadius: BorderRadius.circular(14),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Status accent strip
+              Container(
+                width: 3,
+                color: accent,
+              ),
+              // Leading icon
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.md,
+                  AppSpacing.md,
+                  0,
+                  AppSpacing.md,
+                ),
+                child: Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(9),
+                  ),
+                  alignment: Alignment.center,
+                  child: Icon(
+                    Icons.computer_rounded,
+                    color: accent,
+                    size: 20,
+                  ),
+                ),
+              ),
+              // Text content
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.md,
+                    AppSpacing.md,
+                    AppSpacing.sm,
+                    AppSpacing.md,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        name,
+                        style: tt.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        '${l10n.labelVmid} ${vm.vmid}  ·  ${vm.node}',
+                        style: tt.bodySmall?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                          fontSize: 11,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 5),
+                      Row(
+                        children: [
+                          Text(
+                            formatCpuPercent(vm.cpu),
+                            style: tt.labelSmall?.copyWith(
+                              color: scheme.onSurfaceVariant,
+                              fontSize: 10,
+                            ),
+                          ),
+                          Text(
+                            '  ·  ',
+                            style: tt.labelSmall?.copyWith(
+                              color: scheme.outlineVariant,
+                              fontSize: 10,
+                            ),
+                          ),
+                          Text(
+                            formatMemoryRatio(vm.mem, vm.maxMem),
+                            style: tt.labelSmall?.copyWith(
+                              color: scheme.onSurfaceVariant,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // Trailing: badge + chevron
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.md,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    VmStatusBadge(status: vm.status),
+                    const SizedBox(height: AppSpacing.xs),
+                    Icon(
+                      Icons.chevron_right,
+                      size: 18,
+                      color: scheme.outlineVariant,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Node dropdown
+// ────────────────────────────────────────────────────────────────────────────
+
+class _NodeDropdown extends StatelessWidget {
+  const _NodeDropdown({
+    required this.nodes,
+    required this.selected,
+    required this.allLabel,
+    required this.filterByNodeLabel,
+    required this.onChanged,
+    required this.scheme,
+    required this.tt,
+  });
+
+  final List<String> nodes;
+  final String? selected;
+  final String allLabel;
+  final String filterByNodeLabel;
+  final ValueChanged<String?> onChanged;
+  final ColorScheme scheme;
+  final TextTheme tt;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: scheme.outlineVariant),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String?>(
+            isDense: true,
+            value: selected,
+            hint: Text(
+              filterByNodeLabel,
+              style: tt.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+            ),
+            style: tt.bodySmall?.copyWith(color: scheme.onSurface),
+            dropdownColor: scheme.surfaceContainerHigh,
+            borderRadius: BorderRadius.circular(12),
+            icon: Icon(
+              Icons.unfold_more,
+              size: 18,
+              color: scheme.onSurfaceVariant,
+            ),
+            items: [
+              DropdownMenuItem<String?>(
+                value: null,
+                child: Text(allLabel),
+              ),
+              ...nodes.map(
+                (n) => DropdownMenuItem<String>(value: n, child: Text(n)),
+              ),
+            ],
+            onChanged: onChanged,
+          ),
+        ),
       ),
     );
   }
