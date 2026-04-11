@@ -34,6 +34,11 @@ class PremiumDialog extends StatelessWidget {
 }
 
 /// Shows a dialog using [PremiumDialog].
+///
+/// Uses [useRootNavigator]: `false` so the route stacks on the same
+/// [Navigator] as [StatefulShellRoute] branch pages. Action buttons that call
+/// [Navigator.pop] with the caller screen context then dismiss this dialog
+/// instead of popping the underlying detail route (root vs branch mismatch).
 Future<T?> showPremiumDialog<T>({
   required BuildContext context,
   required Widget title,
@@ -42,6 +47,7 @@ Future<T?> showPremiumDialog<T>({
 }) {
   return showDialog<T>(
     context: context,
+    useRootNavigator: false,
     builder:
         (ctx) =>
             PremiumDialog(title: title, content: content, actions: actions),
