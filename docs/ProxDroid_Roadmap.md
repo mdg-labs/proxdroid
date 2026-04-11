@@ -429,6 +429,11 @@ Not in scope for the current **GitHub-only prerelease** path; pick up when targe
 
 These are tracked here for planning purposes but are not in scope for v1.0.
 
+### VM & LXC config editor (create + edit)
+
+- **Plan:** [`VM_CT_Config_Editor_Plan.md`](VM_CT_Config_Editor_Plan.md) — Phases **0–7** with `[ ]`/`[x]` tasks and acceptance criteria (API → models → delta PUT → Riverpod → VM/CT edit UI → create VM/CT); optional **8–10** (networks, disks, cloud-init). CI hygiene per plan §17.
+- [ ] Implement per plan through **Phase 7** minimum; optional phases **8+** as scoped
+
 ### Console Access
 - [ ] Research noVNC WebSocket token flow via Proxmox API
 - [ ] **QEMU VMs:** Implement `POST /nodes/{node}/qemu/{vmid}/vncproxy` to get VNC ticket → embed noVNC in a `WebView` using `webview_flutter`
