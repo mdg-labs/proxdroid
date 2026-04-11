@@ -56,17 +56,38 @@ class NodeDiskIoChart extends ConsumerWidget {
                   () => ref.invalidate(nodeRrdDataProvider(node, timeframe)),
               showTimeframeSelector: false,
             ),
-        data:
-            (points) => ResourceLineChart(
-              data: points,
-              metric: ResourceChartMetric.diskIo,
-              primaryColor: AppColors.chartDiskRead,
-              secondaryColor: AppColors.chartDiskWrite,
-              timeframe: timeframe,
-              onTimeframeChanged: onTimeframeChanged,
-              l10n: l10n,
-              showTimeframeSelector: false,
-            ),
+        data: (points) {
+          final hasDiskSeries =
+              points.isNotEmpty &&
+              points.any((p) => p.diskRead != null || p.diskWrite != null);
+          if (!hasDiskSeries) {
+            return SizedBox(
+              height: 220,
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    l10n.chartDiskIoUnavailableOnNode,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+          return ResourceLineChart(
+            data: points,
+            metric: ResourceChartMetric.diskIo,
+            primaryColor: AppColors.chartDiskRead,
+            secondaryColor: AppColors.chartDiskWrite,
+            timeframe: timeframe,
+            onTimeframeChanged: onTimeframeChanged,
+            l10n: l10n,
+            showTimeframeSelector: false,
+          );
+        },
       ),
     );
   }

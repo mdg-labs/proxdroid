@@ -880,5 +880,21 @@ Map<String, dynamic> _normalizeNodeStatusJson(
     out['maxcpu'] = proxmoxInt(ci['cpus']);
   }
 
+  final swap = data['swap'];
+  if (swap is Map) {
+    out['swapused'] ??= proxmoxInt(swap['used']);
+    out['swaptotal'] ??= proxmoxInt(swap['total']);
+  }
+
+  final loadavg = data['loadavg'];
+  if (loadavg is List && loadavg.isNotEmpty) {
+    out['loadavg1m'] = proxmoxDouble(loadavg.first);
+  }
+
+  final iw = proxmoxDouble(data['iowait']);
+  if (iw != null) {
+    out['iowait'] = iw;
+  }
+
   return out;
 }

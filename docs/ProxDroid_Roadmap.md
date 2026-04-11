@@ -273,6 +273,7 @@
 - [x] Implement `GET /nodes/{node}/qemu/{vmid}/rrddata` – historical resource data (timeframe: hour/day/week/month)
 - [x] Implement `GET /nodes/{node}/lxc/{ctid}/rrddata` – same for containers
 - [x] Implement `GET /nodes/{node}/rrddata` – node-level resource data
+- [x] Node detail: `/nodes/{node}/status` for swap, load (1m), richer grid; guest VM/CT counts; Disk I/O chart explains empty series on Proxmox VE 9+ (host RRD no longer includes disk throughput)
 - [x] Support `timeframe` parameter: `hour`, `day`, `week`, `month` — expose all four in the UI timeframe selector; `year` is **not** exposed in the MVP UI (API supports it but granularity is too low to be useful on a small screen) and is **not** included in the `ChartTimeframe` enum
 
 ### 4.2 Chart Data Models

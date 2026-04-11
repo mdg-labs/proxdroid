@@ -395,6 +395,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get labelNodeHostStatus => 'Status';
 
   @override
+  String get metricSwap => 'Swap';
+
+  @override
+  String get metricLoadAvg1m => 'Load (1m)';
+
+  @override
+  String get metricIoWait => 'I/O wait';
+
+  @override
+  String get metricGuestVms => 'Virtual machines';
+
+  @override
+  String get metricGuestContainers => 'Containers';
+
+  @override
+  String nodeDetailRunningTotalCount(int running, int total) {
+    return '$running running · $total total';
+  }
+
+  @override
+  String get chartDiskIoUnavailableOnNode =>
+      'Host disk throughput is not included in node statistics on newer Proxmox VE versions (node RRD no longer exposes read/write rates). Per-guest Disk I/O charts still work on VM and container detail screens.';
+
+  @override
   String get containerNotFoundTitle => 'Container not found';
 
   @override

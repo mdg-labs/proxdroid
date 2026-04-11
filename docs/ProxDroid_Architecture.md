@@ -112,7 +112,7 @@ lib/
 │   │   │   └── rrd_providers.dart      # Chart data + 60s polling
 │   │   └── ui/
 │   │       ├── dashboard_screen.dart
-│   │       ├── node_detail_screen.dart
+│   │       ├── node_detail_screen.dart   # cluster row + `/nodes/{node}/status` metrics, guest counts
 │   │       └── widgets/              # node-level chart wrappers (node RRD)
 │   │           ├── node_cpu_chart.dart
 │   │           ├── node_memory_chart.dart
@@ -299,7 +299,7 @@ if (allowSelfSigned) {
 /servers/add                        → Add server
 /servers/edit/:serverId             → Edit server (name, host, port, credentials, SSL toggle)
 /dashboard                          → Node overview (after server selection)
-/dashboard/:node                    → Node detail + resource charts (same branch as overview)
+/dashboard/:node                    → Node detail + resource charts (host Disk I/O from rrddata may be absent on PVE 9+; see dashboard feature note above)
 /vms                                → VM list (all nodes)
 /vms/:node/:vmid                    → VM detail + charts
 /containers                         → Container list (all nodes)

@@ -18,6 +18,10 @@ _Node _$NodeFromJson(Map<String, dynamic> json) => _Node(
   uptime: proxmoxInt(json['uptime']),
   sslFingerprint: json['ssl_fingerprint'] as String?,
   level: json['level'] as String?,
+  swapUsed: proxmoxInt(json['swapused']),
+  swapTotal: proxmoxInt(json['swaptotal']),
+  loadavg1m: proxmoxDouble(json['loadavg1m']),
+  ioWait: proxmoxDouble(json['iowait']),
 );
 
 Map<String, dynamic> _$NodeToJson(_Node instance) => <String, dynamic>{
@@ -32,4 +36,8 @@ Map<String, dynamic> _$NodeToJson(_Node instance) => <String, dynamic>{
   'uptime': instance.uptime,
   'ssl_fingerprint': instance.sslFingerprint,
   'level': instance.level,
+  'swapused': instance.swapUsed,
+  'swaptotal': instance.swapTotal,
+  'loadavg1m': instance.loadavg1m,
+  'iowait': instance.ioWait,
 };

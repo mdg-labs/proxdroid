@@ -820,6 +820,48 @@ abstract class AppLocalizations {
   /// **'Status'**
   String get labelNodeHostStatus;
 
+  /// Label for swap usage on node detail.
+  ///
+  /// In en, this message translates to:
+  /// **'Swap'**
+  String get metricSwap;
+
+  /// Label for one-minute load average.
+  ///
+  /// In en, this message translates to:
+  /// **'Load (1m)'**
+  String get metricLoadAvg1m;
+
+  /// Label for CPU I/O wait when shown on node detail.
+  ///
+  /// In en, this message translates to:
+  /// **'I/O wait'**
+  String get metricIoWait;
+
+  /// Label for QEMU guest count on this node.
+  ///
+  /// In en, this message translates to:
+  /// **'Virtual machines'**
+  String get metricGuestVms;
+
+  /// Label for LXC count on this node.
+  ///
+  /// In en, this message translates to:
+  /// **'Containers'**
+  String get metricGuestContainers;
+
+  /// Running vs total guest count for node detail grid.
+  ///
+  /// In en, this message translates to:
+  /// **'{running} running · {total} total'**
+  String nodeDetailRunningTotalCount(int running, int total);
+
+  /// Explains empty node-level Disk I/O chart on Proxmox VE 9+.
+  ///
+  /// In en, this message translates to:
+  /// **'Host disk throughput is not included in node statistics on newer Proxmox VE versions (node RRD no longer exposes read/write rates). Per-guest Disk I/O charts still work on VM and container detail screens.'**
+  String get chartDiskIoUnavailableOnNode;
+
   /// Detail screen when container id or route is invalid.
   ///
   /// In en, this message translates to:

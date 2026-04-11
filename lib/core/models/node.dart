@@ -27,6 +27,16 @@ sealed class Node with _$Node {
     @JsonKey(fromJson: proxmoxInt) int? uptime,
     @JsonKey(name: 'ssl_fingerprint') String? sslFingerprint,
     String? level,
+
+    /// From [GET /nodes/{node}/status] `swap` map (flattened by the API client).
+    @JsonKey(name: 'swapused', fromJson: proxmoxInt) int? swapUsed,
+    @JsonKey(name: 'swaptotal', fromJson: proxmoxInt) int? swapTotal,
+
+    /// First value of Proxmox `loadavg` (1 minute).
+    @JsonKey(name: 'loadavg1m', fromJson: proxmoxDouble) double? loadavg1m,
+
+    /// CPU I/O wait when exposed by the node status payload.
+    @JsonKey(name: 'iowait', fromJson: proxmoxDouble) double? ioWait,
   }) = _Node;
 
   factory Node.fromJson(Map<String, dynamic> json) => _$NodeFromJson(json);

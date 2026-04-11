@@ -41,3 +41,16 @@ class NodeList extends _$NodeList {
     ref.invalidateSelf();
   }
 }
+
+/// Live fields from `GET /nodes/{node}/status` for the node detail grid.
+///
+/// Returns `null` when no API client is configured (should not happen on
+/// `/dashboard/:node` due to router redirect).
+@riverpod
+Future<Node?> nodeDetailStatus(Ref ref, String nodeName) async {
+  final repo = await ref.watch(nodeRepositoryProvider.future);
+  if (repo == null) {
+    return null;
+  }
+  return repo.getNodeStatus(nodeName);
+}

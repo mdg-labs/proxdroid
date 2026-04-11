@@ -518,6 +518,44 @@
   "@labelNodeHostStatus": {
     "description": "Metric grid label for Proxmox node online/offline state."
   },
+  "metricSwap": "Swap",
+  "@metricSwap": {
+    "description": "Label for swap usage on node detail."
+  },
+  "metricLoadAvg1m": "Load (1m)",
+  "@metricLoadAvg1m": {
+    "description": "Label for one-minute load average."
+  },
+  "metricIoWait": "I/O wait",
+  "@metricIoWait": {
+    "description": "Label for CPU I/O wait when shown on node detail."
+  },
+  "metricGuestVms": "Virtual machines",
+  "@metricGuestVms": {
+    "description": "Label for QEMU guest count on this node."
+  },
+  "metricGuestContainers": "Containers",
+  "@metricGuestContainers": {
+    "description": "Label for LXC count on this node."
+  },
+  "nodeDetailRunningTotalCount": "{running} running · {total} total",
+  "@nodeDetailRunningTotalCount": {
+    "description": "Running vs total guest count for node detail grid.",
+    "placeholders": {
+      "running": {
+        "type": "int",
+        "example": "2"
+      },
+      "total": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "chartDiskIoUnavailableOnNode": "Host disk throughput is not included in node statistics on newer Proxmox VE versions (node RRD no longer exposes read/write rates). Per-guest Disk I/O charts still work on VM and container detail screens.",
+  "@chartDiskIoUnavailableOnNode": {
+    "description": "Explains empty node-level Disk I/O chart on Proxmox VE 9+."
+  },
   "containerNotFoundTitle": "Container not found",
   "@containerNotFoundTitle": {
     "description": "Detail screen when container id or route is invalid."

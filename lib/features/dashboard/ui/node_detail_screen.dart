@@ -3,12 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:proxdroid/app/theme/app_colors.dart';
 import 'package:proxdroid/app/theme/app_theme.dart';
+import 'package:proxdroid/core/models/container.dart' as models;
 import 'package:proxdroid/core/models/node.dart';
 import 'package:proxdroid/core/models/resource_data_point.dart';
+import 'package:proxdroid/core/models/vm.dart';
 import 'package:proxdroid/core/utils/formatters.dart';
 import 'package:proxdroid/features/backups/ui/trigger_backup_sheet.dart';
+import 'package:proxdroid/features/containers/providers/container_providers.dart';
 import 'package:proxdroid/features/dashboard/providers/dashboard_providers.dart';
 import 'package:proxdroid/features/settings/providers/settings_providers.dart';
+import 'package:proxdroid/features/vms/providers/vm_providers.dart';
 import 'package:proxdroid/features/dashboard/ui/widgets/node_cpu_chart.dart';
 import 'package:proxdroid/features/dashboard/ui/widgets/node_disk_io_chart.dart';
 import 'package:proxdroid/features/dashboard/ui/widgets/node_memory_chart.dart';
@@ -21,6 +25,33 @@ import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
 import 'package:proxdroid/shared/widgets/resource_chart.dart';
 import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
 import 'package:proxdroid/shared/widgets/status_badge.dart';
+
+/// Merges `GET /nodes/{node}/status` into the cluster resource row for the grid.
+Node _mergedNodeForDetailGrid(Node listRow, AsyncValue<Node?> statusAsync) {
+  return statusAsync.when(
+    data: (status) {
+      if (status == null) {
+        return listRow;
+      }
+      return listRow.copyWith(
+        status: status.status ?? listRow.status,
+        cpu: status.cpu ?? listRow.cpu,
+        maxCpu: status.maxCpu ?? listRow.maxCpu,
+        mem: status.mem ?? listRow.mem,
+        maxMem: status.maxMem ?? listRow.maxMem,
+        disk: status.disk ?? listRow.disk,
+        maxDisk: status.maxDisk ?? listRow.maxDisk,
+        uptime: status.uptime ?? listRow.uptime,
+        swapUsed: status.swapUsed ?? listRow.swapUsed,
+        swapTotal: status.swapTotal ?? listRow.swapTotal,
+        loadavg1m: status.loadavg1m ?? listRow.loadavg1m,
+        ioWait: status.ioWait ?? listRow.ioWait,
+      );
+    },
+    loading: () => listRow,
+    error: (_, _) => listRow,
+  );
+}
 
 class NodeDetailScreen extends ConsumerWidget {
   const NodeDetailScreen({required this.nodeName, super.key});
@@ -102,9 +133,27 @@ class NodeDetailScreen extends ConsumerWidget {
         void setChartTf(ChartTimeframe tf) =>
             ref.read(defaultChartTimeframeProvider.notifier).setTimeframe(tf);
 
-        final node = found;
-        final online = _nodeOnline(node);
-        final title = node.name;
+        final listNode = found;
+        final statusAsync = ref.watch(nodeDetailStatusProvider(nodeName));
+        final mergedNode = _mergedNodeForDetailGrid(listNode, statusAsync);
+        final vms = ref.watch(allVmsProvider).valueOrNull ?? const <Vm>[];
+        final containers =
+            ref.watch(allContainersProvider).valueOrNull ??
+            const <models.Container>[];
+        final vmOnNode = vms.where((v) => v.node == listNode.name).toList();
+        final vmTotal = vmOnNode.length;
+        final vmRunning =
+            vmOnNode.where((v) => v.status == VmStatus.running).length;
+        final ctOnNode =
+            containers.where((c) => c.node == listNode.name).toList();
+        final ctTotal = ctOnNode.length;
+        final ctRunning =
+            ctOnNode
+                .where((c) => c.status == models.ContainerStatus.running)
+                .length;
+
+        final online = _nodeOnline(listNode);
+        final title = listNode.name;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -123,21 +172,37 @@ class NodeDetailScreen extends ConsumerWidget {
             Expanded(
               child: RefreshIndicator(
                 onRefresh: () async {
+                  ref.invalidate(nodeDetailStatusProvider(nodeName));
                   ref.read(nodeListProvider.notifier).refresh();
-                  await ref.read(nodeListProvider.future);
+                  ref.read(allVmsProvider.notifier).refresh();
+                  ref.read(allContainersProvider.notifier).refresh();
+                  await Future.wait([
+                    ref.read(nodeListProvider.future),
+                    ref.read(nodeDetailStatusProvider(nodeName).future),
+                    ref.read(allVmsProvider.future),
+                    ref.read(allContainersProvider.future),
+                  ]);
                 },
                 child: ListView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding: const EdgeInsets.all(AppSpacing.lg),
                   children: [
                     _NodeHeroHeader(
-                      node: node,
+                      node: listNode,
                       title: title,
                       online: online,
                       l10n: l10n,
                     ),
                     const SizedBox(height: AppSpacing.lg),
-                    _NodeMetricGrid(node: node, online: online, l10n: l10n),
+                    _NodeMetricGrid(
+                      node: mergedNode,
+                      online: online,
+                      vmRunning: vmRunning,
+                      vmTotal: vmTotal,
+                      ctRunning: ctRunning,
+                      ctTotal: ctTotal,
+                      l10n: l10n,
+                    ),
                     const SizedBox(height: AppSpacing.lg),
                     ChartTimeframeSelector(
                       selected: chartTf,
@@ -147,25 +212,25 @@ class NodeDetailScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     NodeCpuChart(
-                      node: node.name,
+                      node: listNode.name,
                       timeframe: chartTf,
                       onTimeframeChanged: setChartTf,
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     NodeMemoryChart(
-                      node: node.name,
+                      node: listNode.name,
                       timeframe: chartTf,
                       onTimeframeChanged: setChartTf,
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     NodeNetworkChart(
-                      node: node.name,
+                      node: listNode.name,
                       timeframe: chartTf,
                       onTimeframeChanged: setChartTf,
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     NodeDiskIoChart(
-                      node: node.name,
+                      node: listNode.name,
                       timeframe: chartTf,
                       onTimeframeChanged: setChartTf,
                     ),
@@ -267,11 +332,19 @@ class _NodeMetricGrid extends StatelessWidget {
   const _NodeMetricGrid({
     required this.node,
     required this.online,
+    required this.vmRunning,
+    required this.vmTotal,
+    required this.ctRunning,
+    required this.ctTotal,
     required this.l10n,
   });
 
   final Node node;
   final bool online;
+  final int vmRunning;
+  final int vmTotal;
+  final int ctRunning;
+  final int ctTotal;
   final AppLocalizations l10n;
 
   @override
@@ -280,6 +353,10 @@ class _NodeMetricGrid extends StatelessWidget {
     final tt = Theme.of(context).textTheme;
     final cpuFrac = nodeCpuFraction(node.cpu, node.maxCpu);
     final statusLabel = online ? l10n.statusOnline : l10n.statusOffline;
+    final ioWaitLabel =
+        node.ioWait != null
+            ? formatCpuPercent(node.ioWait)
+            : l10n.valueUnavailable;
 
     final cells = <(String, String)>[
       (l10n.labelNodeHostStatus, statusLabel),
@@ -287,6 +364,17 @@ class _NodeMetricGrid extends StatelessWidget {
       (l10n.metricMemory, formatMemoryRatio(node.mem, node.maxMem)),
       (l10n.metricDisk, formatMemoryRatio(node.disk, node.maxDisk)),
       (l10n.metricUptime, formatUptimeSeconds(node.uptime)),
+      (l10n.metricLoadAvg1m, formatLoadAvg(node.loadavg1m)),
+      (l10n.metricSwap, formatMemoryRatio(node.swapUsed, node.swapTotal)),
+      (l10n.metricIoWait, ioWaitLabel),
+      (
+        l10n.metricGuestVms,
+        l10n.nodeDetailRunningTotalCount(vmRunning, vmTotal),
+      ),
+      (
+        l10n.metricGuestContainers,
+        l10n.nodeDetailRunningTotalCount(ctRunning, ctTotal),
+      ),
     ];
 
     return Container(
