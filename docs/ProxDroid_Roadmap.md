@@ -357,9 +357,8 @@
 
 ### 6.3 Settings Screen
 - [x] Build `SettingsScreen` with sections:
-  - **Servers:** row above Appearance → `/servers` (add/edit/switch Proxmox server)
-  - **Preferences:** row → `/settings/preferences` (`PreferencesScreen`: default chart time range for VM/container/node detail charts, persisted in Hive)
-  - **Appearance:** theme control (dark/light/system) via `SegmentedButton`
+  - **Servers:** row → `/servers` (add/edit/switch Proxmox server)
+  - **Preferences:** row → `/settings/preferences` (`PreferencesScreen`: theme dark/light/system; default chart time range for VM/container/node detail charts; both persisted in Hive)
   - **About:** app version (`package_info_plus`), link to `github.com/mdg-labs/proxdroid`, MIT license summary dialog (Play Store / F-Droid links deferred — out of scope for this release; see §6.5–6.6)
   - **Support:** Ko-fi and GitHub Sponsors tiles (`url_launcher`)
 - [x] Wire up theme preference to hive_ce (`settings` box, key `themeMode`; values `dark` / `light` / `system`)
@@ -370,7 +369,7 @@
 - [x] Representative repository unit tests (Vm, Node, Task via fake HTTP adapter + `ProxmoxApiClient`; `AppSettingsRepository` via Hive) — expand to remaining repos over time
 - [x] Representative Riverpod unit test (`AppThemeMode` with `ProviderContainer` overrides)
 - [x] Representative Freezed JSON roundtrip tests (`Vm`, `Node`, `Task`)
-- [x] Widget tests: settings Appearance l10n + theme `SegmentedButton` smoke; `ServerEditorPage` save validation (empty name)
+- [x] Widget tests: Preferences appearance l10n + theme `SegmentedButton` smoke (same keys as `PreferencesScreen`); `ServerEditorPage` save validation (empty name)
 - [x] `integration_test` scaffold with `testWidgets(..., tags: ['integration'])`; documented in `CONTRIBUTING.md` (`flutter test integration_test --tags integration`); default `flutter test` does not run `integration_test/`
 - [ ] Unit / widget coverage for all repositories, providers, and critical flows (e.g. start VM) — ongoing
 - [ ] Integration tests for end-to-end flows (add server → dashboard → VM action) against optional live PVE

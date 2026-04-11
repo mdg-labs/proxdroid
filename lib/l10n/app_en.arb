@@ -906,9 +906,9 @@
   "@settingsPreferencesTitle": {
     "description": "Settings row title for the Preferences screen."
   },
-  "settingsPreferencesSubtitle": "Default chart time range and other app preferences.",
+  "settingsPreferencesSubtitle": "Theme, default chart time range, and other app preferences.",
   "@settingsPreferencesSubtitle": {
-    "description": "Subtitle for Settings row that opens Preferences."
+    "description": "Subtitle for Settings row that opens Preferences (appearance + charts)."
   },
   "preferencesScreenTitle": "Preferences",
   "@preferencesScreenTitle": {

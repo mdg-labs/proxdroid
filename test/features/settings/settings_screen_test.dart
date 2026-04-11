@@ -7,9 +7,9 @@ import 'package:proxdroid/l10n/app_localizations.dart';
 /// + Hive wiring as [main.dart]; see [widget_test.dart] for app-level smoke).
 ///
 /// This still verifies the Appearance section title and theme labels resolve
-/// through [AppLocalizations] like the real screen.
+/// through [AppLocalizations] like [PreferencesScreen] (theme lives there).
 void main() {
-  testWidgets('settings appearance section and theme labels (l10n)', (
+  testWidgets('preferences appearance section and theme labels (l10n)', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(

@@ -310,7 +310,7 @@ if (allowSelfSigned) {
 /tasks                              → Task viewer
 /tasks/:node/:upid                  → Task detail + log output
 /settings                           → Settings
-/settings/preferences               → Preferences (default chart time range, etc.)
+/settings/preferences               → Preferences (theme + default chart time range, etc.)
 ```
 
 > **Shell AppBar leading:** On section roots (`/vms`, `/dashboard`, `/servers`, …) the app bar shows the drawer (hamburger). On nested routes (`/servers/add`, `/dashboard/:node`, `/vms/:node/:vmid`, …) it shows back. The implementation keys off `GoRouterState.uri.path` and `isShellDrawerRootPath` — not `GoRouter.canPop()`, which can stay true on section roots after redirects or pops and would incorrectly show only the back affordance.
@@ -321,7 +321,7 @@ if (allowSelfSigned) {
 
 ### UI shell and theme (Material 3)
 
-- **`AppShell`** (`lib/app/app_shell.dart`): `Scaffold` with `NavigationBar` + `NavigationDrawer` (More opens drawer). Drawer includes a branding header (avatar, app title, localized subtitle), optional **active server** row (`selectedServerProvider`) that navigates to `/servers`, section labels (**Infrastructure** / **Operations** from ARB), then **seven** drawer destinations (Dashboard, VMs, Containers, Storage, Backups, Tasks, Settings — no duplicate **Servers** row; `/servers` is also linked from **Settings** above Appearance). Offline banner uses light elevation and rounded bottom corners.
+- **`AppShell`** (`lib/app/app_shell.dart`): `Scaffold` with `NavigationBar` + `NavigationDrawer` (More opens drawer). Drawer includes a branding header (avatar, app title, localized subtitle), optional **active server** row (`selectedServerProvider`) that navigates to `/servers`, section labels (**Infrastructure** / **Operations** from ARB), then **seven** drawer destinations (Dashboard, VMs, Containers, Storage, Backups, Tasks, Settings — no duplicate **Servers** row; `/servers` is also linked from **Settings** above Troubleshooting). Offline banner uses light elevation and rounded bottom corners.
 - **`ShellSectionBody`** (`lib/shared/widgets/shell_section_body.dart`): Reusable **AppBar + Expanded(body)** for shell routes; optional **FAB** via `Stack` (used on server list). Prefer this for new section screens; body padding stays inside scroll/sliver children where pull-to-refresh applies.
 - **`AppTheme`** (`lib/app/theme/app_theme.dart`): Shared **card** shape (16px radius, elevation 0, `surfaceContainerHighest`), **filled inputs** with rounded borders, **list tile** shape/padding, **filled/text buttons**, **segmented** shape hint, **app bar** with `scrolledUnderElevation` on scroll.
 

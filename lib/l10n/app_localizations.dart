@@ -1342,10 +1342,10 @@ abstract class AppLocalizations {
   /// **'Preferences'**
   String get settingsPreferencesTitle;
 
-  /// Subtitle for Settings row that opens Preferences.
+  /// Subtitle for Settings row that opens Preferences (appearance + charts).
   ///
   /// In en, this message translates to:
-  /// **'Default chart time range and other app preferences.'**
+  /// **'Theme, default chart time range, and other app preferences.'**
   String get settingsPreferencesSubtitle;
 
   /// App bar title on the Preferences screen.

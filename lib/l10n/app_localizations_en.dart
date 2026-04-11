@@ -681,7 +681,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsPreferencesSubtitle =>
-      'Default chart time range and other app preferences.';
+      'Theme, default chart time range, and other app preferences.';
 
   @override
   String get preferencesScreenTitle => 'Preferences';

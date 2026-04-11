@@ -6,7 +6,6 @@ import 'package:proxdroid/app/theme/app_theme.dart';
 import 'package:proxdroid/features/settings/providers/settings_providers.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/widgets/grouped_section.dart';
-import 'package:proxdroid/shared/widgets/pill_segmented.dart';
 import 'package:proxdroid/shared/widgets/premium_modals.dart';
 import 'package:proxdroid/shared/widgets/section_header.dart';
 import 'package:proxdroid/shared/widgets/shell_section_body.dart';
@@ -49,7 +48,6 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
-    final themeMode = ref.watch(appThemeModeProvider);
     final packageInfoAsync = ref.watch(packageInfoProvider);
 
     return ShellSectionBody(
@@ -114,35 +112,6 @@ class SettingsScreen extends ConsumerWidget {
                 color: scheme.onSurfaceVariant,
               ),
               onTap: () => context.push('/settings/preferences'),
-            ),
-          ),
-          const Divider(height: 1),
-          GroupedSection(
-            topSpacing: 0,
-            header: SectionHeader(title: l10n.settingsAppearanceSection),
-            child: PillSegmentedButton<ThemeMode>(
-              segments: [
-                ButtonSegment<ThemeMode>(
-                  value: ThemeMode.dark,
-                  label: Text(l10n.settingsThemeDark),
-                  icon: const Icon(Icons.dark_mode_outlined),
-                ),
-                ButtonSegment<ThemeMode>(
-                  value: ThemeMode.light,
-                  label: Text(l10n.settingsThemeLight),
-                  icon: const Icon(Icons.light_mode_outlined),
-                ),
-                ButtonSegment<ThemeMode>(
-                  value: ThemeMode.system,
-                  label: Text(l10n.settingsThemeSystem),
-                  icon: const Icon(Icons.brightness_auto_outlined),
-                ),
-              ],
-              selected: {themeMode},
-              onSelectionChanged: (Set<ThemeMode> selected) {
-                final mode = selected.first;
-                ref.read(appThemeModeProvider.notifier).setThemeMode(mode);
-              },
             ),
           ),
           const Divider(height: 1),
