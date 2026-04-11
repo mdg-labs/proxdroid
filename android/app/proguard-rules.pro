@@ -13,3 +13,8 @@
 -keepclasseswithmembernames class * {
     native <methods>;
 }
+
+# Play Core — optional deferred-components / dynamic feature APIs referenced by the
+# Flutter Android embedding. The Play Core artifacts are not an app dependency;
+# without -dontwarn, R8 fails release minify with "Missing class … play.core …".
+-dontwarn com.google.android.play.core.**
