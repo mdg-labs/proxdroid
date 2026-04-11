@@ -448,16 +448,7 @@ class _NodeCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: scheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16),
-        border: Border(
-          top: BorderSide(color: statusColor.withValues(alpha: 0.55), width: 2),
-          left: BorderSide(color: scheme.outlineVariant.withValues(alpha: 0.3)),
-          right: BorderSide(
-            color: scheme.outlineVariant.withValues(alpha: 0.3),
-          ),
-          bottom: BorderSide(
-            color: scheme.outlineVariant.withValues(alpha: 0.3),
-          ),
-        ),
+        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.3)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
@@ -571,23 +562,19 @@ class _NodeRrdSparklines extends ConsumerWidget {
       loading:
           () => Padding(
             padding: const EdgeInsets.only(top: AppSpacing.md),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(
-                  child: ChartCard(
-                    title: l10n.metricCpu,
-                    compact: true,
-                    child: const PulsingPlaceholder(height: 120),
-                  ),
+                ChartCard(
+                  title: l10n.metricCpu,
+                  compact: true,
+                  child: const PulsingPlaceholder(height: 120),
                 ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: ChartCard(
-                    title: l10n.metricMemory,
-                    compact: true,
-                    child: const PulsingPlaceholder(height: 120),
-                  ),
+                const SizedBox(height: AppSpacing.md),
+                ChartCard(
+                  title: l10n.metricMemory,
+                  compact: true,
+                  child: const PulsingPlaceholder(height: 120),
                 ),
               ],
             ),
@@ -627,42 +614,38 @@ class _NodeRrdSparklines extends ConsumerWidget {
       data:
           (points) => Padding(
             padding: const EdgeInsets.only(top: AppSpacing.md),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(
-                  child: ChartCard(
-                    title: l10n.metricCpu,
+                ChartCard(
+                  title: l10n.metricCpu,
+                  compact: true,
+                  child: ResourceLineChart(
+                    data: points,
+                    metric: ResourceChartMetric.cpu,
+                    primaryColor: scheme.primary,
+                    timeframe: _tf,
+                    onTimeframeChanged: (_) {},
+                    l10n: l10n,
                     compact: true,
-                    child: ResourceLineChart(
-                      data: points,
-                      metric: ResourceChartMetric.cpu,
-                      primaryColor: scheme.primary,
-                      timeframe: _tf,
-                      onTimeframeChanged: (_) {},
-                      l10n: l10n,
-                      compact: true,
-                      chartHeight: 120,
-                      showTimeframeSelector: false,
-                    ),
+                    chartHeight: 120,
+                    showTimeframeSelector: false,
                   ),
                 ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: ChartCard(
-                    title: l10n.metricMemory,
+                const SizedBox(height: AppSpacing.md),
+                ChartCard(
+                  title: l10n.metricMemory,
+                  compact: true,
+                  child: ResourceLineChart(
+                    data: points,
+                    metric: ResourceChartMetric.memory,
+                    primaryColor: scheme.secondary,
+                    timeframe: _tf,
+                    onTimeframeChanged: (_) {},
+                    l10n: l10n,
                     compact: true,
-                    child: ResourceLineChart(
-                      data: points,
-                      metric: ResourceChartMetric.memory,
-                      primaryColor: scheme.secondary,
-                      timeframe: _tf,
-                      onTimeframeChanged: (_) {},
-                      l10n: l10n,
-                      compact: true,
-                      chartHeight: 120,
-                      showTimeframeSelector: false,
-                    ),
+                    chartHeight: 120,
+                    showTimeframeSelector: false,
                   ),
                 ),
               ],
