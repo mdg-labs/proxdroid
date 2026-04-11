@@ -13,6 +13,7 @@ import 'package:proxdroid/shared/providers/proxmox_tag_colors_provider.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
+import 'package:proxdroid/shared/widgets/node_filter_dropdown.dart';
 import 'package:proxdroid/shared/widgets/proxmox_tag_widgets.dart';
 import 'package:proxdroid/shared/widgets/shell_section_body.dart';
 
@@ -250,7 +251,7 @@ class _VmListScreenState extends ConsumerState<VmListScreen> {
                             ),
                             if (nodes.length > 1) ...[
                               const SizedBox(width: AppSpacing.sm),
-                              _NodeDropdown(
+                              NodeFilterDropdown(
                                 nodes: nodes,
                                 selected: _nodeFilter,
                                 allLabel: l10n.filterAll,
@@ -466,69 +467,6 @@ class _VmListTile extends StatelessWidget {
                 ),
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ────────────────────────────────────────────────────────────────────────────
-// Node dropdown
-// ────────────────────────────────────────────────────────────────────────────
-
-class _NodeDropdown extends StatelessWidget {
-  const _NodeDropdown({
-    required this.nodes,
-    required this.selected,
-    required this.allLabel,
-    required this.filterByNodeLabel,
-    required this.onChanged,
-    required this.scheme,
-    required this.tt,
-  });
-
-  final List<String> nodes;
-  final String? selected;
-  final String allLabel;
-  final String filterByNodeLabel;
-  final ValueChanged<String?> onChanged;
-  final ColorScheme scheme;
-  final TextTheme tt;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: scheme.outlineVariant),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<String?>(
-            isDense: true,
-            value: selected,
-            hint: Text(
-              filterByNodeLabel,
-              style: tt.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-            ),
-            style: tt.bodySmall?.copyWith(color: scheme.onSurface),
-            dropdownColor: scheme.surfaceContainerHigh,
-            borderRadius: BorderRadius.circular(12),
-            icon: Icon(
-              Icons.unfold_more,
-              size: 18,
-              color: scheme.onSurfaceVariant,
-            ),
-            items: [
-              DropdownMenuItem<String?>(value: null, child: Text(allLabel)),
-              ...nodes.map(
-                (n) => DropdownMenuItem<String>(value: n, child: Text(n)),
-              ),
-            ],
-            onChanged: onChanged,
           ),
         ),
       ),

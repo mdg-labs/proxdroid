@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:proxdroid/app/theme/app_colors.dart';
+import 'package:proxdroid/app/theme/app_theme.dart';
 import 'package:proxdroid/core/models/container.dart' as px;
 import 'package:proxdroid/core/utils/formatters.dart';
 import 'package:proxdroid/features/containers/providers/container_providers.dart';
@@ -11,7 +13,7 @@ import 'package:proxdroid/shared/providers/proxmox_tag_colors_provider.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
-import 'package:proxdroid/shared/widgets/premium_list_row.dart';
+import 'package:proxdroid/shared/widgets/node_filter_dropdown.dart';
 import 'package:proxdroid/shared/widgets/proxmox_tag_widgets.dart';
 import 'package:proxdroid/shared/widgets/shell_section_body.dart';
 
@@ -71,10 +73,19 @@ class _ContainerListScreenState extends ConsumerState<ContainerListScreen> {
     return out;
   }
 
+  Color _containerStatusAccent(px.ContainerStatus status) {
+    return switch (status) {
+      px.ContainerStatus.running => AppColors.darkStatusSuccessForeground,
+      px.ContainerStatus.stopped => AppColors.darkStatusStoppedForeground,
+      px.ContainerStatus.unknown => AppColors.darkStatusStoppedForeground,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
     final async = ref.watch(allContainersProvider);
     final tagColorMap =
         ref.watch(proxmoxTagColorsProvider).valueOrNull ??
@@ -154,94 +165,102 @@ class _ContainerListScreenState extends ConsumerState<ContainerListScreen> {
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    AppSpacing.sm,
+                    AppSpacing.lg,
+                    AppSpacing.sm,
+                  ),
                   sliver: SliverToBoxAdapter(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        TextField(
+                        SearchBar(
                           controller: _searchController,
-                          decoration: InputDecoration(
-                            hintText: l10n.searchContainersHint,
-                            prefixIcon: const Icon(Icons.search),
-                            isDense: true,
+                          hintText: l10n.searchContainersHint,
+                          leading: Icon(
+                            Icons.search,
+                            color: scheme.onSurfaceVariant,
+                            size: 20,
                           ),
+                          trailing:
+                              _searchQuery.isNotEmpty
+                                  ? [
+                                    IconButton(
+                                      icon: const Icon(Icons.close, size: 18),
+                                      onPressed:
+                                          () => setState(() {
+                                            _searchController.clear();
+                                            _searchQuery = '';
+                                          }),
+                                    ),
+                                  ]
+                                  : null,
                           onChanged: (v) => setState(() => _searchQuery = v),
+                          elevation: const WidgetStatePropertyAll(0),
+                          backgroundColor: WidgetStatePropertyAll(
+                            scheme.surfaceContainerHighest,
+                          ),
+                          shape: WidgetStatePropertyAll(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: BorderSide(color: scheme.outlineVariant),
+                            ),
+                          ),
+                          padding: const WidgetStatePropertyAll(
+                            EdgeInsets.symmetric(horizontal: 12),
+                          ),
+                          textStyle: WidgetStatePropertyAll(
+                            tt.bodyMedium?.copyWith(color: scheme.onSurface),
+                          ),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: AppSpacing.md),
                         Row(
                           children: [
                             Expanded(
-                              child: InputDecorator(
-                                decoration: InputDecoration(
-                                  labelText: l10n.filterByStatus,
-                                  isDense: true,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 8,
+                              child: SegmentedButton<_ContainerStatusFilter>(
+                                style: ButtonStyle(
+                                  visualDensity: VisualDensity.compact,
+                                  textStyle: WidgetStatePropertyAll(
+                                    tt.labelSmall,
+                                  ),
+                                  padding: const WidgetStatePropertyAll(
+                                    EdgeInsets.symmetric(horizontal: 8),
                                   ),
                                 ),
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton<_ContainerStatusFilter>(
-                                    isExpanded: true,
-                                    value: _statusFilter,
-                                    items: [
-                                      DropdownMenuItem(
-                                        value: _ContainerStatusFilter.all,
-                                        child: Text(l10n.filterAll),
-                                      ),
-                                      DropdownMenuItem(
-                                        value: _ContainerStatusFilter.running,
-                                        child: Text(l10n.filterRunning),
-                                      ),
-                                      DropdownMenuItem(
-                                        value: _ContainerStatusFilter.stopped,
-                                        child: Text(l10n.filterStopped),
-                                      ),
-                                    ],
-                                    onChanged: (v) {
-                                      if (v != null) {
-                                        setState(() => _statusFilter = v);
-                                      }
-                                    },
+                                segments: [
+                                  ButtonSegment(
+                                    value: _ContainerStatusFilter.all,
+                                    label: Text(l10n.filterAll),
                                   ),
-                                ),
+                                  ButtonSegment(
+                                    value: _ContainerStatusFilter.running,
+                                    label: Text(l10n.filterRunning),
+                                  ),
+                                  ButtonSegment(
+                                    value: _ContainerStatusFilter.stopped,
+                                    label: Text(l10n.filterStopped),
+                                  ),
+                                ],
+                                selected: {_statusFilter},
+                                onSelectionChanged:
+                                    (s) =>
+                                        setState(() => _statusFilter = s.first),
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: InputDecorator(
-                                decoration: InputDecoration(
-                                  labelText: l10n.filterByNode,
-                                  isDense: true,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 8,
-                                  ),
-                                ),
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton<String?>(
-                                    isExpanded: true,
-                                    value: _nodeFilter,
-                                    items: [
-                                      DropdownMenuItem<String?>(
-                                        value: null,
-                                        child: Text(l10n.filterAll),
-                                      ),
-                                      ...nodes.map(
-                                        (n) => DropdownMenuItem(
-                                          value: n,
-                                          child: Text(n),
-                                        ),
-                                      ),
-                                    ],
-                                    onChanged: (v) {
-                                      setState(() => _nodeFilter = v);
-                                    },
-                                  ),
-                                ),
+                            if (nodes.length > 1) ...[
+                              const SizedBox(width: AppSpacing.sm),
+                              NodeFilterDropdown(
+                                nodes: nodes,
+                                selected: _nodeFilter,
+                                allLabel: l10n.filterAll,
+                                filterByNodeLabel: l10n.filterByNode,
+                                onChanged:
+                                    (v) => setState(() => _nodeFilter = v),
+                                scheme: scheme,
+                                tt: tt,
                               ),
-                            ),
+                            ],
                           ],
                         ),
                       ],
@@ -258,78 +277,194 @@ class _ContainerListScreenState extends ConsumerState<ContainerListScreen> {
                     ),
                   )
                 else
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      final ct = filtered[index];
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-                        child: Card(
-                          margin: EdgeInsets.zero,
-                          clipBehavior: Clip.antiAlias,
-                          child: PremiumListRow(
-                            title: Text(
-                              ct.name.isEmpty
-                                  ? '${l10n.labelCtid} ${ct.vmid}'
-                                  : ct.name,
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  '${l10n.labelCtid} ${ct.vmid} · ${l10n.entityNode} ${ct.node}',
-                                ),
-                                if (ct.tags.isNotEmpty) ...[
-                                  const SizedBox(height: 6),
-                                  ProxmoxTagRow(
-                                    tags: ct.tags,
-                                    clusterTagHexByLabel: tagColorMap,
-                                    density: ProxmoxTagDensity.compact,
-                                    spacing: 5,
-                                  ),
-                                ],
-                              ],
-                            ),
-                            trailing: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                ContainerStatusBadge(status: ct.status),
-                                const SizedBox(height: 4),
-                                Text(
-                                  formatCpuPercent(ct.cpu),
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.labelSmall?.copyWith(
-                                    color: scheme.onSurfaceVariant,
-                                  ),
-                                ),
-                                Text(
-                                  formatMemoryRatio(ct.mem, ct.maxMem),
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.labelSmall?.copyWith(
-                                    color: scheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            showChevron: true,
-                            showDividerBelow: false,
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.lg,
+                      0,
+                      AppSpacing.lg,
+                      AppSpacing.lg,
+                    ),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final ct = filtered[index];
+                        final accent = _containerStatusAccent(ct.status);
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                          child: _ContainerListTile(
+                            container: ct,
+                            accent: accent,
+                            clusterTagHexByLabel: tagColorMap,
+                            l10n: l10n,
+                            scheme: scheme,
+                            tt: tt,
                             onTap:
                                 () => context.push(
                                   '/containers/${Uri.encodeComponent(ct.node)}/${Uri.encodeComponent(ct.vmid.toString())}',
                                 ),
                           ),
-                        ),
-                      );
-                    }, childCount: filtered.length),
+                        );
+                      }, childCount: filtered.length),
+                    ),
                   ),
               ],
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class _ContainerListTile extends StatelessWidget {
+  const _ContainerListTile({
+    required this.container,
+    required this.accent,
+    required this.clusterTagHexByLabel,
+    required this.l10n,
+    required this.scheme,
+    required this.tt,
+    required this.onTap,
+  });
+
+  final px.Container container;
+  final Color accent;
+  final Map<String, String> clusterTagHexByLabel;
+  final AppLocalizations l10n;
+  final ColorScheme scheme;
+  final TextTheme tt;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final name =
+        container.name.isEmpty
+            ? '${l10n.labelCtid} ${container.vmid}'
+            : container.name;
+
+    return Material(
+      color: scheme.surfaceContainerHighest,
+      borderRadius: BorderRadius.circular(14),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(width: 3, color: accent),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.md,
+                  AppSpacing.md,
+                  0,
+                  AppSpacing.md,
+                ),
+                child: Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(9),
+                  ),
+                  alignment: Alignment.center,
+                  child: Icon(
+                    Icons.inventory_2_rounded,
+                    color: accent,
+                    size: 20,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.md,
+                    AppSpacing.md,
+                    AppSpacing.sm,
+                    AppSpacing.md,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        name,
+                        style: tt.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        '${l10n.labelCtid} ${container.vmid}  ·  ${container.node}',
+                        style: tt.bodySmall?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                          fontSize: 11,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (container.tags.isNotEmpty) ...[
+                        const SizedBox(height: 6),
+                        ProxmoxTagRow(
+                          tags: container.tags,
+                          clusterTagHexByLabel: clusterTagHexByLabel,
+                          density: ProxmoxTagDensity.compact,
+                          spacing: 5,
+                        ),
+                      ],
+                      const SizedBox(height: 5),
+                      Row(
+                        children: [
+                          Text(
+                            formatCpuPercent(container.cpu),
+                            style: tt.labelSmall?.copyWith(
+                              color: scheme.onSurfaceVariant,
+                              fontSize: 10,
+                            ),
+                          ),
+                          Text(
+                            '  ·  ',
+                            style: tt.labelSmall?.copyWith(
+                              color: scheme.outlineVariant,
+                              fontSize: 10,
+                            ),
+                          ),
+                          Text(
+                            formatMemoryRatio(container.mem, container.maxMem),
+                            style: tt.labelSmall?.copyWith(
+                              color: scheme.onSurfaceVariant,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.md,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    ContainerStatusBadge(status: container.status),
+                    const SizedBox(height: AppSpacing.xs),
+                    Icon(
+                      Icons.chevron_right,
+                      size: 18,
+                      color: scheme.outlineVariant,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

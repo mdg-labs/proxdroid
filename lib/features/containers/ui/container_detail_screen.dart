@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:proxdroid/app/theme/app_colors.dart';
+import 'package:proxdroid/app/theme/app_theme.dart';
 import 'package:proxdroid/core/models/container.dart' as px;
 import 'package:proxdroid/core/models/resource_data_point.dart';
 import 'package:proxdroid/core/models/task.dart' as pve;
@@ -21,8 +23,6 @@ import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/providers/proxmox_tag_colors_provider.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
-import 'package:proxdroid/shared/widgets/icon_badge_avatar.dart';
-import 'package:proxdroid/shared/widgets/labeled_row.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
 import 'package:proxdroid/shared/widgets/premium_modals.dart';
 import 'package:proxdroid/shared/widgets/proxmox_tag_widgets.dart';
@@ -199,8 +199,6 @@ class _ContainerDetailScreenState extends ConsumerState<ContainerDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final scheme = Theme.of(context).colorScheme;
-    final tt = Theme.of(context).textTheme;
     final async = ref.watch(allContainersProvider);
     final id = int.tryParse(widget.ctid);
 
@@ -342,247 +340,102 @@ class _ContainerDetailScreenState extends ConsumerState<ContainerDetailScreen> {
                     },
                     child: ListView(
                       physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(AppSpacing.lg),
                       children: [
-                        // — Premium header (T6.9 / T6.7) —
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            IconBadgeAvatar(
-                              icon: Icons.dns_rounded,
-                              size: 56,
-                              iconSize: 28,
-                              borderRadius: 14,
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(title, style: tt.titleLarge),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        '${l10n.labelCtid} ${ct.vmid}',
-                                        style: tt.bodySmall?.copyWith(
-                                          color: scheme.onSurfaceVariant,
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 6,
-                                        ),
-                                        child: Text(
-                                          '·',
-                                          style: tt.bodySmall?.copyWith(
-                                            color: scheme.onSurfaceVariant,
-                                          ),
-                                        ),
-                                      ),
-                                      Text(
-                                        ct.node,
-                                        style: tt.bodySmall?.copyWith(
-                                          color: scheme.onSurfaceVariant,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 8),
-                                  ContainerStatusBadge(status: ct.status),
-                                  if (ct.tags.isNotEmpty) ...[
-                                    const SizedBox(height: 12),
-                                    Text(
-                                      l10n.sectionGuestTags,
-                                      style: tt.labelSmall?.copyWith(
-                                        color: scheme.onSurfaceVariant,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    ProxmoxTagRow(
-                                      tags: ct.tags,
-                                      clusterTagHexByLabel: tagColors,
-                                      density: ProxmoxTagDensity.comfortable,
-                                    ),
-                                  ],
-                                ],
-                              ),
-                            ),
-                          ],
+                        _ContainerHeroHeader(
+                          ct: ct,
+                          title: title,
+                          l10n: l10n,
+                          clusterTagHexByLabel: tagColors,
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: AppSpacing.lg),
 
-                        // — Power actions row —
                         if (canStart || canStopOrReboot) ...[
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: [
-                              if (canStart)
-                                FilledButton(
-                                  onPressed:
-                                      _powerBusy
-                                          ? null
-                                          : () {
-                                            HapticFeedback.lightImpact();
-                                            _runPowerAction(
-                                              ct,
-                                              (r) => r.startContainer(
-                                                ct.node,
-                                                ct.vmid,
-                                              ),
-                                              l10n.actionStart,
-                                            );
-                                          },
-                                  child: Text(l10n.actionStart),
-                                ),
-                              if (canStopOrReboot) ...[
-                                FilledButton.tonal(
-                                  onPressed:
-                                      _powerBusy
-                                          ? null
-                                          : () async {
-                                            final ok = await _confirmStop();
-                                            if (ok == true && mounted) {
-                                              await _runPowerAction(
-                                                ct,
-                                                (r) => r.shutdownContainer(
-                                                  ct.node,
-                                                  ct.vmid,
-                                                ),
-                                                l10n.actionStop,
-                                              );
-                                            }
-                                          },
-                                  child: Text(l10n.actionStop),
-                                ),
-                                FilledButton.tonal(
-                                  onPressed:
-                                      _powerBusy
-                                          ? null
-                                          : () async {
-                                            final ok =
-                                                await _confirmForceStop();
-                                            if (ok == true && mounted) {
-                                              await _runPowerAction(
-                                                ct,
-                                                (r) => r.stopContainer(
-                                                  ct.node,
-                                                  ct.vmid,
-                                                ),
-                                                l10n.actionForceStop,
-                                              );
-                                            }
-                                          },
-                                  child: Text(l10n.actionForceStop),
-                                ),
-                                FilledButton.tonal(
-                                  onPressed:
-                                      _powerBusy
-                                          ? null
-                                          : () async {
-                                            final ok = await _confirmReboot();
-                                            if (ok == true && mounted) {
-                                              await _runPowerAction(
-                                                ct,
-                                                (r) => r.rebootContainer(
-                                                  ct.node,
-                                                  ct.vmid,
-                                                ),
-                                                l10n.actionReboot,
-                                              );
-                                            }
-                                          },
-                                  child: Text(l10n.actionReboot),
-                                ),
-                              ],
-                            ],
+                          _ContainerPowerActionsRow(
+                            l10n: l10n,
+                            canStart: canStart,
+                            canStopOrReboot: canStopOrReboot,
+                            busy: _powerBusy,
+                            onStart: () {
+                              HapticFeedback.lightImpact();
+                              _runPowerAction(
+                                ct,
+                                (r) => r.startContainer(ct.node, ct.vmid),
+                                l10n.actionStart,
+                              );
+                            },
+                            onStop: () async {
+                              final ok = await _confirmStop();
+                              if (ok == true && mounted) {
+                                await _runPowerAction(
+                                  ct,
+                                  (r) => r.shutdownContainer(ct.node, ct.vmid),
+                                  l10n.actionStop,
+                                );
+                              }
+                            },
+                            onForceStop: () async {
+                              final ok = await _confirmForceStop();
+                              if (ok == true && mounted) {
+                                await _runPowerAction(
+                                  ct,
+                                  (r) => r.stopContainer(ct.node, ct.vmid),
+                                  l10n.actionForceStop,
+                                );
+                              }
+                            },
+                            onReboot: () async {
+                              final ok = await _confirmReboot();
+                              if (ok == true && mounted) {
+                                await _runPowerAction(
+                                  ct,
+                                  (r) => r.rebootContainer(ct.node, ct.vmid),
+                                  l10n.actionReboot,
+                                );
+                              }
+                            },
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: AppSpacing.lg),
                         ],
 
-                        // — Labeled metric rows (T6.9) —
-                        Card(
-                          margin: EdgeInsets.zero,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                LabeledRow(
-                                  label: l10n.labelCtid,
-                                  value: '${ct.vmid}',
-                                ),
-                                LabeledRow(
-                                  label: l10n.entityNode,
-                                  value: ct.node,
-                                ),
-                                LabeledRow(
-                                  label: l10n.metricCpu,
-                                  value: formatCpuPercent(ct.cpu),
-                                ),
-                                LabeledRow(
-                                  label: l10n.metricMemory,
-                                  value: formatMemoryRatio(ct.mem, ct.maxMem),
-                                ),
-                                LabeledRow(
-                                  label: l10n.metricDisk,
-                                  value: formatMemoryRatio(ct.disk, ct.maxDisk),
-                                ),
-                                LabeledRow(
-                                  label: l10n.metricUptime,
-                                  value: formatUptimeSeconds(ct.uptime),
-                                ),
-                                LabeledRow(
-                                  label: l10n.labelContainerOsType,
-                                  value: ct.ostype ?? l10n.valueUnavailable,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
+                        _ContainerMetricGrid(ct: ct, l10n: l10n),
+                        const SizedBox(height: AppSpacing.lg),
 
-                        // — Charts (shared timeframe) —
                         ChartTimeframeSelector(
                           selected: chartTf,
                           expandToWidth: true,
                           l10n: l10n,
                           onChanged: setChartTf,
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.lg),
                         ContainerCpuChart(
                           node: ct.node,
                           ctid: ct.vmid,
                           timeframe: chartTf,
                           onTimeframeChanged: setChartTf,
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.lg),
                         ContainerMemoryChart(
                           node: ct.node,
                           ctid: ct.vmid,
                           timeframe: chartTf,
                           onTimeframeChanged: setChartTf,
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.lg),
                         ContainerNetworkChart(
                           node: ct.node,
                           ctid: ct.vmid,
                           timeframe: chartTf,
                           onTimeframeChanged: setChartTf,
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.lg),
                         ContainerDiskIoChart(
                           node: ct.node,
                           ctid: ct.vmid,
                           timeframe: chartTf,
                           onTimeframeChanged: setChartTf,
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.lg),
                       ],
                     ),
                   ),
@@ -599,6 +452,306 @@ class _ContainerDetailScreenState extends ConsumerState<ContainerDetailScreen> {
           ],
         );
       },
+    );
+  }
+}
+
+class _ContainerHeroHeader extends StatelessWidget {
+  const _ContainerHeroHeader({
+    required this.ct,
+    required this.title,
+    required this.l10n,
+    required this.clusterTagHexByLabel,
+  });
+
+  final px.Container ct;
+  final String title;
+  final AppLocalizations l10n;
+  final Map<String, String> clusterTagHexByLabel;
+
+  Color _statusColor(px.ContainerStatus status) => switch (status) {
+    px.ContainerStatus.running => AppColors.darkStatusSuccessForeground,
+    px.ContainerStatus.stopped => AppColors.darkStatusStoppedForeground,
+    px.ContainerStatus.unknown => AppColors.darkStatusStoppedForeground,
+  };
+
+  Color _statusBg(px.ContainerStatus status) => switch (status) {
+    px.ContainerStatus.running => AppColors.darkStatusSuccessBackground,
+    px.ContainerStatus.stopped => AppColors.darkStatusStoppedBackground,
+    px.ContainerStatus.unknown => AppColors.darkStatusStoppedBackground,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+    final accent = _statusColor(ct.status);
+    final accentBg = _statusBg(ct.status);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
+      ),
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: accentBg,
+              borderRadius: BorderRadius.circular(13),
+            ),
+            alignment: Alignment.center,
+            child: Icon(Icons.inventory_2_rounded, color: accent, size: 26),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${l10n.labelCtid} ${ct.vmid}  ·  ${ct.node}',
+                  style: tt.bodySmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                    fontSize: 12,
+                  ),
+                ),
+                if (ct.tags.isNotEmpty) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    l10n.sectionGuestTags,
+                    style: tt.labelSmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  ProxmoxTagRow(
+                    tags: ct.tags,
+                    clusterTagHexByLabel: clusterTagHexByLabel,
+                    density: ProxmoxTagDensity.comfortable,
+                  ),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          ContainerStatusBadge(status: ct.status),
+        ],
+      ),
+    );
+  }
+}
+
+class _ContainerPowerActionsRow extends StatelessWidget {
+  const _ContainerPowerActionsRow({
+    required this.l10n,
+    required this.canStart,
+    required this.canStopOrReboot,
+    required this.busy,
+    required this.onStart,
+    required this.onStop,
+    required this.onForceStop,
+    required this.onReboot,
+  });
+
+  final AppLocalizations l10n;
+  final bool canStart;
+  final bool canStopOrReboot;
+  final bool busy;
+  final VoidCallback onStart;
+  final VoidCallback onStop;
+  final VoidCallback onForceStop;
+  final VoidCallback onReboot;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final warningColor =
+        isDark
+            ? AppColors.darkStatusWarningForeground
+            : AppColors.lightStatusWarningForeground;
+
+    return Wrap(
+      spacing: AppSpacing.sm,
+      runSpacing: AppSpacing.sm,
+      children: [
+        if (canStart)
+          FilledButton.icon(
+            onPressed: busy ? null : onStart,
+            icon: const Icon(Icons.play_arrow_rounded, size: 18),
+            label: Text(l10n.actionStart),
+          ),
+        if (canStopOrReboot) ...[
+          OutlinedButton.icon(
+            onPressed: busy ? null : onStop,
+            icon: Icon(Icons.stop_rounded, size: 18, color: warningColor),
+            label: Text(l10n.actionStop),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: warningColor,
+              side: BorderSide(color: warningColor.withValues(alpha: 0.6)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.md),
+              ),
+            ),
+          ),
+          FilledButton.icon(
+            onPressed: busy ? null : onForceStop,
+            icon: const Icon(Icons.power_settings_new_rounded, size: 18),
+            label: Text(l10n.actionForceStop),
+            style: FilledButton.styleFrom(
+              backgroundColor: scheme.errorContainer,
+              foregroundColor: scheme.onErrorContainer,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.md),
+              ),
+            ),
+          ),
+          OutlinedButton.icon(
+            onPressed: busy ? null : onReboot,
+            icon: const Icon(Icons.refresh_rounded, size: 18),
+            label: Text(l10n.actionReboot),
+            style: OutlinedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.md),
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _ContainerMetricGrid extends StatelessWidget {
+  const _ContainerMetricGrid({required this.ct, required this.l10n});
+
+  final px.Container ct;
+  final AppLocalizations l10n;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+
+    final cells = [
+      (l10n.labelCtid, '${ct.vmid}'),
+      (l10n.entityNode, ct.node),
+      (l10n.metricCpu, formatCpuPercent(ct.cpu)),
+      (l10n.metricMemory, formatMemoryRatio(ct.mem, ct.maxMem)),
+      (l10n.metricDisk, formatMemoryRatio(ct.disk, ct.maxDisk)),
+      (l10n.metricUptime, formatUptimeSeconds(ct.uptime)),
+      (l10n.labelContainerOsType, ct.ostype ?? l10n.valueUnavailable),
+    ];
+
+    return Container(
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
+      ),
+      child: Column(
+        children: [
+          for (var row = 0; row < cells.length; row += 2) ...[
+            if (row > 0)
+              Divider(
+                height: 1,
+                thickness: 1,
+                color: scheme.outlineVariant.withValues(alpha: 0.35),
+              ),
+            IntrinsicHeight(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _ContainerMetricCell(
+                      label: cells[row].$1,
+                      value: cells[row].$2,
+                      scheme: scheme,
+                      tt: tt,
+                    ),
+                  ),
+                  VerticalDivider(
+                    width: 1,
+                    thickness: 1,
+                    color: scheme.outlineVariant.withValues(alpha: 0.35),
+                  ),
+                  if (row + 1 < cells.length)
+                    Expanded(
+                      child: _ContainerMetricCell(
+                        label: cells[row + 1].$1,
+                        value: cells[row + 1].$2,
+                        scheme: scheme,
+                        tt: tt,
+                      ),
+                    )
+                  else
+                    const Expanded(child: SizedBox()),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _ContainerMetricCell extends StatelessWidget {
+  const _ContainerMetricCell({
+    required this.label,
+    required this.value,
+    required this.scheme,
+    required this.tt,
+  });
+
+  final String label;
+  final String value;
+  final ColorScheme scheme;
+  final TextTheme tt;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.md,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: tt.labelSmall?.copyWith(
+              color: scheme.onSurfaceVariant,
+              fontSize: 11,
+              letterSpacing: 0.2,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            value,
+            style: tt.bodyLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+              height: 1.2,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
     );
   }
 }
