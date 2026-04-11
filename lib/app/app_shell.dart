@@ -34,20 +34,19 @@ class AppShell extends ConsumerStatefulWidget {
 class _AppShellState extends ConsumerState<AppShell> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  static int _drawerIndexForLocation(String location) {
-    if (location.startsWith('/servers')) return 0;
-    if (location.startsWith('/dashboard')) return 1;
-    if (location.startsWith('/vms')) return 2;
-    if (location.startsWith('/containers')) return 3;
-    if (location.startsWith('/storage')) return 4;
-    if (location.startsWith('/backups')) return 5;
-    if (location.startsWith('/tasks')) return 6;
-    if (location.startsWith('/settings')) return 7;
+  static int? _drawerIndexForLocation(String location) {
+    if (location.startsWith('/servers')) return null;
+    if (location.startsWith('/dashboard')) return 0;
+    if (location.startsWith('/vms')) return 1;
+    if (location.startsWith('/containers')) return 2;
+    if (location.startsWith('/storage')) return 3;
+    if (location.startsWith('/backups')) return 4;
+    if (location.startsWith('/tasks')) return 5;
+    if (location.startsWith('/settings')) return 6;
     return 0;
   }
 
   static const List<String> kDrawerPaths = <String>[
-    '/servers',
     '/dashboard',
     '/vms',
     '/containers',
@@ -155,11 +154,6 @@ class _AppShellState extends ConsumerState<AppShell> {
           SectionHeader(
             title: l10n.drawerSectionInfrastructure,
             variant: SectionHeaderVariant.muted,
-          ),
-          NavigationDrawerDestination(
-            icon: const Icon(Icons.dns_outlined),
-            selectedIcon: const Icon(Icons.dns_rounded),
-            label: Text(l10n.sectionServers),
           ),
           NavigationDrawerDestination(
             icon: const Icon(Icons.dashboard_outlined),

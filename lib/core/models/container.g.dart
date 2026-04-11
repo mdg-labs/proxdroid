@@ -18,6 +18,7 @@ _Container _$ContainerFromJson(Map<String, dynamic> json) => _Container(
   disk: proxmoxInt(json['disk']),
   uptime: proxmoxInt(json['uptime']),
   ostype: json['ostype'] as String?,
+  tags: json['tags'] == null ? const [] : guestTagsFromJson(json['tags']),
 );
 
 Map<String, dynamic> _$ContainerToJson(_Container instance) =>
@@ -33,4 +34,5 @@ Map<String, dynamic> _$ContainerToJson(_Container instance) =>
       'disk': instance.disk,
       'uptime': instance.uptime,
       'ostype': instance.ostype,
+      'tags': guestTagsToJson(instance.tags),
     };

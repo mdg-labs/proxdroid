@@ -673,6 +673,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get actionClose => 'Close';
 
   @override
+  String get settingsServersSubtitle =>
+      'Add, edit, or switch the active Proxmox server.';
+
+  @override
   String get settingsAppearanceSection => 'Appearance';
 
   @override

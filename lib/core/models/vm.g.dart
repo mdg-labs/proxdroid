@@ -17,6 +17,7 @@ _Vm _$VmFromJson(Map<String, dynamic> json) => _Vm(
   maxDisk: proxmoxInt(json['maxdisk']),
   disk: proxmoxInt(json['disk']),
   uptime: proxmoxInt(json['uptime']),
+  tags: json['tags'] == null ? const [] : guestTagsFromJson(json['tags']),
 );
 
 Map<String, dynamic> _$VmToJson(_Vm instance) => <String, dynamic>{
@@ -30,4 +31,5 @@ Map<String, dynamic> _$VmToJson(_Vm instance) => <String, dynamic>{
   'maxdisk': instance.maxDisk,
   'disk': instance.disk,
   'uptime': instance.uptime,
+  'tags': guestTagsToJson(instance.tags),
 };

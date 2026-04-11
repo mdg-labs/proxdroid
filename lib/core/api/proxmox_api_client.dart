@@ -13,25 +13,11 @@ import 'package:proxdroid/core/models/storage.dart';
 import 'package:proxdroid/core/models/resource_data_point.dart';
 import 'package:proxdroid/core/models/server.dart';
 import 'package:proxdroid/core/models/task.dart';
+import 'package:proxdroid/core/models/proxmox_version.dart';
 import 'package:proxdroid/core/models/vm.dart';
 import 'package:proxdroid/shared/constants/api_endpoints.dart';
 
-/// Parsed `GET /version` payload (`data` object).
-final class ProxmoxVersion {
-  const ProxmoxVersion({required this.version, this.release});
-
-  final String version;
-  final String? release;
-
-  factory ProxmoxVersion.fromDataJson(Map<String, dynamic> json) {
-    final v = json['version'];
-    final r = json['release'];
-    return ProxmoxVersion(
-      version: v is String ? v : v?.toString() ?? '',
-      release: r is String ? r : r?.toString(),
-    );
-  }
-}
+export 'package:proxdroid/core/models/proxmox_version.dart' show ProxmoxVersion;
 
 /// Dio client for Proxmox `api2/json` with token or ticket authentication.
 ///

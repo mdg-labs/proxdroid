@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Container {
 
-@JsonKey(fromJson: _ctidFromJson) int get vmid;@JsonKey(fromJson: _containerNameFromJson) String get name;@JsonKey(fromJson: _containerStatusFromJson, toJson: _containerStatusToJson) ContainerStatus get status; String get node;@JsonKey(fromJson: proxmoxDouble) double? get cpu;@JsonKey(name: 'maxmem', fromJson: proxmoxInt) int? get maxMem;@JsonKey(fromJson: proxmoxInt) int? get mem;@JsonKey(name: 'maxdisk', fromJson: proxmoxInt) int? get maxDisk;@JsonKey(fromJson: proxmoxInt) int? get disk;@JsonKey(fromJson: proxmoxInt) int? get uptime; String? get ostype;
+@JsonKey(fromJson: _ctidFromJson) int get vmid;@JsonKey(fromJson: _containerNameFromJson) String get name;@JsonKey(fromJson: _containerStatusFromJson, toJson: _containerStatusToJson) ContainerStatus get status; String get node;@JsonKey(fromJson: proxmoxDouble) double? get cpu;@JsonKey(name: 'maxmem', fromJson: proxmoxInt) int? get maxMem;@JsonKey(fromJson: proxmoxInt) int? get mem;@JsonKey(name: 'maxdisk', fromJson: proxmoxInt) int? get maxDisk;@JsonKey(fromJson: proxmoxInt) int? get disk;@JsonKey(fromJson: proxmoxInt) int? get uptime; String? get ostype;@JsonKey(fromJson: guestTagsFromJson, toJson: guestTagsToJson) List<ProxmoxGuestTag> get tags;
 /// Create a copy of Container
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $ContainerCopyWith<Container> get copyWith => _$ContainerCopyWithImpl<Container>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Container&&(identical(other.vmid, vmid) || other.vmid == vmid)&&(identical(other.name, name) || other.name == name)&&(identical(other.status, status) || other.status == status)&&(identical(other.node, node) || other.node == node)&&(identical(other.cpu, cpu) || other.cpu == cpu)&&(identical(other.maxMem, maxMem) || other.maxMem == maxMem)&&(identical(other.mem, mem) || other.mem == mem)&&(identical(other.maxDisk, maxDisk) || other.maxDisk == maxDisk)&&(identical(other.disk, disk) || other.disk == disk)&&(identical(other.uptime, uptime) || other.uptime == uptime)&&(identical(other.ostype, ostype) || other.ostype == ostype));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Container&&(identical(other.vmid, vmid) || other.vmid == vmid)&&(identical(other.name, name) || other.name == name)&&(identical(other.status, status) || other.status == status)&&(identical(other.node, node) || other.node == node)&&(identical(other.cpu, cpu) || other.cpu == cpu)&&(identical(other.maxMem, maxMem) || other.maxMem == maxMem)&&(identical(other.mem, mem) || other.mem == mem)&&(identical(other.maxDisk, maxDisk) || other.maxDisk == maxDisk)&&(identical(other.disk, disk) || other.disk == disk)&&(identical(other.uptime, uptime) || other.uptime == uptime)&&(identical(other.ostype, ostype) || other.ostype == ostype)&&const DeepCollectionEquality().equals(other.tags, tags));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,vmid,name,status,node,cpu,maxMem,mem,maxDisk,disk,uptime,ostype);
+int get hashCode => Object.hash(runtimeType,vmid,name,status,node,cpu,maxMem,mem,maxDisk,disk,uptime,ostype,const DeepCollectionEquality().hash(tags));
 
 @override
 String toString() {
-  return 'Container(vmid: $vmid, name: $name, status: $status, node: $node, cpu: $cpu, maxMem: $maxMem, mem: $mem, maxDisk: $maxDisk, disk: $disk, uptime: $uptime, ostype: $ostype)';
+  return 'Container(vmid: $vmid, name: $name, status: $status, node: $node, cpu: $cpu, maxMem: $maxMem, mem: $mem, maxDisk: $maxDisk, disk: $disk, uptime: $uptime, ostype: $ostype, tags: $tags)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $ContainerCopyWith<$Res>  {
   factory $ContainerCopyWith(Container value, $Res Function(Container) _then) = _$ContainerCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(fromJson: _ctidFromJson) int vmid,@JsonKey(fromJson: _containerNameFromJson) String name,@JsonKey(fromJson: _containerStatusFromJson, toJson: _containerStatusToJson) ContainerStatus status, String node,@JsonKey(fromJson: proxmoxDouble) double? cpu,@JsonKey(name: 'maxmem', fromJson: proxmoxInt) int? maxMem,@JsonKey(fromJson: proxmoxInt) int? mem,@JsonKey(name: 'maxdisk', fromJson: proxmoxInt) int? maxDisk,@JsonKey(fromJson: proxmoxInt) int? disk,@JsonKey(fromJson: proxmoxInt) int? uptime, String? ostype
+@JsonKey(fromJson: _ctidFromJson) int vmid,@JsonKey(fromJson: _containerNameFromJson) String name,@JsonKey(fromJson: _containerStatusFromJson, toJson: _containerStatusToJson) ContainerStatus status, String node,@JsonKey(fromJson: proxmoxDouble) double? cpu,@JsonKey(name: 'maxmem', fromJson: proxmoxInt) int? maxMem,@JsonKey(fromJson: proxmoxInt) int? mem,@JsonKey(name: 'maxdisk', fromJson: proxmoxInt) int? maxDisk,@JsonKey(fromJson: proxmoxInt) int? disk,@JsonKey(fromJson: proxmoxInt) int? uptime, String? ostype,@JsonKey(fromJson: guestTagsFromJson, toJson: guestTagsToJson) List<ProxmoxGuestTag> tags
 });
 
 
@@ -65,7 +65,7 @@ class _$ContainerCopyWithImpl<$Res>
 
 /// Create a copy of Container
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? vmid = null,Object? name = null,Object? status = null,Object? node = null,Object? cpu = freezed,Object? maxMem = freezed,Object? mem = freezed,Object? maxDisk = freezed,Object? disk = freezed,Object? uptime = freezed,Object? ostype = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? vmid = null,Object? name = null,Object? status = null,Object? node = null,Object? cpu = freezed,Object? maxMem = freezed,Object? mem = freezed,Object? maxDisk = freezed,Object? disk = freezed,Object? uptime = freezed,Object? ostype = freezed,Object? tags = null,}) {
   return _then(_self.copyWith(
 vmid: null == vmid ? _self.vmid : vmid // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -78,7 +78,8 @@ as int?,maxDisk: freezed == maxDisk ? _self.maxDisk : maxDisk // ignore: cast_nu
 as int?,disk: freezed == disk ? _self.disk : disk // ignore: cast_nullable_to_non_nullable
 as int?,uptime: freezed == uptime ? _self.uptime : uptime // ignore: cast_nullable_to_non_nullable
 as int?,ostype: freezed == ostype ? _self.ostype : ostype // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,tags: null == tags ? _self.tags : tags // ignore: cast_nullable_to_non_nullable
+as List<ProxmoxGuestTag>,
   ));
 }
 
@@ -160,10 +161,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(fromJson: _ctidFromJson)  int vmid, @JsonKey(fromJson: _containerNameFromJson)  String name, @JsonKey(fromJson: _containerStatusFromJson, toJson: _containerStatusToJson)  ContainerStatus status,  String node, @JsonKey(fromJson: proxmoxDouble)  double? cpu, @JsonKey(name: 'maxmem', fromJson: proxmoxInt)  int? maxMem, @JsonKey(fromJson: proxmoxInt)  int? mem, @JsonKey(name: 'maxdisk', fromJson: proxmoxInt)  int? maxDisk, @JsonKey(fromJson: proxmoxInt)  int? disk, @JsonKey(fromJson: proxmoxInt)  int? uptime,  String? ostype)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(fromJson: _ctidFromJson)  int vmid, @JsonKey(fromJson: _containerNameFromJson)  String name, @JsonKey(fromJson: _containerStatusFromJson, toJson: _containerStatusToJson)  ContainerStatus status,  String node, @JsonKey(fromJson: proxmoxDouble)  double? cpu, @JsonKey(name: 'maxmem', fromJson: proxmoxInt)  int? maxMem, @JsonKey(fromJson: proxmoxInt)  int? mem, @JsonKey(name: 'maxdisk', fromJson: proxmoxInt)  int? maxDisk, @JsonKey(fromJson: proxmoxInt)  int? disk, @JsonKey(fromJson: proxmoxInt)  int? uptime,  String? ostype, @JsonKey(fromJson: guestTagsFromJson, toJson: guestTagsToJson)  List<ProxmoxGuestTag> tags)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Container() when $default != null:
-return $default(_that.vmid,_that.name,_that.status,_that.node,_that.cpu,_that.maxMem,_that.mem,_that.maxDisk,_that.disk,_that.uptime,_that.ostype);case _:
+return $default(_that.vmid,_that.name,_that.status,_that.node,_that.cpu,_that.maxMem,_that.mem,_that.maxDisk,_that.disk,_that.uptime,_that.ostype,_that.tags);case _:
   return orElse();
 
 }
@@ -181,10 +182,10 @@ return $default(_that.vmid,_that.name,_that.status,_that.node,_that.cpu,_that.ma
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(fromJson: _ctidFromJson)  int vmid, @JsonKey(fromJson: _containerNameFromJson)  String name, @JsonKey(fromJson: _containerStatusFromJson, toJson: _containerStatusToJson)  ContainerStatus status,  String node, @JsonKey(fromJson: proxmoxDouble)  double? cpu, @JsonKey(name: 'maxmem', fromJson: proxmoxInt)  int? maxMem, @JsonKey(fromJson: proxmoxInt)  int? mem, @JsonKey(name: 'maxdisk', fromJson: proxmoxInt)  int? maxDisk, @JsonKey(fromJson: proxmoxInt)  int? disk, @JsonKey(fromJson: proxmoxInt)  int? uptime,  String? ostype)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(fromJson: _ctidFromJson)  int vmid, @JsonKey(fromJson: _containerNameFromJson)  String name, @JsonKey(fromJson: _containerStatusFromJson, toJson: _containerStatusToJson)  ContainerStatus status,  String node, @JsonKey(fromJson: proxmoxDouble)  double? cpu, @JsonKey(name: 'maxmem', fromJson: proxmoxInt)  int? maxMem, @JsonKey(fromJson: proxmoxInt)  int? mem, @JsonKey(name: 'maxdisk', fromJson: proxmoxInt)  int? maxDisk, @JsonKey(fromJson: proxmoxInt)  int? disk, @JsonKey(fromJson: proxmoxInt)  int? uptime,  String? ostype, @JsonKey(fromJson: guestTagsFromJson, toJson: guestTagsToJson)  List<ProxmoxGuestTag> tags)  $default,) {final _that = this;
 switch (_that) {
 case _Container():
-return $default(_that.vmid,_that.name,_that.status,_that.node,_that.cpu,_that.maxMem,_that.mem,_that.maxDisk,_that.disk,_that.uptime,_that.ostype);}
+return $default(_that.vmid,_that.name,_that.status,_that.node,_that.cpu,_that.maxMem,_that.mem,_that.maxDisk,_that.disk,_that.uptime,_that.ostype,_that.tags);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -198,10 +199,10 @@ return $default(_that.vmid,_that.name,_that.status,_that.node,_that.cpu,_that.ma
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(fromJson: _ctidFromJson)  int vmid, @JsonKey(fromJson: _containerNameFromJson)  String name, @JsonKey(fromJson: _containerStatusFromJson, toJson: _containerStatusToJson)  ContainerStatus status,  String node, @JsonKey(fromJson: proxmoxDouble)  double? cpu, @JsonKey(name: 'maxmem', fromJson: proxmoxInt)  int? maxMem, @JsonKey(fromJson: proxmoxInt)  int? mem, @JsonKey(name: 'maxdisk', fromJson: proxmoxInt)  int? maxDisk, @JsonKey(fromJson: proxmoxInt)  int? disk, @JsonKey(fromJson: proxmoxInt)  int? uptime,  String? ostype)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(fromJson: _ctidFromJson)  int vmid, @JsonKey(fromJson: _containerNameFromJson)  String name, @JsonKey(fromJson: _containerStatusFromJson, toJson: _containerStatusToJson)  ContainerStatus status,  String node, @JsonKey(fromJson: proxmoxDouble)  double? cpu, @JsonKey(name: 'maxmem', fromJson: proxmoxInt)  int? maxMem, @JsonKey(fromJson: proxmoxInt)  int? mem, @JsonKey(name: 'maxdisk', fromJson: proxmoxInt)  int? maxDisk, @JsonKey(fromJson: proxmoxInt)  int? disk, @JsonKey(fromJson: proxmoxInt)  int? uptime,  String? ostype, @JsonKey(fromJson: guestTagsFromJson, toJson: guestTagsToJson)  List<ProxmoxGuestTag> tags)?  $default,) {final _that = this;
 switch (_that) {
 case _Container() when $default != null:
-return $default(_that.vmid,_that.name,_that.status,_that.node,_that.cpu,_that.maxMem,_that.mem,_that.maxDisk,_that.disk,_that.uptime,_that.ostype);case _:
+return $default(_that.vmid,_that.name,_that.status,_that.node,_that.cpu,_that.maxMem,_that.mem,_that.maxDisk,_that.disk,_that.uptime,_that.ostype,_that.tags);case _:
   return null;
 
 }
@@ -213,7 +214,7 @@ return $default(_that.vmid,_that.name,_that.status,_that.node,_that.cpu,_that.ma
 @JsonSerializable()
 
 class _Container implements Container {
-  const _Container({@JsonKey(fromJson: _ctidFromJson) required this.vmid, @JsonKey(fromJson: _containerNameFromJson) required this.name, @JsonKey(fromJson: _containerStatusFromJson, toJson: _containerStatusToJson) required this.status, required this.node, @JsonKey(fromJson: proxmoxDouble) this.cpu, @JsonKey(name: 'maxmem', fromJson: proxmoxInt) this.maxMem, @JsonKey(fromJson: proxmoxInt) this.mem, @JsonKey(name: 'maxdisk', fromJson: proxmoxInt) this.maxDisk, @JsonKey(fromJson: proxmoxInt) this.disk, @JsonKey(fromJson: proxmoxInt) this.uptime, this.ostype});
+  const _Container({@JsonKey(fromJson: _ctidFromJson) required this.vmid, @JsonKey(fromJson: _containerNameFromJson) required this.name, @JsonKey(fromJson: _containerStatusFromJson, toJson: _containerStatusToJson) required this.status, required this.node, @JsonKey(fromJson: proxmoxDouble) this.cpu, @JsonKey(name: 'maxmem', fromJson: proxmoxInt) this.maxMem, @JsonKey(fromJson: proxmoxInt) this.mem, @JsonKey(name: 'maxdisk', fromJson: proxmoxInt) this.maxDisk, @JsonKey(fromJson: proxmoxInt) this.disk, @JsonKey(fromJson: proxmoxInt) this.uptime, this.ostype, @JsonKey(fromJson: guestTagsFromJson, toJson: guestTagsToJson) final  List<ProxmoxGuestTag> tags = const []}): _tags = tags;
   factory _Container.fromJson(Map<String, dynamic> json) => _$ContainerFromJson(json);
 
 @override@JsonKey(fromJson: _ctidFromJson) final  int vmid;
@@ -227,6 +228,13 @@ class _Container implements Container {
 @override@JsonKey(fromJson: proxmoxInt) final  int? disk;
 @override@JsonKey(fromJson: proxmoxInt) final  int? uptime;
 @override final  String? ostype;
+ final  List<ProxmoxGuestTag> _tags;
+@override@JsonKey(fromJson: guestTagsFromJson, toJson: guestTagsToJson) List<ProxmoxGuestTag> get tags {
+  if (_tags is EqualUnmodifiableListView) return _tags;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_tags);
+}
+
 
 /// Create a copy of Container
 /// with the given fields replaced by the non-null parameter values.
@@ -241,16 +249,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Container&&(identical(other.vmid, vmid) || other.vmid == vmid)&&(identical(other.name, name) || other.name == name)&&(identical(other.status, status) || other.status == status)&&(identical(other.node, node) || other.node == node)&&(identical(other.cpu, cpu) || other.cpu == cpu)&&(identical(other.maxMem, maxMem) || other.maxMem == maxMem)&&(identical(other.mem, mem) || other.mem == mem)&&(identical(other.maxDisk, maxDisk) || other.maxDisk == maxDisk)&&(identical(other.disk, disk) || other.disk == disk)&&(identical(other.uptime, uptime) || other.uptime == uptime)&&(identical(other.ostype, ostype) || other.ostype == ostype));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Container&&(identical(other.vmid, vmid) || other.vmid == vmid)&&(identical(other.name, name) || other.name == name)&&(identical(other.status, status) || other.status == status)&&(identical(other.node, node) || other.node == node)&&(identical(other.cpu, cpu) || other.cpu == cpu)&&(identical(other.maxMem, maxMem) || other.maxMem == maxMem)&&(identical(other.mem, mem) || other.mem == mem)&&(identical(other.maxDisk, maxDisk) || other.maxDisk == maxDisk)&&(identical(other.disk, disk) || other.disk == disk)&&(identical(other.uptime, uptime) || other.uptime == uptime)&&(identical(other.ostype, ostype) || other.ostype == ostype)&&const DeepCollectionEquality().equals(other._tags, _tags));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,vmid,name,status,node,cpu,maxMem,mem,maxDisk,disk,uptime,ostype);
+int get hashCode => Object.hash(runtimeType,vmid,name,status,node,cpu,maxMem,mem,maxDisk,disk,uptime,ostype,const DeepCollectionEquality().hash(_tags));
 
 @override
 String toString() {
-  return 'Container(vmid: $vmid, name: $name, status: $status, node: $node, cpu: $cpu, maxMem: $maxMem, mem: $mem, maxDisk: $maxDisk, disk: $disk, uptime: $uptime, ostype: $ostype)';
+  return 'Container(vmid: $vmid, name: $name, status: $status, node: $node, cpu: $cpu, maxMem: $maxMem, mem: $mem, maxDisk: $maxDisk, disk: $disk, uptime: $uptime, ostype: $ostype, tags: $tags)';
 }
 
 
@@ -261,7 +269,7 @@ abstract mixin class _$ContainerCopyWith<$Res> implements $ContainerCopyWith<$Re
   factory _$ContainerCopyWith(_Container value, $Res Function(_Container) _then) = __$ContainerCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(fromJson: _ctidFromJson) int vmid,@JsonKey(fromJson: _containerNameFromJson) String name,@JsonKey(fromJson: _containerStatusFromJson, toJson: _containerStatusToJson) ContainerStatus status, String node,@JsonKey(fromJson: proxmoxDouble) double? cpu,@JsonKey(name: 'maxmem', fromJson: proxmoxInt) int? maxMem,@JsonKey(fromJson: proxmoxInt) int? mem,@JsonKey(name: 'maxdisk', fromJson: proxmoxInt) int? maxDisk,@JsonKey(fromJson: proxmoxInt) int? disk,@JsonKey(fromJson: proxmoxInt) int? uptime, String? ostype
+@JsonKey(fromJson: _ctidFromJson) int vmid,@JsonKey(fromJson: _containerNameFromJson) String name,@JsonKey(fromJson: _containerStatusFromJson, toJson: _containerStatusToJson) ContainerStatus status, String node,@JsonKey(fromJson: proxmoxDouble) double? cpu,@JsonKey(name: 'maxmem', fromJson: proxmoxInt) int? maxMem,@JsonKey(fromJson: proxmoxInt) int? mem,@JsonKey(name: 'maxdisk', fromJson: proxmoxInt) int? maxDisk,@JsonKey(fromJson: proxmoxInt) int? disk,@JsonKey(fromJson: proxmoxInt) int? uptime, String? ostype,@JsonKey(fromJson: guestTagsFromJson, toJson: guestTagsToJson) List<ProxmoxGuestTag> tags
 });
 
 
@@ -278,7 +286,7 @@ class __$ContainerCopyWithImpl<$Res>
 
 /// Create a copy of Container
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? vmid = null,Object? name = null,Object? status = null,Object? node = null,Object? cpu = freezed,Object? maxMem = freezed,Object? mem = freezed,Object? maxDisk = freezed,Object? disk = freezed,Object? uptime = freezed,Object? ostype = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? vmid = null,Object? name = null,Object? status = null,Object? node = null,Object? cpu = freezed,Object? maxMem = freezed,Object? mem = freezed,Object? maxDisk = freezed,Object? disk = freezed,Object? uptime = freezed,Object? ostype = freezed,Object? tags = null,}) {
   return _then(_Container(
 vmid: null == vmid ? _self.vmid : vmid // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -291,7 +299,8 @@ as int?,maxDisk: freezed == maxDisk ? _self.maxDisk : maxDisk // ignore: cast_nu
 as int?,disk: freezed == disk ? _self.disk : disk // ignore: cast_nullable_to_non_nullable
 as int?,uptime: freezed == uptime ? _self.uptime : uptime // ignore: cast_nullable_to_non_nullable
 as int?,ostype: freezed == ostype ? _self.ostype : ostype // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,tags: null == tags ? _self._tags : tags // ignore: cast_nullable_to_non_nullable
+as List<ProxmoxGuestTag>,
   ));
 }
 

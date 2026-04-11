@@ -18,6 +18,7 @@ void main() {
           'cpu': 0.12,
           'maxmem': 1073741824,
           'mem': 536870912,
+          'tags': 'public;color=FF0000',
         },
         <String, dynamic>{
           'type': 'lxc',
@@ -41,6 +42,9 @@ void main() {
     expect(vm.cpu, closeTo(0.12, 1e-9));
     expect(vm.maxMem, 1073741824);
     expect(vm.mem, 536870912);
+    expect(vm.tags, hasLength(1));
+    expect(vm.tags.single.label, 'public');
+    expect(vm.tags.single.inlineBackgroundHex, 'FF0000');
 
     expect(adapter.requests, hasLength(1));
     expect(adapter.requests.single.path, ApiEndpoints.clusterResources);

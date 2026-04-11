@@ -898,6 +898,10 @@
   "@actionClose": {
     "description": "Dismiss a dialog (e.g. license summary)."
   },
+  "settingsServersSubtitle": "Add, edit, or switch the active Proxmox server.",
+  "@settingsServersSubtitle": {
+    "description": "Subtitle for Settings row that opens the server list."
+  },
   "settingsAppearanceSection": "Appearance",
   "@settingsAppearanceSection": {
     "description": "Settings section: theme / display."
@@ -1011,5 +1015,9 @@
   "navMore": "More",
   "@navMore": {
     "description": "Bottom navigation bar label for the More tab, which opens the full navigation drawer."
+  },
+  "sectionGuestTags": "Tags",
+  "@sectionGuestTags": {
+    "description": "Section title for Proxmox guest tags on VM / container detail screens."
   }
 }

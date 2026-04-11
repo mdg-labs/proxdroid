@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:proxdroid/app/theme/app_theme.dart';
 import 'package:proxdroid/features/settings/providers/settings_providers.dart';
@@ -85,6 +86,20 @@ class SettingsScreen extends ConsumerWidget {
               ],
             ),
           ),
+          GroupedSection(
+            topSpacing: 0,
+            child: ListTile(
+              leading: Icon(Icons.dns_outlined, color: scheme.onSurfaceVariant),
+              title: Text(l10n.sectionServers),
+              subtitle: Text(l10n.settingsServersSubtitle),
+              trailing: Icon(
+                Icons.chevron_right,
+                color: scheme.onSurfaceVariant,
+              ),
+              onTap: () => context.go('/servers'),
+            ),
+          ),
+          const Divider(height: 1),
           GroupedSection(
             topSpacing: 0,
             header: SectionHeader(title: l10n.settingsAppearanceSection),

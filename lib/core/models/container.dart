@@ -3,6 +3,7 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'package:proxdroid/core/models/proxmox_guest_tag.dart';
 import 'package:proxdroid/core/models/proxmox_json_helpers.dart';
 
 part 'container.freezed.dart';
@@ -58,6 +59,9 @@ sealed class Container with _$Container {
     @JsonKey(fromJson: proxmoxInt) int? disk,
     @JsonKey(fromJson: proxmoxInt) int? uptime,
     String? ostype,
+    @JsonKey(fromJson: guestTagsFromJson, toJson: guestTagsToJson)
+    @Default([])
+    List<ProxmoxGuestTag> tags,
   }) = _Container;
 
   factory Container.fromJson(Map<String, dynamic> json) =>

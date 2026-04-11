@@ -347,7 +347,7 @@
 - [x] Add pull-to-refresh on all data screens
 - [x] Ensure all loading states use shimmer (no blank screens)
 - [x] **Material 3 theme tokens:** `AppTheme` card / input / list tile / button / app bar (`lib/app/theme/app_theme.dart`)
-- [x] **Navigation drawer:** branding header, Infrastructure vs Operations section labels (ARB), active-server shortcut to `/servers` (`lib/app/app_shell.dart`)
+- [x] **Navigation drawer:** branding header, Infrastructure vs Operations section labels (ARB), active-server shortcut to `/servers`; no duplicate Servers row under Infrastructure (`lib/app/app_shell.dart`)
 - [x] **`ShellSectionBody`:** shared AppBar + body (+ optional FAB); adopted on Settings, Servers, VMs, Containers, Dashboard (`lib/shared/widgets/shell_section_body.dart`)
 - [x] **Dashboard & lists:** primary-container cluster summary card; node cards with DNS icon chip; VM/container rows as cards with chevron; themed progress bars
 - [x] **EmptyState** tonal icon background; offline banner elevation + rounded bottom
@@ -356,6 +356,7 @@
 
 ### 6.3 Settings Screen
 - [x] Build `SettingsScreen` with sections:
+  - **Servers:** row above Appearance → `/servers` (add/edit/switch Proxmox server)
   - **Appearance:** theme control (dark/light/system) via `SegmentedButton`
   - **About:** app version (`package_info_plus`), link to `github.com/mdg-labs/proxdroid`, MIT license summary dialog (Play Store / F-Droid links deferred — out of scope for this release; see §6.5–6.6)
   - **Support:** Ko-fi and GitHub Sponsors tiles (`url_launcher`)

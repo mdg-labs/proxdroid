@@ -3,6 +3,7 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'package:proxdroid/core/models/proxmox_guest_tag.dart';
 import 'package:proxdroid/core/models/proxmox_json_helpers.dart';
 
 part 'vm.freezed.dart';
@@ -59,6 +60,9 @@ sealed class Vm with _$Vm {
     @JsonKey(name: 'maxdisk', fromJson: proxmoxInt) int? maxDisk,
     @JsonKey(fromJson: proxmoxInt) int? disk,
     @JsonKey(fromJson: proxmoxInt) int? uptime,
+    @JsonKey(fromJson: guestTagsFromJson, toJson: guestTagsToJson)
+    @Default([])
+    List<ProxmoxGuestTag> tags,
   }) = _Vm;
 
   factory Vm.fromJson(Map<String, dynamic> json) => _$VmFromJson(json);

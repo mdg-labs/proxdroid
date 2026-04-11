@@ -20,3 +20,21 @@ String proxmoxString(dynamic value, {String fallback = ''}) {
   if (value is String) return value;
   return value.toString();
 }
+
+/// Normalizes PVE-style hex colors to 6 uppercase hex digits, or null if invalid.
+String? proxmoxNormalizeHexColor(String? raw) {
+  if (raw == null) return null;
+  var s = raw.trim();
+  if (s.isEmpty) return null;
+  if (s.startsWith('#')) s = s.substring(1);
+  if (s.length == 3) {
+    final a = s.split('');
+    if (a.length == 3) {
+      s = '${a[0]}${a[0]}${a[1]}${a[1]}${a[2]}${a[2]}';
+    }
+  }
+  if (!RegExp(r'^[0-9A-Fa-f]{6}$').hasMatch(s)) {
+    return null;
+  }
+  return s.toUpperCase();
+}

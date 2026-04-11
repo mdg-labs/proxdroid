@@ -45,7 +45,6 @@ Strip the leading `v` to compare to changelog headings (e.g. `v1.0.0-beta.1` →
 - Collect every `## [x.y.z…]` heading (including `[Unreleased]` — do not treat it as a released tag).
 - Normalize: heading text inside brackets is the version key.
 
-
 ### 2b. pubspec version check
 
 Read `pubspec.yaml` and extract the `version:` field. Strip any build metadata after `+` (e.g. `1.0.0-beta.15+3` → use `1.0.0-beta.15` as the version key). Compare it against the latest tag from the `version:refname`-sorted tag list.
@@ -59,7 +58,7 @@ Do not ask for confirmation. Execute the following immediately.
 Determine which scenario applies:
 
 - **Scenario A — next pre-release** (e.g. pubspec is `1.0.0-beta.15`, latest tag is `v1.0.0-beta.14`): the pre-release identifier is the same base type (both `beta`, both `rc`, etc.).
-- **Scenario B — stable release** (e.g. pubspec is `1.0.0` or `2.0.0`, latest tag is any pre-release of that same base version): pubspec version has no pre-release suffix.
+- **Scenario B — stable release** (e.g. pubspec is `1.0.0` or `2.0.0`, latest tag is any pre-release of that same base version): pubspec version has no pre-release suffix. Check whether pre-release tags for this base version exist in the tag list (e.g. `1.0.0-beta.*`). **If no such pre-release tags exist** (e.g. latest tag is `v0.9.0` and pubspec is `1.0.0`): skip the beta summary entirely and proceed with **Scenario A** logic — collect commits since the latest tag, classify, and promote `[Unreleased]` as the new stable version.
 
 **Scenario A — collect and promote:**
 
@@ -75,7 +74,7 @@ Determine which scenario applies:
 5. Insert a new empty `## [Unreleased]` section above the promoted section with no bullets.
 6. Update the footer diff links: `[Unreleased]` → `compare/v<pubspec-version>...HEAD`; add `[<pubspec-version>]` → `compare/<latest_tag>...v<pubspec-version>`.
 
-**Scenario B — stable release summary:**
+**Scenario B — stable release summary (pre-releases exist):**
 
 1. Identify all beta/pre-release sections in `CHANGELOG.md` that belong to this stable version (e.g. for `1.0.0`: collect all `## [1.0.0-beta.*]`, `## [1.0.0-rc.*]` sections, in chronological order oldest-first).
 2. Collect all commits since the tag that preceded the first of those pre-releases all the way to HEAD:
@@ -94,7 +93,7 @@ After completing either scenario, continue to Step 3 to handle any remaining bac
 
 ### 3. Compare and classify
 
-> **⚠️ Early exit — no tags found:**  
+> **⚠️ Early exit — no tags found:**
 > If `git tag -l 'v*'` returns no output, **stop here** and **do not** continue to Step 4 (or the **Otherwise** branch below).
 >
 > - Ensure `CHANGELOG.md` has **`## [Unreleased]`** at the top with correct Keep a Changelog subsection structure (`### Added`, `### Changed`, etc. as needed — create empty scaffolding only if the file is missing or malformed).
@@ -110,8 +109,7 @@ After completing either scenario, continue to Step 3 to handle any remaining bac
 Otherwise:
 
 - **Tag with no matching `## [<version>]` section** → **missing section** (backfill candidate).
-- **`## [version]` with no matching remote tag** → append that heading’s version string to a **Warnings** list (stale heading, renamed tag, or not yet pushed). Do not delete without explicit user confirmation. In **Step 6**, print this **Warnings** list explicitly so nothing is silently skipped.
-- **`pubspec.yaml` `version:`** → if it differs from the latest tag and work is unreleased, keep bullets under **`## [Unreleased]`** until the user cuts a release; do not invent a dated release section for an unpublished version.
+- **`## [version]` with no matching remote tag** → append that heading's version string to a **Warnings** list (stale heading, renamed tag, or not yet pushed). Do not delete without explicit user confirmation. In **Step 6**, print this **Warnings** list explicitly so nothing is silently skipped.
 
 ### 4. Update `CHANGELOG.md` (Keep a Changelog)
 
@@ -139,7 +137,7 @@ Otherwise:
    git log <tag> --no-merges --pretty=format:'- %s'
    ```
 
-   For repos with a **very long** initial history, this can be large — the maintainer should **manually trim or summarize** older commits in `CHANGELOG.md` after the agent’s pass; do not cap with an arbitrary commit count.
+   For repos with a **very long** initial history, this can be large — the maintainer should **manually trim or summarize** older commits in `CHANGELOG.md` after the agent's pass; do not cap with an arbitrary commit count.
 
 3. **Classify commits** before writing any bullets. Split the raw list into two buckets:
 

@@ -17,11 +17,14 @@ void main() {
         'maxdisk': 10737418240,
         'disk': 1024,
         'uptime': 0,
+        'tags': 'prod;web',
       };
       final vm = Vm.fromJson(map);
       final again = Vm.fromJson(vm.toJson());
       expect(again, vm);
       expect(vm.status, VmStatus.stopped);
+      expect(vm.tags, hasLength(2));
+      expect(vm.tags.map((t) => t.label), ['prod', 'web']);
     });
   });
 

@@ -1330,6 +1330,12 @@ abstract class AppLocalizations {
   /// **'Close'**
   String get actionClose;
 
+  /// Subtitle for Settings row that opens the server list.
+  ///
+  /// In en, this message translates to:
+  /// **'Add, edit, or switch the active Proxmox server.'**
+  String get settingsServersSubtitle;
+
   /// Settings section: theme / display.
   ///
   /// In en, this message translates to:
