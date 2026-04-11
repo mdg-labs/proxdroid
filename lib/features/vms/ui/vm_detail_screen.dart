@@ -23,6 +23,7 @@ import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/providers/proxmox_tag_colors_provider.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
+import 'package:proxdroid/shared/widgets/guest_power_action_icon_pills.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
 import 'package:proxdroid/shared/widgets/premium_modals.dart';
 import 'package:proxdroid/shared/widgets/proxmox_tag_widgets.dart';
@@ -347,8 +348,7 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
 
                         // ── Power actions ────────────────────────────────
                         if (canStart || canStopOrReboot) ...[
-                          _PowerActionsRow(
-                            vm: vm,
+                          GuestPowerActionIconPills(
                             l10n: l10n,
                             canStart: canStart,
                             canStopOrReboot: canStopOrReboot,
@@ -555,96 +555,6 @@ class _VmHeroHeader extends StatelessWidget {
           VmStatusBadge(status: vm.status),
         ],
       ),
-    );
-  }
-}
-
-// ────────────────────────────────────────────────────────────────────────────
-// Power actions row
-// ────────────────────────────────────────────────────────────────────────────
-
-class _PowerActionsRow extends StatelessWidget {
-  const _PowerActionsRow({
-    required this.vm,
-    required this.l10n,
-    required this.canStart,
-    required this.canStopOrReboot,
-    required this.busy,
-    required this.onStart,
-    required this.onStop,
-    required this.onForceStop,
-    required this.onReboot,
-  });
-
-  final Vm vm;
-  final AppLocalizations l10n;
-  final bool canStart;
-  final bool canStopOrReboot;
-  final bool busy;
-  final VoidCallback onStart;
-  final VoidCallback onStop;
-  final VoidCallback onForceStop;
-  final VoidCallback onReboot;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final warningColor =
-        isDark
-            ? AppColors.darkStatusWarningForeground
-            : AppColors.lightStatusWarningForeground;
-
-    return Wrap(
-      spacing: AppSpacing.sm,
-      runSpacing: AppSpacing.sm,
-      children: [
-        if (canStart)
-          FilledButton.icon(
-            onPressed: busy ? null : onStart,
-            icon: const Icon(Icons.play_arrow_rounded, size: 18),
-            label: Text(l10n.actionStart),
-          ),
-        if (canStopOrReboot) ...[
-          // Stop — outlined amber (soft stop, not destructive)
-          OutlinedButton.icon(
-            onPressed: busy ? null : onStop,
-            icon: Icon(Icons.stop_rounded, size: 18, color: warningColor),
-            label: Text(l10n.actionStop),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: warningColor,
-              side: BorderSide(color: warningColor.withValues(alpha: 0.6)),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.md),
-              ),
-            ),
-          ),
-          // Force Stop — filled red (destructive)
-          FilledButton.icon(
-            onPressed: busy ? null : onForceStop,
-            icon: const Icon(Icons.power_settings_new_rounded, size: 18),
-            label: Text(l10n.actionForceStop),
-            style: FilledButton.styleFrom(
-              backgroundColor: scheme.errorContainer,
-              foregroundColor: scheme.onErrorContainer,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.md),
-              ),
-            ),
-          ),
-          // Reboot — outlined neutral
-          OutlinedButton.icon(
-            onPressed: busy ? null : onReboot,
-            icon: const Icon(Icons.refresh_rounded, size: 18),
-            label: Text(l10n.actionReboot),
-            style: OutlinedButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.md),
-              ),
-            ),
-          ),
-        ],
-      ],
     );
   }
 }
