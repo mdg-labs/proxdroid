@@ -35,5 +35,13 @@ class StorageRepository {
     String node,
     String storageId, {
     String? contentKind,
-  }) => _client.fetchStorageContent(node, storageId, contentKind: contentKind);
+    int? start,
+    int? limit,
+  }) => _client.fetchStorageContent(
+    node,
+    storageId,
+    contentKind: contentKind,
+    start: start,
+    limit: limit,
+  );
 }

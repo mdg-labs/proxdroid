@@ -433,7 +433,7 @@ These are tracked here for planning purposes but are not in scope for v1.0.
 ### VM & LXC config editor (create + edit)
 
 - **Plan:** [`VM_CT_Config_Editor_Plan.md`](VM_CT_Config_Editor_Plan.md) — Phases **0–9** with `[ ]`/`[x]` tasks and acceptance criteria (through **netN** + **delete=**, **QEMU disks** / **LXC rootfs & mpN**, risk confirm + stopped-guest locks); optional **10** (cloud-init & advanced). CI hygiene per plan §17.
-- **Progress:** Phases **0–9** are implemented in app code and CI; Tier-1 manual rows in the plan may remain until cluster QA.
+- **Progress:** Phases **0–9** are implemented in app code and CI; Tier-1 manual rows in the plan may remain until cluster QA. Create/edit flows use **node-scoped pickers** (storage pools, volumes, bridges) and **fixed OS / SCSI / NIC lists**, with an **advanced raw string** path when values do not match the simplified parser.
 - [ ] Implement per plan through **Phase 7** minimum; optional phases **8+** as scoped
 
 ### Console Access

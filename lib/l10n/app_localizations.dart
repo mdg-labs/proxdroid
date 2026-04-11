@@ -1930,6 +1930,126 @@ abstract class AppLocalizations {
   /// **'Apply changes'**
   String get guestConfigRiskConfirmAction;
 
+  /// Label for storage dropdown on guest forms.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage pool'**
+  String get guestPickerStoragePool;
+
+  /// Label for Linux bridge iface dropdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Bridge'**
+  String get guestPickerBridge;
+
+  /// QEMU NIC hardware model dropdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Network model'**
+  String get guestPickerNicModel;
+
+  /// LXC eth name inside container (name=).
+  ///
+  /// In en, this message translates to:
+  /// **'Interface name'**
+  String get guestPickerIfaceName;
+
+  /// Radio option to allocate a new disk by size.
+  ///
+  /// In en, this message translates to:
+  /// **'New volume (size in GiB)'**
+  String get guestPickerDiskModeNew;
+
+  /// Radio option to attach an existing storage volume.
+  ///
+  /// In en, this message translates to:
+  /// **'Existing volume'**
+  String get guestPickerDiskModeExisting;
+
+  /// Dropdown of volid from storage content.
+  ///
+  /// In en, this message translates to:
+  /// **'Volume'**
+  String get guestPickerVolume;
+
+  /// Numeric size for new disk or rootfs.
+  ///
+  /// In en, this message translates to:
+  /// **'Size (GiB)'**
+  String get guestPickerSizeGiB;
+
+  /// Toggle or tile to edit Proxmox value as free text.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced (raw string)'**
+  String get guestPickerAdvancedRaw;
+
+  /// Leave raw string mode when the value parses cleanly.
+  ///
+  /// In en, this message translates to:
+  /// **'Use simplified editor'**
+  String get guestPickerUseSimpleEditor;
+
+  /// Label for LXC static IP text field.
+  ///
+  /// In en, this message translates to:
+  /// **'Static CIDR'**
+  String get guestPickerStaticIpLabel;
+
+  /// Section label for LXC IP mode.
+  ///
+  /// In en, this message translates to:
+  /// **'IPv4'**
+  String get guestPickerNetIpMode;
+
+  /// LXC net ip=dhcp option.
+  ///
+  /// In en, this message translates to:
+  /// **'DHCP'**
+  String get guestPickerNetIpDhcp;
+
+  /// LXC static ip= value.
+  ///
+  /// In en, this message translates to:
+  /// **'Static'**
+  String get guestPickerNetIpStatic;
+
+  /// LXC net line without ip= key.
+  ///
+  /// In en, this message translates to:
+  /// **'Omit IP (bridge only)'**
+  String get guestPickerNetIpNone;
+
+  /// Hint for LXC static CIDR field.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 192.168.1.50/24'**
+  String get guestPickerNetStaticHint;
+
+  /// Placeholder while node network list loads.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading bridges…'**
+  String get guestPickerLoadingBridges;
+
+  /// Empty bridge list hint.
+  ///
+  /// In en, this message translates to:
+  /// **'No bridge interfaces found. Use advanced raw entry.'**
+  String get guestPickerNoBridges;
+
+  /// Empty filtered storage list for guest disk/rootfs.
+  ///
+  /// In en, this message translates to:
+  /// **'No storage pools on this node support this content type. Use advanced raw entry.'**
+  String get guestPickerNoStoragePools;
+
+  /// Shown when net/disk string cannot be parsed for structured UI.
+  ///
+  /// In en, this message translates to:
+  /// **'This value uses options the simplified editor does not handle. Edit as raw or adjust in Proxmox.'**
+  String get guestPickerParseFallbackHint;
+
   /// Generic required field validation.
   ///
   /// In en, this message translates to:

@@ -29,6 +29,10 @@
 
 - Node migration, in-place `vmid` change, full disk wizard, full Proxmox UI parity, OCI-only LXC create (**9.1+**) until explicitly added in an optional phase.
 
+**UX reliability (post Phase 9)**
+
+- Create and Tier-A edit screens prefer **dropdowns** backed by `GET /nodes/{node}/storage`, `…/content`, and `GET /nodes/{node}/network` where applicable, plus curated enum lists for `ostype` / `scsihw` / NIC models. Unsupported Proxmox syntax remains editable via **Advanced (raw)** so saves never silently drop fields.
+
 ---
 
 ## 2. Master tracker (quick view)

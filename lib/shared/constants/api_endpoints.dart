@@ -74,6 +74,11 @@ abstract final class ApiEndpoints {
   static String nodeRrdData(String node) =>
       '/nodes/${Uri.encodeComponent(node)}/rrddata';
 
+  /// `GET /nodes/{node}/network` — physical and virtual interfaces (bridges,
+  /// bonds, VLANs, etc.) for UI pickers (e.g. `bridge=` in VM/LXC net lines).
+  static String nodeNetwork(String node) =>
+      '/nodes/${Uri.encodeComponent(node)}/network';
+
   /// `GET /nodes/{node}/storage` — storage pools on a node.
   static String nodeStorage(String node) =>
       '/nodes/${Uri.encodeComponent(node)}/storage';

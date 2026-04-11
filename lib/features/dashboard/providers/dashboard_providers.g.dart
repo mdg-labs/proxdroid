@@ -218,6 +218,144 @@ class _NodeDetailStatusProviderElement
   String get nodeName => (origin as NodeDetailStatusProvider).nodeName;
 }
 
+String _$nodeNetworkBridgesHash() =>
+    r'9f742c9a508af4bbd35bd986092678a690d37839';
+
+/// Linux / OVS bridges and related ifaces for guest `bridge=` pickers.
+///
+/// Copied from [nodeNetworkBridges].
+@ProviderFor(nodeNetworkBridges)
+const nodeNetworkBridgesProvider = NodeNetworkBridgesFamily();
+
+/// Linux / OVS bridges and related ifaces for guest `bridge=` pickers.
+///
+/// Copied from [nodeNetworkBridges].
+class NodeNetworkBridgesFamily
+    extends Family<AsyncValue<List<NodeNetworkIface>>> {
+  /// Linux / OVS bridges and related ifaces for guest `bridge=` pickers.
+  ///
+  /// Copied from [nodeNetworkBridges].
+  const NodeNetworkBridgesFamily();
+
+  /// Linux / OVS bridges and related ifaces for guest `bridge=` pickers.
+  ///
+  /// Copied from [nodeNetworkBridges].
+  NodeNetworkBridgesProvider call(String node) {
+    return NodeNetworkBridgesProvider(node);
+  }
+
+  @override
+  NodeNetworkBridgesProvider getProviderOverride(
+    covariant NodeNetworkBridgesProvider provider,
+  ) {
+    return call(provider.node);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'nodeNetworkBridgesProvider';
+}
+
+/// Linux / OVS bridges and related ifaces for guest `bridge=` pickers.
+///
+/// Copied from [nodeNetworkBridges].
+class NodeNetworkBridgesProvider
+    extends AutoDisposeFutureProvider<List<NodeNetworkIface>> {
+  /// Linux / OVS bridges and related ifaces for guest `bridge=` pickers.
+  ///
+  /// Copied from [nodeNetworkBridges].
+  NodeNetworkBridgesProvider(String node)
+    : this._internal(
+        (ref) => nodeNetworkBridges(ref as NodeNetworkBridgesRef, node),
+        from: nodeNetworkBridgesProvider,
+        name: r'nodeNetworkBridgesProvider',
+        debugGetCreateSourceHash:
+            const bool.fromEnvironment('dart.vm.product')
+                ? null
+                : _$nodeNetworkBridgesHash,
+        dependencies: NodeNetworkBridgesFamily._dependencies,
+        allTransitiveDependencies:
+            NodeNetworkBridgesFamily._allTransitiveDependencies,
+        node: node,
+      );
+
+  NodeNetworkBridgesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.node,
+  }) : super.internal();
+
+  final String node;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<NodeNetworkIface>> Function(NodeNetworkBridgesRef provider)
+    create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: NodeNetworkBridgesProvider._internal(
+        (ref) => create(ref as NodeNetworkBridgesRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        node: node,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<NodeNetworkIface>> createElement() {
+    return _NodeNetworkBridgesProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is NodeNetworkBridgesProvider && other.node == node;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, node.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin NodeNetworkBridgesRef
+    on AutoDisposeFutureProviderRef<List<NodeNetworkIface>> {
+  /// The parameter `node` of this provider.
+  String get node;
+}
+
+class _NodeNetworkBridgesProviderElement
+    extends AutoDisposeFutureProviderElement<List<NodeNetworkIface>>
+    with NodeNetworkBridgesRef {
+  _NodeNetworkBridgesProviderElement(super.provider);
+
+  @override
+  String get node => (origin as NodeNetworkBridgesProvider).node;
+}
+
 String _$nodeListHash() => r'b1c4e0dee31c90b945eda8d16422ff02f1dd84e2';
 
 /// Cluster node list (`nodeListProvider`). Pull-to-refresh:

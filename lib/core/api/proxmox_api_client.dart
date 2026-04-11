@@ -8,6 +8,7 @@ import 'package:proxdroid/core/api/api_interceptors.dart';
 import 'package:proxdroid/core/models/backup.dart';
 import 'package:proxdroid/core/models/container.dart';
 import 'package:proxdroid/core/models/node.dart';
+import 'package:proxdroid/core/models/node_network_iface.dart';
 import 'package:proxdroid/core/models/proxmox_json_helpers.dart';
 import 'package:proxdroid/core/models/storage.dart';
 import 'package:proxdroid/core/models/resource_data_point.dart';
@@ -601,6 +602,18 @@ class ProxmoxApiClient {
     }).toList();
   }
 
+  /// `GET /nodes/{node}/network` — interface list for bridge pickers.
+  Future<List<NodeNetworkIface>> fetchNodeNetworkIfaces(String node) async {
+    final response = await _unwrap(
+      _dio.get<Map<String, dynamic>>(ApiEndpoints.nodeNetwork(node)),
+    );
+    final list = _dataAsList(response.data?['data']);
+    return list.map((dynamic e) {
+      final m = Map<String, dynamic>.from(e as Map);
+      return NodeNetworkIface.fromJson(m);
+    }).toList();
+  }
+
   /// `GET /nodes/{node}/storage` — storage pools.
   Future<List<Storage>> fetchStorageForNode(String node) async {
     final response = await _unwrap(
@@ -632,15 +645,24 @@ class ProxmoxApiClient {
   }
 
   /// `GET /nodes/{node}/storage/{storage}/content` — optional [contentKind]
-  /// limits rows (e.g. `backup`).
+  /// limits rows (e.g. `images`, `rootdir`, `backup`). [start]/[limit] map to
+  /// PVE list pagination when set.
   Future<List<BackupContent>> fetchStorageContent(
     String node,
     String storage, {
     String? contentKind,
+    int? start,
+    int? limit,
   }) async {
     final query = <String, dynamic>{};
     if (contentKind != null && contentKind.isNotEmpty) {
       query['content'] = contentKind;
+    }
+    if (start != null) {
+      query['start'] = start;
+    }
+    if (limit != null) {
+      query['limit'] = limit;
     }
     final response = await _unwrap(
       _dio.get<Map<String, dynamic>>(

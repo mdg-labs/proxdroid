@@ -494,4 +494,33 @@ void main() {
     expect(r.upid, upid);
     expect(adapter.requests.single.path, ApiEndpoints.nodeLxcCreate('n2'));
   });
+
+  test('fetchNodeNetworkIfaces GET nodeNetwork path', () async {
+    final adapter = FakeHttpClientAdapter([
+      ResponseBody.fromString(
+        jsonEncode({
+          'data': [
+            {'iface': 'vmbr0', 'type': 'bridge'},
+            {'iface': 'eth0', 'type': 'eth'},
+          ],
+        }),
+        200,
+        headers: {
+          Headers.contentTypeHeader: [Headers.jsonContentType],
+        },
+      ),
+    ]);
+    final dio = Dio()..httpClientAdapter = adapter;
+    final client = ProxmoxApiClient.withApiToken(
+      server: serverToken,
+      apiToken: 't',
+      dioOverride: dio,
+    );
+    final list = await client.fetchNodeNetworkIfaces('my-node');
+    expect(adapter.requests.single.path, ApiEndpoints.nodeNetwork('my-node'));
+    expect(list, hasLength(2));
+    expect(list[0].iface, 'vmbr0');
+    expect(list[0].isGuestAttachableBridge, isTrue);
+    expect(list[1].isGuestAttachableBridge, isFalse);
+  });
 }

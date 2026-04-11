@@ -1323,6 +1323,86 @@
   "@guestConfigRiskConfirmAction": {
     "description": "Confirm button on high-risk save dialog."
   },
+  "guestPickerStoragePool": "Storage pool",
+  "@guestPickerStoragePool": {
+    "description": "Label for storage dropdown on guest forms."
+  },
+  "guestPickerBridge": "Bridge",
+  "@guestPickerBridge": {
+    "description": "Label for Linux bridge iface dropdown."
+  },
+  "guestPickerNicModel": "Network model",
+  "@guestPickerNicModel": {
+    "description": "QEMU NIC hardware model dropdown."
+  },
+  "guestPickerIfaceName": "Interface name",
+  "@guestPickerIfaceName": {
+    "description": "LXC eth name inside container (name=)."
+  },
+  "guestPickerDiskModeNew": "New volume (size in GiB)",
+  "@guestPickerDiskModeNew": {
+    "description": "Radio option to allocate a new disk by size."
+  },
+  "guestPickerDiskModeExisting": "Existing volume",
+  "@guestPickerDiskModeExisting": {
+    "description": "Radio option to attach an existing storage volume."
+  },
+  "guestPickerVolume": "Volume",
+  "@guestPickerVolume": {
+    "description": "Dropdown of volid from storage content."
+  },
+  "guestPickerSizeGiB": "Size (GiB)",
+  "@guestPickerSizeGiB": {
+    "description": "Numeric size for new disk or rootfs."
+  },
+  "guestPickerAdvancedRaw": "Advanced (raw string)",
+  "@guestPickerAdvancedRaw": {
+    "description": "Toggle or tile to edit Proxmox value as free text."
+  },
+  "guestPickerUseSimpleEditor": "Use simplified editor",
+  "@guestPickerUseSimpleEditor": {
+    "description": "Leave raw string mode when the value parses cleanly."
+  },
+  "guestPickerStaticIpLabel": "Static CIDR",
+  "@guestPickerStaticIpLabel": {
+    "description": "Label for LXC static IP text field."
+  },
+  "guestPickerNetIpMode": "IPv4",
+  "@guestPickerNetIpMode": {
+    "description": "Section label for LXC IP mode."
+  },
+  "guestPickerNetIpDhcp": "DHCP",
+  "@guestPickerNetIpDhcp": {
+    "description": "LXC net ip=dhcp option."
+  },
+  "guestPickerNetIpStatic": "Static",
+  "@guestPickerNetIpStatic": {
+    "description": "LXC static ip= value."
+  },
+  "guestPickerNetIpNone": "Omit IP (bridge only)",
+  "@guestPickerNetIpNone": {
+    "description": "LXC net line without ip= key."
+  },
+  "guestPickerNetStaticHint": "e.g. 192.168.1.50/24",
+  "@guestPickerNetStaticHint": {
+    "description": "Hint for LXC static CIDR field."
+  },
+  "guestPickerLoadingBridges": "Loading bridges…",
+  "@guestPickerLoadingBridges": {
+    "description": "Placeholder while node network list loads."
+  },
+  "guestPickerNoBridges": "No bridge interfaces found. Use advanced raw entry.",
+  "@guestPickerNoBridges": {
+    "description": "Empty bridge list hint."
+  },
+  "guestPickerNoStoragePools": "No storage pools on this node support this content type. Use advanced raw entry.",
+  "@guestPickerNoStoragePools": {
+    "description": "Empty filtered storage list for guest disk/rootfs."
+  },
+  "guestPickerParseFallbackHint": "This value uses options the simplified editor does not handle. Edit as raw or adjust in Proxmox.",
+  "@guestPickerParseFallbackHint": {
+    "description": "Shown when net/disk string cannot be parsed for structured UI."
+  },
   "validationFieldRequired": "This field is required.",
   "@validationFieldRequired": {
     "description": "Generic required field validation."

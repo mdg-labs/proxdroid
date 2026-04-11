@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:proxdroid/app/theme/app_theme.dart';
+import 'package:proxdroid/core/guest_config/pve_net_line.dart';
 import 'package:proxdroid/core/models/node.dart';
 import 'package:proxdroid/core/models/task.dart' as pve;
 import 'package:proxdroid/features/containers/data/container_repository.dart';
@@ -10,8 +11,12 @@ import 'package:proxdroid/features/dashboard/providers/dashboard_providers.dart'
 import 'package:proxdroid/features/servers/ui/proxmox_exception_messages.dart';
 import 'package:proxdroid/features/tasks/providers/task_providers.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
+import 'package:proxdroid/shared/constants/pve_guest_enums.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
 import 'package:proxdroid/shared/widgets/grouped_section.dart';
+import 'package:proxdroid/shared/widgets/guest_config/guest_disk_volume_editor.dart';
+import 'package:proxdroid/shared/widgets/guest_config/guest_net_line_editor.dart';
+import 'package:proxdroid/shared/widgets/guest_config/guest_string_dropdown.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
 import 'package:proxdroid/shared/widgets/section_header.dart';
 import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
@@ -40,12 +45,12 @@ class _ContainerCreateScreenState extends ConsumerState<ContainerCreateScreen> {
   late final TextEditingController _hostname = TextEditingController();
   late final TextEditingController _password = TextEditingController();
   late final TextEditingController _memory = TextEditingController(text: '512');
-  late final TextEditingController _ostype = TextEditingController(
-    text: 'debian',
-  );
-  late final TextEditingController _rootfs = TextEditingController();
-  late final TextEditingController _net0 = TextEditingController(
-    text: 'name=eth0,bridge=vmbr0,ip=dhcp',
+  String _ostype = 'debian';
+  String _rootfs = '';
+  String _net0 = buildLxcNetLine(
+    name: 'eth0',
+    bridge: 'vmbr0',
+    ipMode: GuestNetIpMode.dhcp,
   );
 
   @override
@@ -54,9 +59,6 @@ class _ContainerCreateScreenState extends ConsumerState<ContainerCreateScreen> {
     _hostname.dispose();
     _password.dispose();
     _memory.dispose();
-    _ostype.dispose();
-    _rootfs.dispose();
-    _net0.dispose();
     super.dispose();
   }
 
@@ -134,6 +136,12 @@ class _ContainerCreateScreenState extends ConsumerState<ContainerCreateScreen> {
       return;
     }
     final node = _resolvedNode(nodes);
+    if (_rootfs.trim().isEmpty || _net0.trim().isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.validationFieldRequired)));
+      return;
+    }
     setState(() => _submitting = true);
     final messenger = ScaffoldMessenger.of(context);
     try {
@@ -152,10 +160,10 @@ class _ContainerCreateScreenState extends ConsumerState<ContainerCreateScreen> {
         'vmid': vmid,
         'hostname': _hostname.text.trim(),
         'password': _password.text,
-        'ostype': _ostype.text.trim(),
-        'rootfs': _rootfs.text.trim(),
+        'ostype': _ostype.trim(),
+        'rootfs': _rootfs.trim(),
         'memory': mem,
-        'net0': _net0.text.trim(),
+        'net0': _net0.trim(),
         'unprivileged': _unprivileged ? 1 : 0,
       };
       final result = await repo.createContainer(node, body);
@@ -373,37 +381,60 @@ class _ContainerCreateScreenState extends ConsumerState<ContainerCreateScreen> {
                         readOnly: _submitting,
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      TextFormField(
-                        controller: _ostype,
-                        decoration: InputDecoration(
-                          labelText: l10n.guestConfigFieldGuestOs,
-                          filled: true,
-                          helperText: l10n.guestCreateCtOstypeHint,
+                      IgnorePointer(
+                        ignoring: _submitting,
+                        child: GuestStringDropdown(
+                          label: l10n.guestConfigFieldGuestOs,
+                          ids: pveLxcOstypeIds,
+                          value: _ostype,
+                          enabled: !_submitting,
+                          onChanged:
+                              (v) => setState(() {
+                                if (v != null) {
+                                  _ostype = v;
+                                }
+                              }),
                         ),
-                        validator: (v) => _required(v, l10n),
-                        readOnly: _submitting,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4, left: 12),
+                        child: Text(
+                          l10n.guestCreateCtOstypeHint,
+                          style: tt.bodySmall?.copyWith(
+                            color: scheme.onSurfaceVariant,
+                          ),
+                        ),
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      TextFormField(
-                        controller: _rootfs,
-                        decoration: InputDecoration(
-                          labelText: l10n.guestConfigFieldRootfs,
-                          filled: true,
-                          helperText: l10n.guestCreateFieldRootfsHint,
+                      Text(l10n.guestConfigFieldRootfs, style: tt.titleSmall),
+                      const SizedBox(height: AppSpacing.sm),
+                      GuestDiskVolumeEditor(
+                        key: ValueKey<String>('rootfs-$resolved'),
+                        node: resolved,
+                        contentKind: 'rootdir',
+                        value: _rootfs,
+                        enabled: !_submitting,
+                        onChanged: (s) => setState(() => _rootfs = s),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4, left: 12),
+                        child: Text(
+                          l10n.guestCreateFieldRootfsHint,
+                          style: tt.bodySmall?.copyWith(
+                            color: scheme.onSurfaceVariant,
+                          ),
                         ),
-                        validator: (v) => _required(v, l10n),
-                        readOnly: _submitting,
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      TextFormField(
-                        controller: _net0,
-                        decoration: InputDecoration(
-                          labelText: l10n.guestCreateFieldNet0,
-                          filled: true,
-                          helperText: l10n.guestCreateFieldNet0HintCt,
-                        ),
-                        validator: (v) => _required(v, l10n),
-                        readOnly: _submitting,
+                      Text(l10n.guestCreateFieldNet0, style: tt.titleSmall),
+                      const SizedBox(height: AppSpacing.sm),
+                      GuestNetLineEditor(
+                        key: ValueKey<String>('net-$resolved'),
+                        node: resolved,
+                        isQemu: false,
+                        value: _net0,
+                        enabled: !_submitting,
+                        onChanged: (s) => setState(() => _net0 = s),
                       ),
                     ],
                   ),

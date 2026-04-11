@@ -9,7 +9,11 @@ import 'package:proxdroid/features/servers/ui/proxmox_exception_messages.dart';
 import 'package:proxdroid/features/vms/providers/vm_config_providers.dart';
 import 'package:proxdroid/features/vms/providers/vm_providers.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
+import 'package:proxdroid/shared/constants/pve_guest_enums.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
+import 'package:proxdroid/shared/widgets/guest_config/guest_disk_volume_editor.dart';
+import 'package:proxdroid/shared/widgets/guest_config/guest_net_line_editor.dart';
+import 'package:proxdroid/shared/widgets/guest_config/guest_string_dropdown.dart';
 import 'package:proxdroid/shared/widgets/grouped_section.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
 import 'package:proxdroid/shared/widgets/premium_modals.dart';
@@ -128,6 +132,31 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
         ctrls[i].text = lines[i].value;
       }
     }
+  }
+
+  Widget _ostypeField(AppLocalizations l10n) {
+    final t = _ostype.text.trim();
+    if (t.isNotEmpty && !pveQemuOstypeIds.contains(t)) {
+      return TextFormField(
+        controller: _ostype,
+        decoration: InputDecoration(
+          labelText: l10n.guestConfigFieldGuestOs,
+          border: const OutlineInputBorder(),
+        ),
+        textInputAction: TextInputAction.next,
+      );
+    }
+    return GuestStringDropdown(
+      label: l10n.guestConfigFieldGuestOs,
+      ids: pveQemuOstypeIds,
+      value: t.isEmpty ? 'l26' : t,
+      enabled: !_saving,
+      onChanged: (v) {
+        if (v != null) {
+          setState(() => _ostype.text = v);
+        }
+      },
+    );
   }
 
   bool _guestVmIsLive() {
@@ -553,14 +582,7 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
                               textInputAction: TextInputAction.next,
                             ),
                             const SizedBox(height: 16),
-                            TextFormField(
-                              controller: _ostype,
-                              decoration: InputDecoration(
-                                labelText: l10n.guestConfigFieldGuestOs,
-                                border: const OutlineInputBorder(),
-                              ),
-                              textInputAction: TextInputAction.next,
-                            ),
+                            _ostypeField(l10n),
                           ],
                         ),
                       ),
@@ -620,18 +642,20 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
                                             ),
                                           ),
                                           Expanded(
-                                            child: TextFormField(
-                                              controller: _netControllers[i],
-                                              readOnly: guestLive || _saving,
-                                              decoration: InputDecoration(
-                                                labelText: l10n
-                                                    .guestConfigNetworkLineLabel(
-                                                      _netApiKeys[i],
-                                                    ),
-                                                border:
-                                                    const OutlineInputBorder(),
+                                            child: GuestNetLineEditor(
+                                              key: ValueKey<String>(
+                                                '${state.bindKey}_net_${_netApiKeys[i]}',
                                               ),
-                                              maxLines: 2,
+                                              node: node,
+                                              isQemu: true,
+                                              value: _netControllers[i].text,
+                                              enabled: !guestLive && !_saving,
+                                              onChanged:
+                                                  (s) => setState(
+                                                    () =>
+                                                        _netControllers[i]
+                                                            .text = s,
+                                                  ),
                                             ),
                                           ),
                                           IconButton(
@@ -719,15 +743,36 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
                                             ),
                                           ),
                                           Expanded(
-                                            child: TextFormField(
-                                              controller: _diskControllers[i],
-                                              readOnly: guestLive || _saving,
-                                              decoration: InputDecoration(
-                                                labelText: _diskApiKeys[i],
-                                                border:
-                                                    const OutlineInputBorder(),
-                                              ),
-                                              maxLines: 3,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.stretch,
+                                              children: [
+                                                Text(
+                                                  _diskApiKeys[i],
+                                                  style:
+                                                      Theme.of(
+                                                        context,
+                                                      ).textTheme.titleSmall,
+                                                ),
+                                                const SizedBox(height: 8),
+                                                GuestDiskVolumeEditor(
+                                                  key: ValueKey<String>(
+                                                    '${state.bindKey}_disk_${_diskApiKeys[i]}',
+                                                  ),
+                                                  node: node,
+                                                  contentKind: 'images',
+                                                  value:
+                                                      _diskControllers[i].text,
+                                                  enabled:
+                                                      !guestLive && !_saving,
+                                                  onChanged:
+                                                      (s) => setState(
+                                                        () =>
+                                                            _diskControllers[i]
+                                                                .text = s,
+                                                      ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                           IconButton(

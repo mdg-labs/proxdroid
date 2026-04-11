@@ -1,5 +1,6 @@
 import 'package:proxdroid/core/api/proxmox_api_client.dart';
 import 'package:proxdroid/core/models/node.dart';
+import 'package:proxdroid/core/models/node_network_iface.dart';
 
 /// Loads node overview data for the dashboard and node list.
 ///
@@ -16,4 +17,8 @@ class NodeRepository {
   Future<List<Node>> getNodes() => _client.fetchClusterResourceNodes();
 
   Future<Node> getNodeStatus(String node) => _client.fetchNodeStatus(node);
+
+  /// `GET /nodes/{node}/network` — bridges and related ifaces for guest `netN`.
+  Future<List<NodeNetworkIface>> getNetworkIfaces(String node) =>
+      _client.fetchNodeNetworkIfaces(node);
 }

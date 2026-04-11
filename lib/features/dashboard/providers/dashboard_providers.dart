@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:proxdroid/core/models/node.dart';
+import 'package:proxdroid/core/models/node_network_iface.dart';
 import 'package:proxdroid/features/containers/providers/container_providers.dart';
 import 'package:proxdroid/features/dashboard/data/dashboard_repository.dart';
 import 'package:proxdroid/features/dashboard/data/node_repository.dart';
@@ -53,4 +54,21 @@ Future<Node?> nodeDetailStatus(Ref ref, String nodeName) async {
     return null;
   }
   return repo.getNodeStatus(nodeName);
+}
+
+/// Linux / OVS bridges and related ifaces for guest `bridge=` pickers.
+@riverpod
+Future<List<NodeNetworkIface>> nodeNetworkBridges(
+  NodeNetworkBridgesRef ref,
+  String node,
+) async {
+  final repo = await ref.watch(nodeRepositoryProvider.future);
+  if (repo == null) {
+    return const [];
+  }
+  final list = await repo.getNetworkIfaces(node);
+  final bridges =
+      list.where((i) => i.isGuestAttachableBridge).toList()
+        ..sort((a, b) => a.iface.compareTo(b.iface));
+  return bridges;
 }

@@ -996,6 +996,69 @@ class AppLocalizationsEn extends AppLocalizations {
   String get guestConfigRiskConfirmAction => 'Apply changes';
 
   @override
+  String get guestPickerStoragePool => 'Storage pool';
+
+  @override
+  String get guestPickerBridge => 'Bridge';
+
+  @override
+  String get guestPickerNicModel => 'Network model';
+
+  @override
+  String get guestPickerIfaceName => 'Interface name';
+
+  @override
+  String get guestPickerDiskModeNew => 'New volume (size in GiB)';
+
+  @override
+  String get guestPickerDiskModeExisting => 'Existing volume';
+
+  @override
+  String get guestPickerVolume => 'Volume';
+
+  @override
+  String get guestPickerSizeGiB => 'Size (GiB)';
+
+  @override
+  String get guestPickerAdvancedRaw => 'Advanced (raw string)';
+
+  @override
+  String get guestPickerUseSimpleEditor => 'Use simplified editor';
+
+  @override
+  String get guestPickerStaticIpLabel => 'Static CIDR';
+
+  @override
+  String get guestPickerNetIpMode => 'IPv4';
+
+  @override
+  String get guestPickerNetIpDhcp => 'DHCP';
+
+  @override
+  String get guestPickerNetIpStatic => 'Static';
+
+  @override
+  String get guestPickerNetIpNone => 'Omit IP (bridge only)';
+
+  @override
+  String get guestPickerNetStaticHint => 'e.g. 192.168.1.50/24';
+
+  @override
+  String get guestPickerLoadingBridges => 'Loading bridges…';
+
+  @override
+  String get guestPickerNoBridges =>
+      'No bridge interfaces found. Use advanced raw entry.';
+
+  @override
+  String get guestPickerNoStoragePools =>
+      'No storage pools on this node support this content type. Use advanced raw entry.';
+
+  @override
+  String get guestPickerParseFallbackHint =>
+      'This value uses options the simplified editor does not handle. Edit as raw or adjust in Proxmox.';
+
+  @override
   String get validationFieldRequired => 'This field is required.';
 
   @override

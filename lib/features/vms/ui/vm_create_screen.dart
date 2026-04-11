@@ -10,8 +10,12 @@ import 'package:proxdroid/features/tasks/providers/task_providers.dart';
 import 'package:proxdroid/features/vms/data/vm_repository.dart';
 import 'package:proxdroid/features/vms/providers/vm_providers.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
+import 'package:proxdroid/shared/constants/pve_guest_enums.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
 import 'package:proxdroid/shared/widgets/grouped_section.dart';
+import 'package:proxdroid/shared/widgets/guest_config/guest_disk_volume_editor.dart';
+import 'package:proxdroid/shared/widgets/guest_config/guest_net_line_editor.dart';
+import 'package:proxdroid/shared/widgets/guest_config/guest_string_dropdown.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
 import 'package:proxdroid/shared/widgets/section_header.dart';
 import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
@@ -42,24 +46,16 @@ class _VmCreateScreenState extends ConsumerState<VmCreateScreen> {
   late final TextEditingController _memory = TextEditingController(
     text: '2048',
   );
-  late final TextEditingController _ostype = TextEditingController(text: 'l26');
-  late final TextEditingController _scsihw = TextEditingController(
-    text: 'virtio-scsi-single',
-  );
-  late final TextEditingController _scsi0 = TextEditingController();
-  late final TextEditingController _net0 = TextEditingController(
-    text: 'virtio,bridge=vmbr0',
-  );
+  String _ostype = 'l26';
+  String _scsihw = 'virtio-scsi-single';
+  String _scsi0 = '';
+  String _net0 = 'virtio,bridge=vmbr0';
 
   @override
   void dispose() {
     _vmid.dispose();
     _name.dispose();
     _memory.dispose();
-    _ostype.dispose();
-    _scsihw.dispose();
-    _scsi0.dispose();
-    _net0.dispose();
     super.dispose();
   }
 
@@ -137,6 +133,12 @@ class _VmCreateScreenState extends ConsumerState<VmCreateScreen> {
       return;
     }
     final node = _resolvedNode(nodes);
+    if (_scsi0.trim().isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.validationFieldRequired)));
+      return;
+    }
     setState(() => _submitting = true);
     final messenger = ScaffoldMessenger.of(context);
     try {
@@ -155,11 +157,11 @@ class _VmCreateScreenState extends ConsumerState<VmCreateScreen> {
         'vmid': vmid,
         'name': _name.text.trim(),
         'memory': mem,
-        'ostype': _ostype.text.trim(),
-        'net0': _net0.text.trim(),
-        'scsi0': _scsi0.text.trim(),
+        'ostype': _ostype.trim(),
+        'net0': _net0.trim(),
+        'scsi0': _scsi0.trim(),
       };
-      final scsihw = _scsihw.text.trim();
+      final scsihw = _scsihw.trim();
       if (scsihw.isNotEmpty) {
         body['scsihw'] = scsihw;
       }
@@ -349,16 +351,31 @@ class _VmCreateScreenState extends ConsumerState<VmCreateScreen> {
                         readOnly: _submitting,
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      TextFormField(
-                        controller: _ostype,
-                        decoration: InputDecoration(
-                          labelText: l10n.guestConfigFieldGuestOs,
-                          filled: true,
-                          helperText: l10n.guestCreateVmOstypeHint,
+                      IgnorePointer(
+                        ignoring: _submitting,
+                        child: GuestStringDropdown(
+                          label: l10n.guestConfigFieldGuestOs,
+                          ids: pveQemuOstypeIds,
+                          value: _ostype,
+                          enabled: !_submitting,
+                          onChanged:
+                              (v) => setState(() {
+                                if (v != null) {
+                                  _ostype = v;
+                                }
+                              }),
                         ),
-                        validator: (v) => _required(v, l10n),
-                        readOnly: _submitting,
                       ),
+                      if (l10n.guestCreateVmOstypeHint.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4, left: 12),
+                          child: Text(
+                            l10n.guestCreateVmOstypeHint,
+                            style: tt.bodySmall?.copyWith(
+                              color: scheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -368,36 +385,51 @@ class _VmCreateScreenState extends ConsumerState<VmCreateScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       SectionHeader(title: l10n.guestCreateSectionDiskNet),
-                      TextFormField(
-                        controller: _scsihw,
-                        decoration: InputDecoration(
-                          labelText: l10n.guestCreateFieldScsihw,
-                          filled: true,
-                          helperText: l10n.guestCreateFieldScsihwHint,
+                      IgnorePointer(
+                        ignoring: _submitting,
+                        child: GuestStringDropdown(
+                          label: l10n.guestCreateFieldScsihw,
+                          ids: pveQemuScsihwIds,
+                          value: _scsihw,
+                          enabled: !_submitting,
+                          onChanged:
+                              (v) => setState(() {
+                                if (v != null) {
+                                  _scsihw = v;
+                                }
+                              }),
                         ),
-                        readOnly: _submitting,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4, left: 12),
+                        child: Text(
+                          l10n.guestCreateFieldScsihwHint,
+                          style: tt.bodySmall?.copyWith(
+                            color: scheme.onSurfaceVariant,
+                          ),
+                        ),
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      TextFormField(
-                        controller: _scsi0,
-                        decoration: InputDecoration(
-                          labelText: l10n.guestCreateFieldScsi0,
-                          filled: true,
-                          helperText: l10n.guestCreateFieldScsi0Hint,
-                        ),
-                        validator: (v) => _required(v, l10n),
-                        readOnly: _submitting,
+                      Text(l10n.guestCreateFieldScsi0, style: tt.titleSmall),
+                      const SizedBox(height: AppSpacing.sm),
+                      GuestDiskVolumeEditor(
+                        key: ValueKey<String>('scsi-$resolved'),
+                        node: resolved,
+                        contentKind: 'images',
+                        value: _scsi0,
+                        enabled: !_submitting,
+                        onChanged: (s) => setState(() => _scsi0 = s),
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      TextFormField(
-                        controller: _net0,
-                        decoration: InputDecoration(
-                          labelText: l10n.guestCreateFieldNet0,
-                          filled: true,
-                          helperText: l10n.guestCreateFieldNet0Hint,
-                        ),
-                        validator: (v) => _required(v, l10n),
-                        readOnly: _submitting,
+                      Text(l10n.guestCreateFieldNet0, style: tt.titleSmall),
+                      const SizedBox(height: AppSpacing.sm),
+                      GuestNetLineEditor(
+                        key: ValueKey<String>('net-$resolved'),
+                        node: resolved,
+                        isQemu: true,
+                        value: _net0,
+                        enabled: !_submitting,
+                        onChanged: (s) => setState(() => _net0 = s),
                       ),
                     ],
                   ),

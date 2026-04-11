@@ -337,6 +337,343 @@ class _StorageContentProviderElement
   String get storageId => (origin as StorageContentProvider).storageId;
 }
 
+String _$nodeStoragePoolsWithKindHash() =>
+    r'b50245429c352449f02c74740d9b3404c0b1c019';
+
+/// Active storage pools on [node] that advertise [contentKind] in PVE `content`
+/// (e.g. `images` for QEMU disks, `rootdir` for LXC root).
+///
+/// Copied from [nodeStoragePoolsWithKind].
+@ProviderFor(nodeStoragePoolsWithKind)
+const nodeStoragePoolsWithKindProvider = NodeStoragePoolsWithKindFamily();
+
+/// Active storage pools on [node] that advertise [contentKind] in PVE `content`
+/// (e.g. `images` for QEMU disks, `rootdir` for LXC root).
+///
+/// Copied from [nodeStoragePoolsWithKind].
+class NodeStoragePoolsWithKindFamily extends Family<AsyncValue<List<Storage>>> {
+  /// Active storage pools on [node] that advertise [contentKind] in PVE `content`
+  /// (e.g. `images` for QEMU disks, `rootdir` for LXC root).
+  ///
+  /// Copied from [nodeStoragePoolsWithKind].
+  const NodeStoragePoolsWithKindFamily();
+
+  /// Active storage pools on [node] that advertise [contentKind] in PVE `content`
+  /// (e.g. `images` for QEMU disks, `rootdir` for LXC root).
+  ///
+  /// Copied from [nodeStoragePoolsWithKind].
+  NodeStoragePoolsWithKindProvider call(String node, String contentKind) {
+    return NodeStoragePoolsWithKindProvider(node, contentKind);
+  }
+
+  @override
+  NodeStoragePoolsWithKindProvider getProviderOverride(
+    covariant NodeStoragePoolsWithKindProvider provider,
+  ) {
+    return call(provider.node, provider.contentKind);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'nodeStoragePoolsWithKindProvider';
+}
+
+/// Active storage pools on [node] that advertise [contentKind] in PVE `content`
+/// (e.g. `images` for QEMU disks, `rootdir` for LXC root).
+///
+/// Copied from [nodeStoragePoolsWithKind].
+class NodeStoragePoolsWithKindProvider
+    extends AutoDisposeFutureProvider<List<Storage>> {
+  /// Active storage pools on [node] that advertise [contentKind] in PVE `content`
+  /// (e.g. `images` for QEMU disks, `rootdir` for LXC root).
+  ///
+  /// Copied from [nodeStoragePoolsWithKind].
+  NodeStoragePoolsWithKindProvider(String node, String contentKind)
+    : this._internal(
+        (ref) => nodeStoragePoolsWithKind(
+          ref as NodeStoragePoolsWithKindRef,
+          node,
+          contentKind,
+        ),
+        from: nodeStoragePoolsWithKindProvider,
+        name: r'nodeStoragePoolsWithKindProvider',
+        debugGetCreateSourceHash:
+            const bool.fromEnvironment('dart.vm.product')
+                ? null
+                : _$nodeStoragePoolsWithKindHash,
+        dependencies: NodeStoragePoolsWithKindFamily._dependencies,
+        allTransitiveDependencies:
+            NodeStoragePoolsWithKindFamily._allTransitiveDependencies,
+        node: node,
+        contentKind: contentKind,
+      );
+
+  NodeStoragePoolsWithKindProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.node,
+    required this.contentKind,
+  }) : super.internal();
+
+  final String node;
+  final String contentKind;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<Storage>> Function(NodeStoragePoolsWithKindRef provider)
+    create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: NodeStoragePoolsWithKindProvider._internal(
+        (ref) => create(ref as NodeStoragePoolsWithKindRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        node: node,
+        contentKind: contentKind,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<Storage>> createElement() {
+    return _NodeStoragePoolsWithKindProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is NodeStoragePoolsWithKindProvider &&
+        other.node == node &&
+        other.contentKind == contentKind;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, node.hashCode);
+    hash = _SystemHash.combine(hash, contentKind.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin NodeStoragePoolsWithKindRef
+    on AutoDisposeFutureProviderRef<List<Storage>> {
+  /// The parameter `node` of this provider.
+  String get node;
+
+  /// The parameter `contentKind` of this provider.
+  String get contentKind;
+}
+
+class _NodeStoragePoolsWithKindProviderElement
+    extends AutoDisposeFutureProviderElement<List<Storage>>
+    with NodeStoragePoolsWithKindRef {
+  _NodeStoragePoolsWithKindProviderElement(super.provider);
+
+  @override
+  String get node => (origin as NodeStoragePoolsWithKindProvider).node;
+  @override
+  String get contentKind =>
+      (origin as NodeStoragePoolsWithKindProvider).contentKind;
+}
+
+String _$guestStorageContentByKindHash() =>
+    r'73f70c79bf1755b8dc6b4b98649605e68ab1ed42';
+
+/// Volumes under a pool filtered by PVE `content` (e.g. `images`, `rootdir`).
+///
+/// Copied from [guestStorageContentByKind].
+@ProviderFor(guestStorageContentByKind)
+const guestStorageContentByKindProvider = GuestStorageContentByKindFamily();
+
+/// Volumes under a pool filtered by PVE `content` (e.g. `images`, `rootdir`).
+///
+/// Copied from [guestStorageContentByKind].
+class GuestStorageContentByKindFamily
+    extends Family<AsyncValue<List<BackupContent>>> {
+  /// Volumes under a pool filtered by PVE `content` (e.g. `images`, `rootdir`).
+  ///
+  /// Copied from [guestStorageContentByKind].
+  const GuestStorageContentByKindFamily();
+
+  /// Volumes under a pool filtered by PVE `content` (e.g. `images`, `rootdir`).
+  ///
+  /// Copied from [guestStorageContentByKind].
+  GuestStorageContentByKindProvider call(
+    String node,
+    String storageId,
+    String contentKind,
+  ) {
+    return GuestStorageContentByKindProvider(node, storageId, contentKind);
+  }
+
+  @override
+  GuestStorageContentByKindProvider getProviderOverride(
+    covariant GuestStorageContentByKindProvider provider,
+  ) {
+    return call(provider.node, provider.storageId, provider.contentKind);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'guestStorageContentByKindProvider';
+}
+
+/// Volumes under a pool filtered by PVE `content` (e.g. `images`, `rootdir`).
+///
+/// Copied from [guestStorageContentByKind].
+class GuestStorageContentByKindProvider
+    extends AutoDisposeFutureProvider<List<BackupContent>> {
+  /// Volumes under a pool filtered by PVE `content` (e.g. `images`, `rootdir`).
+  ///
+  /// Copied from [guestStorageContentByKind].
+  GuestStorageContentByKindProvider(
+    String node,
+    String storageId,
+    String contentKind,
+  ) : this._internal(
+        (ref) => guestStorageContentByKind(
+          ref as GuestStorageContentByKindRef,
+          node,
+          storageId,
+          contentKind,
+        ),
+        from: guestStorageContentByKindProvider,
+        name: r'guestStorageContentByKindProvider',
+        debugGetCreateSourceHash:
+            const bool.fromEnvironment('dart.vm.product')
+                ? null
+                : _$guestStorageContentByKindHash,
+        dependencies: GuestStorageContentByKindFamily._dependencies,
+        allTransitiveDependencies:
+            GuestStorageContentByKindFamily._allTransitiveDependencies,
+        node: node,
+        storageId: storageId,
+        contentKind: contentKind,
+      );
+
+  GuestStorageContentByKindProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.node,
+    required this.storageId,
+    required this.contentKind,
+  }) : super.internal();
+
+  final String node;
+  final String storageId;
+  final String contentKind;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<BackupContent>> Function(
+      GuestStorageContentByKindRef provider,
+    )
+    create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: GuestStorageContentByKindProvider._internal(
+        (ref) => create(ref as GuestStorageContentByKindRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        node: node,
+        storageId: storageId,
+        contentKind: contentKind,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<BackupContent>> createElement() {
+    return _GuestStorageContentByKindProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is GuestStorageContentByKindProvider &&
+        other.node == node &&
+        other.storageId == storageId &&
+        other.contentKind == contentKind;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, node.hashCode);
+    hash = _SystemHash.combine(hash, storageId.hashCode);
+    hash = _SystemHash.combine(hash, contentKind.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin GuestStorageContentByKindRef
+    on AutoDisposeFutureProviderRef<List<BackupContent>> {
+  /// The parameter `node` of this provider.
+  String get node;
+
+  /// The parameter `storageId` of this provider.
+  String get storageId;
+
+  /// The parameter `contentKind` of this provider.
+  String get contentKind;
+}
+
+class _GuestStorageContentByKindProviderElement
+    extends AutoDisposeFutureProviderElement<List<BackupContent>>
+    with GuestStorageContentByKindRef {
+  _GuestStorageContentByKindProviderElement(super.provider);
+
+  @override
+  String get node => (origin as GuestStorageContentByKindProvider).node;
+  @override
+  String get storageId =>
+      (origin as GuestStorageContentByKindProvider).storageId;
+  @override
+  String get contentKind =>
+      (origin as GuestStorageContentByKindProvider).contentKind;
+}
+
 String _$allClusterStorageHash() => r'e3970bbb573e219cc769e7ce9fcdd01ba2585ee6';
 
 /// All storage pools across nodes with usage from [GET …/status] per pool.

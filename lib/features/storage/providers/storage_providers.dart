@@ -66,3 +66,46 @@ Future<List<BackupContent>> storageContent(
   }
   return repo.getStorageContent(node, storageId);
 }
+
+/// Active storage pools on [node] that advertise [contentKind] in PVE `content`
+/// (e.g. `images` for QEMU disks, `rootdir` for LXC root).
+@riverpod
+Future<List<Storage>> nodeStoragePoolsWithKind(
+  NodeStoragePoolsWithKindRef ref,
+  String node,
+  String contentKind,
+) async {
+  final repo = await ref.watch(storageRepositoryProvider.future);
+  if (repo == null) {
+    return const [];
+  }
+  final pools = await repo.getStorageForNode(node);
+  final k = contentKind.toLowerCase();
+  final filtered =
+      pools
+          .where((s) => s.active && s.content.any((c) => c.toLowerCase() == k))
+          .toList()
+        ..sort((a, b) => a.id.compareTo(b.id));
+  return filtered;
+}
+
+/// Volumes under a pool filtered by PVE `content` (e.g. `images`, `rootdir`).
+@riverpod
+Future<List<BackupContent>> guestStorageContentByKind(
+  GuestStorageContentByKindRef ref,
+  String node,
+  String storageId,
+  String contentKind,
+) async {
+  final repo = await ref.watch(storageRepositoryProvider.future);
+  if (repo == null) {
+    return const [];
+  }
+  return repo.getStorageContent(
+    node,
+    storageId,
+    contentKind: contentKind,
+    start: 0,
+    limit: 500,
+  );
+}
