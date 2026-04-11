@@ -52,12 +52,14 @@ class _VmListScreenState extends ConsumerState<VmListScreen> {
       case _VmStatusFilter.all:
         break;
       case _VmStatusFilter.running:
-        out = out
-            .where(
-              (v) =>
-                  v.status == VmStatus.running || v.status == VmStatus.paused,
-            )
-            .toList();
+        out =
+            out
+                .where(
+                  (v) =>
+                      v.status == VmStatus.running ||
+                      v.status == VmStatus.paused,
+                )
+                .toList();
       case _VmStatusFilter.stopped:
         out = out.where((v) => v.status == VmStatus.stopped).toList();
     }
@@ -93,36 +95,39 @@ class _VmListScreenState extends ConsumerState<VmListScreen> {
     return ShellSectionBody(
       title: Text(l10n.sectionVms),
       body: async.when(
-        loading: () => RefreshIndicator(
-          onRefresh: refreshVms,
-          child: ListView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            children: [
-              SizedBox(
-                height: minPullHeight,
-                child: const LoadingShimmer(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                ),
+        loading:
+            () => RefreshIndicator(
+              onRefresh: refreshVms,
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  SizedBox(
+                    height: minPullHeight,
+                    child: const LoadingShimmer(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-        error: (e, _) => RefreshIndicator(
-          onRefresh: refreshVms,
-          child: ListView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            children: [
-              SizedBox(
-                height: minPullHeight,
-                child: ErrorView(
-                  message: proxmoxExceptionMessage(e, l10n),
-                  onRetry: () => ref.read(allVmsProvider.notifier).refresh(),
-                ),
+            ),
+        error:
+            (e, _) => RefreshIndicator(
+              onRefresh: refreshVms,
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  SizedBox(
+                    height: minPullHeight,
+                    child: ErrorView(
+                      message: proxmoxExceptionMessage(e, l10n),
+                      onRetry:
+                          () => ref.read(allVmsProvider.notifier).refresh(),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
         data: (vms) {
           if (vms.isEmpty) {
             return RefreshIndicator(
@@ -172,17 +177,19 @@ class _VmListScreenState extends ConsumerState<VmListScreen> {
                             color: scheme.onSurfaceVariant,
                             size: 20,
                           ),
-                          trailing: _searchQuery.isNotEmpty
-                              ? [
-                                  IconButton(
-                                    icon: const Icon(Icons.close, size: 18),
-                                    onPressed: () => setState(() {
-                                      _searchController.clear();
-                                      _searchQuery = '';
-                                    }),
-                                  ),
-                                ]
-                              : null,
+                          trailing:
+                              _searchQuery.isNotEmpty
+                                  ? [
+                                    IconButton(
+                                      icon: const Icon(Icons.close, size: 18),
+                                      onPressed:
+                                          () => setState(() {
+                                            _searchController.clear();
+                                            _searchQuery = '';
+                                          }),
+                                    ),
+                                  ]
+                                  : null,
                           onChanged: (v) => setState(() => _searchQuery = v),
                           elevation: const WidgetStatePropertyAll(0),
                           backgroundColor: WidgetStatePropertyAll(
@@ -191,9 +198,7 @@ class _VmListScreenState extends ConsumerState<VmListScreen> {
                           shape: WidgetStatePropertyAll(
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
-                              side: BorderSide(
-                                color: scheme.outlineVariant,
-                              ),
+                              side: BorderSide(color: scheme.outlineVariant),
                             ),
                           ),
                           padding: const WidgetStatePropertyAll(
@@ -233,8 +238,9 @@ class _VmListScreenState extends ConsumerState<VmListScreen> {
                                   ),
                                 ],
                                 selected: {_statusFilter},
-                                onSelectionChanged: (s) =>
-                                    setState(() => _statusFilter = s.first),
+                                onSelectionChanged:
+                                    (s) =>
+                                        setState(() => _statusFilter = s.first),
                               ),
                             ),
                             if (nodes.length > 1) ...[
@@ -244,8 +250,8 @@ class _VmListScreenState extends ConsumerState<VmListScreen> {
                                 selected: _nodeFilter,
                                 allLabel: l10n.filterAll,
                                 filterByNodeLabel: l10n.filterByNode,
-                                onChanged: (v) =>
-                                    setState(() => _nodeFilter = v),
+                                onChanged:
+                                    (v) => setState(() => _nodeFilter = v),
                                 scheme: scheme,
                                 tt: tt,
                               ),
@@ -276,28 +282,24 @@ class _VmListScreenState extends ConsumerState<VmListScreen> {
                       AppSpacing.lg,
                     ),
                     sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final vm = filtered[index];
-                          final accent = _vmStatusAccent(vm.status);
-                          return Padding(
-                            padding: const EdgeInsets.only(
-                              bottom: AppSpacing.sm,
-                            ),
-                            child: _VmListTile(
-                              vm: vm,
-                              accent: accent,
-                              l10n: l10n,
-                              scheme: scheme,
-                              tt: tt,
-                              onTap: () => context.push(
-                                '/vms/${Uri.encodeComponent(vm.node)}/${Uri.encodeComponent(vm.vmid.toString())}',
-                              ),
-                            ),
-                          );
-                        },
-                        childCount: filtered.length,
-                      ),
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final vm = filtered[index];
+                        final accent = _vmStatusAccent(vm.status);
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                          child: _VmListTile(
+                            vm: vm,
+                            accent: accent,
+                            l10n: l10n,
+                            scheme: scheme,
+                            tt: tt,
+                            onTap:
+                                () => context.push(
+                                  '/vms/${Uri.encodeComponent(vm.node)}/${Uri.encodeComponent(vm.vmid.toString())}',
+                                ),
+                          ),
+                        );
+                      }, childCount: filtered.length),
                     ),
                   ),
               ],
@@ -332,8 +334,7 @@ class _VmListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name =
-        vm.name.isEmpty ? '${l10n.labelVmid} ${vm.vmid}' : vm.name;
+    final name = vm.name.isEmpty ? '${l10n.labelVmid} ${vm.vmid}' : vm.name;
 
     return Material(
       color: scheme.surfaceContainerHighest,
@@ -346,10 +347,7 @@ class _VmListTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Status accent strip
-              Container(
-                width: 3,
-                color: accent,
-              ),
+              Container(width: 3, color: accent),
               // Leading icon
               Padding(
                 padding: const EdgeInsets.fromLTRB(
@@ -366,11 +364,7 @@ class _VmListTile extends StatelessWidget {
                     borderRadius: BorderRadius.circular(9),
                   ),
                   alignment: Alignment.center,
-                  child: Icon(
-                    Icons.computer_rounded,
-                    color: accent,
-                    size: 20,
-                  ),
+                  child: Icon(Icons.computer_rounded, color: accent, size: 20),
                 ),
               ),
               // Text content
@@ -512,10 +506,7 @@ class _NodeDropdown extends StatelessWidget {
               color: scheme.onSurfaceVariant,
             ),
             items: [
-              DropdownMenuItem<String?>(
-                value: null,
-                child: Text(allLabel),
-              ),
+              DropdownMenuItem<String?>(value: null, child: Text(allLabel)),
               ...nodes.map(
                 (n) => DropdownMenuItem<String>(value: n, child: Text(n)),
               ),

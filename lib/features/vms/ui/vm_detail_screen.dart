@@ -194,8 +194,6 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final scheme = Theme.of(context).colorScheme;
-    final tt = Theme.of(context).textTheme;
     final async = ref.watch(allVmsProvider);
     final id = int.tryParse(widget.vmid);
 
@@ -497,11 +495,7 @@ class _VmHeroHeader extends StatelessWidget {
               borderRadius: BorderRadius.circular(13),
             ),
             alignment: Alignment.center,
-            child: Icon(
-              Icons.computer_rounded,
-              color: accent,
-              size: 26,
-            ),
+            child: Icon(Icons.computer_rounded, color: accent, size: 26),
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
@@ -564,9 +558,10 @@ class _PowerActionsRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final warningColor = isDark
-        ? AppColors.darkStatusWarningForeground
-        : AppColors.lightStatusWarningForeground;
+    final warningColor =
+        isDark
+            ? AppColors.darkStatusWarningForeground
+            : AppColors.lightStatusWarningForeground;
 
     return Wrap(
       spacing: AppSpacing.sm,

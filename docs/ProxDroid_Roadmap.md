@@ -1,6 +1,6 @@
 # ProxDroid – Development Roadmap
 
-**Version:** 0.1 | **Date:** April 2026 | **Status:** Draft — Phase 6 polish complete; **GitHub prerelease APKs** on `v*-beta*` tags; Play Store & F-Droid **deferred**
+**Version:** 0.1 | **Date:** April 2026 | **Status:** Draft — Phase 6 polish complete; **GitHub Releases** via `build.yml` (beta pre-releases + stable draft APKs); Play Store & F-Droid **deferred**
 
 > For architecture decisions and tech stack → see `ProxDroid_Architecture.md`
 > For feature scope and product goals → see `ProxDroid_MVP_PRD.md`
@@ -17,7 +17,7 @@
 | **Phase 3** | VM & container actions + task viewer | **Complete** — power actions on detail screens + merged task list, detail log, encoded UPID routes |
 | **Phase 4** | Resource monitoring charts | **Complete** — VM/LXC/node rrddata charts with timeframe selector and 60s refresh |
 | **Phase 5** | Storage & backup management | **Complete** — browse storage usage/content, cluster backup jobs, aggregated backup files, manual vzdump + task navigation |
-| **Phase 6** | Polish & release prep | **Complete** for polish + **GitHub prereleases** (APK on tag); Play Store & F-Droid **deferred** |
+| **Phase 6** | Polish & release prep | **Complete** for polish + **GitHub Releases** (beta pre-release + stable draft APK via branch push); Play Store & F-Droid **deferred** |
 | **Post-MVP** | Extended features | Console, push notifications, homescreen widget, snapshot management, suspend/resume |
 
 ---
@@ -77,13 +77,15 @@
   - `flutter gen-l10n` (validates ARB / generated localizations)
   - `flutter analyze`
   - `flutter test`
-- [x] Add workflow: `build.yml` – runs on beta prerelease tags only (`v*-beta*`); publishes GitHub **prerelease** with APK
+- [x] Add workflow: `build.yml` – runs on push to **`beta`** or **`main`** when **`pubspec.yaml`** changes; creates `v<pubspec version>` if missing; publishes APK to GitHub Releases
+  - **Beta branch:** version must contain `-beta` → **pre-release** + commit log since previous tag
+  - **Main branch:** version must not contain `-beta` → **draft** release (`make_latest` applies when draft is published) + aggregated beta release notes (with `git log` fallback when a beta body is empty)
   - Pin same Flutter version as `ci.yml`
   - `flutter pub get`
   - `dart run build_runner build --delete-conflicting-outputs` (must run before build; generates Freezed/Riverpod code)
   - `flutter gen-l10n`
   - Build release APK (`flutter build apk --release`)
-  - Upload as GitHub Release asset named `proxdroid-<tag>.apk` (e.g. `proxdroid-v1.0.0-beta.1.apk`)
+  - Upload as GitHub Release asset named `proxdroid-<tag>.apk` (e.g. `proxdroid-v1.0.0-beta.12+1.apk`)
 - [x] Confirm both workflows pass on a clean run (verified locally: `flutter pub get`, format check, `build_runner`, `gen-l10n`, `flutter analyze`, `flutter test` — all exit 0; first GitHub Actions run should still be watched by maintainers)
 
 ---
@@ -325,7 +327,7 @@
 
 ## Phase 6 – Polish & Release Prep
 
-**Goal:** The app is stable, handles all error cases gracefully, feels polished, and is distributable via **GitHub prerelease APKs** (tag convention documented in README and CI). Play Store and F-Droid remain **deferred** (§6.5).
+**Goal:** The app is stable, handles all error cases gracefully, feels polished, and is distributable via **GitHub Releases** (beta pre-releases and stable drafts from `build.yml`; see README). Play Store and F-Droid remain **deferred** (§6.5).
 
 ### 6.1 Error Handling & Edge Cases
 - [x] Audit all screens for unhandled error states
@@ -393,11 +395,11 @@ Not in scope for the current **GitHub-only prerelease** path; pick up when targe
   - Signed APK (`flutter build apk --release`) → for GitHub Releases and F-Droid sideload
 - [ ] Submit to Play Store internal testing track first, then production
 
-### 6.6 GitHub Release (prerelease path — **done** for current scope)
-- [x] **Tag convention:** push tags matching `v*-beta*` (e.g. `v0.1.0-beta.1`) — triggers `build.yml`, creates/updates a GitHub **prerelease** with the **release-signed** APK attached (requires Actions secrets in `docs/Android_release_signing.md`; Play/AAB path still §6.5). A separate prod release workflow can be added later for stable tags.
-- [x] **Release notes:** maintain `[Unreleased]` in `CHANGELOG.md` during development; when tagging, promote entries into a version section and paste or summarize into the GitHub release body (do not invent notes from scratch)
-- [x] **README:** download section documents GitHub Releases, tag patterns, and deferred Play/F-Droid; optional `build.yml` status badge
-- [ ] **Prod / stable releases:** add a dedicated workflow (or extend CI) for stable tags such as `v1.0.0` when ready — not required to close Phase 6; beta workflow stays on `v*-beta*` only
+### 6.6 GitHub Release (beta + stable draft — **done** for current scope)
+- [x] **Triggers:** push to **`beta`** or **`main`** with **`pubspec.yaml`** changed — `build.yml` reads `version:`, skips if `v<version>` already exists, otherwise creates the tag, builds the **release-signed** APK (requires Actions secrets in `docs/Android_release_signing.md`; Play/AAB path still §6.5), and publishes **beta** as pre-release or **main** as draft (latest when the draft is published).
+- [x] **Release notes:** beta = commits since previous tag; stable draft = aggregated bodies from beta pre-releases in range (fallback: `git log` per beta tag if body empty). Maintain `[Unreleased]` in `CHANGELOG.md` during development; edit the stable draft on GitHub before publishing if needed.
+- [x] **README:** download section documents GitHub Releases, branch/version rules, and deferred Play/F-Droid; optional `build.yml` status badge
+- [x] **Prod / stable releases:** `build.yml` handles stable **`main`** pushes (non-beta `pubspec` version) as **draft** releases; maintainer publishes the draft on GitHub when ready.
 - [ ] **Store download badges** in README — deferred with §6.5
 
 ### 6.7 Localization & Terminology Review

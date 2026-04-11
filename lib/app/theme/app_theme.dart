@@ -6,11 +6,11 @@ import 'app_colors.dart';
 ///
 /// All values are multiples of 4 (4-point grid), matching Material 3 guidance.
 abstract final class AppSpacing {
-  static const double xs  =  4.0;
-  static const double sm  =  8.0;
-  static const double md  = 12.0;
-  static const double lg  = 16.0;
-  static const double xl  = 24.0;
+  static const double xs = 4.0;
+  static const double sm = 8.0;
+  static const double md = 12.0;
+  static const double lg = 16.0;
+  static const double xl = 24.0;
   static const double xxl = 32.0;
 }
 
@@ -149,14 +149,16 @@ abstract final class AppTheme {
           return TextStyle(
             fontSize: 14,
             fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-            color: selected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+            color:
+                selected ? colorScheme.primary : colorScheme.onSurfaceVariant,
           );
         }),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
           return IconThemeData(
             size: 22,
-            color: selected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+            color:
+                selected ? colorScheme.primary : colorScheme.onSurfaceVariant,
           );
         }),
       ),
@@ -173,9 +175,10 @@ abstract final class AppTheme {
           return TextStyle(
             fontSize: 11,
             fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
-            color: selected
-                ? colorScheme.primary
-                : colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+            color:
+                selected
+                    ? colorScheme.primary
+                    : colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
             letterSpacing: 0.1,
           );
         }),
@@ -183,9 +186,10 @@ abstract final class AppTheme {
           final selected = states.contains(WidgetState.selected);
           return IconThemeData(
             size: 22,
-            color: selected
-                ? colorScheme.primary
-                : colorScheme.onSurfaceVariant.withValues(alpha: 0.65),
+            color:
+                selected
+                    ? colorScheme.primary
+                    : colorScheme.onSurfaceVariant.withValues(alpha: 0.65),
           );
         }),
       ),

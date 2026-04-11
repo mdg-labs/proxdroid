@@ -111,7 +111,10 @@ void main() {
     );
     await tester.pump();
 
-    final text = tester.widget<Text>(find.text('Servers'));
-    expect(text.style?.color, AppTheme.dark.colorScheme.onSurfaceVariant);
+    final text = tester.widget<Text>(find.text('SERVERS'));
+    expect(
+      text.style?.color,
+      AppTheme.dark.colorScheme.onSurfaceVariant.withValues(alpha: 0.65),
+    );
   });
 }

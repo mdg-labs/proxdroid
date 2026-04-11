@@ -27,11 +27,14 @@ ProxDroid fills the gap of high-quality, modern Proxmox VE clients on Android. B
 
 ## Download
 
-**GitHub Releases (prerelease APKs):** Prebuilt APKs are attached as **`proxdroid-<tag>.apk`** (for example `proxdroid-v1.0.0-beta.1.apk`) when you push a tag matching **`v*-beta*`** (for example `v1.0.0-beta.1`). See [Releases](https://github.com/mdg-labs/proxdroid/releases).
+**GitHub Releases:** Prebuilt APKs are attached as **`proxdroid-<tag>.apk`** (for example `proxdroid-v1.0.0-beta.12+1.apk`, matching the `version:` line in `pubspec.yaml`). See [Releases](https://github.com/mdg-labs/proxdroid/releases).
+
+- **Beta:** push to the **`beta`** branch with a change to **`pubspec.yaml`**. The version must include **`-beta`**. If the Git tag `v<version>` does not exist yet, [Release APK](https://github.com/mdg-labs/proxdroid/actions/workflows/build.yml) builds a signed APK, creates the tag, and publishes a **pre-release** (release notes: commits since the previous tag).
+- **Stable:** push to **`main`** with a **`pubspec.yaml`** change. The version must **not** include `-beta`. If the tag is new, CI publishes a **draft** release (aggregate notes from beta pre-releases in that cycle); publish the draft on GitHub when ready — it becomes **latest** then.
 
 **Play Store** and **F-Droid** are planned but not available yet.
 
-To cut a prerelease locally: update `CHANGELOG.md`, tag with a matching name, push the tag, and confirm the [Release APK](https://github.com/mdg-labs/proxdroid/actions/workflows/build.yml) workflow completes.
+Maintainers: keep `CHANGELOG.md` updated; release bodies are generated in CI as above (edit the stable draft on GitHub before publishing if needed).
 
 ---
 

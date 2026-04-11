@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- GitHub Actions: `build.yml` now runs on push to **`beta`** or **`main`** when **`pubspec.yaml`** changes; CI creates `v<version>` if missing, publishes **beta** pre-releases or **main** stable **draft** releases (see `README.md`).
+- `dart format` on several UI files; analyzer: removed unused `Theme` locals; `SectionHeader` tests and muted goldens aligned with uppercase muted titles and `onSurfaceVariant` alpha.
+
 ## [1.0.0-beta.1] - 2026-04-10
 
 First public **beta** prerelease on GitHub Releases (APK via CI).

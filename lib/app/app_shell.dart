@@ -92,9 +92,10 @@ class _AppShellState extends ConsumerState<AppShell> {
             curve: Curves.easeOutCubic,
             alignment: Alignment.topCenter,
             clipBehavior: Clip.hardEdge,
-            child: showOffline
-                ? SafeArea(bottom: false, child: const ConnectivityBanner())
-                : const SizedBox(width: double.infinity),
+            child:
+                showOffline
+                    ? SafeArea(bottom: false, child: const ConnectivityBanner())
+                    : const SizedBox(width: double.infinity),
           ),
           Expanded(child: widget.navigationShell),
         ],

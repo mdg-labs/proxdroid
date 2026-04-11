@@ -38,7 +38,6 @@ class DashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final scheme = Theme.of(context).colorScheme;
 
     final nodesAsync = ref.watch(nodeListProvider);
     final vmsAsync = ref.watch(allVmsProvider);
@@ -103,12 +102,13 @@ class DashboardScreen extends ConsumerWidget {
     final vms = vmsAsync.requireValue;
     final containers = containersAsync.requireValue;
 
-    final runningVms = vms
-        .where(
-          (v) =>
-              v.status == VmStatus.running || v.status == VmStatus.paused,
-        )
-        .length;
+    final runningVms =
+        vms
+            .where(
+              (v) =>
+                  v.status == VmStatus.running || v.status == VmStatus.paused,
+            )
+            .length;
     final onlineNodes = nodes.where(_nodeOnline).length;
 
     if (nodes.isEmpty) {
@@ -165,26 +165,23 @@ class DashboardScreen extends ConsumerWidget {
             SliverPadding(
               padding: const EdgeInsets.all(AppSpacing.lg),
               sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final node = nodes[index];
-                    final online = _nodeOnline(node);
-                    final cpuFrac = nodeCpuFraction(node.cpu, node.maxCpu);
-                    final memFrac = memoryFraction(node.mem, node.maxMem);
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final node = nodes[index];
+                  final online = _nodeOnline(node);
+                  final cpuFrac = nodeCpuFraction(node.cpu, node.maxCpu);
+                  final memFrac = memoryFraction(node.mem, node.maxMem);
 
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                      child: _NodeCard(
-                        node: node,
-                        online: online,
-                        cpuFrac: cpuFrac,
-                        memFrac: memFrac,
-                        l10n: l10n,
-                      ),
-                    );
-                  },
-                  childCount: nodes.length,
-                ),
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                    child: _NodeCard(
+                      node: node,
+                      online: online,
+                      cpuFrac: cpuFrac,
+                      memFrac: memFrac,
+                      l10n: l10n,
+                    ),
+                  );
+                }, childCount: nodes.length),
               ),
             ),
           ],
@@ -250,11 +247,7 @@ class _ClusterOverviewCard extends StatelessWidget {
             // — Header row —
             Row(
               children: [
-                Icon(
-                  Icons.hub_outlined,
-                  size: 16,
-                  color: scheme.primary,
-                ),
+                Icon(Icons.hub_outlined, size: 16, color: scheme.primary),
                 const SizedBox(width: AppSpacing.xs),
                 Text(
                   l10n.dashboardClusterSummary.toUpperCase(),
@@ -269,16 +262,18 @@ class _ClusterOverviewCard extends StatelessWidget {
                 // Nodes online indicator
                 DecoratedBox(
                   decoration: BoxDecoration(
-                    color: allOnline
-                        ? AppColors.darkStatusSuccessBackground
-                        : AppColors.darkStatusStoppedBackground,
+                    color:
+                        allOnline
+                            ? AppColors.darkStatusSuccessBackground
+                            : AppColors.darkStatusStoppedBackground,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: allOnline
-                          ? AppColors.darkStatusSuccessForeground
-                              .withValues(alpha: 0.3)
-                          : AppColors.darkStatusStoppedForeground
-                              .withValues(alpha: 0.2),
+                      color:
+                          allOnline
+                              ? AppColors.darkStatusSuccessForeground
+                                  .withValues(alpha: 0.3)
+                              : AppColors.darkStatusStoppedForeground
+                                  .withValues(alpha: 0.2),
                       width: 0.5,
                     ),
                   ),
@@ -295,9 +290,10 @@ class _ClusterOverviewCard extends StatelessWidget {
                           height: 5,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: allOnline
-                                ? AppColors.darkStatusSuccessForeground
-                                : AppColors.darkStatusStoppedForeground,
+                            color:
+                                allOnline
+                                    ? AppColors.darkStatusSuccessForeground
+                                    : AppColors.darkStatusStoppedForeground,
                           ),
                         ),
                         const SizedBox(width: 4),
@@ -306,9 +302,10 @@ class _ClusterOverviewCard extends StatelessWidget {
                           style: tt.labelSmall?.copyWith(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
-                            color: allOnline
-                                ? AppColors.darkStatusSuccessForeground
-                                : AppColors.darkStatusStoppedForeground,
+                            color:
+                                allOnline
+                                    ? AppColors.darkStatusSuccessForeground
+                                    : AppColors.darkStatusStoppedForeground,
                           ),
                         ),
                       ],
@@ -334,7 +331,10 @@ class _ClusterOverviewCard extends StatelessWidget {
                     label: l10n.dashboardSummaryRunningVms,
                     scheme: scheme,
                     tt: tt,
-                    valueColor: runningVms > 0 ? AppColors.darkStatusSuccessForeground : null,
+                    valueColor:
+                        runningVms > 0
+                            ? AppColors.darkStatusSuccessForeground
+                            : null,
                   ),
                   _StatDivider(scheme: scheme),
                   _StatCell(
@@ -435,12 +435,14 @@ class _NodeCard extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
 
-    final statusColor = online
-        ? AppColors.darkStatusSuccessForeground
-        : AppColors.darkStatusStoppedForeground;
-    final statusBg = online
-        ? AppColors.darkStatusSuccessBackground
-        : AppColors.darkStatusStoppedBackground;
+    final statusColor =
+        online
+            ? AppColors.darkStatusSuccessForeground
+            : AppColors.darkStatusStoppedForeground;
+    final statusBg =
+        online
+            ? AppColors.darkStatusSuccessBackground
+            : AppColors.darkStatusStoppedBackground;
 
     return Container(
       decoration: BoxDecoration(
@@ -448,9 +450,7 @@ class _NodeCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border(
           top: BorderSide(color: statusColor.withValues(alpha: 0.55), width: 2),
-          left: BorderSide(
-            color: scheme.outlineVariant.withValues(alpha: 0.3),
-          ),
+          left: BorderSide(color: scheme.outlineVariant.withValues(alpha: 0.3)),
           right: BorderSide(
             color: scheme.outlineVariant.withValues(alpha: 0.3),
           ),
@@ -476,11 +476,7 @@ class _NodeCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   alignment: Alignment.center,
-                  child: Icon(
-                    Icons.dns_rounded,
-                    color: statusColor,
-                    size: 22,
-                  ),
+                  child: Icon(Icons.dns_rounded, color: statusColor, size: 22),
                 ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
@@ -509,9 +505,10 @@ class _NodeCard extends StatelessWidget {
                 const SizedBox(width: AppSpacing.sm),
                 StatusBadge(
                   label: online ? l10n.statusOnline : l10n.statusOffline,
-                  variant: online
-                      ? StatusBadgeVariant.success
-                      : StatusBadgeVariant.stopped,
+                  variant:
+                      online
+                          ? StatusBadgeVariant.success
+                          : StatusBadgeVariant.stopped,
                 ),
               ],
             ),
@@ -521,17 +518,19 @@ class _NodeCard extends StatelessWidget {
             ResourceGaugeRow(
               label: l10n.metricCpu,
               value: cpuFrac,
-              valueSuffix: cpuFrac != null
-                  ? formatCpuPercent(cpuFrac)
-                  : l10n.valueUnavailable,
+              valueSuffix:
+                  cpuFrac != null
+                      ? formatCpuPercent(cpuFrac)
+                      : l10n.valueUnavailable,
             ),
             const SizedBox(height: AppSpacing.md),
             ResourceGaugeRow(
               label: l10n.metricMemory,
               value: memFrac,
-              valueSuffix: memFrac != null
-                  ? formatMemoryRatio(node.mem, node.maxMem)
-                  : l10n.valueUnavailable,
+              valueSuffix:
+                  memFrac != null
+                      ? formatMemoryRatio(node.mem, node.maxMem)
+                      : l10n.valueUnavailable,
             ),
 
             // ── Sparklines ────────────────────────────────────────────
@@ -569,102 +568,106 @@ class _NodeRrdSparklines extends ConsumerWidget {
     final async = ref.watch(nodeRrdDataProvider(nodeName, _tf));
 
     return async.when(
-      loading: () => Padding(
-        padding: const EdgeInsets.only(top: AppSpacing.md),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: ChartCard(
-                title: l10n.metricCpu,
-                compact: true,
-                child: const PulsingPlaceholder(height: 120),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: ChartCard(
-                title: l10n.metricMemory,
-                compact: true,
-                child: const PulsingPlaceholder(height: 120),
-              ),
-            ),
-          ],
-        ),
-      ),
-      error: (e, _) => Padding(
-        padding: const EdgeInsets.only(top: AppSpacing.md),
-        child: Row(
-          children: [
-            Icon(Icons.error_outline, size: 16, color: scheme.error),
-            const SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: Text(
-                proxmoxExceptionMessage(e, l10n),
-                style: Theme.of(context).textTheme.bodySmall
-                    ?.copyWith(color: scheme.error),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            TextButton(
-              onPressed: () => ref.invalidate(nodeRrdDataProvider(nodeName, _tf)),
-              style: TextButton.styleFrom(
-                minimumSize: Size.zero,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.sm,
-                  vertical: AppSpacing.xs,
+      loading:
+          () => Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.md),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: ChartCard(
+                    title: l10n.metricCpu,
+                    compact: true,
+                    child: const PulsingPlaceholder(height: 120),
+                  ),
                 ),
-              ),
-              child: Text(l10n.actionRetry),
-            ),
-          ],
-        ),
-      ),
-      data: (points) => Padding(
-        padding: const EdgeInsets.only(top: AppSpacing.md),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: ChartCard(
-                title: l10n.metricCpu,
-                compact: true,
-                child: ResourceLineChart(
-                  data: points,
-                  metric: ResourceChartMetric.cpu,
-                  primaryColor: scheme.primary,
-                  timeframe: _tf,
-                  onTimeframeChanged: (_) {},
-                  l10n: l10n,
-                  compact: true,
-                  chartHeight: 120,
-                  showTimeframeSelector: false,
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: ChartCard(
+                    title: l10n.metricMemory,
+                    compact: true,
+                    child: const PulsingPlaceholder(height: 120),
+                  ),
                 ),
-              ),
+              ],
             ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: ChartCard(
-                title: l10n.metricMemory,
-                compact: true,
-                child: ResourceLineChart(
-                  data: points,
-                  metric: ResourceChartMetric.memory,
-                  primaryColor: scheme.secondary,
-                  timeframe: _tf,
-                  onTimeframeChanged: (_) {},
-                  l10n: l10n,
-                  compact: true,
-                  chartHeight: 120,
-                  showTimeframeSelector: false,
+          ),
+      error:
+          (e, _) => Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.md),
+            child: Row(
+              children: [
+                Icon(Icons.error_outline, size: 16, color: scheme.error),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    proxmoxExceptionMessage(e, l10n),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: scheme.error),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
+                TextButton(
+                  onPressed:
+                      () => ref.invalidate(nodeRrdDataProvider(nodeName, _tf)),
+                  style: TextButton.styleFrom(
+                    minimumSize: Size.zero,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: AppSpacing.xs,
+                    ),
+                  ),
+                  child: Text(l10n.actionRetry),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+      data:
+          (points) => Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.md),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: ChartCard(
+                    title: l10n.metricCpu,
+                    compact: true,
+                    child: ResourceLineChart(
+                      data: points,
+                      metric: ResourceChartMetric.cpu,
+                      primaryColor: scheme.primary,
+                      timeframe: _tf,
+                      onTimeframeChanged: (_) {},
+                      l10n: l10n,
+                      compact: true,
+                      chartHeight: 120,
+                      showTimeframeSelector: false,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: ChartCard(
+                    title: l10n.metricMemory,
+                    compact: true,
+                    child: ResourceLineChart(
+                      data: points,
+                      metric: ResourceChartMetric.memory,
+                      primaryColor: scheme.secondary,
+                      timeframe: _tf,
+                      onTimeframeChanged: (_) {},
+                      l10n: l10n,
+                      compact: true,
+                      chartHeight: 120,
+                      showTimeframeSelector: false,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
     );
   }
 }
-

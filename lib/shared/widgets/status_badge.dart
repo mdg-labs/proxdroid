@@ -68,10 +68,9 @@ class _StatusBadgeState extends State<StatusBadge>
     if (widget.variant == StatusBadgeVariant.running && _pulse != null) {
       dot = AnimatedBuilder(
         animation: _pulse!,
-        builder: (_, child) => Opacity(
-          opacity: 0.35 + 0.65 * _pulse!.value,
-          child: child,
-        ),
+        builder:
+            (_, child) =>
+                Opacity(opacity: 0.35 + 0.65 * _pulse!.value, child: child),
         child: Container(
           width: 5,
           height: 5,
@@ -125,40 +124,48 @@ _BadgeColors _colorsFor(BuildContext context, StatusBadgeVariant variant) {
 
   return switch (variant) {
     StatusBadgeVariant.success => _BadgeColors(
-      background: isDark
-          ? AppColors.darkStatusSuccessBackground
-          : AppColors.lightStatusSuccessBackground,
-      foreground: isDark
-          ? AppColors.darkStatusSuccessForeground
-          : AppColors.lightStatusSuccessForeground,
+      background:
+          isDark
+              ? AppColors.darkStatusSuccessBackground
+              : AppColors.lightStatusSuccessBackground,
+      foreground:
+          isDark
+              ? AppColors.darkStatusSuccessForeground
+              : AppColors.lightStatusSuccessForeground,
     ),
     StatusBadgeVariant.running => _BadgeColors(
-      background: isDark
-          ? AppColors.darkStatusRunningBackground
-          : AppColors.lightStatusRunningBackground,
-      foreground: isDark
-          ? AppColors.darkStatusRunningForeground
-          : AppColors.lightStatusRunningForeground,
+      background:
+          isDark
+              ? AppColors.darkStatusRunningBackground
+              : AppColors.lightStatusRunningBackground,
+      foreground:
+          isDark
+              ? AppColors.darkStatusRunningForeground
+              : AppColors.lightStatusRunningForeground,
     ),
     StatusBadgeVariant.warning => _BadgeColors(
-      background: isDark
-          ? AppColors.darkStatusWarningBackground
-          : AppColors.lightStatusWarningBackground,
-      foreground: isDark
-          ? AppColors.darkStatusWarningForeground
-          : AppColors.lightStatusWarningForeground,
+      background:
+          isDark
+              ? AppColors.darkStatusWarningBackground
+              : AppColors.lightStatusWarningBackground,
+      foreground:
+          isDark
+              ? AppColors.darkStatusWarningForeground
+              : AppColors.lightStatusWarningForeground,
     ),
     StatusBadgeVariant.error => _BadgeColors(
       background: scheme.errorContainer,
       foreground: scheme.onErrorContainer,
     ),
     StatusBadgeVariant.stopped => _BadgeColors(
-      background: isDark
-          ? AppColors.darkStatusStoppedBackground
-          : AppColors.lightStatusStoppedBackground,
-      foreground: isDark
-          ? AppColors.darkStatusStoppedForeground
-          : AppColors.lightStatusStoppedForeground,
+      background:
+          isDark
+              ? AppColors.darkStatusStoppedBackground
+              : AppColors.lightStatusStoppedBackground,
+      foreground:
+          isDark
+              ? AppColors.darkStatusStoppedForeground
+              : AppColors.lightStatusStoppedForeground,
     ),
     StatusBadgeVariant.neutral => _BadgeColors(
       background: scheme.surfaceContainerHighest,

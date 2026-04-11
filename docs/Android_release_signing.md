@@ -58,7 +58,7 @@ Copy the single line into `KEYSTORE_BASE64`.
 base64 -i android/proxdroid-release.jks | tr -d '\n'
 ```
 
-After secrets exist, **Build release APK** on a beta tag will write `android/proxdroid-release.jks` and `android/key.properties` on the runner, then build a **release-signed** APK.
+After secrets exist, **Build release APK** (push to `beta` or `main` when `pubspec.yaml` changes, per `README.md`) will write `android/proxdroid-release.jks` and `android/key.properties` on the runner, then build a **release-signed** APK.
 
 ## First install after switching signing
 

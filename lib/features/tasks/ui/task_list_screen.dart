@@ -123,10 +123,11 @@ class TaskListScreen extends ConsumerWidget {
       if (start == null) {
         header = 'Earlier';
       } else {
-        final dt = DateTime.fromMillisecondsSinceEpoch(
-          start * 1000,
-          isUtc: true,
-        ).toLocal();
+        final dt =
+            DateTime.fromMillisecondsSinceEpoch(
+              start * 1000,
+              isUtc: true,
+            ).toLocal();
         final dtDate = DateTime(dt.year, dt.month, dt.day);
         if (dtDate == todayDate) {
           header = 'Today';
@@ -165,37 +166,40 @@ class TaskListScreen extends ConsumerWidget {
     }
 
     final body = tasksAsync.when(
-      loading: () => RefreshIndicator(
-        onRefresh: refreshTasks,
-        child: ListView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          children: [
-            SizedBox(
-              height: minPullHeight,
-              child: const LoadingShimmer(
-                itemCount: 8,
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-              ),
+      loading:
+          () => RefreshIndicator(
+            onRefresh: refreshTasks,
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: minPullHeight,
+                  child: const LoadingShimmer(
+                    itemCount: 8,
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-      error: (e, _) => RefreshIndicator(
-        onRefresh: refreshTasks,
-        child: ListView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          children: [
-            SizedBox(
-              height: minPullHeight,
-              child: ErrorView(
-                message: proxmoxExceptionMessage(e, l10n),
-                onRetry: () => ref.read(taskListProvider.notifier).refresh(),
-              ),
+          ),
+      error:
+          (e, _) => RefreshIndicator(
+            onRefresh: refreshTasks,
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: minPullHeight,
+                  child: ErrorView(
+                    message: proxmoxExceptionMessage(e, l10n),
+                    onRetry:
+                        () => ref.read(taskListProvider.notifier).refresh(),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
       data: (tasks) {
         if (tasks.isEmpty) {
           return RefreshIndicator(
@@ -262,15 +266,17 @@ class TaskListScreen extends ConsumerWidget {
               final start = task.startTime;
               String startedText = l10n.valueUnavailable;
               if (start != null) {
-                final dt = DateTime.fromMillisecondsSinceEpoch(
-                  start * 1000,
-                  isUtc: true,
-                ).toLocal();
+                final dt =
+                    DateTime.fromMillisecondsSinceEpoch(
+                      start * 1000,
+                      isUtc: true,
+                    ).toLocal();
                 startedText = DateFormat.jm(locale).format(dt);
               }
-              final durationText = start != null
-                  ? _formatDuration(start, task.endTime)
-                  : l10n.valueUnavailable;
+              final durationText =
+                  start != null
+                      ? _formatDuration(start, task.endTime)
+                      : l10n.valueUnavailable;
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -284,9 +290,10 @@ class TaskListScreen extends ConsumerWidget {
                   l10n: l10n,
                   scheme: scheme,
                   tt: tt,
-                  onTap: () => context.push(
-                    '/tasks/${Uri.encodeComponent(task.node)}/${Uri.encodeComponent(task.upid)}',
-                  ),
+                  onTap:
+                      () => context.push(
+                        '/tasks/${Uri.encodeComponent(task.node)}/${Uri.encodeComponent(task.upid)}',
+                      ),
                 ),
               );
             },

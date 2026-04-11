@@ -1,14 +1,13 @@
-# Release APK on prerelease-style tags only. Uses GITHUB_TOKEN (default) with contents: write.
-# Stable semver tags like v1.0.0 do NOT match — a separate prod release workflow can be added later.
-# If you ever need a draft release first, set draft: true on softprops/action-gh-release.
+# Branch-push release workflow: push to `beta` or `main` when `pubspec.yaml` changes.
+# Creates the Git tag if missing, builds a signed release APK, and publishes a GitHub Release.
+# Beta → pre-release + commits since last tag. Main → draft (latest on publish) + aggregated beta notes.
 
 name: Build release APK
 
 on:
   push:
-    tags:
-      # Beta prerelease tags only (e.g. v0.1.0-beta.1).
-      - 'v*-beta*'
+    branches: [beta, main]
+    paths: [pubspec.yaml]
 
 permissions:
   contents: write
@@ -18,18 +17,64 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gate — version, branch rules, remote tag
+        id: gate
+        run: |
+          set -euo pipefail
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version:[[:space:]]*//')
+          TAG="v${VERSION}"
+          BRANCH="${{ github.ref_name }}"
+          SHOULD_BUILD=false
+          RELEASE_KIND=""
+
+          if [ "$BRANCH" = "beta" ]; then
+            if ! echo "$VERSION" | grep -q -- '-beta'; then
+              echo "::notice::Branch beta but version has no -beta suffix; skipping."
+            elif git ls-remote --tags origin "refs/tags/${TAG}" | grep -q .; then
+              echo "::notice::Tag ${TAG} already exists; skipping."
+            else
+              SHOULD_BUILD=true
+              RELEASE_KIND=beta
+            fi
+          elif [ "$BRANCH" = "main" ]; then
+            if echo "$VERSION" | grep -q -- '-beta'; then
+              echo "::notice::Branch main but version still contains -beta; skipping."
+            elif git ls-remote --tags origin "refs/tags/${TAG}" | grep -q .; then
+              echo "::notice::Tag ${TAG} already exists; skipping."
+            else
+              SHOULD_BUILD=true
+              RELEASE_KIND=stable
+            fi
+          else
+            echo "::notice::Unexpected branch ${BRANCH}; skipping."
+          fi
+
+          {
+            echo "should_build=${SHOULD_BUILD}"
+            echo "release_kind=${RELEASE_KIND}"
+            echo "version=${VERSION}"
+            echo "tag=${TAG}"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Set up Flutter
+        if: steps.gate.outputs.should_build == 'true'
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.41.6'
           channel: stable
 
-      - run: flutter pub get
-      - run: dart run build_runner build --delete-conflicting-outputs
-      - run: flutter gen-l10n
+      - if: steps.gate.outputs.should_build == 'true'
+        run: flutter pub get
+      - if: steps.gate.outputs.should_build == 'true'
+        run: dart run build_runner build --delete-conflicting-outputs
+      - if: steps.gate.outputs.should_build == 'true'
+        run: flutter gen-l10n
 
       - name: Configure Android release signing
+        if: steps.gate.outputs.should_build == 'true'
         working-directory: ${{ github.workspace }}
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
@@ -46,14 +91,109 @@ jobs:
           printf 'storePassword=%s\nkeyPassword=%s\nkeyAlias=%s\nstoreFile=proxdroid-release.jks\n' \
             "$KEYSTORE_PASSWORD" "$KEY_PASSWORD" "$KEY_ALIAS" > android/key.properties
 
-      - run: flutter build apk --release
+      - if: steps.gate.outputs.should_build == 'true'
+        run: flutter build apk --release
 
-      # Friendly asset name: proxdroid-<tag>.apk (matches git tag, e.g. proxdroid-v1.0.0-beta.1.apk).
       - name: Name release APK
-        run: cp build/app/outputs/flutter-apk/app-release.apk "proxdroid-${{ github.ref_name }}.apk"
+        if: steps.gate.outputs.should_build == 'true'
+        run: cp build/app/outputs/flutter-apk/app-release.apk "proxdroid-${{ steps.gate.outputs.tag }}.apk"
 
-      - name: Upload APK to GitHub Release
+      - name: Beta release notes (commits since last tag)
+        id: notes_beta
+        if: steps.gate.outputs.should_build == 'true' && steps.gate.outputs.release_kind == 'beta'
+        run: |
+          set -euo pipefail
+          NOTES_FILE="$RUNNER_TEMP/release_notes.md"
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || true)
+          if [ -n "$LAST_TAG" ]; then
+            git log "${LAST_TAG}..HEAD" --pretty="- %s (%h)" > "$NOTES_FILE"
+          else
+            git log HEAD --pretty="- %s (%h)" > "$NOTES_FILE"
+          fi
+          echo "path=${NOTES_FILE}" >> "$GITHUB_OUTPUT"
+
+      - name: Stable release notes (aggregate beta pre-releases)
+        id: notes_stable
+        if: steps.gate.outputs.should_build == 'true' && steps.gate.outputs.release_kind == 'stable'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          NOTES_FILE="$RUNNER_TEMP/release_notes.md"
+          : > "$NOTES_FILE"
+
+          # Only tags reachable from this branch (avoids a newer stable on another branch).
+          PREV_STABLE=$(git tag --list 'v*' --merged HEAD --sort=-version:refname | grep -v -- '-beta' | head -1 || true)
+
+          # All beta tags merged into HEAD, semver order (oldest first). When there is no prior
+          # stable tag yet (first stable release), PREV_STABLE is empty and every merged beta tag
+          # is included. When PREV_STABLE is set, only betas whose commits come after that stable.
+          mapfile -t ALL_BETA_SORTED < <(git tag -l 'v*-beta*' --merged HEAD --sort=version:refname)
+          BETA_TAGS=()
+          for t in "${ALL_BETA_SORTED[@]}"; do
+            if [ -z "$PREV_STABLE" ]; then
+              BETA_TAGS+=("$t")
+            elif git merge-base --is-ancestor "$PREV_STABLE" "$t"; then
+              BETA_TAGS+=("$t")
+            fi
+          done
+
+          if [ "${#BETA_TAGS[@]}" -eq 0 ]; then
+            echo "_No beta pre-releases found in this range; edit the draft release body as needed._" >> "$NOTES_FILE"
+          fi
+
+          PREV_REF="${PREV_STABLE:-}"
+          for t in "${BETA_TAGS[@]}"; do
+            echo "## ${t}" >> "$NOTES_FILE"
+            BODY=$(gh release view "$t" --json body -q .body 2>/dev/null || true)
+            if [ -n "$(printf '%s' "$BODY" | tr -d '[:space:]')" ]; then
+              printf '%s\n\n' "$BODY" >> "$NOTES_FILE"
+            else
+              if [ -n "$PREV_REF" ]; then
+                git log "${PREV_REF}..${t}" --pretty="- %s (%h)" >> "$NOTES_FILE" || true
+              else
+                git log "$t" -50 --first-parent --pretty="- %s (%h)" >> "$NOTES_FILE" || true
+              fi
+              echo "" >> "$NOTES_FILE"
+            fi
+            PREV_REF="$t"
+          done
+
+          echo "path=${NOTES_FILE}" >> "$GITHUB_OUTPUT"
+
+      - name: Create and push Git tag
+        if: steps.gate.outputs.should_build == 'true'
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.gate.outputs.tag }}"
+          git tag "$TAG"
+          git push origin "refs/tags/${TAG}"
+
+      - name: Upload APK — beta pre-release
+        if: steps.gate.outputs.should_build == 'true' && steps.gate.outputs.release_kind == 'beta'
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.gate.outputs.tag }}
           prerelease: true
-          files: proxdroid-${{ github.ref_name }}.apk
+          draft: false
+          body_path: ${{ steps.notes_beta.outputs.path }}
+          files: proxdroid-${{ steps.gate.outputs.tag }}.apk
+
+      - name: Upload APK — stable draft (latest on publish)
+        if: steps.gate.outputs.should_build == 'true' && steps.gate.outputs.release_kind == 'stable'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.gate.outputs.tag }}
+          prerelease: false
+          draft: true
+          # make_latest has no effect while draft; GitHub applies latest when the draft is published.
+          make_latest: true
+          body_path: ${{ steps.notes_stable.outputs.path }}
+          files: proxdroid-${{ steps.gate.outputs.tag }}.apk
+
+      - name: Remove signing artifacts from runner
+        if: always()
+        run: |
+          set -euo pipefail
+          rm -f android/proxdroid-release.jks android/key.properties
