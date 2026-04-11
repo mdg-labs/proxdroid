@@ -1,34 +1,42 @@
-Here are practical patterns that fit “mostly manual, but easier before beta,” without tying `CHANGELOG.md` to `build.yml`.
+Here’s a clear split between what **rules** can do vs what **hooks** can do in Cursor, given you’re mostly “developing with Cursor” rather than typing every line yourself.
 
-### 1. Treat `[Unreleased]` as the only automation you need
+### Hooks are not a good place to “have Cursor evaluate” the changelog
 
-Keep a single **`## [Unreleased]`** section and add bullets as you merge work (Added / Changed / Fixed). When you bump `pubspec` for beta, **rename** that block to `## [1.0.0-beta.13] - 2026-04-11` and start a fresh `[Unreleased]`. No CI required; `build.yml` stays focused on GitHub release bodies.
+Cursor hooks run **scripts** or small **prompt-policy** checks. They receive JSON on stdin and return JSON on stdout. They do **not** spin up a full agent pass that reads the whole repo and rewrites `CHANGELOG.md` like a mini-conversation.
 
-That stays fully manual but predictable.
+What hooks *can* do usefully:
 
-### 2. Nudge locally (no “auto text,” just discipline)
+- **`postToolUse`** (often with a matcher on `Write` / edits under `lib/`): inject **`additional_context`** reminding the model: “If this was user-visible, add a line under `[Unreleased]` in `CHANGELOG.md`.” That nudges **during** the run, right after an edit, which is usually better than “at conversation end.”
+- **`stop`**: useful for **follow-up loops** in some setups (see Cursor hook docs for exact fields), but using it to force changelog maintenance tends to be **fragile or noisy** (every stop, merge conflicts with “one more turn,” etc.).
+- **Deterministic checks only** in a command hook: e.g. “warn if `lib/` changed in git diff but `CHANGELOG.md` did not” — no LLM, just `git diff`.
 
-- **PR template** (you may already have one): checkbox — “Updated `CHANGELOG.md` `[Unreleased]` for user-visible changes.”
-- **Optional git hook** (pre-commit or pre-push): *warn* (not block) if `lib/` changed but `CHANGELOG.md` did not—easy to ignore for refactors, still catches forgetfulness.
+So: **there isn’t a hook that reliably means “before each conversation end, run Cursor again to fix CHANGELOG.”** The model that should maintain the changelog is **already** the agent in the thread; hooks are sidecars.
 
-This keeps control 100% human.
+### A **rule** is the better default for your situation
 
-### 3. Fragment-based tools (good “hybrid”)
+The reliable pattern is: **tell the agent, in repo rules, that updating the changelog is part of “done.”**
 
-Tools like **[Changie](https://github.com/miniscruff/changie)** (or Changesets-style flows) match what you described:
+Concretely:
 
-- During development you run something like `changie new` and drop a **small file** (or answer prompts) per change.
-- Files live under e.g. `.changes/unreleased/` until release.
-- At release you run `changie batch` / `changie merge` and it **stitches** those fragments into `CHANGELOG.md` in proper Keep a Changelog shape.
+- Add a **project rule** (e.g. `.cursor/rules/changelog-unreleased.mdc`) that says something like:
+  - When completing a task that changes **user-visible** behavior (UI copy, flows, defaults, permissions, etc.), **append** a bullet under `CHANGELOG.md` → `## [Unreleased]` in the right subsection (Added / Changed / Fixed).
+  - Skip for refactors, tests-only, internal renames, comment-only, CI-only, unless user-facing.
+  - Do **not** invent marketing text; one factual line is enough.
+  - If nothing user-facing shipped, **do not** touch `CHANGELOG.md`.
 
-You still write meaningful text; the tool handles **ordering, sections, and the final merge** so you’re not hand-editing huge blocks. That’s usually nicer than appending raw `git log` into `CHANGELOG.md`.
+Pair it with your existing **“update roadmap when affected”** rule so both stay in the same mental “before you say you’re finished” bucket.
 
-### 4. Generate a *draft* locally, then you curate
+Use **`alwaysApply: true`** only if you want that reminder in every chat (more tokens). Prefer **`alwaysApply: false` + globs** on paths the agent usually touches for features (`lib/**/*.dart`, maybe `lib/l10n/*.arb`) so the rule appears when those files are in play—**never** combine `alwaysApply: true` with `globs` in the same rule file (your workspace rules call that out).
 
-If you like conventional commits (`feat:`, `fix:`), **`git-cliff`** (or similar) can print a **draft** section from `git log`. You copy the useful lines into `[Unreleased]` and delete noise. Fully manual final text; automation only suggests.
+### Practical combo (what I’d actually use)
+
+1. **Rule** — primary: “changelog is part of completion for user-visible work.”
+2. **Optional `postToolUse` hook** — secondary: after writes under `lib/`, inject one line of `additional_context` pointing at that rule + `CHANGELOG.md`. That’s a **nudge**, not a second agent.
+
+### Why not rely on “conversation end” only?
+
+The agent doesn’t have a special “end” hook that runs **after** it has already said “all done” in a way you trust. By then you’re relying on the **last** assistant turn to have included the edit. Nudges **right after `lib/` edits** (rule + optional `postToolUse`) line up better with how agents actually work.
 
 ---
 
-**Recommendation for your workflow:** keep **`[Unreleased]` + manual bullets** as source of truth; optionally add **Changie** (or a light hook + PR checkbox) if you want structure without CI touching `CHANGELOG.md`. Reserve **GitHub release notes** from `build.yml` for what you already automated there.
-
-If you want to go further next step, say whether you prefer **Changie-style fragments** vs **only hooks + template**—implementation effort differs a lot.
+If you want this codified in the repo next, say whether you prefer **`alwaysApply` + short checklist** or **globs on `lib/**` only**, and I can draft the exact `.mdc` (and optionally a minimal `postToolUse` entry in `.cursor/hooks.json`).
