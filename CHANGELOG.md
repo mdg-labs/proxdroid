@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-beta.16] - 2026-04-11
+
+### Changed
+
+- Premium dialog now uses the branch navigator for clearer context handling.
+- Task list supports guest filtering with improved status presentation.
+- Container and VM detail screens use consolidated power action icon pills.
+- Container and VM list screens updated with refined UI components and theme integration.
+- Node detail screen shows additional metrics with improved data handling.
+- Preferences screen adds theme selection with localization updates.
+
+### Internal
+
+- Bumped version to `1.0.0-beta.16+1` in `pubspec.yaml`.
+
 ## [1.0.0-beta.15] - 2026-04-11
 
 ### Added
@@ -161,7 +176,8 @@ First public **beta** prerelease on GitHub Releases (APK via CI).
 - GitHub Actions: release workflow runs only on beta prerelease tags (`v*-beta*`) and
   publishes GitHub **prereleases** with the release APK.
 
-[Unreleased]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.15...HEAD
+[Unreleased]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.16...HEAD
+[1.0.0-beta.16]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.15...v1.0.0-beta.16
 [1.0.0-beta.15]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.14...v1.0.0-beta.15
 [1.0.0-beta.14]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.13%2B1...v1.0.0-beta.14
 [1.0.0-beta.13+1]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.11...v1.0.0-beta.13%2B1
