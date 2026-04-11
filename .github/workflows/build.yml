@@ -24,7 +24,7 @@ jobs:
         id: gate
         run: |
           set -euo pipefail
-          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version:[[:space:]]*//')
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version:[[:space:]]*//; s/+.*//')
           TAG="v${VERSION}"
           BRANCH="${{ github.ref_name }}"
           SHOULD_BUILD=false
