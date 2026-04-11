@@ -55,12 +55,26 @@ abstract final class AppColors {
   static const Color darkErrorContainer = Color(0xFF93000A);
   static const Color darkOnErrorContainer = Color(0xFFFFDAD6);
 
-  /// Success / warning badge helpers for dark UI (§7.4); [StatusBadge] may
-  /// reference these in a later phase.
+  /// Success / warning / running / stopped badge helpers (§7.4).
   static const Color darkStatusSuccessBackground = Color(0xFF1B4332);
   static const Color darkStatusSuccessForeground = Color(0xFF95D5B2);
   static const Color darkStatusWarningBackground = Color(0xFF5C4A00);
   static const Color darkStatusWarningForeground = Color(0xFFFFE082);
+
+  /// Running / in-progress (informational blue — active task badges).
+  static const Color darkStatusRunningBackground = Color(0xFF0A2A50);
+  static const Color darkStatusRunningForeground = Color(0xFF5BC0FF);
+  static const Color lightStatusRunningBackground = Color(0xFFDBEEFE);
+  static const Color lightStatusRunningForeground = Color(0xFF004A9B);
+
+  /// Stopped (muted neutral — powered-off VMs are not in error state).
+  static const Color darkStatusStoppedBackground = Color(0xFF252528);
+  static const Color darkStatusStoppedForeground = Color(0xFF909099);
+  static const Color lightStatusStoppedBackground = Color(0xFFF0F0F5);
+  static const Color lightStatusStoppedForeground = Color(0xFF5A5A66);
+
+  /// Destructive accent for force-stop / delete actions (iOS-style red).
+  static const Color destructiveRed = Color(0xFFFF453A);
 
   // --- Light (§10) ---
 
@@ -103,7 +117,7 @@ abstract final class AppColors {
   static const Color lightStatusSuccessBackground = Color(0xFFE8F5E9);
   static const Color lightStatusSuccessForeground = Color(0xFF1B4332);
   static const Color lightStatusWarningBackground = Color(0xFFFFF8E1);
-  static const Color lightStatusWarningForeground = Color(0xFF5C4A00);
+  static const Color lightStatusWarningForeground = Color(0xFF7A5A00);
 
   // --- Chart series colors (§9) ---
   //

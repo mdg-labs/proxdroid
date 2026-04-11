@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:proxdroid/app/theme/app_theme.dart';
 import 'package:proxdroid/core/models/container.dart' as px;
 import 'package:proxdroid/core/models/task.dart';
 import 'package:proxdroid/core/models/vm.dart';
@@ -14,16 +15,35 @@ import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
-import 'package:proxdroid/shared/widgets/premium_list_row.dart';
 import 'package:proxdroid/shared/widgets/shell_section_body.dart';
 import 'package:proxdroid/shared/widgets/status_badge.dart';
+
+// ────────────────────────────────────────────────────────────────────────────
+// List item model (header or task row)
+// ────────────────────────────────────────────────────────────────────────────
+
+sealed class _Item {}
+
+class _DateHeader extends _Item {
+  _DateHeader(this.label);
+  final String label;
+}
+
+class _TaskRow extends _Item {
+  _TaskRow(this.task);
+  final Task task;
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Screen
+// ────────────────────────────────────────────────────────────────────────────
 
 class TaskListScreen extends ConsumerWidget {
   const TaskListScreen({super.key});
 
   static StatusBadgeVariant _statusVariant(TaskStatus status) {
     return switch (status) {
-      TaskStatus.running => StatusBadgeVariant.warning,
+      TaskStatus.running => StatusBadgeVariant.running,
       TaskStatus.ok => StatusBadgeVariant.success,
       TaskStatus.error => StatusBadgeVariant.error,
       TaskStatus.unknown => StatusBadgeVariant.neutral,
@@ -46,9 +66,7 @@ class TaskListScreen extends ConsumerWidget {
     required List<px.Container> containers,
     required AppLocalizations l10n,
   }) {
-    if (vmid == null) {
-      return l10n.valueUnavailable;
-    }
+    if (vmid == null) return l10n.valueUnavailable;
     for (final v in vms) {
       if (v.vmid == vmid && v.node == taskNode) {
         return v.name.isEmpty ? '$vmid' : '${v.name} ($vmid)';
@@ -72,29 +90,68 @@ class TaskListScreen extends ConsumerWidget {
     return '$vmid';
   }
 
-  static String _formatDurationSeconds(int startSec, int? endSec) {
+  static String _formatDuration(int startSec, int? endSec) {
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     final end = endSec ?? now;
     var secs = end - startSec;
-    if (secs < 0) {
-      secs = 0;
-    }
+    if (secs < 0) secs = 0;
     final d = Duration(seconds: secs);
     final h = d.inHours;
     final m = d.inMinutes.remainder(60);
     final s = d.inSeconds.remainder(60);
     if (h > 0) {
-      return '${h.toString().padLeft(2, '0')}:'
-          '${m.toString().padLeft(2, '0')}:'
-          '${s.toString().padLeft(2, '0')}';
+      return '${h}h ${m.toString().padLeft(2, '0')}m';
     }
-    return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
+    if (m > 0) {
+      return '${m}m ${s.toString().padLeft(2, '0')}s';
+    }
+    return '${s}s';
+  }
+
+  /// Groups tasks into date-bucket flat list with [_DateHeader] separators.
+  static List<_Item> _buildItems(List<Task> tasks, String locale) {
+    final now = DateTime.now();
+    final todayDate = DateTime(now.year, now.month, now.day);
+    final yesterdayDate = todayDate.subtract(const Duration(days: 1));
+
+    String? currentHeader;
+    final items = <_Item>[];
+
+    for (final task in tasks) {
+      final start = task.startTime;
+      final String header;
+      if (start == null) {
+        header = 'Earlier';
+      } else {
+        final dt = DateTime.fromMillisecondsSinceEpoch(
+          start * 1000,
+          isUtc: true,
+        ).toLocal();
+        final dtDate = DateTime(dt.year, dt.month, dt.day);
+        if (dtDate == todayDate) {
+          header = 'Today';
+        } else if (dtDate == yesterdayDate) {
+          header = 'Yesterday';
+        } else {
+          header = DateFormat.yMMMd(locale).format(dt);
+        }
+      }
+
+      if (header != currentHeader) {
+        currentHeader = header;
+        items.add(_DateHeader(header));
+      }
+      items.add(_TaskRow(task));
+    }
+
+    return items;
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
     final locale = Localizations.localeOf(context).toString();
     final tasksAsync = ref.watch(taskListProvider);
     final vms = ref.watch(allVmsProvider).valueOrNull ?? const <Vm>[];
@@ -108,40 +165,37 @@ class TaskListScreen extends ConsumerWidget {
     }
 
     final body = tasksAsync.when(
-      loading:
-          () => RefreshIndicator(
-            onRefresh: refreshTasks,
-            child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              children: [
-                SizedBox(
-                  height: minPullHeight,
-                  child: const LoadingShimmer(
-                    itemCount: 8,
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                  ),
-                ),
-              ],
+      loading: () => RefreshIndicator(
+        onRefresh: refreshTasks,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            SizedBox(
+              height: minPullHeight,
+              child: const LoadingShimmer(
+                itemCount: 8,
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+              ),
             ),
-          ),
-      error:
-          (e, _) => RefreshIndicator(
-            onRefresh: refreshTasks,
-            child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              children: [
-                SizedBox(
-                  height: minPullHeight,
-                  child: ErrorView(
-                    message: proxmoxExceptionMessage(e, l10n),
-                    onRetry:
-                        () => ref.read(taskListProvider.notifier).refresh(),
-                  ),
-                ),
-              ],
+          ],
+        ),
+      ),
+      error: (e, _) => RefreshIndicator(
+        onRefresh: refreshTasks,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            SizedBox(
+              height: minPullHeight,
+              child: ErrorView(
+                message: proxmoxExceptionMessage(e, l10n),
+                onRetry: () => ref.read(taskListProvider.notifier).refresh(),
+              ),
             ),
-          ),
+          ],
+        ),
+      ),
       data: (tasks) {
         if (tasks.isEmpty) {
           return RefreshIndicator(
@@ -162,14 +216,41 @@ class TaskListScreen extends ConsumerWidget {
           );
         }
 
+        final items = _buildItems(tasks, locale);
+
         return RefreshIndicator(
           onRefresh: refreshTasks,
           child: ListView.builder(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            itemCount: tasks.length,
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.sm,
+              AppSpacing.lg,
+              AppSpacing.lg,
+            ),
+            itemCount: items.length,
             itemBuilder: (context, index) {
-              final task = tasks[index];
+              final item = items[index];
+
+              if (item is _DateHeader) {
+                return Padding(
+                  padding: EdgeInsets.only(
+                    top: index == 0 ? AppSpacing.xs : AppSpacing.xl,
+                    bottom: AppSpacing.sm,
+                  ),
+                  child: Text(
+                    item.label,
+                    style: tt.labelSmall?.copyWith(
+                      color: scheme.onSurfaceVariant.withValues(alpha: 0.65),
+                      fontWeight: FontWeight.w700,
+                      fontSize: 10,
+                      letterSpacing: 1.3,
+                    ),
+                  ),
+                );
+              }
+
+              final task = (item as _TaskRow).task;
               final vmid = vmidFromProxmoxUpid(task.upid);
               final guest = _guestLabel(
                 vmid: vmid,
@@ -181,51 +262,32 @@ class TaskListScreen extends ConsumerWidget {
               final start = task.startTime;
               String startedText = l10n.valueUnavailable;
               if (start != null) {
-                final dt =
-                    DateTime.fromMillisecondsSinceEpoch(
-                      start * 1000,
-                      isUtc: true,
-                    ).toLocal();
-                startedText = DateFormat.yMMMd(locale).add_Hm().format(dt);
+                final dt = DateTime.fromMillisecondsSinceEpoch(
+                  start * 1000,
+                  isUtc: true,
+                ).toLocal();
+                startedText = DateFormat.jm(locale).format(dt);
               }
-              final durationText =
-                  start != null
-                      ? _formatDurationSeconds(start, task.endTime)
-                      : l10n.valueUnavailable;
+              final durationText = start != null
+                  ? _formatDuration(start, task.endTime)
+                  : l10n.valueUnavailable;
 
-              return PremiumListRow(
-                title: Text(
-                  task.type,
-                  style: Theme.of(context).textTheme.titleSmall,
+              return Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                child: _TaskTile(
+                  task: task,
+                  guest: guest,
+                  startedText: startedText,
+                  durationText: durationText,
+                  statusVariant: _statusVariant(task.status),
+                  statusLabel: _statusLabel(task.status, l10n),
+                  l10n: l10n,
+                  scheme: scheme,
+                  tt: tt,
+                  onTap: () => context.push(
+                    '/tasks/${Uri.encodeComponent(task.node)}/${Uri.encodeComponent(task.upid)}',
+                  ),
                 ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 2),
-                    Text(
-                      '${l10n.taskRowGuest}: $guest',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodySmall?.copyWith(color: scheme.onSurface),
-                    ),
-                    Text(
-                      '${l10n.taskRowStarted}: $startedText · '
-                      '${l10n.taskRowDuration}: $durationText',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-                trailing: StatusBadge(
-                  label: _statusLabel(task.status, l10n),
-                  variant: _statusVariant(task.status),
-                ),
-                showDividerBelow: index < tasks.length - 1,
-                onTap:
-                    () => context.push(
-                      '/tasks/${Uri.encodeComponent(task.node)}/${Uri.encodeComponent(task.upid)}',
-                    ),
               );
             },
           ),
@@ -234,5 +296,127 @@ class TaskListScreen extends ConsumerWidget {
     );
 
     return ShellSectionBody(title: Text(l10n.sectionTasks), body: body);
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Task tile
+// ────────────────────────────────────────────────────────────────────────────
+
+class _TaskTile extends StatelessWidget {
+  const _TaskTile({
+    required this.task,
+    required this.guest,
+    required this.startedText,
+    required this.durationText,
+    required this.statusVariant,
+    required this.statusLabel,
+    required this.l10n,
+    required this.scheme,
+    required this.tt,
+    required this.onTap,
+  });
+
+  final Task task;
+  final String guest;
+  final String startedText;
+  final String durationText;
+  final StatusBadgeVariant statusVariant;
+  final String statusLabel;
+  final AppLocalizations l10n;
+  final ColorScheme scheme;
+  final TextTheme tt;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: scheme.surfaceContainerHighest,
+      borderRadius: BorderRadius.circular(12),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.md,
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Main content
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      task.type,
+                      style: tt.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      guest,
+                      style: tt.bodySmall?.copyWith(
+                        color: scheme.onSurface.withValues(alpha: 0.75),
+                        fontSize: 12,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Text(
+                          startedText,
+                          style: tt.labelSmall?.copyWith(
+                            color: scheme.onSurfaceVariant,
+                            fontSize: 11,
+                          ),
+                        ),
+                        if (durationText != l10n.valueUnavailable) ...[
+                          Text(
+                            '  ·  ',
+                            style: tt.labelSmall?.copyWith(
+                              color: scheme.outlineVariant,
+                              fontSize: 11,
+                            ),
+                          ),
+                          Text(
+                            durationText,
+                            style: tt.labelSmall?.copyWith(
+                              color: scheme.onSurfaceVariant,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              // Trailing: badge + chevron
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  StatusBadge(label: statusLabel, variant: statusVariant),
+                  const SizedBox(height: AppSpacing.xs),
+                  Icon(
+                    Icons.chevron_right,
+                    size: 16,
+                    color: scheme.outlineVariant,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

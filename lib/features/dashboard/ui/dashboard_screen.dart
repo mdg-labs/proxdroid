@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:proxdroid/app/theme/app_colors.dart';
+import 'package:proxdroid/app/theme/app_theme.dart';
 import 'package:proxdroid/core/models/node.dart';
 import 'package:proxdroid/core/models/resource_data_point.dart';
 import 'package:proxdroid/core/models/vm.dart';
@@ -101,13 +103,13 @@ class DashboardScreen extends ConsumerWidget {
     final vms = vmsAsync.requireValue;
     final containers = containersAsync.requireValue;
 
-    final runningVms =
-        vms
-            .where(
-              (v) =>
-                  v.status == VmStatus.running || v.status == VmStatus.paused,
-            )
-            .length;
+    final runningVms = vms
+        .where(
+          (v) =>
+              v.status == VmStatus.running || v.status == VmStatus.paused,
+        )
+        .length;
+    final onlineNodes = nodes.where(_nodeOnline).length;
 
     if (nodes.isEmpty) {
       return ShellSectionBody(
@@ -138,156 +140,51 @@ class DashboardScreen extends ConsumerWidget {
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            // — Cluster summary card —
+            // ── Cluster overview card ────────────────────────────────────────
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                AppSpacing.sm,
+                AppSpacing.lg,
+                0,
+              ),
               sliver: SliverToBoxAdapter(
-                child: Card(
-                  margin: EdgeInsets.zero,
-                  color: scheme.primaryContainer,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n.dashboardClusterSummary,
-                          style: Theme.of(
-                            context,
-                          ).textTheme.titleLarge?.copyWith(
-                            color: scheme.onPrimaryContainer,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        _SummaryRow(
-                          label: l10n.dashboardSummaryTotalVms,
-                          value: '${vms.length}',
-                          labelColor: scheme.onPrimaryContainer.withValues(
-                            alpha: 0.9,
-                          ),
-                          valueColor: scheme.onPrimaryContainer,
-                        ),
-                        _SummaryRow(
-                          label: l10n.dashboardSummaryRunningVms,
-                          value: '$runningVms',
-                          labelColor: scheme.onPrimaryContainer.withValues(
-                            alpha: 0.9,
-                          ),
-                          valueColor: scheme.onPrimaryContainer,
-                        ),
-                        _SummaryRow(
-                          label: l10n.dashboardSummaryTotalContainers,
-                          value: '${containers.length}',
-                          labelColor: scheme.onPrimaryContainer.withValues(
-                            alpha: 0.9,
-                          ),
-                          valueColor: scheme.onPrimaryContainer,
-                        ),
-                      ],
-                    ),
-                  ),
+                child: _ClusterOverviewCard(
+                  nodes: nodes,
+                  vms: vms,
+                  containers: containers,
+                  runningVms: runningVms,
+                  onlineNodes: onlineNodes,
+                  l10n: l10n,
+                  nodeOnline: _nodeOnline,
                 ),
               ),
             ),
 
-            // — Per-node cards —
+            // ── Per-node cards ───────────────────────────────────────────────
             SliverPadding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppSpacing.lg),
               sliver: SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  final node = nodes[index];
-                  final online = _nodeOnline(node);
-                  final cpuFrac = nodeCpuFraction(node.cpu, node.maxCpu);
-                  final memFrac = memoryFraction(node.mem, node.maxMem);
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final node = nodes[index];
+                    final online = _nodeOnline(node);
+                    final cpuFrac = nodeCpuFraction(node.cpu, node.maxCpu);
+                    final memFrac = memoryFraction(node.mem, node.maxMem);
 
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: Card(
-                      margin: EdgeInsets.zero,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Node name + icon + status badge
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: scheme.primaryContainer.withValues(
-                                      alpha: 0.35,
-                                    ),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Icon(
-                                    Icons.dns_rounded,
-                                    color: scheme.primary,
-                                    size: 24,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    node.name,
-                                    style:
-                                        Theme.of(context).textTheme.titleMedium,
-                                  ),
-                                ),
-                                StatusBadge(
-                                  label:
-                                      online
-                                          ? l10n.statusOnline
-                                          : l10n.statusOffline,
-                                  variant:
-                                      online
-                                          ? StatusBadgeVariant.success
-                                          : StatusBadgeVariant.error,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              '${l10n.metricUptime}: ${formatUptimeSeconds(node.uptime)}',
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(color: scheme.onSurfaceVariant),
-                            ),
-                            const SizedBox(height: 12),
-
-                            // CPU gauge (T6.4: ResourceGaugeRow)
-                            ResourceGaugeRow(
-                              label: l10n.metricCpu,
-                              value: cpuFrac,
-                              valueSuffix:
-                                  cpuFrac != null
-                                      ? formatCpuPercent(cpuFrac)
-                                      : l10n.valueUnavailable,
-                            ),
-                            const SizedBox(height: 12),
-
-                            // Memory gauge (T6.4: ResourceGaugeRow)
-                            ResourceGaugeRow(
-                              label: l10n.metricMemory,
-                              value: memFrac,
-                              valueSuffix:
-                                  memFrac != null
-                                      ? formatMemoryRatio(node.mem, node.maxMem)
-                                      : l10n.valueUnavailable,
-                            ),
-
-                            // Compact sparkline charts (T6.4: ChartCard compact)
-                            if (online) ...[
-                              const SizedBox(height: 16),
-                              _NodeRrdSparklines(nodeName: node.name),
-                            ],
-                          ],
-                        ),
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                      child: _NodeCard(
+                        node: node,
+                        online: online,
+                        cpuFrac: cpuFrac,
+                        memFrac: memFrac,
+                        l10n: l10n,
                       ),
-                    ),
-                  );
-                }, childCount: nodes.length),
+                    );
+                  },
+                  childCount: nodes.length,
+                ),
               ),
             ),
           ],
@@ -297,8 +194,367 @@ class DashboardScreen extends ConsumerWidget {
   }
 }
 
-/// Compact CPU + memory line charts from node-level rrddata (1h, no selector).
-/// Wrapped in compact [ChartCard]s per T6.4.
+// ────────────────────────────────────────────────────────────────────────────
+// Cluster overview card
+// ────────────────────────────────────────────────────────────────────────────
+
+class _ClusterOverviewCard extends StatelessWidget {
+  const _ClusterOverviewCard({
+    required this.nodes,
+    required this.vms,
+    required this.containers,
+    required this.runningVms,
+    required this.onlineNodes,
+    required this.l10n,
+    required this.nodeOnline,
+  });
+
+  final List<Node> nodes;
+  final List<Vm> vms;
+  final List<dynamic> containers;
+  final int runningVms;
+  final int onlineNodes;
+  final AppLocalizations l10n;
+  final bool Function(Node) nodeOnline;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final allOnline = onlineNodes == nodes.length && nodes.isNotEmpty;
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            isDark
+                ? const Color(0xFF08304A)
+                : scheme.primaryContainer.withValues(alpha: 0.6),
+            isDark ? const Color(0xFF141820) : scheme.surfaceContainerHigh,
+          ],
+        ),
+        border: Border.all(
+          color: scheme.primary.withValues(alpha: isDark ? 0.30 : 0.20),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // — Header row —
+            Row(
+              children: [
+                Icon(
+                  Icons.hub_outlined,
+                  size: 16,
+                  color: scheme.primary,
+                ),
+                const SizedBox(width: AppSpacing.xs),
+                Text(
+                  l10n.dashboardClusterSummary.toUpperCase(),
+                  style: tt.labelSmall?.copyWith(
+                    color: scheme.primary,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.2,
+                    fontSize: 10,
+                  ),
+                ),
+                const Spacer(),
+                // Nodes online indicator
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: allOnline
+                        ? AppColors.darkStatusSuccessBackground
+                        : AppColors.darkStatusStoppedBackground,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: allOnline
+                          ? AppColors.darkStatusSuccessForeground
+                              .withValues(alpha: 0.3)
+                          : AppColors.darkStatusStoppedForeground
+                              .withValues(alpha: 0.2),
+                      width: 0.5,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: 3,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 5,
+                          height: 5,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: allOnline
+                                ? AppColors.darkStatusSuccessForeground
+                                : AppColors.darkStatusStoppedForeground,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '$onlineNodes/${nodes.length}',
+                          style: tt.labelSmall?.copyWith(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: allOnline
+                                ? AppColors.darkStatusSuccessForeground
+                                : AppColors.darkStatusStoppedForeground,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            // — Stat grid —
+            IntrinsicHeight(
+              child: Row(
+                children: [
+                  _StatCell(
+                    value: '${vms.length}',
+                    label: l10n.dashboardSummaryTotalVms,
+                    scheme: scheme,
+                    tt: tt,
+                  ),
+                  _StatDivider(scheme: scheme),
+                  _StatCell(
+                    value: '$runningVms',
+                    label: l10n.dashboardSummaryRunningVms,
+                    scheme: scheme,
+                    tt: tt,
+                    valueColor: runningVms > 0 ? AppColors.darkStatusSuccessForeground : null,
+                  ),
+                  _StatDivider(scheme: scheme),
+                  _StatCell(
+                    value: '${containers.length}',
+                    label: l10n.dashboardSummaryTotalContainers,
+                    scheme: scheme,
+                    tt: tt,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StatCell extends StatelessWidget {
+  const _StatCell({
+    required this.value,
+    required this.label,
+    required this.scheme,
+    required this.tt,
+    this.valueColor,
+  });
+
+  final String value;
+  final String label;
+  final ColorScheme scheme;
+  final TextTheme tt;
+  final Color? valueColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            value,
+            style: tt.headlineMedium?.copyWith(
+              color: valueColor ?? scheme.onSurface,
+              fontWeight: FontWeight.w700,
+              height: 1,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            label,
+            style: tt.bodySmall?.copyWith(
+              color: scheme.onSurfaceVariant,
+              fontSize: 11,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatDivider extends StatelessWidget {
+  const _StatDivider({required this.scheme});
+  final ColorScheme scheme;
+
+  @override
+  Widget build(BuildContext context) {
+    return VerticalDivider(
+      width: 1,
+      thickness: 1,
+      color: scheme.outlineVariant.withValues(alpha: 0.5),
+    );
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Node card
+// ────────────────────────────────────────────────────────────────────────────
+
+class _NodeCard extends StatelessWidget {
+  const _NodeCard({
+    required this.node,
+    required this.online,
+    required this.cpuFrac,
+    required this.memFrac,
+    required this.l10n,
+  });
+
+  final Node node;
+  final bool online;
+  final double? cpuFrac;
+  final double? memFrac;
+  final AppLocalizations l10n;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+
+    final statusColor = online
+        ? AppColors.darkStatusSuccessForeground
+        : AppColors.darkStatusStoppedForeground;
+    final statusBg = online
+        ? AppColors.darkStatusSuccessBackground
+        : AppColors.darkStatusStoppedBackground;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(16),
+        border: Border(
+          top: BorderSide(color: statusColor.withValues(alpha: 0.55), width: 2),
+          left: BorderSide(
+            color: scheme.outlineVariant.withValues(alpha: 0.3),
+          ),
+          right: BorderSide(
+            color: scheme.outlineVariant.withValues(alpha: 0.3),
+          ),
+          bottom: BorderSide(
+            color: scheme.outlineVariant.withValues(alpha: 0.3),
+          ),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Header ────────────────────────────────────────────────
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: statusBg,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  alignment: Alignment.center,
+                  child: Icon(
+                    Icons.dns_rounded,
+                    color: statusColor,
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        node.name,
+                        style: tt.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${l10n.metricUptime}: ${formatUptimeSeconds(node.uptime)}',
+                        style: tt.bodySmall?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                StatusBadge(
+                  label: online ? l10n.statusOnline : l10n.statusOffline,
+                  variant: online
+                      ? StatusBadgeVariant.success
+                      : StatusBadgeVariant.stopped,
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.lg),
+
+            // ── Gauges ────────────────────────────────────────────────
+            ResourceGaugeRow(
+              label: l10n.metricCpu,
+              value: cpuFrac,
+              valueSuffix: cpuFrac != null
+                  ? formatCpuPercent(cpuFrac)
+                  : l10n.valueUnavailable,
+            ),
+            const SizedBox(height: AppSpacing.md),
+            ResourceGaugeRow(
+              label: l10n.metricMemory,
+              value: memFrac,
+              valueSuffix: memFrac != null
+                  ? formatMemoryRatio(node.mem, node.maxMem)
+                  : l10n.valueUnavailable,
+            ),
+
+            // ── Sparklines ────────────────────────────────────────────
+            if (online) ...[
+              const SizedBox(height: AppSpacing.lg),
+              Divider(
+                height: 1,
+                thickness: 1,
+                color: scheme.outlineVariant.withValues(alpha: 0.35),
+              ),
+              _NodeRrdSparklines(nodeName: node.name),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Compact sparklines (node-level RRD, 1 h)
+// ────────────────────────────────────────────────────────────────────────────
+
 class _NodeRrdSparklines extends ConsumerWidget {
   const _NodeRrdSparklines({required this.nodeName});
 
@@ -313,153 +569,102 @@ class _NodeRrdSparklines extends ConsumerWidget {
     final async = ref.watch(nodeRrdDataProvider(nodeName, _tf));
 
     return async.when(
-      loading:
-          () => Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: ChartCard(
-                  title: l10n.metricCpu,
-                  compact: true,
-                  child: const PulsingPlaceholder(height: 88),
-                ),
+      loading: () => Padding(
+        padding: const EdgeInsets.only(top: AppSpacing.md),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: ChartCard(
+                title: l10n.metricCpu,
+                compact: true,
+                child: const PulsingPlaceholder(height: 120),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ChartCard(
-                  title: l10n.metricMemory,
-                  compact: true,
-                  child: const PulsingPlaceholder(height: 88),
-                ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: ChartCard(
+                title: l10n.metricMemory,
+                compact: true,
+                child: const PulsingPlaceholder(height: 120),
               ),
-            ],
-          ),
-      error:
-          (e, _) => Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      l10n.metricCpu,
-                      style: Theme.of(context).textTheme.labelSmall,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      l10n.metricMemory,
-                      style: Theme.of(context).textTheme.labelSmall,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Icon(Icons.error_outline, size: 28, color: scheme.error),
-              const SizedBox(height: 8),
-              Text(
+            ),
+          ],
+        ),
+      ),
+      error: (e, _) => Padding(
+        padding: const EdgeInsets.only(top: AppSpacing.md),
+        child: Row(
+          children: [
+            Icon(Icons.error_outline, size: 16, color: scheme.error),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Text(
                 proxmoxExceptionMessage(e, l10n),
-                textAlign: TextAlign.center,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: scheme.onSurface),
+                style: Theme.of(context).textTheme.bodySmall
+                    ?.copyWith(color: scheme.error),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              TextButton.icon(
-                onPressed:
-                    () => ref.invalidate(nodeRrdDataProvider(nodeName, _tf)),
-                icon: const Icon(Icons.refresh),
-                label: Text(l10n.actionRetry),
-              ),
-            ],
-          ),
-      data:
-          (points) => Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: ChartCard(
-                  title: l10n.metricCpu,
-                  compact: true,
-                  child: ResourceLineChart(
-                    data: points,
-                    metric: ResourceChartMetric.cpu,
-                    primaryColor: scheme.primary,
-                    timeframe: _tf,
-                    onTimeframeChanged: (_) {},
-                    l10n: l10n,
-                    compact: true,
-                    chartHeight: 88,
-                    showTimeframeSelector: false,
-                  ),
+            ),
+            TextButton(
+              onPressed: () => ref.invalidate(nodeRrdDataProvider(nodeName, _tf)),
+              style: TextButton.styleFrom(
+                minimumSize: Size.zero,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: AppSpacing.xs,
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ChartCard(
-                  title: l10n.metricMemory,
+              child: Text(l10n.actionRetry),
+            ),
+          ],
+        ),
+      ),
+      data: (points) => Padding(
+        padding: const EdgeInsets.only(top: AppSpacing.md),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: ChartCard(
+                title: l10n.metricCpu,
+                compact: true,
+                child: ResourceLineChart(
+                  data: points,
+                  metric: ResourceChartMetric.cpu,
+                  primaryColor: scheme.primary,
+                  timeframe: _tf,
+                  onTimeframeChanged: (_) {},
+                  l10n: l10n,
                   compact: true,
-                  child: ResourceLineChart(
-                    data: points,
-                    metric: ResourceChartMetric.memory,
-                    primaryColor: scheme.secondary,
-                    timeframe: _tf,
-                    onTimeframeChanged: (_) {},
-                    l10n: l10n,
-                    compact: true,
-                    chartHeight: 88,
-                    showTimeframeSelector: false,
-                  ),
+                  chartHeight: 120,
+                  showTimeframeSelector: false,
                 ),
               ),
-            ],
-          ),
-    );
-  }
-}
-
-class _SummaryRow extends StatelessWidget {
-  const _SummaryRow({
-    required this.label,
-    required this.value,
-    this.labelColor,
-    this.valueColor,
-  });
-
-  final String label;
-  final String value;
-  final Color? labelColor;
-  final Color? valueColor;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final labelStyle =
-        labelColor != null
-            ? Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: labelColor)
-            : Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant);
-    final valueStyle =
-        valueColor != null
-            ? Theme.of(context).textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: valueColor,
-            )
-            : Theme.of(
-              context,
-            ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600);
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: labelStyle),
-          Text(value, style: valueStyle),
-        ],
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: ChartCard(
+                title: l10n.metricMemory,
+                compact: true,
+                child: ResourceLineChart(
+                  data: points,
+                  metric: ResourceChartMetric.memory,
+                  primaryColor: scheme.secondary,
+                  timeframe: _tf,
+                  onTimeframeChanged: (_) {},
+                  l10n: l10n,
+                  compact: true,
+                  chartHeight: 120,
+                  showTimeframeSelector: false,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
+

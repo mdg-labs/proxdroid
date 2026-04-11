@@ -1,7 +1,7 @@
 name: proxdroid
 description: "A modern, open-source Android client for Proxmox Virtual Environment (PVE)."
 publish_to: 'none'
-version: 1.0.0-beta.11+1
+version: 1.0.0-beta.12+1
 
 environment:
   sdk: ^3.7.0
