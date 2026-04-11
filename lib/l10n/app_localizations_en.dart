@@ -492,6 +492,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get taskListLoadError => 'Could not load tasks.';
 
   @override
+  String get taskFilterByGuest => 'Filter by guest';
+
+  @override
+  String get taskFilterAllGuests => 'All guests';
+
+  @override
+  String get taskGuestFilterTitle => 'Guest';
+
+  @override
   String get taskRowGuest => 'Guest';
 
   @override

@@ -29,6 +29,11 @@ TaskStatus taskStatusFromApiString(Object? raw) {
     case 'stopped':
       return TaskStatus.ok;
     case 'error':
+    case 'failed':
+    case 'failure':
+    case 'aborted':
+    case 'canceled':
+    case 'cancelled':
       return TaskStatus.error;
     case 'unknown':
       return TaskStatus.unknown;
@@ -99,18 +104,34 @@ TaskStatus taskStatusFromApiData(dynamic data) {
   return TaskStatus.unknown;
 }
 
-/// Feeds [taskStatusFromApiString] for [Task.status] while coercing list rows
-/// where `status` is missing but `type` contains `TASK ERROR`.
+/// Derives a JSON value for [Task.status] from a [GET /nodes/{node}/tasks] row.
+///
+/// Order matches [taskStatusFromApiData]: in-flight rows use `status` only;
+/// for terminal rows, non-OK `exitstatus` overrides `stopped`→OK; then
+/// `TASK ERROR` in `type`; then plain `status` string mapping.
 Object? readTaskStatusJsonValue(Map json, String key) {
   final statusRaw = json['status'];
   final typeStr = proxmoxString(json['type']);
-  final fromStatus = taskStatusFromApiString(statusRaw);
-  if (fromStatus != TaskStatus.unknown) {
+  final exitRaw = json['exitstatus'];
+  final exitStr = exitRaw?.toString().trim() ?? '';
+
+  if (taskStatusFromApiString(statusRaw) == TaskStatus.running) {
     return statusRaw;
   }
+
+  if (exitStr.isNotEmpty && exitStr.toLowerCase() != 'ok') {
+    return 'error';
+  }
+
   if (typeStr.toLowerCase().contains('task error')) {
     return 'error';
   }
+
+  final statusStr = statusRaw?.toString().trim().toLowerCase();
+  if (statusStr == 'stopped') {
+    return 'ok';
+  }
+
   return statusRaw;
 }
 

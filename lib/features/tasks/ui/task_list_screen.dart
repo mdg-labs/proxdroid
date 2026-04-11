@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:proxdroid/app/theme/app_colors.dart';
 import 'package:proxdroid/app/theme/app_theme.dart';
 import 'package:proxdroid/core/models/container.dart' as px;
 import 'package:proxdroid/core/models/proxmox_guest_tag.dart';
@@ -41,7 +42,7 @@ class _TaskRow extends _Item {
 // Screen
 // ────────────────────────────────────────────────────────────────────────────
 
-class TaskListScreen extends ConsumerWidget {
+class TaskListScreen extends ConsumerStatefulWidget {
   const TaskListScreen({super.key});
 
   static StatusBadgeVariant _statusVariant(TaskStatus status) {
@@ -186,8 +187,70 @@ class TaskListScreen extends ConsumerWidget {
     return counts;
   }
 
+  static Map<int, String> _guestLabelsForFilter({
+    required List<Vm> vms,
+    required List<px.Container> containers,
+  }) {
+    final map = <int, String>{};
+    for (final v in vms) {
+      map[v.vmid] = v.name.isEmpty ? '${v.vmid}' : '${v.name} (${v.vmid})';
+    }
+    for (final c in containers) {
+      map.putIfAbsent(
+        c.vmid,
+        () => c.name.isEmpty ? '${c.vmid}' : '${c.name} (${c.vmid})',
+      );
+    }
+    return map;
+  }
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TaskListScreen> createState() => _TaskListScreenState();
+}
+
+class _TaskListScreenState extends ConsumerState<TaskListScreen> {
+  int? _guestVmidFilter;
+
+  Future<void> _refreshTasks() async {
+    ref.read(taskListProvider.notifier).refresh();
+    await ref.read(taskListProvider.future);
+  }
+
+  void _openGuestFilter({
+    required BuildContext context,
+    required AppLocalizations l10n,
+    required List<Vm> vms,
+    required List<px.Container> containers,
+  }) {
+    final raw = TaskListScreen._guestLabelsForFilter(
+      vms: vms,
+      containers: containers,
+    );
+    final entries =
+        raw.entries.toList()..sort(
+          (a, b) => a.value.toLowerCase().compareTo(b.value.toLowerCase()),
+        );
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (ctx) {
+        return _TaskGuestFilterSheet(
+          entries: entries,
+          selectedVmid: _guestVmidFilter,
+          l10n: l10n,
+          onSelect: (vmid) {
+            Navigator.of(ctx).pop();
+            setState(() => _guestVmidFilter = vmid);
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
@@ -201,15 +264,36 @@ class TaskListScreen extends ConsumerWidget {
         const <String, String>{};
     final minPullHeight = MediaQuery.sizeOf(context).height * 0.5;
 
-    Future<void> refreshTasks() async {
-      ref.read(taskListProvider.notifier).refresh();
-      await ref.read(taskListProvider.future);
-    }
+    final List<Widget>? appBarActions = tasksAsync.maybeWhen(
+      data: (tasks) {
+        if (tasks.isEmpty) return null;
+        return [
+          IconButton(
+            tooltip: l10n.taskFilterByGuest,
+            icon: Icon(
+              _guestVmidFilter != null
+                  ? Icons.filter_alt
+                  : Icons.filter_alt_outlined,
+              color:
+                  _guestVmidFilter != null ? scheme.primary : scheme.onSurface,
+            ),
+            onPressed:
+                () => _openGuestFilter(
+                  context: context,
+                  l10n: l10n,
+                  vms: vms,
+                  containers: containers,
+                ),
+          ),
+        ];
+      },
+      orElse: () => null,
+    );
 
     final body = tasksAsync.when(
       loading:
           () => RefreshIndicator(
-            onRefresh: refreshTasks,
+            onRefresh: _refreshTasks,
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
               children: [
@@ -226,7 +310,7 @@ class TaskListScreen extends ConsumerWidget {
           ),
       error:
           (e, _) => RefreshIndicator(
-            onRefresh: refreshTasks,
+            onRefresh: _refreshTasks,
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
               children: [
@@ -244,7 +328,7 @@ class TaskListScreen extends ConsumerWidget {
       data: (tasks) {
         if (tasks.isEmpty) {
           return RefreshIndicator(
-            onRefresh: refreshTasks,
+            onRefresh: _refreshTasks,
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
               children: [
@@ -261,15 +345,57 @@ class TaskListScreen extends ConsumerWidget {
           );
         }
 
-        final items = _buildItems(tasks, locale);
-        final statusCounts = _taskStatusCounts(tasks);
+        final filtered =
+            _guestVmidFilter == null
+                ? tasks
+                : tasks
+                    .where(
+                      (t) => vmidFromProxmoxUpid(t.upid) == _guestVmidFilter,
+                    )
+                    .toList();
+
+        final statusCounts = TaskListScreen._taskStatusCounts(filtered);
+
+        if (filtered.isEmpty) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: _refreshTasks,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(
+                        height: minPullHeight,
+                        child: EmptyState(
+                          icon: Icons.filter_alt_off_outlined,
+                          title: l10n.listFilteredEmptyTitle,
+                          message: l10n.listFilteredEmptyMessage,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              _TaskListStatusSummary(
+                counts: statusCounts,
+                l10n: l10n,
+                scheme: scheme,
+                tt: tt,
+              ),
+            ],
+          );
+        }
+
+        final items = TaskListScreen._buildItems(filtered, locale);
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
               child: RefreshIndicator(
-                onRefresh: refreshTasks,
+                onRefresh: _refreshTasks,
                 child: ListView.builder(
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding: const EdgeInsets.fromLTRB(
@@ -304,14 +430,14 @@ class TaskListScreen extends ConsumerWidget {
 
                     final task = (item as _TaskRow).task;
                     final vmid = vmidFromProxmoxUpid(task.upid);
-                    final guest = _guestLabel(
+                    final guest = TaskListScreen._guestLabel(
                       vmid: vmid,
                       taskNode: task.node,
                       vms: vms,
                       containers: containers,
                       l10n: l10n,
                     );
-                    final guestTags = _guestTagsForTask(
+                    final guestTags = TaskListScreen._guestTagsForTask(
                       vmid: vmid,
                       taskNode: task.node,
                       vms: vms,
@@ -329,7 +455,10 @@ class TaskListScreen extends ConsumerWidget {
                     }
                     final durationText =
                         start != null
-                            ? _formatDuration(start, task.endTime)
+                            ? TaskListScreen._formatDuration(
+                              start,
+                              task.endTime,
+                            )
                             : l10n.valueUnavailable;
 
                     return Padding(
@@ -341,8 +470,13 @@ class TaskListScreen extends ConsumerWidget {
                         clusterTagHexByLabel: tagColorMap,
                         startedText: startedText,
                         durationText: durationText,
-                        statusVariant: _statusVariant(task.status),
-                        statusLabel: _statusLabel(task.status, l10n),
+                        statusVariant: TaskListScreen._statusVariant(
+                          task.status,
+                        ),
+                        statusLabel: TaskListScreen._statusLabel(
+                          task.status,
+                          l10n,
+                        ),
                         l10n: l10n,
                         scheme: scheme,
                         tt: tt,
@@ -367,7 +501,125 @@ class TaskListScreen extends ConsumerWidget {
       },
     );
 
-    return ShellSectionBody(title: Text(l10n.sectionTasks), body: body);
+    return ShellSectionBody(
+      title: Text(l10n.sectionTasks),
+      actions: appBarActions,
+      body: body,
+    );
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Guest filter sheet
+// ────────────────────────────────────────────────────────────────────────────
+
+class _TaskGuestFilterSheet extends StatefulWidget {
+  const _TaskGuestFilterSheet({
+    required this.entries,
+    required this.selectedVmid,
+    required this.l10n,
+    required this.onSelect,
+  });
+
+  final List<MapEntry<int, String>> entries;
+  final int? selectedVmid;
+  final AppLocalizations l10n;
+  final ValueChanged<int?> onSelect;
+
+  @override
+  State<_TaskGuestFilterSheet> createState() => _TaskGuestFilterSheetState();
+}
+
+class _TaskGuestFilterSheetState extends State<_TaskGuestFilterSheet> {
+  final TextEditingController _query = TextEditingController();
+
+  @override
+  void dispose() {
+    _query.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+    final q = _query.text.trim().toLowerCase();
+    final filtered =
+        q.isEmpty
+            ? widget.entries
+            : widget.entries
+                .where((e) => e.value.toLowerCase().contains(q))
+                .toList();
+
+    final sheetHeight = MediaQuery.sizeOf(context).height * 0.62;
+
+    return SizedBox(
+      height: sheetHeight,
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.viewPaddingOf(context).bottom,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                0,
+                AppSpacing.lg,
+                AppSpacing.sm,
+              ),
+              child: Text(
+                widget.l10n.taskGuestFilterTitle,
+                style: tt.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+              child: TextField(
+                controller: _query,
+                decoration: InputDecoration(
+                  hintText: widget.l10n.taskFilterByGuest,
+                  prefixIcon: const Icon(Icons.search),
+                  isDense: true,
+                  filled: true,
+                  fillColor: scheme.surfaceContainerHighest,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: scheme.outlineVariant),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: scheme.outlineVariant),
+                  ),
+                ),
+                onChanged: (_) => setState(() {}),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Expanded(
+              child: ListView(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.clear_all),
+                    title: Text(widget.l10n.taskFilterAllGuests),
+                    selected: widget.selectedVmid == null,
+                    onTap: () => widget.onSelect(null),
+                  ),
+                  for (final e in filtered)
+                    ListTile(
+                      leading: const Icon(Icons.dns_outlined),
+                      title: Text(e.value),
+                      selected: widget.selectedVmid == e.key,
+                      onTap: () => widget.onSelect(e.key),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -388,67 +640,115 @@ class _TaskListStatusSummary extends StatelessWidget {
   final ColorScheme scheme;
   final TextTheme tt;
 
+  String _labelFor(TaskStatus s) => switch (s) {
+    TaskStatus.running => l10n.statusRunning,
+    TaskStatus.ok => l10n.taskStatusCompleted,
+    TaskStatus.error => l10n.taskStatusFailed,
+    TaskStatus.unknown => l10n.statusUnknown,
+  };
+
+  IconData _iconFor(TaskStatus s) => switch (s) {
+    TaskStatus.running => Icons.play_circle_outline,
+    TaskStatus.ok => Icons.check_circle_outline,
+    TaskStatus.error => Icons.error_outline,
+    TaskStatus.unknown => Icons.help_outline,
+  };
+
+  Color _iconColor(BuildContext context, TaskStatus s) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return switch (s) {
+      TaskStatus.running =>
+        isDark
+            ? AppColors.darkStatusRunningForeground
+            : AppColors.lightStatusRunningForeground,
+      TaskStatus.ok =>
+        isDark
+            ? AppColors.darkStatusSuccessForeground
+            : AppColors.lightStatusSuccessForeground,
+      TaskStatus.error => scheme.error,
+      TaskStatus.unknown => scheme.onSurfaceVariant,
+    };
+  }
+
+  Widget _segment(BuildContext context, TaskStatus status) {
+    final count = counts[status] ?? 0;
+    final opacity = count == 0 ? 0.4 : 1.0;
+    return Expanded(
+      child: Opacity(
+        opacity: opacity,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                _iconFor(status),
+                size: 22,
+                color: _iconColor(context, status),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                '$count',
+                style: tt.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: scheme.onSurface,
+                  height: 1.1,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                _labelFor(status),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: tt.labelSmall?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 10,
+                  height: 1.15,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    String labelFor(TaskStatus s) => switch (s) {
-      TaskStatus.running => l10n.statusRunning,
-      TaskStatus.ok => l10n.taskStatusCompleted,
-      TaskStatus.error => l10n.taskStatusFailed,
-      TaskStatus.unknown => l10n.statusUnknown,
-    };
-
-    final style = tt.labelSmall?.copyWith(
-      color: scheme.onSurfaceVariant,
-      fontWeight: FontWeight.w600,
-      fontSize: 11,
-    );
-    final sepStyle = style?.copyWith(
-      color: scheme.outlineVariant,
-      fontWeight: FontWeight.w400,
-    );
-
-    Widget cell(TaskStatus s) =>
-        Text('${labelFor(s)}: ${counts[s] ?? 0}', style: style);
-
-    Widget sep() => Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-      child: Text('·', style: sepStyle),
-    );
+    final bottomInset =
+        AppSpacing.md + MediaQuery.viewPaddingOf(context).bottom;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        AppSpacing.xs,
+      padding: EdgeInsets.fromLTRB(
         AppSpacing.lg,
         AppSpacing.sm,
+        AppSpacing.lg,
+        bottomInset,
       ),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: scheme.surfaceContainerHigh,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: scheme.outlineVariant.withValues(alpha: 0.35),
-            width: 0.5,
+            color: scheme.outlineVariant.withValues(alpha: 0.45),
+            width: 1,
           ),
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.sm,
+            horizontal: AppSpacing.sm,
+            vertical: AppSpacing.md,
           ),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                cell(TaskStatus.running),
-                sep(),
-                cell(TaskStatus.ok),
-                sep(),
-                cell(TaskStatus.error),
-                sep(),
-                cell(TaskStatus.unknown),
-              ],
-            ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _segment(context, TaskStatus.running),
+              _segment(context, TaskStatus.ok),
+              _segment(context, TaskStatus.error),
+              _segment(context, TaskStatus.unknown),
+            ],
           ),
         ),
       ),

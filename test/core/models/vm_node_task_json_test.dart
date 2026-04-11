@@ -85,6 +85,56 @@ void main() {
       };
       expect(Task.fromJson(map).status, TaskStatus.running);
     });
+
+    test('fromJson list row: stopped + TASK ERROR exitstatus → Failed', () {
+      final map = <String, dynamic>{
+        'upid': 'UPID:pve:1:2:3:vzdump:100:root@pam:',
+        'node': 'pve',
+        'type': 'vzdump',
+        'status': 'stopped',
+        'exitstatus': 'TASK ERROR: VM is locked',
+        'starttime': 1700000000,
+        'user': 'root@pam',
+      };
+      expect(Task.fromJson(map).status, TaskStatus.error);
+    });
+
+    test('fromJson list row: stopped + OK exitstatus → Completed', () {
+      final map = <String, dynamic>{
+        'upid': 'UPID:pve:1:2:3:vzdump:100:root@pam:',
+        'node': 'pve',
+        'type': 'vzdump',
+        'status': 'stopped',
+        'exitstatus': 'OK',
+        'starttime': 1700000000,
+        'user': 'root@pam',
+      };
+      expect(Task.fromJson(map).status, TaskStatus.ok);
+    });
+
+    test('fromJson list row: stopped + missing exitstatus → Completed', () {
+      final map = <String, dynamic>{
+        'upid': 'UPID:pve:1:2:3:vzdump:100:root@pam:',
+        'node': 'pve',
+        'type': 'vzdump',
+        'status': 'stopped',
+        'starttime': 1700000000,
+        'user': 'root@pam',
+      };
+      expect(Task.fromJson(map).status, TaskStatus.ok);
+    });
+
+    test('fromJson list row: failed status → Failed', () {
+      final map = <String, dynamic>{
+        'upid': 'UPID:pve:1:2:3:qmstart:101:root@pam:',
+        'node': 'pve',
+        'type': 'qmstart',
+        'status': 'failed',
+        'starttime': 1700000000,
+        'user': 'root@pam',
+      };
+      expect(Task.fromJson(map).status, TaskStatus.error);
+    });
   });
 
   group('taskStatusFromApiData', () {

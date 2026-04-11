@@ -646,6 +646,18 @@
   "@taskListLoadError": {
     "description": "Error when task list fails to load."
   },
+  "taskFilterByGuest": "Filter by guest",
+  "@taskFilterByGuest": {
+    "description": "Tooltip / label for opening the task list guest filter."
+  },
+  "taskFilterAllGuests": "All guests",
+  "@taskFilterAllGuests": {
+    "description": "Clears the task list guest filter to show every guest."
+  },
+  "taskGuestFilterTitle": "Guest",
+  "@taskGuestFilterTitle": {
+    "description": "Title for the task list guest filter bottom sheet."
+  },
   "taskRowGuest": "Guest",
   "@taskRowGuest": {
     "description": "Label for resolved VM/CT name or ID in task row."

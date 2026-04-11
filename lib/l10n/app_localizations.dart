@@ -988,6 +988,24 @@ abstract class AppLocalizations {
   /// **'Could not load tasks.'**
   String get taskListLoadError;
 
+  /// Tooltip / label for opening the task list guest filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter by guest'**
+  String get taskFilterByGuest;
+
+  /// Clears the task list guest filter to show every guest.
+  ///
+  /// In en, this message translates to:
+  /// **'All guests'**
+  String get taskFilterAllGuests;
+
+  /// Title for the task list guest filter bottom sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest'**
+  String get taskGuestFilterTitle;
+
   /// Label for resolved VM/CT name or ID in task row.
   ///
   /// In en, this message translates to:
