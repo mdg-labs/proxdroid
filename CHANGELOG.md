@@ -7,9 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-beta.17] - 2026-04-11
+
 ### Security
 
 - Self-signed TLS now uses a stored leaf certificate SHA-256 pin (`pinnedTlsSha256`) with a fetch action in the server editor; release Android builds use R8 shrinking, optional Dart obfuscation in CI, stricter Gradle release signing, `FLAG_SECURE` on server credential screens, disabled ADB backup, Dio send timeout, and redacted verbose connection diagnostics.
+
+### Added
+
+- VM and LXC creation and editing.
+- Expanded VM and LXC config editor functionality with improved data handling.
+
+### Changed
+
+- Task status handling for PVE list rows.
+
+### Internal
+
+- Bumped version to `1.0.0-beta.17+1` in `pubspec.yaml`.
+- Updated architecture documentation, configuration models, and VM/LXC config editor roadmap planning.
 
 ## [1.0.0-beta.16] - 2026-04-11
 
@@ -180,7 +196,8 @@ First public **beta** prerelease on GitHub Releases (APK via CI).
 - GitHub Actions: release workflow runs only on beta prerelease tags (`v*-beta*`) and
   publishes GitHub **prereleases** with the release APK.
 
-[Unreleased]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.16...HEAD
+[Unreleased]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.17...HEAD
+[1.0.0-beta.17]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.16...v1.0.0-beta.17
 [1.0.0-beta.16]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.15...v1.0.0-beta.16
 [1.0.0-beta.15]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.14...v1.0.0-beta.15
 [1.0.0-beta.14]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.13%2B1...v1.0.0-beta.14
