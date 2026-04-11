@@ -57,5 +57,76 @@ void main() {
       expect(again, task);
       expect(task.status, TaskStatus.running);
     });
+
+    test('fromJson maps TASK ERROR in type to Failed when status missing', () {
+      final map = <String, dynamic>{
+        'upid': 'UPID:x:1:2',
+        'node': 'pve',
+        'type': 'TASK ERROR: VM is locked (backup)',
+        'starttime': 1700000000,
+        'user': 'root@pam',
+      };
+      final task = Task.fromJson(map);
+      expect(task.status, TaskStatus.error);
+      expect(task.type, 'TASK ERROR: VM is locked (backup)');
+    });
+
+    test('fromJson keeps explicit status when present', () {
+      final map = <String, dynamic>{
+        'upid': 'UPID:x:1:2',
+        'node': 'pve',
+        'type': 'TASK ERROR: should not matter',
+        'status': 'running',
+        'starttime': 1700000000,
+        'user': 'root@pam',
+      };
+      expect(Task.fromJson(map).status, TaskStatus.running);
+    });
+  });
+
+  group('taskStatusFromApiData', () {
+    test('stopped + OK exitstatus → ok', () {
+      expect(
+        taskStatusFromApiData(<String, dynamic>{
+          'status': 'stopped',
+          'exitstatus': 'OK',
+        }),
+        TaskStatus.ok,
+      );
+    });
+
+    test('stopped + lowercase ok exitstatus → ok', () {
+      expect(
+        taskStatusFromApiData(<String, dynamic>{
+          'status': 'stopped',
+          'exitstatus': 'ok',
+        }),
+        TaskStatus.ok,
+      );
+    });
+
+    test('stopped + missing exitstatus → ok', () {
+      expect(
+        taskStatusFromApiData(<String, dynamic>{'status': 'stopped'}),
+        TaskStatus.ok,
+      );
+    });
+
+    test('stopped + TASK ERROR exitstatus → error', () {
+      expect(
+        taskStatusFromApiData(<String, dynamic>{
+          'status': 'stopped',
+          'exitstatus': 'TASK ERROR: VM is locked (backup)',
+        }),
+        TaskStatus.error,
+      );
+    });
+
+    test('running → running', () {
+      expect(
+        taskStatusFromApiData(<String, dynamic>{'status': 'running'}),
+        TaskStatus.running,
+      );
+    });
   });
 }

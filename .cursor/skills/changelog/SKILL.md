@@ -45,6 +45,53 @@ Strip the leading `v` to compare to changelog headings (e.g. `v1.0.0-beta.1` →
 - Collect every `## [x.y.z…]` heading (including `[Unreleased]` — do not treat it as a released tag).
 - Normalize: heading text inside brackets is the version key.
 
+
+### 2b. pubspec version check
+
+Read `pubspec.yaml` and extract the `version:` field. Strip any build metadata after `+` (e.g. `1.0.0-beta.15+3` → use `1.0.0-beta.15` as the version key). Compare it against the latest tag from the `version:refname`-sorted tag list.
+
+**If pubspec version == latest tag version:** nothing to do here — continue to Step 3 normally.
+
+**⚠️ If pubspec version is ahead of all tags — promote `[Unreleased]` automatically:**
+
+Do not ask for confirmation. Execute the following immediately.
+
+Determine which scenario applies:
+
+- **Scenario A — next pre-release** (e.g. pubspec is `1.0.0-beta.15`, latest tag is `v1.0.0-beta.14`): the pre-release identifier is the same base type (both `beta`, both `rc`, etc.).
+- **Scenario B — stable release** (e.g. pubspec is `1.0.0` or `2.0.0`, latest tag is any pre-release of that same base version): pubspec version has no pre-release suffix.
+
+**Scenario A — collect and promote:**
+
+1. Collect all commits since the latest tag that are not yet tagged:
+
+   ```bash
+   git log <latest_tag>..HEAD --no-merges --pretty=format:'- %s'
+   ```
+
+2. Apply the same commit classification rules from Step 4 (maintenance vs. user-facing buckets, `### Internal`, version-bump-only fallback).
+3. Use today's date (`date +%Y-%m-%d`) as the release date.
+4. Rename `## [Unreleased]` to `## [<pubspec-version>] - <today>` and replace its content with the freshly collected and classified commits. If `[Unreleased]` already had bullets, merge them with the newly collected commits — deduplicate, do not double-count.
+5. Insert a new empty `## [Unreleased]` section above the promoted section with no bullets.
+6. Update the footer diff links: `[Unreleased]` → `compare/v<pubspec-version>...HEAD`; add `[<pubspec-version>]` → `compare/<latest_tag>...v<pubspec-version>`.
+
+**Scenario B — stable release summary:**
+
+1. Identify all beta/pre-release sections in `CHANGELOG.md` that belong to this stable version (e.g. for `1.0.0`: collect all `## [1.0.0-beta.*]`, `## [1.0.0-rc.*]` sections, in chronological order oldest-first).
+2. Collect all commits since the tag that preceded the first of those pre-releases all the way to HEAD:
+
+   ```bash
+   git log <tag-before-first-prerelease>..HEAD --no-merges --pretty=format:'- %s'
+   ```
+
+3. Apply commit classification (Step 4 rules). Then additionally deduplicate against bullets already present across the collected pre-release sections — prefer the existing human-curated wording over the raw git subject when the same change appears in both.
+4. Produce a single `## [<pubspec-version>] - <today>` section with a one-line summary (e.g. `First stable release.`) followed by the merged, deduplicated, classified bullets.
+5. Do not remove the existing beta sections — keep them below the new stable section so the history is preserved.
+6. Rename `## [Unreleased]` to the new stable version section and insert a fresh empty `## [Unreleased]` above it, exactly as in Scenario A steps 4–5.
+7. Update footer diff links: `[Unreleased]` → `compare/v<pubspec-version>...HEAD`; add `[<pubspec-version>]` → `compare/<tag-before-first-prerelease>...v<pubspec-version>`.
+
+After completing either scenario, continue to Step 3 to handle any remaining backfill gaps as usual.
+
 ### 3. Compare and classify
 
 > **⚠️ Early exit — no tags found:**  
@@ -144,7 +191,6 @@ Resolve `OWNER` and `REPO` from `git remote get-url origin` (support both `https
 ### 5. Consistency pass
 
 - Re-read `CHANGELOG.md` for duplicate sections or duplicate bullets across `[Unreleased]` and a new section.
-- If `pubspec.yaml` documents a version that now matches a **new** tag the user just pushed, offer to **rename** `[Unreleased]` content into `## [that version] - date` **only** when the user explicitly asked to “cut” or “finalize” that release; otherwise leave `[Unreleased]` as the working bucket.
 
 ### 6. Finish
 

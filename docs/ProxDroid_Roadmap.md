@@ -254,6 +254,8 @@
 
 ### 3.5 Task Viewer UI
 - [x] Build `TaskListScreen` – list of all tasks, newest first
+- [x] Sticky bottom status summary on the task list (counts per task status), above the shell bottom nav
+- [x] Task status parsing: `GET .../tasks/{upid}/status` uses `stopped` + `exitstatus` (non-OK → Failed); list rows with `TASK ERROR` in `type` map to Failed when `status` is missing or unknown
 - [x] Each task row: type, VMID (decoded from UPID), status badge, start time, duration
   - Note: `Task.upid` encodes the node, type, PID, and VMID — parse the UPID to extract VMID, then resolve VMID → name via the VM/container list; if the VM no longer exists, fall back to displaying the raw VMID
 - [x] Color-code status: running (blue), ok (green), error (red)

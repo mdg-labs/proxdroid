@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Task {
 
-@JsonKey(fromJson: _taskUpidFromJson) String get upid;@JsonKey(fromJson: _taskNodeFromJson) String get node;@JsonKey(fromJson: _taskTypeFromJson) String get type;@JsonKey(fromJson: _taskStatusFromJson, toJson: _taskStatusToJson) TaskStatus get status;@JsonKey(name: 'starttime', fromJson: proxmoxInt) int? get startTime;@JsonKey(name: 'endtime', fromJson: proxmoxInt) int? get endTime;@JsonKey(fromJson: proxmoxString) String get user;
+@JsonKey(fromJson: _taskUpidFromJson) String get upid;@JsonKey(fromJson: _taskNodeFromJson) String get node;@JsonKey(fromJson: _taskTypeFromJson) String get type;@JsonKey(readValue: readTaskStatusJsonValue, fromJson: _taskStatusFromJson, toJson: _taskStatusToJson) TaskStatus get status;@JsonKey(name: 'starttime', fromJson: proxmoxInt) int? get startTime;@JsonKey(name: 'endtime', fromJson: proxmoxInt) int? get endTime;@JsonKey(fromJson: proxmoxString) String get user;
 /// Create a copy of Task
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $TaskCopyWith<$Res>  {
   factory $TaskCopyWith(Task value, $Res Function(Task) _then) = _$TaskCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(fromJson: _taskUpidFromJson) String upid,@JsonKey(fromJson: _taskNodeFromJson) String node,@JsonKey(fromJson: _taskTypeFromJson) String type,@JsonKey(fromJson: _taskStatusFromJson, toJson: _taskStatusToJson) TaskStatus status,@JsonKey(name: 'starttime', fromJson: proxmoxInt) int? startTime,@JsonKey(name: 'endtime', fromJson: proxmoxInt) int? endTime,@JsonKey(fromJson: proxmoxString) String user
+@JsonKey(fromJson: _taskUpidFromJson) String upid,@JsonKey(fromJson: _taskNodeFromJson) String node,@JsonKey(fromJson: _taskTypeFromJson) String type,@JsonKey(readValue: readTaskStatusJsonValue, fromJson: _taskStatusFromJson, toJson: _taskStatusToJson) TaskStatus status,@JsonKey(name: 'starttime', fromJson: proxmoxInt) int? startTime,@JsonKey(name: 'endtime', fromJson: proxmoxInt) int? endTime,@JsonKey(fromJson: proxmoxString) String user
 });
 
 
@@ -156,7 +156,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(fromJson: _taskUpidFromJson)  String upid, @JsonKey(fromJson: _taskNodeFromJson)  String node, @JsonKey(fromJson: _taskTypeFromJson)  String type, @JsonKey(fromJson: _taskStatusFromJson, toJson: _taskStatusToJson)  TaskStatus status, @JsonKey(name: 'starttime', fromJson: proxmoxInt)  int? startTime, @JsonKey(name: 'endtime', fromJson: proxmoxInt)  int? endTime, @JsonKey(fromJson: proxmoxString)  String user)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(fromJson: _taskUpidFromJson)  String upid, @JsonKey(fromJson: _taskNodeFromJson)  String node, @JsonKey(fromJson: _taskTypeFromJson)  String type, @JsonKey(readValue: readTaskStatusJsonValue, fromJson: _taskStatusFromJson, toJson: _taskStatusToJson)  TaskStatus status, @JsonKey(name: 'starttime', fromJson: proxmoxInt)  int? startTime, @JsonKey(name: 'endtime', fromJson: proxmoxInt)  int? endTime, @JsonKey(fromJson: proxmoxString)  String user)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Task() when $default != null:
 return $default(_that.upid,_that.node,_that.type,_that.status,_that.startTime,_that.endTime,_that.user);case _:
@@ -177,7 +177,7 @@ return $default(_that.upid,_that.node,_that.type,_that.status,_that.startTime,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(fromJson: _taskUpidFromJson)  String upid, @JsonKey(fromJson: _taskNodeFromJson)  String node, @JsonKey(fromJson: _taskTypeFromJson)  String type, @JsonKey(fromJson: _taskStatusFromJson, toJson: _taskStatusToJson)  TaskStatus status, @JsonKey(name: 'starttime', fromJson: proxmoxInt)  int? startTime, @JsonKey(name: 'endtime', fromJson: proxmoxInt)  int? endTime, @JsonKey(fromJson: proxmoxString)  String user)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(fromJson: _taskUpidFromJson)  String upid, @JsonKey(fromJson: _taskNodeFromJson)  String node, @JsonKey(fromJson: _taskTypeFromJson)  String type, @JsonKey(readValue: readTaskStatusJsonValue, fromJson: _taskStatusFromJson, toJson: _taskStatusToJson)  TaskStatus status, @JsonKey(name: 'starttime', fromJson: proxmoxInt)  int? startTime, @JsonKey(name: 'endtime', fromJson: proxmoxInt)  int? endTime, @JsonKey(fromJson: proxmoxString)  String user)  $default,) {final _that = this;
 switch (_that) {
 case _Task():
 return $default(_that.upid,_that.node,_that.type,_that.status,_that.startTime,_that.endTime,_that.user);}
@@ -194,7 +194,7 @@ return $default(_that.upid,_that.node,_that.type,_that.status,_that.startTime,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(fromJson: _taskUpidFromJson)  String upid, @JsonKey(fromJson: _taskNodeFromJson)  String node, @JsonKey(fromJson: _taskTypeFromJson)  String type, @JsonKey(fromJson: _taskStatusFromJson, toJson: _taskStatusToJson)  TaskStatus status, @JsonKey(name: 'starttime', fromJson: proxmoxInt)  int? startTime, @JsonKey(name: 'endtime', fromJson: proxmoxInt)  int? endTime, @JsonKey(fromJson: proxmoxString)  String user)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(fromJson: _taskUpidFromJson)  String upid, @JsonKey(fromJson: _taskNodeFromJson)  String node, @JsonKey(fromJson: _taskTypeFromJson)  String type, @JsonKey(readValue: readTaskStatusJsonValue, fromJson: _taskStatusFromJson, toJson: _taskStatusToJson)  TaskStatus status, @JsonKey(name: 'starttime', fromJson: proxmoxInt)  int? startTime, @JsonKey(name: 'endtime', fromJson: proxmoxInt)  int? endTime, @JsonKey(fromJson: proxmoxString)  String user)?  $default,) {final _that = this;
 switch (_that) {
 case _Task() when $default != null:
 return $default(_that.upid,_that.node,_that.type,_that.status,_that.startTime,_that.endTime,_that.user);case _:
@@ -209,13 +209,13 @@ return $default(_that.upid,_that.node,_that.type,_that.status,_that.startTime,_t
 @JsonSerializable()
 
 class _Task implements Task {
-  const _Task({@JsonKey(fromJson: _taskUpidFromJson) required this.upid, @JsonKey(fromJson: _taskNodeFromJson) required this.node, @JsonKey(fromJson: _taskTypeFromJson) required this.type, @JsonKey(fromJson: _taskStatusFromJson, toJson: _taskStatusToJson) required this.status, @JsonKey(name: 'starttime', fromJson: proxmoxInt) this.startTime, @JsonKey(name: 'endtime', fromJson: proxmoxInt) this.endTime, @JsonKey(fromJson: proxmoxString) this.user = ''});
+  const _Task({@JsonKey(fromJson: _taskUpidFromJson) required this.upid, @JsonKey(fromJson: _taskNodeFromJson) required this.node, @JsonKey(fromJson: _taskTypeFromJson) required this.type, @JsonKey(readValue: readTaskStatusJsonValue, fromJson: _taskStatusFromJson, toJson: _taskStatusToJson) required this.status, @JsonKey(name: 'starttime', fromJson: proxmoxInt) this.startTime, @JsonKey(name: 'endtime', fromJson: proxmoxInt) this.endTime, @JsonKey(fromJson: proxmoxString) this.user = ''});
   factory _Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
 
 @override@JsonKey(fromJson: _taskUpidFromJson) final  String upid;
 @override@JsonKey(fromJson: _taskNodeFromJson) final  String node;
 @override@JsonKey(fromJson: _taskTypeFromJson) final  String type;
-@override@JsonKey(fromJson: _taskStatusFromJson, toJson: _taskStatusToJson) final  TaskStatus status;
+@override@JsonKey(readValue: readTaskStatusJsonValue, fromJson: _taskStatusFromJson, toJson: _taskStatusToJson) final  TaskStatus status;
 @override@JsonKey(name: 'starttime', fromJson: proxmoxInt) final  int? startTime;
 @override@JsonKey(name: 'endtime', fromJson: proxmoxInt) final  int? endTime;
 @override@JsonKey(fromJson: proxmoxString) final  String user;
@@ -253,7 +253,7 @@ abstract mixin class _$TaskCopyWith<$Res> implements $TaskCopyWith<$Res> {
   factory _$TaskCopyWith(_Task value, $Res Function(_Task) _then) = __$TaskCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(fromJson: _taskUpidFromJson) String upid,@JsonKey(fromJson: _taskNodeFromJson) String node,@JsonKey(fromJson: _taskTypeFromJson) String type,@JsonKey(fromJson: _taskStatusFromJson, toJson: _taskStatusToJson) TaskStatus status,@JsonKey(name: 'starttime', fromJson: proxmoxInt) int? startTime,@JsonKey(name: 'endtime', fromJson: proxmoxInt) int? endTime,@JsonKey(fromJson: proxmoxString) String user
+@JsonKey(fromJson: _taskUpidFromJson) String upid,@JsonKey(fromJson: _taskNodeFromJson) String node,@JsonKey(fromJson: _taskTypeFromJson) String type,@JsonKey(readValue: readTaskStatusJsonValue, fromJson: _taskStatusFromJson, toJson: _taskStatusToJson) TaskStatus status,@JsonKey(name: 'starttime', fromJson: proxmoxInt) int? startTime,@JsonKey(name: 'endtime', fromJson: proxmoxInt) int? endTime,@JsonKey(fromJson: proxmoxString) String user
 });
 
 

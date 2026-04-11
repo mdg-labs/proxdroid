@@ -148,6 +148,19 @@ class TaskListScreen extends ConsumerWidget {
     return items;
   }
 
+  static Map<TaskStatus, int> _taskStatusCounts(List<Task> tasks) {
+    final counts = <TaskStatus, int>{
+      TaskStatus.running: 0,
+      TaskStatus.ok: 0,
+      TaskStatus.error: 0,
+      TaskStatus.unknown: 0,
+    };
+    for (final t in tasks) {
+      counts[t.status] = counts[t.status]! + 1;
+    }
+    return counts;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
@@ -221,88 +234,189 @@ class TaskListScreen extends ConsumerWidget {
         }
 
         final items = _buildItems(tasks, locale);
+        final statusCounts = _taskStatusCounts(tasks);
 
-        return RefreshIndicator(
-          onRefresh: refreshTasks,
-          child: ListView.builder(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg,
-              AppSpacing.sm,
-              AppSpacing.lg,
-              AppSpacing.lg,
-            ),
-            itemCount: items.length,
-            itemBuilder: (context, index) {
-              final item = items[index];
-
-              if (item is _DateHeader) {
-                return Padding(
-                  padding: EdgeInsets.only(
-                    top: index == 0 ? AppSpacing.xs : AppSpacing.xl,
-                    bottom: AppSpacing.sm,
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: refreshTasks,
+                child: ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    AppSpacing.sm,
+                    AppSpacing.lg,
+                    AppSpacing.sm,
                   ),
-                  child: Text(
-                    item.label,
-                    style: tt.labelSmall?.copyWith(
-                      color: scheme.onSurfaceVariant.withValues(alpha: 0.65),
-                      fontWeight: FontWeight.w700,
-                      fontSize: 10,
-                      letterSpacing: 1.3,
-                    ),
-                  ),
-                );
-              }
+                  itemCount: items.length,
+                  itemBuilder: (context, index) {
+                    final item = items[index];
 
-              final task = (item as _TaskRow).task;
-              final vmid = vmidFromProxmoxUpid(task.upid);
-              final guest = _guestLabel(
-                vmid: vmid,
-                taskNode: task.node,
-                vms: vms,
-                containers: containers,
-                l10n: l10n,
-              );
-              final start = task.startTime;
-              String startedText = l10n.valueUnavailable;
-              if (start != null) {
-                final dt =
-                    DateTime.fromMillisecondsSinceEpoch(
-                      start * 1000,
-                      isUtc: true,
-                    ).toLocal();
-                startedText = DateFormat.jm(locale).format(dt);
-              }
-              final durationText =
-                  start != null
-                      ? _formatDuration(start, task.endTime)
-                      : l10n.valueUnavailable;
+                    if (item is _DateHeader) {
+                      return Padding(
+                        padding: EdgeInsets.only(
+                          top: index == 0 ? AppSpacing.xs : AppSpacing.xl,
+                          bottom: AppSpacing.sm,
+                        ),
+                        child: Text(
+                          item.label,
+                          style: tt.labelSmall?.copyWith(
+                            color: scheme.onSurfaceVariant.withValues(
+                              alpha: 0.65,
+                            ),
+                            fontWeight: FontWeight.w700,
+                            fontSize: 10,
+                            letterSpacing: 1.3,
+                          ),
+                        ),
+                      );
+                    }
 
-              return Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                child: _TaskTile(
-                  task: task,
-                  guest: guest,
-                  startedText: startedText,
-                  durationText: durationText,
-                  statusVariant: _statusVariant(task.status),
-                  statusLabel: _statusLabel(task.status, l10n),
-                  l10n: l10n,
-                  scheme: scheme,
-                  tt: tt,
-                  onTap:
-                      () => context.push(
-                        '/tasks/${Uri.encodeComponent(task.node)}/${Uri.encodeComponent(task.upid)}',
+                    final task = (item as _TaskRow).task;
+                    final vmid = vmidFromProxmoxUpid(task.upid);
+                    final guest = _guestLabel(
+                      vmid: vmid,
+                      taskNode: task.node,
+                      vms: vms,
+                      containers: containers,
+                      l10n: l10n,
+                    );
+                    final start = task.startTime;
+                    String startedText = l10n.valueUnavailable;
+                    if (start != null) {
+                      final dt =
+                          DateTime.fromMillisecondsSinceEpoch(
+                            start * 1000,
+                            isUtc: true,
+                          ).toLocal();
+                      startedText = DateFormat.jm(locale).format(dt);
+                    }
+                    final durationText =
+                        start != null
+                            ? _formatDuration(start, task.endTime)
+                            : l10n.valueUnavailable;
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                      child: _TaskTile(
+                        task: task,
+                        guest: guest,
+                        startedText: startedText,
+                        durationText: durationText,
+                        statusVariant: _statusVariant(task.status),
+                        statusLabel: _statusLabel(task.status, l10n),
+                        l10n: l10n,
+                        scheme: scheme,
+                        tt: tt,
+                        onTap:
+                            () => context.push(
+                              '/tasks/${Uri.encodeComponent(task.node)}/${Uri.encodeComponent(task.upid)}',
+                            ),
                       ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
+              ),
+            ),
+            _TaskListStatusSummary(
+              counts: statusCounts,
+              l10n: l10n,
+              scheme: scheme,
+              tt: tt,
+            ),
+          ],
         );
       },
     );
 
     return ShellSectionBody(title: Text(l10n.sectionTasks), body: body);
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Sticky status counts (non-scrolling; sits above shell bottom nav)
+// ────────────────────────────────────────────────────────────────────────────
+
+class _TaskListStatusSummary extends StatelessWidget {
+  const _TaskListStatusSummary({
+    required this.counts,
+    required this.l10n,
+    required this.scheme,
+    required this.tt,
+  });
+
+  final Map<TaskStatus, int> counts;
+  final AppLocalizations l10n;
+  final ColorScheme scheme;
+  final TextTheme tt;
+
+  @override
+  Widget build(BuildContext context) {
+    String labelFor(TaskStatus s) => switch (s) {
+      TaskStatus.running => l10n.statusRunning,
+      TaskStatus.ok => l10n.taskStatusCompleted,
+      TaskStatus.error => l10n.taskStatusFailed,
+      TaskStatus.unknown => l10n.statusUnknown,
+    };
+
+    final style = tt.labelSmall?.copyWith(
+      color: scheme.onSurfaceVariant,
+      fontWeight: FontWeight.w600,
+      fontSize: 11,
+    );
+    final sepStyle = style?.copyWith(
+      color: scheme.outlineVariant,
+      fontWeight: FontWeight.w400,
+    );
+
+    Widget cell(TaskStatus s) =>
+        Text('${labelFor(s)}: ${counts[s] ?? 0}', style: style);
+
+    Widget sep() => Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+      child: Text('·', style: sepStyle),
+    );
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.xs,
+        AppSpacing.lg,
+        AppSpacing.sm,
+      ),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerHigh,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: scheme.outlineVariant.withValues(alpha: 0.35),
+            width: 0.5,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                cell(TaskStatus.running),
+                sep(),
+                cell(TaskStatus.ok),
+                sep(),
+                cell(TaskStatus.error),
+                sep(),
+                cell(TaskStatus.unknown),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 

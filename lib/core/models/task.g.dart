@@ -10,7 +10,7 @@ _Task _$TaskFromJson(Map<String, dynamic> json) => _Task(
   upid: _taskUpidFromJson(json['upid']),
   node: _taskNodeFromJson(json['node']),
   type: _taskTypeFromJson(json['type']),
-  status: _taskStatusFromJson(json['status']),
+  status: _taskStatusFromJson(readTaskStatusJsonValue(json, 'status')),
   startTime: proxmoxInt(json['starttime']),
   endTime: proxmoxInt(json['endtime']),
   user: json['user'] == null ? '' : proxmoxString(json['user']),

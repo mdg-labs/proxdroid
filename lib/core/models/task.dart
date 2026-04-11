@@ -71,15 +71,47 @@ String _taskTypeFromJson(Object? json) {
 }
 
 /// Parses `data` from [GET /nodes/{node}/tasks/{upid}/status] when it is a
-/// plain string or a map containing `status`.
+/// plain string or a map containing `status` / `exitstatus`.
+///
+/// PVE uses `status`: `running` | `stopped` for this endpoint; success vs
+/// failure is in optional `exitstatus` (`OK` vs a message such as `TASK ERROR:`).
 TaskStatus taskStatusFromApiData(dynamic data) {
   if (data == null) return TaskStatus.unknown;
   if (data is String) return taskStatusFromApiString(data);
   if (data is Map) {
-    final status = data['status'];
-    if (status != null) return taskStatusFromApiString(status);
+    final statusVal = data['status'];
+    final statusStr = statusVal?.toString().trim().toLowerCase();
+    if (statusStr == 'stopped') {
+      final exit = data['exitstatus'];
+      final exitStr = exit?.toString().trim() ?? '';
+      if (exitStr.isEmpty || exitStr.toLowerCase() == 'ok') {
+        return TaskStatus.ok;
+      }
+      return TaskStatus.error;
+    }
+    if (statusStr == 'running') {
+      return TaskStatus.running;
+    }
+    if (statusVal != null) {
+      return taskStatusFromApiString(statusVal);
+    }
   }
   return TaskStatus.unknown;
+}
+
+/// Feeds [taskStatusFromApiString] for [Task.status] while coercing list rows
+/// where `status` is missing but `type` contains `TASK ERROR`.
+Object? readTaskStatusJsonValue(Map json, String key) {
+  final statusRaw = json['status'];
+  final typeStr = proxmoxString(json['type']);
+  final fromStatus = taskStatusFromApiString(statusRaw);
+  if (fromStatus != TaskStatus.unknown) {
+    return statusRaw;
+  }
+  if (typeStr.toLowerCase().contains('task error')) {
+    return 'error';
+  }
+  return statusRaw;
 }
 
 @freezed
@@ -88,7 +120,11 @@ sealed class Task with _$Task {
     @JsonKey(fromJson: _taskUpidFromJson) required String upid,
     @JsonKey(fromJson: _taskNodeFromJson) required String node,
     @JsonKey(fromJson: _taskTypeFromJson) required String type,
-    @JsonKey(fromJson: _taskStatusFromJson, toJson: _taskStatusToJson)
+    @JsonKey(
+      readValue: readTaskStatusJsonValue,
+      fromJson: _taskStatusFromJson,
+      toJson: _taskStatusToJson,
+    )
     required TaskStatus status,
     @JsonKey(name: 'starttime', fromJson: proxmoxInt) int? startTime,
     @JsonKey(name: 'endtime', fromJson: proxmoxInt) int? endTime,
