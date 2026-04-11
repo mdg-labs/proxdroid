@@ -73,9 +73,9 @@ Otherwise:
 - Follow [Keep a Changelog](https://keepachangelog.com/en/1.0.0/): `Added`, `Changed`, `Fixed`, `Removed`, `Security` as appropriate; use **past tense**, imperative-style bullets, one idea per line.
 - **Do not invent** user-visible product copy. For backfills, prefer:
   - **`### Changed`** (or `### Added`) with bullets derived from **merge commit subjects** or **conventional** `feat:` / `fix:` lines when present, or
-  - a single **`### Notes (from git)`** subsection with a short `git log` summary **only** when human-style grouping is impossible — label it so maintainers can rewrite later.
+  - **`### Notes (from git)`** subsection **only** when user-facing commits exist but their subjects are too terse or ambiguous to group into standard categories — label it so maintainers can rewrite later. Never use `### Notes (from git)` for version-bump-only tags; use `### Changed` / `- Version bump; no user-visible changes.` for those instead.
 
-**Squash merges (GitHub):** If the project relies on **squash-merge** PRs, `git log … --no-merges` can drop the **only** commit that carries the squashed PR description (depending on how the tag points at history). In that case, either **omit `--no-merges`** and curate noisy output manually, or run a **second pass** such as `git log <range> --merges --pretty=format:'- %s (%h)'` and merge sensible bullets with the first pass.
+**Squash merges (GitHub):** If the project relies on **squash-merge** PRs, `git log … --no-merges` can drop the **only** commit that carries the squashed PR description (depending on how the tag points at history). In that case, either **omit `--no-merges`** and curate noisy output manually, or run a **second pass** such as `git log <range> --merges --pretty=format:'- %s'` and merge sensible bullets with the first pass.
 
 **For each missing tag** (oldest gap first, to preserve chronological order in the file):
 
@@ -83,18 +83,36 @@ Otherwise:
 2. Collect commits:
 
    ```bash
-   git log <prev_tag>..<tag> --no-merges --pretty=format:'- %s (%h)'
+   git log <prev_tag>..<tag> --no-merges --pretty=format:'- %s'
    ```
 
    If there is no previous tag:
 
    ```bash
-   git log <tag> --no-merges --pretty=format:'- %s (%h)'
+   git log <tag> --no-merges --pretty=format:'- %s'
    ```
 
    For repos with a **very long** initial history, this can be large — the maintainer should **manually trim or summarize** older commits in `CHANGELOG.md` after the agent’s pass; do not cap with an arbitrary commit count.
 
-3. Insert a new section **below `[Unreleased]`** and **above the next older documented release**, using:
+3. **Classify commits** before writing any bullets. Split the raw list into two buckets:
+
+   - **Maintenance commits** — subjects matching any of the following patterns (case-insensitive):
+     - `dart format`, `flutter format`
+     - `build_runner`, `code gen`, `codegen`
+     - `analyzer`, `lint`, `linting`
+     - `unused import`, `unused variable`, `remove unused`
+     - `test fix`, `fix test`, `align test`, `update test`, `golden`
+     - `version bump`, `bump version`, `chore(release)`, `chore: update version`, `update version`
+     - `remove unused … file`, `compiler session`, `.kotlin`
+   - **User-facing commits** — everything else.
+
+   **If all commits are maintenance-only** (the user-facing bucket is empty): write a single `### Changed` subsection with the text `- Version bump; no user-visible changes.` — do **not** list the individual maintenance commits and do **not** use `### Notes (from git)`.
+
+   **If user-facing commits exist**: group them into `### Added`, `### Changed`, `### Fixed`, etc. as appropriate. Then, if any maintenance commits also exist, append a `### Internal` subsection **after** all user-facing subsections containing those bullets.
+
+   **`### Notes (from git)`** is reserved for tags that have user-facing commits but the subjects are too terse or ambiguous to group meaningfully into standard Keep a Changelog categories. It must never be used for version-bump-only tags; use `### Changed` / `- Version bump; no user-visible changes.` for those instead.
+
+4. Insert a new section **below `[Unreleased]`** and **above the next older documented release**, using:
 
    ```markdown
    ## [<version-without-v>] - YYYY-MM-DD
@@ -112,7 +130,7 @@ Otherwise:
    git for-each-ref --format='%(creatordate:short)' "refs/tags/<tag>"
    ```
 
-4. Keep `[Unreleased]` at the top; never remove it. Move or merge duplicate bullets if backfill overlaps content already under `[Unreleased]`.
+5. Keep `[Unreleased]` at the top; never remove it. Move or merge duplicate bullets if backfill overlaps content already under `[Unreleased]`.
 
 **Diff links (Keep a Changelog):** [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) recommends **reference-style compare links** at the **bottom** of `CHANGELOG.md`, one per documented version, e.g.:
 

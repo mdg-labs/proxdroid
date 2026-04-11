@@ -9,8 +9,119 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- GitHub Actions: `build.yml` now runs on push to **`beta`** or **`main`** when **`pubspec.yaml`** changes; CI creates `v<version>` if missing, publishes **beta** pre-releases or **main** stable **draft** releases (see `README.md`).
-- `dart format` on several UI files; analyzer: removed unused `Theme` locals; `SectionHeader` tests and muted goldens aligned with uppercase muted titles and `onSurfaceVariant` alpha.
+- GitHub Actions: `build.yml` now runs on push to **`beta`** or **`main`** when
+  **`pubspec.yaml`** changes; CI creates `v<version>` if missing, publishes
+  **beta** pre-releases or **main** stable **draft** releases (see `README.md`).
+
+### Internal
+
+- `dart format` on several UI files; removed unused `Theme` locals; `SectionHeader`
+  tests and muted goldens aligned with uppercase muted titles and `onSurfaceVariant` alpha.
+
+## [1.0.0-beta.14] - 2026-04-11
+
+### Changed
+
+- Refined CI workflow: trigger on both `main` and `beta` branches; updated version bump step.
+- Refactored `CHANGELOG.md` and `README.md` to clarify CI processes and release conventions.
+
+## [1.0.0-beta.13+1] - 2026-04-11
+
+### Added
+
+- Premium UI redesign across all primary screens and navigation shell.
+
+### Fixed
+
+- Fixed three chart display bugs: label text wrapping, missing memory data, and cramped sparklines.
+
+### Internal
+
+- Enhanced CI workflow; bumped version to `1.0.0-beta.13+1`.
+
+## [1.0.0-beta.11] - 2026-04-10
+
+### Internal
+
+- Refactored UI code across multiple files for improved readability and consistency.
+
+## [1.0.0-beta.10] - 2026-04-10
+
+### Changed
+
+- Refactored navigation and UI components for an improved user experience.
+- Refactored UI component hierarchy and enhanced theme structure.
+
+### Internal
+
+- Updated documentation and `.gitignore` for design references.
+
+## [1.0.0-beta.9] - 2026-04-10
+
+### Changed
+
+- Implemented Material 3 UI updates and enhanced overall navigation structure.
+
+## [1.0.0-beta.8] - 2026-04-10
+
+### Fixed
+
+- Improved error handling in API interceptors for more robust network requests.
+
+### Internal
+
+- Enhanced API documentation for resource-fetching methods.
+
+## [1.0.0-beta.7] - 2026-04-10
+
+### Changed
+
+- Version bump; no user-visible changes.
+
+## [1.0.0-beta.6] - 2026-04-10
+
+### Changed
+
+- Enhanced Android release signing process in GitHub Actions for more reliable APK builds.
+
+### Internal
+
+- Removed unused Kotlin compiler session file from the Android project.
+
+## [1.0.0-beta.5] - 2026-04-10
+
+### Fixed
+
+- Clarified network access requirement in `AndroidManifest.xml` to ensure correct
+  runtime permissions in release builds.
+
+## [1.0.0-beta.4] - 2026-04-10
+
+### Changed
+
+- Updated launcher icons for all required Android density buckets.
+- Updated documentation and `AndroidManifest.xml` to clarify network permission
+  requirements for release builds.
+
+### Internal
+
+- Refactored Proxmox login ID validation test case for correctness.
+
+## [1.0.0-beta.3] - 2026-04-10
+
+### Changed
+
+- Enhanced connection diagnostics and refined Proxmox API settings integration.
+
+## [1.0.0-beta.2] - 2026-04-10
+
+### Added
+
+- Launcher icon configuration integrated via `flutter_launcher_icons`; dependencies updated.
+
+### Changed
+
+- Updated README and release workflow to clarify APK naming conventions for GitHub Releases.
 
 ## [1.0.0-beta.1] - 2026-04-10
 
@@ -22,11 +133,30 @@ First public **beta** prerelease on GitHub Releases (APK via CI).
 - Settings screen: appearance (dark / light / system), about (version, repo, license), support links.
 - Theme mode preference persisted with Hive (`settings` box).
 - Router page transitions; haptic feedback on VM/LXC power actions.
-- Representative tests: repository fakes, Riverpod theme mode, Freezed JSON roundtrips, settings and server editor widget tests; `integration_test` scaffold (tagged, opt-in per `CONTRIBUTING.md`).
+- Representative tests: repository fakes, Riverpod theme mode, Freezed JSON roundtrips,
+  settings and server editor widget tests; `integration_test` scaffold (tagged, opt-in
+  per `CONTRIBUTING.md`).
 
 ### Changed
 
 - Error messages and empty states reviewed; Proxmox exceptions mapped to localized strings.
 - Pull-to-refresh and shimmer loading patterns on data-heavy screens.
-- Localization pass: formatted UI strings moved into `app_en.arb`; ongoing terminology alignment with Proxmox UI.
-- GitHub Actions: release workflow runs only on beta prerelease tags (`v*-beta*`) and publishes GitHub **prereleases** with the release APK.
+- Localization pass: formatted UI strings moved into `app_en.arb`; ongoing terminology
+  alignment with Proxmox UI.
+- GitHub Actions: release workflow runs only on beta prerelease tags (`v*-beta*`) and
+  publishes GitHub **prereleases** with the release APK.
+
+[Unreleased]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.14...HEAD
+[1.0.0-beta.14]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.13%2B1...v1.0.0-beta.14
+[1.0.0-beta.13+1]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.11...v1.0.0-beta.13%2B1
+[1.0.0-beta.11]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.10...v1.0.0-beta.11
+[1.0.0-beta.10]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.9...v1.0.0-beta.10
+[1.0.0-beta.9]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.8...v1.0.0-beta.9
+[1.0.0-beta.8]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.7...v1.0.0-beta.8
+[1.0.0-beta.7]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.6...v1.0.0-beta.7
+[1.0.0-beta.6]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.5...v1.0.0-beta.6
+[1.0.0-beta.5]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.4...v1.0.0-beta.5
+[1.0.0-beta.4]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.3...v1.0.0-beta.4
+[1.0.0-beta.3]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.2...v1.0.0-beta.3
+[1.0.0-beta.2]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.1...v1.0.0-beta.2
+[1.0.0-beta.1]: https://github.com/mdg-labs/proxdroid/commits/v1.0.0-beta.1
