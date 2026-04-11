@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive_ce.dart';
+import 'package:proxdroid/core/models/resource_data_point.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_settings_repository.g.dart';
@@ -13,6 +14,9 @@ const String kThemeModeStorageKey = 'themeMode';
 
 /// Hive key: `'true'` / `'false'` for connection-test diagnostics dialog.
 const String kVerboseConnectionErrorsKey = 'verboseConnectionErrors';
+
+/// Hive key for default RRD chart [ChartTimeframe] (`hour` / `day` / …).
+const String kDefaultChartTimeframeKey = 'defaultChartTimeframe';
 
 const String _valueDark = 'dark';
 const String _valueLight = 'light';
@@ -41,6 +45,16 @@ class AppSettingsRepository {
     await _box.put(kVerboseConnectionErrorsKey, value ? 'true' : 'false');
   }
 
+  /// Default timeframe for resource charts; unknown or null → [ChartTimeframe.hour].
+  ChartTimeframe getDefaultChartTimeframe() {
+    final raw = _box.get(kDefaultChartTimeframeKey);
+    return chartTimeframeFromStorage(raw);
+  }
+
+  Future<void> setDefaultChartTimeframe(ChartTimeframe tf) async {
+    await _box.put(kDefaultChartTimeframeKey, chartTimeframeToStorage(tf));
+  }
+
   /// Parses stored theme string; unknown or null → [ThemeMode.dark].
   static ThemeMode themeModeFromStorage(String? value) {
     switch (value) {
@@ -64,6 +78,16 @@ class AppSettingsRepository {
         return _valueDark;
     }
   }
+
+  /// Parses stored timeframe string; unknown or null → [ChartTimeframe.hour].
+  static ChartTimeframe chartTimeframeFromStorage(String? value) {
+    for (final tf in ChartTimeframe.values) {
+      if (tf.apiValue == value) return tf;
+    }
+    return ChartTimeframe.hour;
+  }
+
+  static String chartTimeframeToStorage(ChartTimeframe tf) => tf.apiValue;
 }
 
 /// Must be overridden in [main] after the settings Hive box is opened.

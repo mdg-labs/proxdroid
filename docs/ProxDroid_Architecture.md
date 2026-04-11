@@ -155,10 +155,11 @@ lib/
 │   │   ├── providers/
 │   │   └── ui/
 │   │
-│   └── settings/                     # Settings (theme, about, donations)
+│   └── settings/                     # Settings (preferences, theme, about, donations)
 │       ├── providers/
 │       └── ui/
-│           └── settings_screen.dart
+│           ├── settings_screen.dart
+│           └── preferences_screen.dart
 │
 ├── shared/
 │   ├── widgets/
@@ -309,6 +310,7 @@ if (allowSelfSigned) {
 /tasks                              → Task viewer
 /tasks/:node/:upid                  → Task detail + log output
 /settings                           → Settings
+/settings/preferences               → Preferences (default chart time range, etc.)
 ```
 
 > **Shell AppBar leading:** On section roots (`/vms`, `/dashboard`, `/servers`, …) the app bar shows the drawer (hamburger). On nested routes (`/servers/add`, `/dashboard/:node`, `/vms/:node/:vmid`, …) it shows back. The implementation keys off `GoRouterState.uri.path` and `isShellDrawerRootPath` — not `GoRouter.canPop()`, which can stay true on section roots after redirects or pops and would incorrectly show only the back affordance.

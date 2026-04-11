@@ -61,5 +61,25 @@ final verboseConnectionErrorsProvider =
     );
 
 typedef _$VerboseConnectionErrors = Notifier<bool>;
+String _$defaultChartTimeframeHash() =>
+    r'48d6a096f5b2fb22984f55e3f8d89d0998ce8b22';
+
+/// Default [ChartTimeframe] for RRD charts; persisted in hive_ce.
+///
+/// Copied from [DefaultChartTimeframe].
+@ProviderFor(DefaultChartTimeframe)
+final defaultChartTimeframeProvider =
+    NotifierProvider<DefaultChartTimeframe, ChartTimeframe>.internal(
+      DefaultChartTimeframe.new,
+      name: r'defaultChartTimeframeProvider',
+      debugGetCreateSourceHash:
+          const bool.fromEnvironment('dart.vm.product')
+              ? null
+              : _$defaultChartTimeframeHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$DefaultChartTimeframe = Notifier<ChartTimeframe>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

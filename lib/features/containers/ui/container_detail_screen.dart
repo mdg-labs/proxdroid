@@ -8,6 +8,7 @@ import 'package:proxdroid/core/models/task.dart' as pve;
 import 'package:proxdroid/core/utils/formatters.dart';
 import 'package:proxdroid/features/containers/data/container_repository.dart';
 import 'package:proxdroid/features/containers/providers/container_providers.dart';
+import 'package:proxdroid/features/settings/providers/settings_providers.dart';
 import 'package:proxdroid/features/containers/ui/widgets/container_status_badge.dart';
 import 'package:proxdroid/features/containers/ui/widgets/cpu_chart.dart';
 import 'package:proxdroid/features/containers/ui/widgets/disk_io_chart.dart';
@@ -25,6 +26,7 @@ import 'package:proxdroid/shared/widgets/labeled_row.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
 import 'package:proxdroid/shared/widgets/premium_modals.dart';
 import 'package:proxdroid/shared/widgets/proxmox_tag_widgets.dart';
+import 'package:proxdroid/shared/widgets/resource_chart.dart';
 import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
 
 class ContainerDetailScreen extends ConsumerStatefulWidget {
@@ -44,10 +46,6 @@ class ContainerDetailScreen extends ConsumerStatefulWidget {
 
 class _ContainerDetailScreenState extends ConsumerState<ContainerDetailScreen> {
   bool _powerBusy = false;
-  ChartTimeframe _cpuChartTf = ChartTimeframe.hour;
-  ChartTimeframe _memChartTf = ChartTimeframe.hour;
-  ChartTimeframe _netChartTf = ChartTimeframe.hour;
-  ChartTimeframe _diskChartTf = ChartTimeframe.hour;
 
   Future<void> _runPowerAction(
     px.Container ct,
@@ -301,6 +299,9 @@ class _ContainerDetailScreenState extends ConsumerState<ContainerDetailScreen> {
             ct.status == px.ContainerStatus.stopped ||
             ct.status == px.ContainerStatus.unknown;
         final canStopOrReboot = ct.status == px.ContainerStatus.running;
+        final chartTf = ref.watch(defaultChartTimeframeProvider);
+        void setChartTf(ChartTimeframe tf) =>
+            ref.read(defaultChartTimeframeProvider.notifier).setTimeframe(tf);
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -546,37 +547,40 @@ class _ContainerDetailScreenState extends ConsumerState<ContainerDetailScreen> {
                         ),
                         const SizedBox(height: 20),
 
-                        // — Charts (each wrapped in ChartCard by their widget) —
+                        // — Charts (shared timeframe) —
+                        ChartTimeframeSelector(
+                          selected: chartTf,
+                          expandToWidth: true,
+                          l10n: l10n,
+                          onChanged: setChartTf,
+                        ),
+                        const SizedBox(height: 16),
                         ContainerCpuChart(
                           node: ct.node,
                           ctid: ct.vmid,
-                          timeframe: _cpuChartTf,
-                          onTimeframeChanged:
-                              (tf) => setState(() => _cpuChartTf = tf),
+                          timeframe: chartTf,
+                          onTimeframeChanged: setChartTf,
                         ),
                         const SizedBox(height: 16),
                         ContainerMemoryChart(
                           node: ct.node,
                           ctid: ct.vmid,
-                          timeframe: _memChartTf,
-                          onTimeframeChanged:
-                              (tf) => setState(() => _memChartTf = tf),
+                          timeframe: chartTf,
+                          onTimeframeChanged: setChartTf,
                         ),
                         const SizedBox(height: 16),
                         ContainerNetworkChart(
                           node: ct.node,
                           ctid: ct.vmid,
-                          timeframe: _netChartTf,
-                          onTimeframeChanged:
-                              (tf) => setState(() => _netChartTf = tf),
+                          timeframe: chartTf,
+                          onTimeframeChanged: setChartTf,
                         ),
                         const SizedBox(height: 16),
                         ContainerDiskIoChart(
                           node: ct.node,
                           ctid: ct.vmid,
-                          timeframe: _diskChartTf,
-                          onTimeframeChanged:
-                              (tf) => setState(() => _diskChartTf = tf),
+                          timeframe: chartTf,
+                          onTimeframeChanged: setChartTf,
                         ),
                         const SizedBox(height: 16),
                       ],

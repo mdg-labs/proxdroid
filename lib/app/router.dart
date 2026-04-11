@@ -12,6 +12,7 @@ import 'package:proxdroid/features/servers/providers/server_providers.dart';
 import 'package:proxdroid/features/servers/ui/add_server_screen.dart';
 import 'package:proxdroid/features/servers/ui/edit_server_screen.dart';
 import 'package:proxdroid/features/servers/ui/server_list_screen.dart';
+import 'package:proxdroid/features/settings/ui/preferences_screen.dart';
 import 'package:proxdroid/features/settings/ui/settings_screen.dart';
 import 'package:proxdroid/features/storage/ui/storage_detail_screen.dart';
 import 'package:proxdroid/features/storage/ui/storage_list_screen.dart';
@@ -131,7 +132,7 @@ GoRouter router(Ref ref) {
                       );
                       return _fadeShellPage(
                         state,
-                        NodeDetailScreen(node: node),
+                        NodeDetailScreen(nodeName: node),
                       );
                     },
                   ),
@@ -294,6 +295,14 @@ GoRouter router(Ref ref) {
                 pageBuilder:
                     (BuildContext context, GoRouterState state) =>
                         _fadeShellPage(state, const SettingsScreen()),
+                routes: <RouteBase>[
+                  GoRoute(
+                    path: 'preferences',
+                    pageBuilder:
+                        (BuildContext context, GoRouterState state) =>
+                            _fadeShellPage(state, const PreferencesScreen()),
+                  ),
+                ],
               ),
             ],
           ),

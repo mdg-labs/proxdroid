@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import 'package:proxdroid/core/models/resource_data_point.dart';
 import 'package:proxdroid/core/storage/app_settings_repository.dart';
 
 part 'settings_providers.g.dart';
@@ -36,5 +37,18 @@ class VerboseConnectionErrors extends _$VerboseConnectionErrors {
         .read(appSettingsRepositoryProvider)
         .setVerboseConnectionErrors(value);
     state = value;
+  }
+}
+
+/// Default [ChartTimeframe] for RRD charts; persisted in hive_ce.
+@Riverpod(keepAlive: true)
+class DefaultChartTimeframe extends _$DefaultChartTimeframe {
+  @override
+  ChartTimeframe build() =>
+      ref.watch(appSettingsRepositoryProvider).getDefaultChartTimeframe();
+
+  Future<void> setTimeframe(ChartTimeframe tf) async {
+    await ref.read(appSettingsRepositoryProvider).setDefaultChartTimeframe(tf);
+    state = tf;
   }
 }

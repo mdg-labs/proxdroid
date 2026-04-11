@@ -902,6 +902,30 @@
   "@settingsServersSubtitle": {
     "description": "Subtitle for Settings row that opens the server list."
   },
+  "settingsPreferencesTitle": "Preferences",
+  "@settingsPreferencesTitle": {
+    "description": "Settings row title for the Preferences screen."
+  },
+  "settingsPreferencesSubtitle": "Default chart time range and other app preferences.",
+  "@settingsPreferencesSubtitle": {
+    "description": "Subtitle for Settings row that opens Preferences."
+  },
+  "preferencesScreenTitle": "Preferences",
+  "@preferencesScreenTitle": {
+    "description": "App bar title on the Preferences screen."
+  },
+  "preferencesChartsSection": "Charts",
+  "@preferencesChartsSection": {
+    "description": "Preferences section for chart-related defaults."
+  },
+  "preferencesDefaultChartTimeframeTitle": "Default time range",
+  "@preferencesDefaultChartTimeframeTitle": {
+    "description": "Label for the default RRD chart timeframe control."
+  },
+  "preferencesDefaultChartTimeframeSubtitle": "Used for CPU, memory, network, and disk charts on VM, container, and node detail screens.",
+  "@preferencesDefaultChartTimeframeSubtitle": {
+    "description": "Explains where the default chart timeframe applies."
+  },
   "settingsAppearanceSection": "Appearance",
   "@settingsAppearanceSection": {
     "description": "Settings section: theme / display."

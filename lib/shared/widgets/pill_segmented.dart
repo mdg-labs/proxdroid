@@ -11,6 +11,9 @@ class PillSegmentedButton<T extends Object> extends StatelessWidget {
     this.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
     this.multiSelectionEnabled = false,
     this.emptySelectionAllowed = false,
+
+    /// When true, segments share width across the parent (via [SegmentedButton.expandedInsets]).
+    this.expandToWidth = false,
     super.key,
   });
 
@@ -20,18 +23,24 @@ class PillSegmentedButton<T extends Object> extends StatelessWidget {
   final EdgeInsetsGeometry padding;
   final bool multiSelectionEnabled;
   final bool emptySelectionAllowed;
+  final bool expandToWidth;
 
   @override
   Widget build(BuildContext context) {
+    final button = SegmentedButton<T>(
+      segments: segments,
+      selected: selected,
+      onSelectionChanged: onSelectionChanged,
+      multiSelectionEnabled: multiSelectionEnabled,
+      emptySelectionAllowed: emptySelectionAllowed,
+      expandedInsets: expandToWidth ? EdgeInsets.zero : null,
+    );
     return Padding(
       padding: padding,
-      child: SegmentedButton<T>(
-        segments: segments,
-        selected: selected,
-        onSelectionChanged: onSelectionChanged,
-        multiSelectionEnabled: multiSelectionEnabled,
-        emptySelectionAllowed: emptySelectionAllowed,
-      ),
+      child:
+          expandToWidth
+              ? SizedBox(width: double.infinity, child: button)
+              : button,
     );
   }
 }

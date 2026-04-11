@@ -677,6 +677,26 @@ class AppLocalizationsEn extends AppLocalizations {
       'Add, edit, or switch the active Proxmox server.';
 
   @override
+  String get settingsPreferencesTitle => 'Preferences';
+
+  @override
+  String get settingsPreferencesSubtitle =>
+      'Default chart time range and other app preferences.';
+
+  @override
+  String get preferencesScreenTitle => 'Preferences';
+
+  @override
+  String get preferencesChartsSection => 'Charts';
+
+  @override
+  String get preferencesDefaultChartTimeframeTitle => 'Default time range';
+
+  @override
+  String get preferencesDefaultChartTimeframeSubtitle =>
+      'Used for CPU, memory, network, and disk charts on VM, container, and node detail screens.';
+
+  @override
   String get settingsAppearanceSection => 'Appearance';
 
   @override

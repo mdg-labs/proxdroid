@@ -16,6 +16,7 @@ class ChartTimeframeSelector extends StatelessWidget {
     required this.selected,
     required this.onChanged,
     required this.l10n,
+    this.expandToWidth = false,
     super.key,
   });
 
@@ -23,10 +24,14 @@ class ChartTimeframeSelector extends StatelessWidget {
   final ValueChanged<ChartTimeframe> onChanged;
   final AppLocalizations l10n;
 
+  /// When true, the control stretches to the parent width with equal segment widths.
+  final bool expandToWidth;
+
   @override
   Widget build(BuildContext context) {
     return PillSegmentedButton<ChartTimeframe>(
       padding: EdgeInsets.zero,
+      expandToWidth: expandToWidth,
       segments: [
         for (final tf in ChartTimeframe.values)
           ButtonSegment<ChartTimeframe>(value: tf, label: Text(_label(tf))),

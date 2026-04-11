@@ -1336,6 +1336,42 @@ abstract class AppLocalizations {
   /// **'Add, edit, or switch the active Proxmox server.'**
   String get settingsServersSubtitle;
 
+  /// Settings row title for the Preferences screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferences'**
+  String get settingsPreferencesTitle;
+
+  /// Subtitle for Settings row that opens Preferences.
+  ///
+  /// In en, this message translates to:
+  /// **'Default chart time range and other app preferences.'**
+  String get settingsPreferencesSubtitle;
+
+  /// App bar title on the Preferences screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferences'**
+  String get preferencesScreenTitle;
+
+  /// Preferences section for chart-related defaults.
+  ///
+  /// In en, this message translates to:
+  /// **'Charts'**
+  String get preferencesChartsSection;
+
+  /// Label for the default RRD chart timeframe control.
+  ///
+  /// In en, this message translates to:
+  /// **'Default time range'**
+  String get preferencesDefaultChartTimeframeTitle;
+
+  /// Explains where the default chart timeframe applies.
+  ///
+  /// In en, this message translates to:
+  /// **'Used for CPU, memory, network, and disk charts on VM, container, and node detail screens.'**
+  String get preferencesDefaultChartTimeframeSubtitle;
+
   /// Settings section: theme / display.
   ///
   /// In en, this message translates to:

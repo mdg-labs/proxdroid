@@ -28,11 +28,6 @@ class NodeCpuChart extends ConsumerWidget {
 
     return ChartCard(
       title: l10n.metricCpu,
-      timeframeSelector: ChartTimeframeSelector(
-        selected: timeframe,
-        onChanged: onTimeframeChanged,
-        l10n: l10n,
-      ),
       child: async.when(
         loading:
             () => ResourceLineChart(

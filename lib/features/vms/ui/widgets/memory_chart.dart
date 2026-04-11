@@ -32,11 +32,6 @@ class VmMemoryChart extends ConsumerWidget {
 
     return ChartCard(
       title: l10n.metricMemory,
-      timeframeSelector: ChartTimeframeSelector(
-        selected: timeframe,
-        onChanged: onTimeframeChanged,
-        l10n: l10n,
-      ),
       child: async.when(
         loading:
             () => ResourceLineChart(

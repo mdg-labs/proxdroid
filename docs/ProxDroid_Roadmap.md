@@ -358,11 +358,13 @@
 ### 6.3 Settings Screen
 - [x] Build `SettingsScreen` with sections:
   - **Servers:** row above Appearance → `/servers` (add/edit/switch Proxmox server)
+  - **Preferences:** row → `/settings/preferences` (`PreferencesScreen`: default chart time range for VM/container/node detail charts, persisted in Hive)
   - **Appearance:** theme control (dark/light/system) via `SegmentedButton`
   - **About:** app version (`package_info_plus`), link to `github.com/mdg-labs/proxdroid`, MIT license summary dialog (Play Store / F-Droid links deferred — out of scope for this release; see §6.5–6.6)
   - **Support:** Ko-fi and GitHub Sponsors tiles (`url_launcher`)
 - [x] Wire up theme preference to hive_ce (`settings` box, key `themeMode`; values `dark` / `light` / `system`)
-- [x] go_router: `/settings` → `SettingsScreen` (already wired)
+- [x] Wire up default chart timeframe to hive_ce (`settings` box, key `defaultChartTimeframe`; values match Proxmox `timeframe` query: `hour` / `day` / `week` / `month`)
+- [x] go_router: `/settings` → `SettingsScreen`; nested `/settings/preferences` → `PreferencesScreen`
 
 ### 6.4 Testing
 - [x] Representative repository unit tests (Vm, Node, Task via fake HTTP adapter + `ProxmoxApiClient`; `AppSettingsRepository` via Hive) — expand to remaining repos over time

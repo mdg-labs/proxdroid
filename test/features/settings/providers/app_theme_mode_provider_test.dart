@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_ce/hive_ce.dart';
+import 'package:proxdroid/core/models/resource_data_point.dart';
 import 'package:proxdroid/core/storage/app_settings_repository.dart';
 import 'package:proxdroid/features/settings/providers/settings_providers.dart';
 
@@ -63,4 +64,28 @@ void main() {
     expect(container.read(verboseConnectionErrorsProvider), true);
     expect(repo.getVerboseConnectionErrors(), true);
   });
+
+  test(
+    'DefaultChartTimeframe reflects repository and setTimeframe updates both',
+    () async {
+      final repo = AppSettingsRepository(box: box);
+      await repo.setDefaultChartTimeframe(ChartTimeframe.day);
+
+      final container = ProviderContainer(
+        overrides: [appSettingsRepositoryProvider.overrideWithValue(repo)],
+      );
+      addTearDown(container.dispose);
+
+      expect(container.read(defaultChartTimeframeProvider), ChartTimeframe.day);
+
+      await container
+          .read(defaultChartTimeframeProvider.notifier)
+          .setTimeframe(ChartTimeframe.month);
+      expect(
+        container.read(defaultChartTimeframeProvider),
+        ChartTimeframe.month,
+      );
+      expect(repo.getDefaultChartTimeframe(), ChartTimeframe.month);
+    },
+  );
 }

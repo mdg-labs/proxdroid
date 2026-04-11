@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_ce/hive_ce.dart';
+import 'package:proxdroid/core/models/resource_data_point.dart';
 import 'package:proxdroid/core/storage/app_settings_repository.dart';
 
 void main() {
@@ -62,5 +63,34 @@ void main() {
     );
     expect(AppSettingsRepository.themeModeFromStorage('dark'), ThemeMode.dark);
     expect(AppSettingsRepository.themeModeFromStorage(null), ThemeMode.dark);
+  });
+
+  test('getDefaultChartTimeframe defaults to hour when box empty', () {
+    final repo = AppSettingsRepository(box: box);
+    expect(repo.getDefaultChartTimeframe(), ChartTimeframe.hour);
+  });
+
+  test('setDefaultChartTimeframe roundtrips via Hive', () async {
+    final repo = AppSettingsRepository(box: box);
+    await repo.setDefaultChartTimeframe(ChartTimeframe.week);
+    expect(repo.getDefaultChartTimeframe(), ChartTimeframe.week);
+
+    final repo2 = AppSettingsRepository(box: box);
+    expect(repo2.getDefaultChartTimeframe(), ChartTimeframe.week);
+  });
+
+  test('chartTimeframeFromStorage maps stored api values', () {
+    expect(
+      AppSettingsRepository.chartTimeframeFromStorage('day'),
+      ChartTimeframe.day,
+    );
+    expect(
+      AppSettingsRepository.chartTimeframeFromStorage('bogus'),
+      ChartTimeframe.hour,
+    );
+    expect(
+      AppSettingsRepository.chartTimeframeFromStorage(null),
+      ChartTimeframe.hour,
+    );
   });
 }

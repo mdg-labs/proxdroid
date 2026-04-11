@@ -8,6 +8,7 @@ import 'package:proxdroid/core/models/resource_data_point.dart';
 import 'package:proxdroid/core/utils/formatters.dart';
 import 'package:proxdroid/features/backups/ui/trigger_backup_sheet.dart';
 import 'package:proxdroid/features/dashboard/providers/dashboard_providers.dart';
+import 'package:proxdroid/features/settings/providers/settings_providers.dart';
 import 'package:proxdroid/features/dashboard/ui/widgets/node_cpu_chart.dart';
 import 'package:proxdroid/features/dashboard/ui/widgets/node_disk_io_chart.dart';
 import 'package:proxdroid/features/dashboard/ui/widgets/node_memory_chart.dart';
@@ -17,24 +18,15 @@ import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
+import 'package:proxdroid/shared/widgets/resource_chart.dart';
 import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
 import 'package:proxdroid/shared/widgets/status_badge.dart';
 
-class NodeDetailScreen extends ConsumerStatefulWidget {
-  const NodeDetailScreen({required this.node, super.key});
+class NodeDetailScreen extends ConsumerWidget {
+  const NodeDetailScreen({required this.nodeName, super.key});
 
   /// Proxmox node name (decoded route segment).
-  final String node;
-
-  @override
-  ConsumerState<NodeDetailScreen> createState() => _NodeDetailScreenState();
-}
-
-class _NodeDetailScreenState extends ConsumerState<NodeDetailScreen> {
-  ChartTimeframe _cpuChartTf = ChartTimeframe.hour;
-  ChartTimeframe _memChartTf = ChartTimeframe.hour;
-  ChartTimeframe _netChartTf = ChartTimeframe.hour;
-  ChartTimeframe _diskChartTf = ChartTimeframe.hour;
+  final String nodeName;
 
   bool _nodeOnline(Node n) {
     final s = n.status?.toLowerCase();
@@ -42,7 +34,7 @@ class _NodeDetailScreenState extends ConsumerState<NodeDetailScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final async = ref.watch(nodeListProvider);
 
@@ -77,7 +69,7 @@ class _NodeDetailScreenState extends ConsumerState<NodeDetailScreen> {
       data: (nodes) {
         Node? found;
         for (final n in nodes) {
-          if (n.name == widget.node) {
+          if (n.name == nodeName) {
             found = n;
             break;
           }
@@ -105,6 +97,10 @@ class _NodeDetailScreenState extends ConsumerState<NodeDetailScreen> {
             ],
           );
         }
+
+        final chartTf = ref.watch(defaultChartTimeframeProvider);
+        void setChartTf(ChartTimeframe tf) =>
+            ref.read(defaultChartTimeframeProvider.notifier).setTimeframe(tf);
 
         final node = found;
         final online = _nodeOnline(node);
@@ -143,32 +139,35 @@ class _NodeDetailScreenState extends ConsumerState<NodeDetailScreen> {
                     const SizedBox(height: AppSpacing.lg),
                     _NodeMetricGrid(node: node, online: online, l10n: l10n),
                     const SizedBox(height: AppSpacing.lg),
+                    ChartTimeframeSelector(
+                      selected: chartTf,
+                      expandToWidth: true,
+                      l10n: l10n,
+                      onChanged: setChartTf,
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
                     NodeCpuChart(
                       node: node.name,
-                      timeframe: _cpuChartTf,
-                      onTimeframeChanged:
-                          (tf) => setState(() => _cpuChartTf = tf),
+                      timeframe: chartTf,
+                      onTimeframeChanged: setChartTf,
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     NodeMemoryChart(
                       node: node.name,
-                      timeframe: _memChartTf,
-                      onTimeframeChanged:
-                          (tf) => setState(() => _memChartTf = tf),
+                      timeframe: chartTf,
+                      onTimeframeChanged: setChartTf,
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     NodeNetworkChart(
                       node: node.name,
-                      timeframe: _netChartTf,
-                      onTimeframeChanged:
-                          (tf) => setState(() => _netChartTf = tf),
+                      timeframe: chartTf,
+                      onTimeframeChanged: setChartTf,
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     NodeDiskIoChart(
                       node: node.name,
-                      timeframe: _diskChartTf,
-                      onTimeframeChanged:
-                          (tf) => setState(() => _diskChartTf = tf),
+                      timeframe: chartTf,
+                      onTimeframeChanged: setChartTf,
                     ),
                     const SizedBox(height: AppSpacing.lg),
                   ],

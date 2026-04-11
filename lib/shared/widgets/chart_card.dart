@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 ///
 /// Per §3 / §9: outer card 16 radius, inner padding 16, [title] in
 /// [TextTheme.titleMedium], optional [subtitle], optional [timeframeSelector]
-/// (pill segmented) placed right-aligned in the header row, [child] fills the
-/// remainder.
+/// on a full-width row below the title (so labels are not truncated by the
+/// pills), then [child].
 ///
 /// When [compact] is `true`, the Card wrapper is omitted (for embedding inside
 /// node cards on the dashboard), padding is reduced to 8 vertical, and the
@@ -23,7 +23,7 @@ class ChartCard extends StatelessWidget {
   final String title;
   final String? subtitle;
 
-  /// Optional pill timeframe selector — displayed right-aligned in the header.
+  /// Optional pill timeframe selector — full-width row below the title.
   final Widget? timeframeSelector;
 
   final Widget child;
@@ -47,38 +47,29 @@ class ChartCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    title,
-                    style: titleStyle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (subtitle != null) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle!,
-                      style: tt.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
+            Text(
+              title,
+              style: titleStyle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            if (timeframeSelector != null) ...[
-              const SizedBox(width: 8),
-              timeframeSelector!,
+            if (subtitle != null) ...[
+              const SizedBox(height: 2),
+              Text(
+                subtitle!,
+                style: tt.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+              ),
             ],
           ],
         ),
+        if (timeframeSelector != null) ...[
+          SizedBox(height: compact ? 6 : 8),
+          SizedBox(width: double.infinity, child: timeframeSelector),
+        ],
         SizedBox(height: gap),
         child,
       ],

@@ -33,11 +33,6 @@ class VmDiskIoChart extends ConsumerWidget {
 
     return ChartCard(
       title: l10n.chartDiskIoSectionTitle,
-      timeframeSelector: ChartTimeframeSelector(
-        selected: timeframe,
-        onChanged: onTimeframeChanged,
-        l10n: l10n,
-      ),
       child: async.when(
         loading:
             () => ResourceLineChart(

@@ -29,11 +29,6 @@ class NodeNetworkChart extends ConsumerWidget {
 
     return ChartCard(
       title: l10n.metricNetwork,
-      timeframeSelector: ChartTimeframeSelector(
-        selected: timeframe,
-        onChanged: onTimeframeChanged,
-        l10n: l10n,
-      ),
       child: async.when(
         loading:
             () => ResourceLineChart(

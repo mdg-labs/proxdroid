@@ -12,6 +12,7 @@ import 'package:proxdroid/features/backups/ui/trigger_backup_sheet.dart';
 import 'package:proxdroid/features/servers/ui/proxmox_exception_messages.dart';
 import 'package:proxdroid/features/tasks/providers/task_providers.dart';
 import 'package:proxdroid/features/vms/data/vm_repository.dart';
+import 'package:proxdroid/features/settings/providers/settings_providers.dart';
 import 'package:proxdroid/features/vms/providers/vm_providers.dart';
 import 'package:proxdroid/features/vms/ui/widgets/cpu_chart.dart';
 import 'package:proxdroid/features/vms/ui/widgets/disk_io_chart.dart';
@@ -25,6 +26,7 @@ import 'package:proxdroid/shared/widgets/error_view.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
 import 'package:proxdroid/shared/widgets/premium_modals.dart';
 import 'package:proxdroid/shared/widgets/proxmox_tag_widgets.dart';
+import 'package:proxdroid/shared/widgets/resource_chart.dart';
 import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
 
 class VmDetailScreen extends ConsumerStatefulWidget {
@@ -39,10 +41,6 @@ class VmDetailScreen extends ConsumerStatefulWidget {
 
 class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
   bool _powerBusy = false;
-  ChartTimeframe _cpuChartTf = ChartTimeframe.hour;
-  ChartTimeframe _memChartTf = ChartTimeframe.hour;
-  ChartTimeframe _netChartTf = ChartTimeframe.hour;
-  ChartTimeframe _diskChartTf = ChartTimeframe.hour;
 
   Future<void> _runPowerAction(
     Vm vm,
@@ -293,6 +291,9 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
             vm.status == VmStatus.stopped || vm.status == VmStatus.unknown;
         final canStopOrReboot =
             vm.status == VmStatus.running || vm.status == VmStatus.paused;
+        final chartTf = ref.watch(defaultChartTimeframeProvider);
+        void setChartTf(ChartTimeframe tf) =>
+            ref.read(defaultChartTimeframeProvider.notifier).setTimeframe(tf);
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -398,37 +399,40 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
                         _MetricGrid(vm: vm, l10n: l10n),
                         const SizedBox(height: AppSpacing.lg),
 
-                        // ── Charts ──────────────────────────────────────
+                        // ── Charts (shared timeframe) ───────────────────
+                        ChartTimeframeSelector(
+                          selected: chartTf,
+                          expandToWidth: true,
+                          l10n: l10n,
+                          onChanged: setChartTf,
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
                         VmCpuChart(
                           node: vm.node,
                           vmid: vm.vmid,
-                          timeframe: _cpuChartTf,
-                          onTimeframeChanged:
-                              (tf) => setState(() => _cpuChartTf = tf),
+                          timeframe: chartTf,
+                          onTimeframeChanged: setChartTf,
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         VmMemoryChart(
                           node: vm.node,
                           vmid: vm.vmid,
-                          timeframe: _memChartTf,
-                          onTimeframeChanged:
-                              (tf) => setState(() => _memChartTf = tf),
+                          timeframe: chartTf,
+                          onTimeframeChanged: setChartTf,
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         VmNetworkChart(
                           node: vm.node,
                           vmid: vm.vmid,
-                          timeframe: _netChartTf,
-                          onTimeframeChanged:
-                              (tf) => setState(() => _netChartTf = tf),
+                          timeframe: chartTf,
+                          onTimeframeChanged: setChartTf,
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         VmDiskIoChart(
                           node: vm.node,
                           vmid: vm.vmid,
-                          timeframe: _diskChartTf,
-                          onTimeframeChanged:
-                              (tf) => setState(() => _diskChartTf = tf),
+                          timeframe: chartTf,
+                          onTimeframeChanged: setChartTf,
                         ),
                         const SizedBox(height: AppSpacing.lg),
                       ],

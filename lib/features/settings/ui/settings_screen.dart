@@ -102,6 +102,23 @@ class SettingsScreen extends ConsumerWidget {
           const Divider(height: 1),
           GroupedSection(
             topSpacing: 0,
+            child: ListTile(
+              leading: Icon(
+                Icons.tune_outlined,
+                color: scheme.onSurfaceVariant,
+              ),
+              title: Text(l10n.settingsPreferencesTitle),
+              subtitle: Text(l10n.settingsPreferencesSubtitle),
+              trailing: Icon(
+                Icons.chevron_right,
+                color: scheme.onSurfaceVariant,
+              ),
+              onTap: () => context.push('/settings/preferences'),
+            ),
+          ),
+          const Divider(height: 1),
+          GroupedSection(
+            topSpacing: 0,
             header: SectionHeader(title: l10n.settingsAppearanceSection),
             child: PillSegmentedButton<ThemeMode>(
               segments: [
