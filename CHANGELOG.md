@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-beta.18] - 2026-04-11
+
+### Changed
+
+- Version bump; no user-visible changes.
+
 ## [1.0.0-beta.17] - 2026-04-11
 
 ### Security
@@ -196,7 +202,8 @@ First public **beta** prerelease on GitHub Releases (APK via CI).
 - GitHub Actions: release workflow runs only on beta prerelease tags (`v*-beta*`) and
   publishes GitHub **prereleases** with the release APK.
 
-[Unreleased]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.17...HEAD
+[Unreleased]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.18...HEAD
+[1.0.0-beta.18]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.17...v1.0.0-beta.18
 [1.0.0-beta.17]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.16...v1.0.0-beta.17
 [1.0.0-beta.16]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.15...v1.0.0-beta.16
 [1.0.0-beta.15]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.14...v1.0.0-beta.15
