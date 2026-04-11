@@ -173,7 +173,7 @@ class _QemuVmConfigProviderElement
 }
 
 String _$qemuVmConfigEditorHash() =>
-    r'f2a30c3d9310195111f294c66743b1dffc383ebc';
+    r'fbe7792273b48e81db7f6a93a9f4af9cd45fe656';
 
 abstract class _$QemuVmConfigEditor
     extends BuildlessAutoDisposeAsyncNotifier<QemuVmConfigEditState> {

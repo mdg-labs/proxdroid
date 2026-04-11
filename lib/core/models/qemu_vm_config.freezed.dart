@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$QemuVmConfig {
 
- String? get name; String? get description; String? get tags; String? get memory; String? get sockets; String? get cores; String? get vcpus; String? get cpu; String? get ostype; String? get onboot; String? get startup; String? get agent; Map<String, String> get passthrough;
+ String? get name; String? get description; String? get tags; String? get memory; String? get sockets; String? get cores; String? get vcpus; String? get cpu; String? get ostype; String? get onboot; String? get startup; String? get agent;@JsonKey(includeFromJson: false, includeToJson: false) List<GuestConfigIndexedLine> get netLines;@JsonKey(includeFromJson: false, includeToJson: false) List<GuestConfigIndexedLine> get diskLines; Map<String, String> get passthrough;
 /// Create a copy of QemuVmConfig
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $QemuVmConfigCopyWith<QemuVmConfig> get copyWith => _$QemuVmConfigCopyWithImpl<Q
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is QemuVmConfig&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.tags, tags) || other.tags == tags)&&(identical(other.memory, memory) || other.memory == memory)&&(identical(other.sockets, sockets) || other.sockets == sockets)&&(identical(other.cores, cores) || other.cores == cores)&&(identical(other.vcpus, vcpus) || other.vcpus == vcpus)&&(identical(other.cpu, cpu) || other.cpu == cpu)&&(identical(other.ostype, ostype) || other.ostype == ostype)&&(identical(other.onboot, onboot) || other.onboot == onboot)&&(identical(other.startup, startup) || other.startup == startup)&&(identical(other.agent, agent) || other.agent == agent)&&const DeepCollectionEquality().equals(other.passthrough, passthrough));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is QemuVmConfig&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.tags, tags) || other.tags == tags)&&(identical(other.memory, memory) || other.memory == memory)&&(identical(other.sockets, sockets) || other.sockets == sockets)&&(identical(other.cores, cores) || other.cores == cores)&&(identical(other.vcpus, vcpus) || other.vcpus == vcpus)&&(identical(other.cpu, cpu) || other.cpu == cpu)&&(identical(other.ostype, ostype) || other.ostype == ostype)&&(identical(other.onboot, onboot) || other.onboot == onboot)&&(identical(other.startup, startup) || other.startup == startup)&&(identical(other.agent, agent) || other.agent == agent)&&const DeepCollectionEquality().equals(other.netLines, netLines)&&const DeepCollectionEquality().equals(other.diskLines, diskLines)&&const DeepCollectionEquality().equals(other.passthrough, passthrough));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,description,tags,memory,sockets,cores,vcpus,cpu,ostype,onboot,startup,agent,const DeepCollectionEquality().hash(passthrough));
+int get hashCode => Object.hash(runtimeType,name,description,tags,memory,sockets,cores,vcpus,cpu,ostype,onboot,startup,agent,const DeepCollectionEquality().hash(netLines),const DeepCollectionEquality().hash(diskLines),const DeepCollectionEquality().hash(passthrough));
 
 @override
 String toString() {
-  return 'QemuVmConfig(name: $name, description: $description, tags: $tags, memory: $memory, sockets: $sockets, cores: $cores, vcpus: $vcpus, cpu: $cpu, ostype: $ostype, onboot: $onboot, startup: $startup, agent: $agent, passthrough: $passthrough)';
+  return 'QemuVmConfig(name: $name, description: $description, tags: $tags, memory: $memory, sockets: $sockets, cores: $cores, vcpus: $vcpus, cpu: $cpu, ostype: $ostype, onboot: $onboot, startup: $startup, agent: $agent, netLines: $netLines, diskLines: $diskLines, passthrough: $passthrough)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $QemuVmConfigCopyWith<$Res>  {
   factory $QemuVmConfigCopyWith(QemuVmConfig value, $Res Function(QemuVmConfig) _then) = _$QemuVmConfigCopyWithImpl;
 @useResult
 $Res call({
- String? name, String? description, String? tags, String? memory, String? sockets, String? cores, String? vcpus, String? cpu, String? ostype, String? onboot, String? startup, String? agent, Map<String, String> passthrough
+ String? name, String? description, String? tags, String? memory, String? sockets, String? cores, String? vcpus, String? cpu, String? ostype, String? onboot, String? startup, String? agent,@JsonKey(includeFromJson: false, includeToJson: false) List<GuestConfigIndexedLine> netLines,@JsonKey(includeFromJson: false, includeToJson: false) List<GuestConfigIndexedLine> diskLines, Map<String, String> passthrough
 });
 
 
@@ -65,7 +65,7 @@ class _$QemuVmConfigCopyWithImpl<$Res>
 
 /// Create a copy of QemuVmConfig
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? name = freezed,Object? description = freezed,Object? tags = freezed,Object? memory = freezed,Object? sockets = freezed,Object? cores = freezed,Object? vcpus = freezed,Object? cpu = freezed,Object? ostype = freezed,Object? onboot = freezed,Object? startup = freezed,Object? agent = freezed,Object? passthrough = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? name = freezed,Object? description = freezed,Object? tags = freezed,Object? memory = freezed,Object? sockets = freezed,Object? cores = freezed,Object? vcpus = freezed,Object? cpu = freezed,Object? ostype = freezed,Object? onboot = freezed,Object? startup = freezed,Object? agent = freezed,Object? netLines = null,Object? diskLines = null,Object? passthrough = null,}) {
   return _then(_self.copyWith(
 name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
@@ -79,7 +79,9 @@ as String?,ostype: freezed == ostype ? _self.ostype : ostype // ignore: cast_nul
 as String?,onboot: freezed == onboot ? _self.onboot : onboot // ignore: cast_nullable_to_non_nullable
 as String?,startup: freezed == startup ? _self.startup : startup // ignore: cast_nullable_to_non_nullable
 as String?,agent: freezed == agent ? _self.agent : agent // ignore: cast_nullable_to_non_nullable
-as String?,passthrough: null == passthrough ? _self.passthrough : passthrough // ignore: cast_nullable_to_non_nullable
+as String?,netLines: null == netLines ? _self.netLines : netLines // ignore: cast_nullable_to_non_nullable
+as List<GuestConfigIndexedLine>,diskLines: null == diskLines ? _self.diskLines : diskLines // ignore: cast_nullable_to_non_nullable
+as List<GuestConfigIndexedLine>,passthrough: null == passthrough ? _self.passthrough : passthrough // ignore: cast_nullable_to_non_nullable
 as Map<String, String>,
   ));
 }
@@ -162,10 +164,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? name,  String? description,  String? tags,  String? memory,  String? sockets,  String? cores,  String? vcpus,  String? cpu,  String? ostype,  String? onboot,  String? startup,  String? agent,  Map<String, String> passthrough)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? name,  String? description,  String? tags,  String? memory,  String? sockets,  String? cores,  String? vcpus,  String? cpu,  String? ostype,  String? onboot,  String? startup,  String? agent, @JsonKey(includeFromJson: false, includeToJson: false)  List<GuestConfigIndexedLine> netLines, @JsonKey(includeFromJson: false, includeToJson: false)  List<GuestConfigIndexedLine> diskLines,  Map<String, String> passthrough)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _QemuVmConfig() when $default != null:
-return $default(_that.name,_that.description,_that.tags,_that.memory,_that.sockets,_that.cores,_that.vcpus,_that.cpu,_that.ostype,_that.onboot,_that.startup,_that.agent,_that.passthrough);case _:
+return $default(_that.name,_that.description,_that.tags,_that.memory,_that.sockets,_that.cores,_that.vcpus,_that.cpu,_that.ostype,_that.onboot,_that.startup,_that.agent,_that.netLines,_that.diskLines,_that.passthrough);case _:
   return orElse();
 
 }
@@ -183,10 +185,10 @@ return $default(_that.name,_that.description,_that.tags,_that.memory,_that.socke
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? name,  String? description,  String? tags,  String? memory,  String? sockets,  String? cores,  String? vcpus,  String? cpu,  String? ostype,  String? onboot,  String? startup,  String? agent,  Map<String, String> passthrough)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? name,  String? description,  String? tags,  String? memory,  String? sockets,  String? cores,  String? vcpus,  String? cpu,  String? ostype,  String? onboot,  String? startup,  String? agent, @JsonKey(includeFromJson: false, includeToJson: false)  List<GuestConfigIndexedLine> netLines, @JsonKey(includeFromJson: false, includeToJson: false)  List<GuestConfigIndexedLine> diskLines,  Map<String, String> passthrough)  $default,) {final _that = this;
 switch (_that) {
 case _QemuVmConfig():
-return $default(_that.name,_that.description,_that.tags,_that.memory,_that.sockets,_that.cores,_that.vcpus,_that.cpu,_that.ostype,_that.onboot,_that.startup,_that.agent,_that.passthrough);}
+return $default(_that.name,_that.description,_that.tags,_that.memory,_that.sockets,_that.cores,_that.vcpus,_that.cpu,_that.ostype,_that.onboot,_that.startup,_that.agent,_that.netLines,_that.diskLines,_that.passthrough);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -200,10 +202,10 @@ return $default(_that.name,_that.description,_that.tags,_that.memory,_that.socke
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? name,  String? description,  String? tags,  String? memory,  String? sockets,  String? cores,  String? vcpus,  String? cpu,  String? ostype,  String? onboot,  String? startup,  String? agent,  Map<String, String> passthrough)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? name,  String? description,  String? tags,  String? memory,  String? sockets,  String? cores,  String? vcpus,  String? cpu,  String? ostype,  String? onboot,  String? startup,  String? agent, @JsonKey(includeFromJson: false, includeToJson: false)  List<GuestConfigIndexedLine> netLines, @JsonKey(includeFromJson: false, includeToJson: false)  List<GuestConfigIndexedLine> diskLines,  Map<String, String> passthrough)?  $default,) {final _that = this;
 switch (_that) {
 case _QemuVmConfig() when $default != null:
-return $default(_that.name,_that.description,_that.tags,_that.memory,_that.sockets,_that.cores,_that.vcpus,_that.cpu,_that.ostype,_that.onboot,_that.startup,_that.agent,_that.passthrough);case _:
+return $default(_that.name,_that.description,_that.tags,_that.memory,_that.sockets,_that.cores,_that.vcpus,_that.cpu,_that.ostype,_that.onboot,_that.startup,_that.agent,_that.netLines,_that.diskLines,_that.passthrough);case _:
   return null;
 
 }
@@ -215,7 +217,7 @@ return $default(_that.name,_that.description,_that.tags,_that.memory,_that.socke
 @JsonSerializable()
 
 class _QemuVmConfig extends QemuVmConfig {
-  const _QemuVmConfig({this.name, this.description, this.tags, this.memory, this.sockets, this.cores, this.vcpus, this.cpu, this.ostype, this.onboot, this.startup, this.agent, final  Map<String, String> passthrough = const {}}): _passthrough = passthrough,super._();
+  const _QemuVmConfig({this.name, this.description, this.tags, this.memory, this.sockets, this.cores, this.vcpus, this.cpu, this.ostype, this.onboot, this.startup, this.agent, @JsonKey(includeFromJson: false, includeToJson: false) final  List<GuestConfigIndexedLine> netLines = const [], @JsonKey(includeFromJson: false, includeToJson: false) final  List<GuestConfigIndexedLine> diskLines = const [], final  Map<String, String> passthrough = const {}}): _netLines = netLines,_diskLines = diskLines,_passthrough = passthrough,super._();
   factory _QemuVmConfig.fromJson(Map<String, dynamic> json) => _$QemuVmConfigFromJson(json);
 
 @override final  String? name;
@@ -230,6 +232,20 @@ class _QemuVmConfig extends QemuVmConfig {
 @override final  String? onboot;
 @override final  String? startup;
 @override final  String? agent;
+ final  List<GuestConfigIndexedLine> _netLines;
+@override@JsonKey(includeFromJson: false, includeToJson: false) List<GuestConfigIndexedLine> get netLines {
+  if (_netLines is EqualUnmodifiableListView) return _netLines;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_netLines);
+}
+
+ final  List<GuestConfigIndexedLine> _diskLines;
+@override@JsonKey(includeFromJson: false, includeToJson: false) List<GuestConfigIndexedLine> get diskLines {
+  if (_diskLines is EqualUnmodifiableListView) return _diskLines;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_diskLines);
+}
+
  final  Map<String, String> _passthrough;
 @override@JsonKey() Map<String, String> get passthrough {
   if (_passthrough is EqualUnmodifiableMapView) return _passthrough;
@@ -251,16 +267,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _QemuVmConfig&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.tags, tags) || other.tags == tags)&&(identical(other.memory, memory) || other.memory == memory)&&(identical(other.sockets, sockets) || other.sockets == sockets)&&(identical(other.cores, cores) || other.cores == cores)&&(identical(other.vcpus, vcpus) || other.vcpus == vcpus)&&(identical(other.cpu, cpu) || other.cpu == cpu)&&(identical(other.ostype, ostype) || other.ostype == ostype)&&(identical(other.onboot, onboot) || other.onboot == onboot)&&(identical(other.startup, startup) || other.startup == startup)&&(identical(other.agent, agent) || other.agent == agent)&&const DeepCollectionEquality().equals(other._passthrough, _passthrough));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _QemuVmConfig&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.tags, tags) || other.tags == tags)&&(identical(other.memory, memory) || other.memory == memory)&&(identical(other.sockets, sockets) || other.sockets == sockets)&&(identical(other.cores, cores) || other.cores == cores)&&(identical(other.vcpus, vcpus) || other.vcpus == vcpus)&&(identical(other.cpu, cpu) || other.cpu == cpu)&&(identical(other.ostype, ostype) || other.ostype == ostype)&&(identical(other.onboot, onboot) || other.onboot == onboot)&&(identical(other.startup, startup) || other.startup == startup)&&(identical(other.agent, agent) || other.agent == agent)&&const DeepCollectionEquality().equals(other._netLines, _netLines)&&const DeepCollectionEquality().equals(other._diskLines, _diskLines)&&const DeepCollectionEquality().equals(other._passthrough, _passthrough));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,description,tags,memory,sockets,cores,vcpus,cpu,ostype,onboot,startup,agent,const DeepCollectionEquality().hash(_passthrough));
+int get hashCode => Object.hash(runtimeType,name,description,tags,memory,sockets,cores,vcpus,cpu,ostype,onboot,startup,agent,const DeepCollectionEquality().hash(_netLines),const DeepCollectionEquality().hash(_diskLines),const DeepCollectionEquality().hash(_passthrough));
 
 @override
 String toString() {
-  return 'QemuVmConfig(name: $name, description: $description, tags: $tags, memory: $memory, sockets: $sockets, cores: $cores, vcpus: $vcpus, cpu: $cpu, ostype: $ostype, onboot: $onboot, startup: $startup, agent: $agent, passthrough: $passthrough)';
+  return 'QemuVmConfig(name: $name, description: $description, tags: $tags, memory: $memory, sockets: $sockets, cores: $cores, vcpus: $vcpus, cpu: $cpu, ostype: $ostype, onboot: $onboot, startup: $startup, agent: $agent, netLines: $netLines, diskLines: $diskLines, passthrough: $passthrough)';
 }
 
 
@@ -271,7 +287,7 @@ abstract mixin class _$QemuVmConfigCopyWith<$Res> implements $QemuVmConfigCopyWi
   factory _$QemuVmConfigCopyWith(_QemuVmConfig value, $Res Function(_QemuVmConfig) _then) = __$QemuVmConfigCopyWithImpl;
 @override @useResult
 $Res call({
- String? name, String? description, String? tags, String? memory, String? sockets, String? cores, String? vcpus, String? cpu, String? ostype, String? onboot, String? startup, String? agent, Map<String, String> passthrough
+ String? name, String? description, String? tags, String? memory, String? sockets, String? cores, String? vcpus, String? cpu, String? ostype, String? onboot, String? startup, String? agent,@JsonKey(includeFromJson: false, includeToJson: false) List<GuestConfigIndexedLine> netLines,@JsonKey(includeFromJson: false, includeToJson: false) List<GuestConfigIndexedLine> diskLines, Map<String, String> passthrough
 });
 
 
@@ -288,7 +304,7 @@ class __$QemuVmConfigCopyWithImpl<$Res>
 
 /// Create a copy of QemuVmConfig
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? name = freezed,Object? description = freezed,Object? tags = freezed,Object? memory = freezed,Object? sockets = freezed,Object? cores = freezed,Object? vcpus = freezed,Object? cpu = freezed,Object? ostype = freezed,Object? onboot = freezed,Object? startup = freezed,Object? agent = freezed,Object? passthrough = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? name = freezed,Object? description = freezed,Object? tags = freezed,Object? memory = freezed,Object? sockets = freezed,Object? cores = freezed,Object? vcpus = freezed,Object? cpu = freezed,Object? ostype = freezed,Object? onboot = freezed,Object? startup = freezed,Object? agent = freezed,Object? netLines = null,Object? diskLines = null,Object? passthrough = null,}) {
   return _then(_QemuVmConfig(
 name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
@@ -302,7 +318,9 @@ as String?,ostype: freezed == ostype ? _self.ostype : ostype // ignore: cast_nul
 as String?,onboot: freezed == onboot ? _self.onboot : onboot // ignore: cast_nullable_to_non_nullable
 as String?,startup: freezed == startup ? _self.startup : startup // ignore: cast_nullable_to_non_nullable
 as String?,agent: freezed == agent ? _self.agent : agent // ignore: cast_nullable_to_non_nullable
-as String?,passthrough: null == passthrough ? _self._passthrough : passthrough // ignore: cast_nullable_to_non_nullable
+as String?,netLines: null == netLines ? _self._netLines : netLines // ignore: cast_nullable_to_non_nullable
+as List<GuestConfigIndexedLine>,diskLines: null == diskLines ? _self._diskLines : diskLines // ignore: cast_nullable_to_non_nullable
+as List<GuestConfigIndexedLine>,passthrough: null == passthrough ? _self._passthrough : passthrough // ignore: cast_nullable_to_non_nullable
 as Map<String, String>,
   ));
 }

@@ -13,9 +13,10 @@ void main() {
             as Map<String, dynamic>;
     final original = QemuVmConfig.fromProxmoxConfigData(raw);
     final edited = original.copyWith(name: 'renamed-only');
-    final delta = qemuVmConfigDelta(original, edited);
-    expect(delta.keys, unorderedEquals(['name']));
-    expect(delta['name'], 'renamed-only');
+    final delta = qemuVmConfigDeltaResult(original, edited);
+    expect(delta.body.keys, unorderedEquals(['name']));
+    expect(delta.body['name'], 'renamed-only');
+    expect(delta.deleteKeys, isEmpty);
   });
 
   test('lxcContainerConfigDelta: only hostname change emits only hostname', () {
@@ -24,8 +25,9 @@ void main() {
             as Map<String, dynamic>;
     final original = LxcContainerConfig.fromProxmoxConfigData(raw);
     final edited = original.copyWith(hostname: 'new-host');
-    final delta = lxcContainerConfigDelta(original, edited);
-    expect(delta.keys, unorderedEquals(['hostname']));
-    expect(delta['hostname'], 'new-host');
+    final delta = lxcContainerConfigDeltaResult(original, edited);
+    expect(delta.body.keys, unorderedEquals(['hostname']));
+    expect(delta.body['hostname'], 'new-host');
+    expect(delta.deleteKeys, isEmpty);
   });
 }

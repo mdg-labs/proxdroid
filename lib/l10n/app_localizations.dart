@@ -1768,6 +1768,12 @@ abstract class AppLocalizations {
   /// **'Root filesystem cannot be edited here yet.'**
   String get guestConfigRootfsReadOnlyHint;
 
+  /// Helper when LXC rootfs is editable (guest stopped).
+  ///
+  /// In en, this message translates to:
+  /// **'Changing rootfs is dangerous; confirm before saving.'**
+  String get guestConfigRootfsEditHint;
+
   /// Reset form to last loaded server values.
   ///
   /// In en, this message translates to:
@@ -1785,6 +1791,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No changes to save'**
   String get guestConfigSaveNothingChanged;
+
+  /// Grouped section title for net0.. on VM/LXC config editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Network interfaces'**
+  String get guestConfigSectionNetworks;
+
+  /// Grouped section title for QEMU disk keys on VM config editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Disks'**
+  String get guestConfigSectionDisks;
+
+  /// Grouped section title for LXC mpN lines.
+  ///
+  /// In en, this message translates to:
+  /// **'Mount points'**
+  String get guestConfigSectionMounts;
+
+  /// Explains why QEMU network rows are read-only while running.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop the machine to add, remove, or reorder network interfaces.'**
+  String get guestConfigNetworksLockedWhileRunning;
+
+  /// Explains why QEMU disk rows are read-only while running.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop the machine to add, remove, or reorder disk definitions.'**
+  String get guestConfigDisksLockedWhileRunning;
+
+  /// Explains why LXC mp rows are read-only while running.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop the container to add, remove, or reorder mount points.'**
+  String get guestConfigMountsLockedWhileRunning;
+
+  /// Explains why LXC rootfs field is read-only while running.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop the container to edit the root filesystem string.'**
+  String get guestConfigRootfsLockedWhileRunning;
+
+  /// Label for a single QEMU/LXC netN row; {name} is e.g. net0.
+  ///
+  /// In en, this message translates to:
+  /// **'Interface ({name})'**
+  String guestConfigNetworkLineLabel(String name);
+
+  /// Button to append a new netN row.
+  ///
+  /// In en, this message translates to:
+  /// **'Add interface'**
+  String get guestConfigAddNetwork;
+
+  /// Tooltip for delete on a net row.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove interface'**
+  String get guestConfigRemoveInterface;
+
+  /// Button to append a new scsiN disk row on QEMU editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Add disk (SCSI)'**
+  String get guestConfigAddDisk;
+
+  /// Tooltip for delete on a QEMU disk row.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove disk'**
+  String get guestConfigRemoveDisk;
+
+  /// Button to append a new mpN row on LXC editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Add mount point'**
+  String get guestConfigAddMountPoint;
+
+  /// Tooltip for delete on an LXC mp row.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove mount point'**
+  String get guestConfigRemoveMountPoint;
+
+  /// Title for confirm dialog before saving disk/net/mp/rootfs mutations.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply high-risk changes?'**
+  String get guestConfigRiskConfirmTitle;
+
+  /// Body for high-risk save confirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Network, disk, mount point, or root filesystem changes can break a guest or destroy data. Continue only if you understand the impact.'**
+  String get guestConfigRiskConfirmBody;
+
+  /// Confirm button on high-risk save dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply changes'**
+  String get guestConfigRiskConfirmAction;
 
   /// Generic required field validation.
   ///

@@ -1210,6 +1210,10 @@
   "@guestConfigRootfsReadOnlyHint": {
     "description": "Helper under read-only rootfs field."
   },
+  "guestConfigRootfsEditHint": "Changing rootfs is dangerous; confirm before saving.",
+  "@guestConfigRootfsEditHint": {
+    "description": "Helper when LXC rootfs is editable (guest stopped)."
+  },
   "guestConfigActionDiscard": "Discard",
   "@guestConfigActionDiscard": {
     "description": "Reset form to last loaded server values."
@@ -1221,6 +1225,79 @@
   "guestConfigSaveNothingChanged": "No changes to save",
   "@guestConfigSaveNothingChanged": {
     "description": "Snackbar when save tapped with empty delta."
+  },
+  "guestConfigSectionNetworks": "Network interfaces",
+  "@guestConfigSectionNetworks": {
+    "description": "Grouped section title for net0.. on VM/LXC config editor."
+  },
+  "guestConfigSectionDisks": "Disks",
+  "@guestConfigSectionDisks": {
+    "description": "Grouped section title for QEMU disk keys on VM config editor."
+  },
+  "guestConfigSectionMounts": "Mount points",
+  "@guestConfigSectionMounts": {
+    "description": "Grouped section title for LXC mpN lines."
+  },
+  "guestConfigNetworksLockedWhileRunning": "Stop the machine to add, remove, or reorder network interfaces.",
+  "@guestConfigNetworksLockedWhileRunning": {
+    "description": "Explains why QEMU network rows are read-only while running."
+  },
+  "guestConfigDisksLockedWhileRunning": "Stop the machine to add, remove, or reorder disk definitions.",
+  "@guestConfigDisksLockedWhileRunning": {
+    "description": "Explains why QEMU disk rows are read-only while running."
+  },
+  "guestConfigMountsLockedWhileRunning": "Stop the container to add, remove, or reorder mount points.",
+  "@guestConfigMountsLockedWhileRunning": {
+    "description": "Explains why LXC mp rows are read-only while running."
+  },
+  "guestConfigRootfsLockedWhileRunning": "Stop the container to edit the root filesystem string.",
+  "@guestConfigRootfsLockedWhileRunning": {
+    "description": "Explains why LXC rootfs field is read-only while running."
+  },
+  "guestConfigNetworkLineLabel": "Interface ({name})",
+  "@guestConfigNetworkLineLabel": {
+    "description": "Label for a single QEMU/LXC netN row; {name} is e.g. net0.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "guestConfigAddNetwork": "Add interface",
+  "@guestConfigAddNetwork": {
+    "description": "Button to append a new netN row."
+  },
+  "guestConfigRemoveInterface": "Remove interface",
+  "@guestConfigRemoveInterface": {
+    "description": "Tooltip for delete on a net row."
+  },
+  "guestConfigAddDisk": "Add disk (SCSI)",
+  "@guestConfigAddDisk": {
+    "description": "Button to append a new scsiN disk row on QEMU editor."
+  },
+  "guestConfigRemoveDisk": "Remove disk",
+  "@guestConfigRemoveDisk": {
+    "description": "Tooltip for delete on a QEMU disk row."
+  },
+  "guestConfigAddMountPoint": "Add mount point",
+  "@guestConfigAddMountPoint": {
+    "description": "Button to append a new mpN row on LXC editor."
+  },
+  "guestConfigRemoveMountPoint": "Remove mount point",
+  "@guestConfigRemoveMountPoint": {
+    "description": "Tooltip for delete on an LXC mp row."
+  },
+  "guestConfigRiskConfirmTitle": "Apply high-risk changes?",
+  "@guestConfigRiskConfirmTitle": {
+    "description": "Title for confirm dialog before saving disk/net/mp/rootfs mutations."
+  },
+  "guestConfigRiskConfirmBody": "Network, disk, mount point, or root filesystem changes can break a guest or destroy data. Continue only if you understand the impact.",
+  "@guestConfigRiskConfirmBody": {
+    "description": "Body for high-risk save confirmation."
+  },
+  "guestConfigRiskConfirmAction": "Apply changes",
+  "@guestConfigRiskConfirmAction": {
+    "description": "Confirm button on high-risk save dialog."
   },
   "validationFieldRequired": "This field is required.",
   "@validationFieldRequired": {

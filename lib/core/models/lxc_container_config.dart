@@ -2,6 +2,7 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'package:proxdroid/core/models/guest_config_indexed_line.dart';
 import 'package:proxdroid/core/models/proxmox_json_helpers.dart';
 
 part 'lxc_container_config.freezed.dart';
@@ -48,6 +49,12 @@ sealed class LxcContainerConfig with _$LxcContainerConfig {
     String? unprivileged,
     String? features,
     String? rootfs,
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    @Default([])
+    List<GuestConfigIndexedLine> netLines,
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    @Default([])
+    List<GuestConfigIndexedLine> mpLines,
     @Default({}) Map<String, String> passthrough,
   }) = _LxcContainerConfig;
 
@@ -59,9 +66,14 @@ sealed class LxcContainerConfig with _$LxcContainerConfig {
     final norm = <String, String>{
       for (final e in raw.entries) e.key: proxmoxString(e.value),
     };
+    final netLines = guestConfigParseNetLines(norm);
+    final mpLines = guestConfigParseLxcMpLines(norm);
     final passthrough = <String, String>{
       for (final e in norm.entries)
-        if (!kLxcContainerConfigStructuredKeys.contains(e.key)) e.key: e.value,
+        if (!kLxcContainerConfigStructuredKeys.contains(e.key) &&
+            !guestConfigIsNetKey(e.key) &&
+            !guestConfigIsLxcMpKey(e.key))
+          e.key: e.value,
     };
     return LxcContainerConfig(
       hostname: _pickStructured(norm, 'hostname'),
@@ -79,6 +91,8 @@ sealed class LxcContainerConfig with _$LxcContainerConfig {
       unprivileged: _pickStructured(norm, 'unprivileged'),
       features: _pickStructured(norm, 'features'),
       rootfs: _pickStructured(norm, 'rootfs'),
+      netLines: netLines,
+      mpLines: mpLines,
       passthrough: passthrough,
     );
   }
@@ -106,6 +120,12 @@ sealed class LxcContainerConfig with _$LxcContainerConfig {
     put('unprivileged', unprivileged);
     put('features', features);
     put('rootfs', rootfs);
+    for (final line in netLines) {
+      m[line.apiKey] = line.value;
+    }
+    for (final line in mpLines) {
+      m[line.apiKey] = line.value;
+    }
     return m;
   }
 }

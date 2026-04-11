@@ -903,6 +903,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Root filesystem cannot be edited here yet.';
 
   @override
+  String get guestConfigRootfsEditHint =>
+      'Changing rootfs is dangerous; confirm before saving.';
+
+  @override
   String get guestConfigActionDiscard => 'Discard';
 
   @override
@@ -910,6 +914,64 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get guestConfigSaveNothingChanged => 'No changes to save';
+
+  @override
+  String get guestConfigSectionNetworks => 'Network interfaces';
+
+  @override
+  String get guestConfigSectionDisks => 'Disks';
+
+  @override
+  String get guestConfigSectionMounts => 'Mount points';
+
+  @override
+  String get guestConfigNetworksLockedWhileRunning =>
+      'Stop the machine to add, remove, or reorder network interfaces.';
+
+  @override
+  String get guestConfigDisksLockedWhileRunning =>
+      'Stop the machine to add, remove, or reorder disk definitions.';
+
+  @override
+  String get guestConfigMountsLockedWhileRunning =>
+      'Stop the container to add, remove, or reorder mount points.';
+
+  @override
+  String get guestConfigRootfsLockedWhileRunning =>
+      'Stop the container to edit the root filesystem string.';
+
+  @override
+  String guestConfigNetworkLineLabel(String name) {
+    return 'Interface ($name)';
+  }
+
+  @override
+  String get guestConfigAddNetwork => 'Add interface';
+
+  @override
+  String get guestConfigRemoveInterface => 'Remove interface';
+
+  @override
+  String get guestConfigAddDisk => 'Add disk (SCSI)';
+
+  @override
+  String get guestConfigRemoveDisk => 'Remove disk';
+
+  @override
+  String get guestConfigAddMountPoint => 'Add mount point';
+
+  @override
+  String get guestConfigRemoveMountPoint => 'Remove mount point';
+
+  @override
+  String get guestConfigRiskConfirmTitle => 'Apply high-risk changes?';
+
+  @override
+  String get guestConfigRiskConfirmBody =>
+      'Network, disk, mount point, or root filesystem changes can break a guest or destroy data. Continue only if you understand the impact.';
+
+  @override
+  String get guestConfigRiskConfirmAction => 'Apply changes';
 
   @override
   String get validationFieldRequired => 'This field is required.';

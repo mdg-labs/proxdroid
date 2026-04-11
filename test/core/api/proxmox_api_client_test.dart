@@ -237,7 +237,8 @@ void main() {
     expect(cfg.name, 'vm1');
     expect(cfg.memory, '2048');
     expect(cfg.cores, '2');
-    expect(cfg.passthrough['net0'], contains('vmbr0'));
+    expect(cfg.netLines.single.apiKey, 'net0');
+    expect(cfg.netLines.single.value, contains('vmbr0'));
     expect(
       adapter.requests.single.path,
       ApiEndpoints.nodeQemuVmConfig('node-1', 100),
@@ -271,7 +272,8 @@ void main() {
     final cfg = await client.fetchLxcConfig('n2', 200);
     expect(cfg.hostname, 'ct1');
     expect(cfg.memory, '512');
-    expect(cfg.passthrough['mp0'], contains('snippets'));
+    expect(cfg.mpLines.single.apiKey, 'mp0');
+    expect(cfg.mpLines.single.value, contains('snippets'));
     expect(
       adapter.requests.single.path,
       ApiEndpoints.nodeLxcCtConfig('n2', 200),

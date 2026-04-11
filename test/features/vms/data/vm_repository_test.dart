@@ -67,7 +67,8 @@ void main() {
     final cfg = await repo.getQemuConfig('node-a', 10);
     expect(cfg.name, 'r-vm');
     expect(cfg.memory, '1024');
-    expect(cfg.passthrough['scsi0'], 'local:vm-disk');
+    expect(cfg.diskLines.single.apiKey, 'scsi0');
+    expect(cfg.diskLines.single.value, 'local:vm-disk');
     expect(
       adapter.requests.single.path,
       ApiEndpoints.nodeQemuVmConfig('node-a', 10),

@@ -125,7 +125,8 @@ void main() {
     final cfg = await ContainerRepository(client).getLxcConfig('node-b', 202);
     expect(cfg.hostname, 'ct-x');
     expect(cfg.memory, '256');
-    expect(cfg.passthrough['net0'], 'bridge=vmbr0');
+    expect(cfg.netLines.single.apiKey, 'net0');
+    expect(cfg.netLines.single.value, 'bridge=vmbr0');
     expect(
       adapter.requests.single.path,
       ApiEndpoints.nodeLxcCtConfig('node-b', 202),

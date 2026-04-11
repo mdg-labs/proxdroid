@@ -2,6 +2,7 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'package:proxdroid/core/models/guest_config_indexed_line.dart';
 import 'package:proxdroid/core/models/proxmox_json_helpers.dart';
 
 part 'qemu_vm_config.freezed.dart';
@@ -43,6 +44,12 @@ sealed class QemuVmConfig with _$QemuVmConfig {
     String? onboot,
     String? startup,
     String? agent,
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    @Default([])
+    List<GuestConfigIndexedLine> netLines,
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    @Default([])
+    List<GuestConfigIndexedLine> diskLines,
     @Default({}) Map<String, String> passthrough,
   }) = _QemuVmConfig;
 
@@ -57,9 +64,14 @@ sealed class QemuVmConfig with _$QemuVmConfig {
     final norm = <String, String>{
       for (final e in raw.entries) e.key: proxmoxString(e.value),
     };
+    final netLines = guestConfigParseNetLines(norm);
+    final diskLines = guestConfigParseQemuDiskLines(norm);
     final passthrough = <String, String>{
       for (final e in norm.entries)
-        if (!kQemuVmConfigStructuredKeys.contains(e.key)) e.key: e.value,
+        if (!kQemuVmConfigStructuredKeys.contains(e.key) &&
+            !guestConfigIsNetKey(e.key) &&
+            !guestConfigIsQemuDiskKey(e.key))
+          e.key: e.value,
     };
     return QemuVmConfig(
       name: _pickStructured(norm, 'name'),
@@ -74,6 +86,8 @@ sealed class QemuVmConfig with _$QemuVmConfig {
       onboot: _pickStructured(norm, 'onboot'),
       startup: _pickStructured(norm, 'startup'),
       agent: _pickStructured(norm, 'agent'),
+      netLines: netLines,
+      diskLines: diskLines,
       passthrough: passthrough,
     );
   }
@@ -100,6 +114,12 @@ sealed class QemuVmConfig with _$QemuVmConfig {
     put('onboot', onboot);
     put('startup', startup);
     put('agent', agent);
+    for (final line in netLines) {
+      m[line.apiKey] = line.value;
+    }
+    for (final line in diskLines) {
+      m[line.apiKey] = line.value;
+    }
     return m;
   }
 }

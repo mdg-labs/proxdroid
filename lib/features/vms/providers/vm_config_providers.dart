@@ -87,7 +87,7 @@ class QemuVmConfigEditor extends _$QemuVmConfigEditor {
     if (v == null) {
       return;
     }
-    final delta = qemuVmConfigDelta(v.original, v.draft);
+    final delta = qemuVmConfigDeltaResult(v.original, v.draft);
     if (delta.isEmpty) {
       return;
     }
@@ -95,7 +95,12 @@ class QemuVmConfigEditor extends _$QemuVmConfigEditor {
     if (repo == null) {
       throw const AuthException();
     }
-    await repo.updateQemuConfig(node, vmid, Map<String, dynamic>.from(delta));
+    await repo.updateQemuConfig(
+      node,
+      vmid,
+      Map<String, dynamic>.from(delta.body),
+      deleteKeys: delta.deleteKeys.isEmpty ? null : delta.deleteKeys,
+    );
     ref.invalidate(allVmsProvider);
     ref.invalidate(qemuVmConfigProvider(node, vmid));
   }

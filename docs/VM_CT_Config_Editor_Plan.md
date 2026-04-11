@@ -1,6 +1,6 @@
 # VM & LXC config editor — implementation plan
 
-**Plan status:** In progress — Phases **0–7** automated tasks complete in repo; optional manual Tier-1 cluster rows may stay open until release QA.  
+**Plan status:** In progress — Phases **0–9** automated tasks complete in repo (including **netN** / **delete=** and **disks / rootfs / mpN** editors); optional manual Tier-1 cluster rows may stay open until release QA.  
 **Date:** April 2026  
 **Audience:** Cursor / implementers. Follow **phases in order** unless a phase explicitly allows skipping.
 
@@ -9,7 +9,7 @@
 ## How to use this document (implementers)
 
 1. Work **Phase 0 → Phase 7** sequentially. Do **not** start Phase *N+1* until **all** acceptance checkboxes for Phase *N* are `[x]`.
-2. **Optional** phases (8+) are out of strict order; still complete acceptance before merging.
+2. **Optional** phases (10+) are out of strict order relative to earlier work; still complete acceptance before merging.
 3. After **each** phase: run local CI parity from `.cursor/rules/ci-local-verification.mdc` (`pub get`, format check, `build_runner`, `gen-l10n`, `analyze`, `test`).
 4. Keep **ProxDroid** conventions: `ApiEndpoints` only (no hard-coded paths), `ProxmoxException` from repos, Riverpod codegen, Freezed + json_serializable, **ARB for all UI strings**, feature-first folders (`features/vms/`, `features/containers/`).
 5. When a **phase** ships: update `docs/ProxDroid_Roadmap.md` checklist if applicable; update `docs/ProxDroid_Architecture.md` §8 route table when routes land.
@@ -45,8 +45,8 @@ Use the detailed phase sections below for full tasks; this table is optional hig
 | 5 | Container Tier-A edit UI + entry point |
 | 6 | Create VM (minimal) + nextid + tasks if UPID |
 | 7 | Create CT (minimal) + tasks if UPID |
-| 8 (opt) | `netN` editor + `delete=` |
-| 9 (opt) | Disks / `rootfs` / `mpN` |
+| 8 | `netN` editor + `delete=` |
+| 9 | Disks / `rootfs` / `mpN` |
 | 10 (opt) | Cloud-init & advanced |
 
 ---
@@ -248,31 +248,32 @@ Expand structured fields **per phase**; always keep passthrough until Tier B is 
 
 ---
 
-## 14. Optional Phase 8 — Network interfaces (`netN`)
+## 14. Phase 8 — Network interfaces (`netN`)
 
 ### 14.1 Tasks
 
-- [ ] UI list editor for `net0`… with add/remove/reorder if product requires.
-- [ ] On save, emit `delete=netN` for removed indices and PUT new/changed `netM` values.
-- [ ] Tests for diff/delete composition.
+- [x] UI list editor for `net0`… with add/remove/reorder if product requires.
+- [x] On save, emit `delete=netN` for removed indices and PUT new/changed `netM` values.
+- [x] Tests for diff/delete composition.
 
 ### 14.2 Acceptance criteria
 
 - [ ] Manual add/remove net on test VM; Proxmox reflects change.
-- [ ] CI passes.
+- [x] CI passes.
 
 ---
 
-## 15. Optional Phase 9 — Disks / `rootfs` / `mpN`
+## 15. Phase 9 — Disks / `rootfs` / `mpN`
 
 ### 15.1 Tasks
 
-- [ ] High-risk strings: confirm UX (confirm dialog, stopped-guest checks).
-- [ ] Targeted tests with fixtures.
+- [x] High-risk strings: confirm UX (confirm dialog, stopped-guest checks).
+- [x] Targeted tests with fixtures.
 
 ### 15.2 Acceptance criteria
 
 - [ ] Documented manual test on non-production guest; CI passes.
+- [x] CI passes.
 
 ---
 

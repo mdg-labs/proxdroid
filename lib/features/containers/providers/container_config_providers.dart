@@ -89,7 +89,7 @@ class LxcContainerConfigEditor extends _$LxcContainerConfigEditor {
     if (v == null) {
       return;
     }
-    final delta = lxcContainerConfigDelta(v.original, v.draft);
+    final delta = lxcContainerConfigDeltaResult(v.original, v.draft);
     if (delta.isEmpty) {
       return;
     }
@@ -97,7 +97,12 @@ class LxcContainerConfigEditor extends _$LxcContainerConfigEditor {
     if (repo == null) {
       throw const AuthException();
     }
-    await repo.updateLxcConfig(node, vmid, Map<String, dynamic>.from(delta));
+    await repo.updateLxcConfig(
+      node,
+      vmid,
+      Map<String, dynamic>.from(delta.body),
+      deleteKeys: delta.deleteKeys.isEmpty ? null : delta.deleteKeys,
+    );
     ref.invalidate(allContainersProvider);
     ref.invalidate(lxcContainerConfigProvider(node, vmid));
   }

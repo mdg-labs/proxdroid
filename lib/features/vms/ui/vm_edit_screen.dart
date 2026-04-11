@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:proxdroid/core/models/guest_config_indexed_line.dart';
 import 'package:proxdroid/core/models/qemu_vm_config.dart';
+import 'package:proxdroid/core/models/vm.dart';
 import 'package:proxdroid/core/models/vm_lxc_config_delta.dart';
 import 'package:proxdroid/features/servers/ui/proxmox_exception_messages.dart';
 import 'package:proxdroid/features/vms/providers/vm_config_providers.dart';
+import 'package:proxdroid/features/vms/providers/vm_providers.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
 import 'package:proxdroid/shared/widgets/grouped_section.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
+import 'package:proxdroid/shared/widgets/premium_modals.dart';
 import 'package:proxdroid/shared/widgets/section_header.dart';
 import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
 
@@ -56,6 +60,12 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
   late final TextEditingController _startup = TextEditingController();
   late final TextEditingController _agent = TextEditingController();
 
+  final List<String> _netApiKeys = <String>[];
+  final List<TextEditingController> _netControllers = <TextEditingController>[];
+  final List<String> _diskApiKeys = <String>[];
+  final List<TextEditingController> _diskControllers =
+      <TextEditingController>[];
+
   @override
   void dispose() {
     _name.dispose();
@@ -69,6 +79,12 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
     _ostype.dispose();
     _startup.dispose();
     _agent.dispose();
+    for (final c in _netControllers) {
+      c.dispose();
+    }
+    for (final c in _diskControllers) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -89,13 +105,145 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
     _startup.text = draft.startup ?? '';
     _agent.text = draft.agent ?? '';
     _onBoot = _truthyString(draft.onboot);
+    _syncIndexedLines(draft.netLines, _netApiKeys, _netControllers);
+    _syncIndexedLines(draft.diskLines, _diskApiKeys, _diskControllers);
   }
 
-  QemuVmConfig _draftFromForm(QemuVmConfig template) {
+  void _syncIndexedLines(
+    List<GuestConfigIndexedLine> lines,
+    List<String> keys,
+    List<TextEditingController> ctrls,
+  ) {
+    while (ctrls.length < lines.length) {
+      ctrls.add(TextEditingController());
+    }
+    while (ctrls.length > lines.length) {
+      ctrls.removeLast().dispose();
+    }
+    keys
+      ..clear()
+      ..addAll(lines.map((e) => e.apiKey));
+    for (var i = 0; i < lines.length; i++) {
+      if (ctrls[i].text != lines[i].value) {
+        ctrls[i].text = lines[i].value;
+      }
+    }
+  }
+
+  bool _guestVmIsLive() {
+    final id = int.tryParse(widget.vmid);
+    if (id == null) {
+      return false;
+    }
+    final vms = ref.watch(allVmsProvider).valueOrNull;
+    if (vms == null) {
+      return false;
+    }
+    for (final v in vms) {
+      if (v.node == widget.node && v.vmid == id) {
+        return v.status == VmStatus.running || v.status == VmStatus.paused;
+      }
+    }
+    return false;
+  }
+
+  void _onReorderNet(int oldIndex, int newIndex) {
+    setState(() {
+      if (newIndex > oldIndex) {
+        newIndex -= 1;
+      }
+      final k = _netApiKeys.removeAt(oldIndex);
+      _netApiKeys.insert(newIndex, k);
+      final c = _netControllers.removeAt(oldIndex);
+      _netControllers.insert(newIndex, c);
+    });
+  }
+
+  void _onReorderDisk(int oldIndex, int newIndex) {
+    setState(() {
+      if (newIndex > oldIndex) {
+        newIndex -= 1;
+      }
+      final k = _diskApiKeys.removeAt(oldIndex);
+      _diskApiKeys.insert(newIndex, k);
+      final c = _diskControllers.removeAt(oldIndex);
+      _diskControllers.insert(newIndex, c);
+    });
+  }
+
+  void _addNetLine() {
+    setState(() {
+      var maxN = -1;
+      for (final k in _netApiKeys) {
+        final n = guestConfigNetSuffix(k);
+        if (n != null) {
+          maxN = maxN > n ? maxN : n;
+        }
+      }
+      final n = (maxN + 1).clamp(0, 31);
+      _netApiKeys.add('net$n');
+      _netControllers.add(TextEditingController(text: 'virtio,bridge=vmbr0'));
+    });
+  }
+
+  void _removeNetAt(int i) {
+    setState(() {
+      _netControllers.removeAt(i).dispose();
+      _netApiKeys.removeAt(i);
+    });
+  }
+
+  void _addDiskLine() {
+    setState(() {
+      var maxS = -1;
+      for (final k in _diskApiKeys) {
+        final m = RegExp(r'^scsi(\d+)$').firstMatch(k);
+        if (m != null) {
+          final v = int.parse(m.group(1)!);
+          maxS = maxS > v ? maxS : v;
+        }
+      }
+      final n = maxS + 1;
+      _diskApiKeys.add('scsi$n');
+      _diskControllers.add(TextEditingController());
+    });
+  }
+
+  void _removeDiskAt(int i) {
+    setState(() {
+      _diskControllers.removeAt(i).dispose();
+      _diskApiKeys.removeAt(i);
+    });
+  }
+
+  QemuVmConfig _draftFromForm(
+    QemuVmConfig template, {
+    required bool lockGuestLinks,
+  }) {
     final onboot =
         _onBoot == _truthyString(template.onboot)
             ? template.onboot
             : _boolToPve(_onBoot);
+    final netLines =
+        lockGuestLinks
+            ? List<GuestConfigIndexedLine>.from(template.netLines)
+            : List<GuestConfigIndexedLine>.generate(
+              _netApiKeys.length,
+              (i) => GuestConfigIndexedLine(
+                apiKey: _netApiKeys[i],
+                value: _netControllers[i].text.trim(),
+              ),
+            );
+    final diskLines =
+        lockGuestLinks
+            ? List<GuestConfigIndexedLine>.from(template.diskLines)
+            : List<GuestConfigIndexedLine>.generate(
+              _diskApiKeys.length,
+              (i) => GuestConfigIndexedLine(
+                apiKey: _diskApiKeys[i],
+                value: _diskControllers[i].text.trim(),
+              ),
+            );
     return template.copyWith(
       name: _nullableTrim(_name.text),
       description: _nullableTrim(_description.text),
@@ -109,6 +257,8 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
       onboot: onboot,
       startup: _nullableTrim(_startup.text),
       agent: _nullableTrim(_agent.text),
+      netLines: netLines,
+      diskLines: diskLines,
     );
   }
 
@@ -118,13 +268,37 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
     }
     final messenger = ScaffoldMessenger.of(context);
     final cur = ref.read(qemuVmConfigEditorProvider(node, vmid)).requireValue;
-    final edited = _draftFromForm(cur.draft);
-    final delta = qemuVmConfigDelta(cur.original, edited);
+    final guestLive = _guestVmIsLive();
+    final edited = _draftFromForm(cur.draft, lockGuestLinks: guestLive);
+    final delta = qemuVmConfigDeltaResult(cur.original, edited);
     if (delta.isEmpty) {
       messenger.showSnackBar(
         SnackBar(content: Text(l10n.guestConfigSaveNothingChanged)),
       );
       return;
+    }
+    if (!guestLive && delta.needsRiskConfirmation) {
+      final ok = await showPremiumDialog<bool>(
+        context: context,
+        title: Text(l10n.guestConfigRiskConfirmTitle),
+        content: Text(
+          l10n.guestConfigRiskConfirmBody,
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.actionCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.guestConfigRiskConfirmAction),
+          ),
+        ],
+      );
+      if (ok != true || !mounted) {
+        return;
+      }
     }
     setState(() => _saving = true);
     try {
@@ -210,6 +384,7 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
             ],
           ),
       data: (state) {
+        final guestLive = _guestVmIsLive();
         if (_appliedBindKey != state.bindKey) {
           final bk = state.bindKey;
           final draft = state.draft;
@@ -385,6 +560,200 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
                                 border: const OutlineInputBorder(),
                               ),
                               textInputAction: TextInputAction.next,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    GroupedSection(
+                      topSpacing: 0,
+                      header: SectionHeader(
+                        title: l10n.guestConfigSectionNetworks,
+                      ),
+                      gapAfterHeader: 8,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            if (guestLive)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: Text(
+                                  l10n.guestConfigNetworksLockedWhileRunning,
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              ),
+                            ReorderableListView(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              buildDefaultDragHandles: false,
+                              onReorder:
+                                  guestLive || _saving
+                                      ? (int _, int _) {}
+                                      : _onReorderNet,
+                              children: [
+                                for (var i = 0; i < _netApiKeys.length; i++)
+                                  Material(
+                                    key: ValueKey<String>(_netApiKeys[i]),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(bottom: 8),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          ReorderableDragStartListener(
+                                            index: i,
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                top: 12,
+                                                right: 8,
+                                              ),
+                                              child: Icon(
+                                                Icons.drag_handle,
+                                                color:
+                                                    Theme.of(
+                                                      context,
+                                                    ).colorScheme.outline,
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: TextFormField(
+                                              controller: _netControllers[i],
+                                              readOnly: guestLive || _saving,
+                                              decoration: InputDecoration(
+                                                labelText: l10n
+                                                    .guestConfigNetworkLineLabel(
+                                                      _netApiKeys[i],
+                                                    ),
+                                                border:
+                                                    const OutlineInputBorder(),
+                                              ),
+                                              maxLines: 2,
+                                            ),
+                                          ),
+                                          IconButton(
+                                            tooltip:
+                                                l10n.guestConfigRemoveInterface,
+                                            onPressed:
+                                                guestLive || _saving
+                                                    ? null
+                                                    : () => _removeNetAt(i),
+                                            icon: const Icon(
+                                              Icons.delete_outline,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextButton.icon(
+                                onPressed:
+                                    guestLive || _saving ? null : _addNetLine,
+                                icon: const Icon(Icons.add),
+                                label: Text(l10n.guestConfigAddNetwork),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    GroupedSection(
+                      topSpacing: 0,
+                      header: SectionHeader(
+                        title: l10n.guestConfigSectionDisks,
+                      ),
+                      gapAfterHeader: 8,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            if (guestLive)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: Text(
+                                  l10n.guestConfigDisksLockedWhileRunning,
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              ),
+                            ReorderableListView(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              buildDefaultDragHandles: false,
+                              onReorder:
+                                  guestLive || _saving
+                                      ? (int _, int _) {}
+                                      : _onReorderDisk,
+                              children: [
+                                for (var i = 0; i < _diskApiKeys.length; i++)
+                                  Material(
+                                    key: ValueKey<String>(_diskApiKeys[i]),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(bottom: 8),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          ReorderableDragStartListener(
+                                            index: i,
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                top: 12,
+                                                right: 8,
+                                              ),
+                                              child: Icon(
+                                                Icons.drag_handle,
+                                                color:
+                                                    Theme.of(
+                                                      context,
+                                                    ).colorScheme.outline,
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: TextFormField(
+                                              controller: _diskControllers[i],
+                                              readOnly: guestLive || _saving,
+                                              decoration: InputDecoration(
+                                                labelText: _diskApiKeys[i],
+                                                border:
+                                                    const OutlineInputBorder(),
+                                              ),
+                                              maxLines: 3,
+                                            ),
+                                          ),
+                                          IconButton(
+                                            tooltip: l10n.guestConfigRemoveDisk,
+                                            onPressed:
+                                                guestLive || _saving
+                                                    ? null
+                                                    : () => _removeDiskAt(i),
+                                            icon: const Icon(
+                                              Icons.delete_outline,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextButton.icon(
+                                onPressed:
+                                    guestLive || _saving ? null : _addDiskLine,
+                                icon: const Icon(Icons.add),
+                                label: Text(l10n.guestConfigAddDisk),
+                              ),
                             ),
                           ],
                         ),
