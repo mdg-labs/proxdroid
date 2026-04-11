@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:proxdroid/core/api/api_exceptions.dart';
 import 'package:proxdroid/core/api/proxmox_api_client.dart';
 import 'package:proxdroid/core/models/server.dart';
+import 'package:proxdroid/core/network/tls_pinning.dart';
 import 'package:proxdroid/core/storage/server_storage.dart';
 import 'package:proxdroid/core/utils/proxmox_login.dart';
 import 'package:proxdroid/features/servers/providers/server_providers.dart';
@@ -43,6 +44,7 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _customRealmController = TextEditingController();
+  final _pinController = TextEditingController();
 
   /// Dropdown value: [_realmPam], [_realmPve], or [_realmOther].
   String _realmDropdownValue = _realmPam;
@@ -51,6 +53,7 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
   bool _allowSelfSigned = false;
   bool _credentialsLoaded = false;
   bool _testingConnection = false;
+  bool _fetchingTlsPin = false;
   bool _saving = false;
 
   /// Stored `login@realm` from secure storage (for edit password/username logic).
@@ -68,6 +71,7 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
       _portController.text = '${existing.port}';
       _authType = existing.authType;
       _allowSelfSigned = existing.allowSelfSigned;
+      _pinController.text = existing.pinnedTlsSha256 ?? '';
       WidgetsBinding.instance.addPostFrameCallback(
         (_) => _loadEditCredentials(),
       );
@@ -113,7 +117,56 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
     _usernameController.dispose();
     _passwordController.dispose();
     _customRealmController.dispose();
+    _pinController.dispose();
     super.dispose();
+  }
+
+  String? _resolvedTlsPinForTest() {
+    if (!_allowSelfSigned) return null;
+    final fromField = normalizePinnedTlsSha256(_pinController.text);
+    if (fromField != null) return fromField;
+    if (_isEdit && widget.existingServer?.allowSelfSigned == true) {
+      return normalizePinnedTlsSha256(widget.existingServer?.pinnedTlsSha256);
+    }
+    return null;
+  }
+
+  Future<void> _fetchTlsCertificateFingerprint() async {
+    final l10n = AppLocalizations.of(context)!;
+    final hostErr = _validateHost(_hostController.text, l10n);
+    if (hostErr != null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(hostErr)));
+      return;
+    }
+    final port = _parsePort(l10n);
+    if (port == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.serverPortErrorInvalid)));
+      return;
+    }
+    setState(() => _fetchingTlsPin = true);
+    try {
+      final hex = await fetchLeafCertSha256Hex(
+        host: _hostController.text.trim(),
+        port: port,
+      );
+      if (!mounted) return;
+      if (hex == null) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.serverTlsPinFetchFailed)));
+        return;
+      }
+      setState(() => _pinController.text = hex);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.serverTlsPinFetchSuccess)));
+    } finally {
+      if (mounted) setState(() => _fetchingTlsPin = false);
+    }
   }
 
   String? _validateHost(String? value, AppLocalizations l10n) {
@@ -294,6 +347,16 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
 
     if (!mounted) return;
 
+    if (_allowSelfSigned) {
+      final pin = _resolvedTlsPinForTest();
+      if (pin == null) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.serverTlsPinErrorRequired)));
+        return;
+      }
+    }
+
     setState(() => _testingConnection = true);
     try {
       final testServer = Server(
@@ -306,6 +369,7 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
         port: port,
         authType: _authType,
         allowSelfSigned: _allowSelfSigned,
+        pinnedTlsSha256: _resolvedTlsPinForTest(),
       );
 
       final ProxmoxApiClient client;
@@ -332,12 +396,15 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
         context,
       ).showSnackBar(SnackBar(content: Text(proxmoxExceptionMessage(e, l10n))));
       _maybeShowConnectionDiagnostics(e);
-    } on ArgumentError {
+    } on ArgumentError catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.serverHostErrorHttps)));
-      _maybeShowConnectionDiagnostics('ArgumentError: invalid host');
+      final msg = e.message?.toString() ?? '';
+      final text =
+          msg.contains('pinnedTlsSha256')
+              ? l10n.serverTlsPinErrorRequired
+              : l10n.serverHostErrorHttps;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+      _maybeShowConnectionDiagnostics(e);
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(
@@ -363,6 +430,16 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
       return;
     }
 
+    if (_allowSelfSigned) {
+      final pin = normalizePinnedTlsSha256(_pinController.text);
+      if (pin == null) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.serverTlsPinErrorRequired)));
+        return;
+      }
+    }
+
     final id = widget.existingServer?.id ?? Uuid().v4();
     final server = Server(
       id: id,
@@ -371,6 +448,10 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
       port: port,
       authType: _authType,
       allowSelfSigned: _allowSelfSigned,
+      pinnedTlsSha256:
+          _allowSelfSigned
+              ? normalizePinnedTlsSha256(_pinController.text)
+              : null,
     );
 
     String? apiToken;
@@ -723,10 +804,55 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
                 GroupedSection(
                   topSpacing: 0,
                   header: SectionHeader(title: l10n.serverFormSecuritySection),
-                  child: SwitchListTile(
-                    title: Text(l10n.serverAllowSelfSigned),
-                    value: _allowSelfSigned,
-                    onChanged: (v) => setState(() => _allowSelfSigned = v),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SwitchListTile(
+                        title: Text(l10n.serverAllowSelfSigned),
+                        value: _allowSelfSigned,
+                        onChanged: (v) {
+                          setState(() {
+                            _allowSelfSigned = v;
+                            if (!v) _pinController.clear();
+                          });
+                        },
+                      ),
+                      if (_allowSelfSigned) ...[
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                          child: TextFormField(
+                            controller: _pinController,
+                            decoration: InputDecoration(
+                              labelText: l10n.serverTlsPinLabel,
+                              border: const OutlineInputBorder(),
+                              helperText: l10n.serverTlsPinHint,
+                            ),
+                            autocorrect: false,
+                            maxLines: 1,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                          child: OutlinedButton.icon(
+                            onPressed:
+                                _fetchingTlsPin
+                                    ? null
+                                    : _fetchTlsCertificateFingerprint,
+                            icon:
+                                _fetchingTlsPin
+                                    ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                    : const Icon(Icons.fingerprint),
+                            label: Text(l10n.serverTlsPinFetch),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
               ],

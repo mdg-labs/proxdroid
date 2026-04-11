@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- Self-signed TLS now uses a stored leaf certificate SHA-256 pin (`pinnedTlsSha256`) with a fetch action in the server editor; release Android builds use R8 shrinking, optional Dart obfuscation in CI, stricter Gradle release signing, `FLAG_SECURE` on server credential screens, disabled ADB backup, Dio send timeout, and redacted verbose connection diagnostics.
+
 ## [1.0.0-beta.16] - 2026-04-11
 
 ### Changed

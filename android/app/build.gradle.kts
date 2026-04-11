@@ -49,13 +49,20 @@ android {
 
     buildTypes {
         release {
-            signingConfig =
-                if (keystorePropertiesFile.exists()) {
-                    signingConfigs.getByName("release")
-                } else {
-                    // Local builds without key.properties only — not for published APKs.
-                    signingConfigs.getByName("debug")
-                }
+            if (!keystorePropertiesFile.exists()) {
+                throw GradleException(
+                    "Release builds require android/key.properties and a keystore. " +
+                        "See docs/Android_release_signing.md. " +
+                        "For local iteration use: flutter build apk --debug",
+                )
+            }
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                file("proguard-rules.pro"),
+            )
         }
     }
 }

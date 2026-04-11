@@ -34,6 +34,7 @@ class Server with _$Server {
     required int port,
     required ServerAuthType authType,
     required bool allowSelfSigned,
+    String? pinnedTlsSha256,
   }) = _Server;
   // No apiToken field. No password field. Credentials live in flutter_secure_storage.
 }
@@ -43,7 +44,7 @@ class Server with _$Server {
 
 | Data | Storage |
 |---|---|
-| Server name, host, port, authType, allowSelfSigned | `hive_ce` |
+| Server name, host, port, authType, allowSelfSigned, pinnedTlsSha256 | `hive_ce` |
 | API token, username/password | `flutter_secure_storage` (keyed by server ID) |
 | Active session ticket + CSRF token (username/password auth) | In-memory only — never persisted |
 | User preferences (theme) | `hive_ce` |

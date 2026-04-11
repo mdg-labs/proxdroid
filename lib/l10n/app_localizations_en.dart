@@ -210,6 +210,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get serverAllowSelfSigned => 'Allow self-signed certificate';
 
   @override
+  String get serverTlsPinLabel => 'Certificate fingerprint (SHA-256)';
+
+  @override
+  String get serverTlsPinHint =>
+      '64 hex characters. Tap fetch after entering host and port. Re-fetch if the server certificate is renewed.';
+
+  @override
+  String get serverTlsPinFetch => 'Fetch certificate fingerprint';
+
+  @override
+  String get serverTlsPinErrorRequired =>
+      'When self-signed is enabled, fetch or paste the certificate fingerprint.';
+
+  @override
+  String get serverTlsPinFetchFailed =>
+      'Could not read the server certificate. Check host, port, and network.';
+
+  @override
+  String get serverTlsPinFetchSuccess =>
+      'Fingerprint loaded. Save the server to keep it.';
+
+  @override
   String get serverHostErrorEmpty => 'Enter a host name or IP address.';
 
   @override

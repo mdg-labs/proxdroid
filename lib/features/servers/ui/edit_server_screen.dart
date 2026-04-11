@@ -6,6 +6,7 @@ import 'package:proxdroid/features/servers/ui/server_editor_page.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
+import 'package:proxdroid/shared/widgets/secure_window_scope.dart';
 import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
 
 class EditServerScreen extends ConsumerWidget {
@@ -115,7 +116,9 @@ class EditServerScreen extends ConsumerWidget {
             ],
           );
         }
-        return ServerEditorPage(existingServer: server);
+        return SecureWindowScope(
+          child: ServerEditorPage(existingServer: server),
+        );
       },
     );
   }

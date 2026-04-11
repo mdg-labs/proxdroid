@@ -20,7 +20,9 @@ keytool -genkey -v \
 
 Files `*.jks` and `key.properties` are **gitignored** — never commit them.
 
-## One-time: local `key.properties` (optional, for local `flutter build apk --release`)
+## Local `key.properties` (required for `flutter build apk --release`)
+
+Gradle is configured to **fail** the `release` build type if `android/key.properties` is missing (so release APKs are never accidentally signed with the debug keystore). Use **`flutter build apk --debug`** for unsigned local APKs when you do not have signing set up.
 
 Create `android/key.properties` (same folder as `android/build.gradle.kts`’s siblings — the **`android/`** directory):
 

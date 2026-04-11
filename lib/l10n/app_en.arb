@@ -276,6 +276,30 @@
   "@serverAllowSelfSigned": {
     "description": "Switch label to trust self-signed TLS certificates."
   },
+  "serverTlsPinLabel": "Certificate fingerprint (SHA-256)",
+  "@serverTlsPinLabel": {
+    "description": "Label for the TLS leaf certificate SHA-256 pin field."
+  },
+  "serverTlsPinHint": "64 hex characters. Tap fetch after entering host and port. Re-fetch if the server certificate is renewed.",
+  "@serverTlsPinHint": {
+    "description": "Helper under the TLS pin field."
+  },
+  "serverTlsPinFetch": "Fetch certificate fingerprint",
+  "@serverTlsPinFetch": {
+    "description": "Button to load the server leaf cert SHA-256 over TLS."
+  },
+  "serverTlsPinErrorRequired": "When self-signed is enabled, fetch or paste the certificate fingerprint.",
+  "@serverTlsPinErrorRequired": {
+    "description": "Snackbar when save or test is blocked without a valid pin."
+  },
+  "serverTlsPinFetchFailed": "Could not read the server certificate. Check host, port, and network.",
+  "@serverTlsPinFetchFailed": {
+    "description": "Snackbar when TLS pin fetch fails."
+  },
+  "serverTlsPinFetchSuccess": "Fingerprint loaded. Save the server to keep it.",
+  "@serverTlsPinFetchSuccess": {
+    "description": "Snackbar after a successful TLS pin fetch."
+  },
   "serverHostErrorEmpty": "Enter a host name or IP address.",
   "@serverHostErrorEmpty": {
     "description": "Validation when host is empty."

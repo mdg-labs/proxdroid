@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 import 'package:proxdroid/core/api/api_exceptions.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
 
@@ -39,6 +41,27 @@ String proxmoxExceptionMessage(Object error, AppLocalizations l10n) {
 
 /// Full technical text for the verbose connection-test dialog (not localized).
 String proxmoxExceptionDiagnosticsText(Object error) {
+  if (error is DioException) {
+    final inner = error.error;
+    if (inner is ProxmoxException) {
+      return proxmoxExceptionDiagnosticsText(inner);
+    }
+    final ro = error.requestOptions;
+    final path = ro.path;
+    final status = error.response?.statusCode;
+    final buf =
+        StringBuffer('DioException')
+          ..writeln('\ntype: ${error.type.name}')
+          ..writeln('method: ${ro.method}');
+    if (error.message != null && error.message!.trim().isNotEmpty) {
+      buf.writeln('message: ${error.message}');
+    }
+    if (status != null) {
+      buf.writeln('statusCode: $status');
+    }
+    buf.writeln('path: $path');
+    return buf.toString();
+  }
   if (error is ProxmoxException) {
     return switch (error) {
       AuthException(:final message) =>
@@ -53,5 +76,5 @@ String proxmoxExceptionDiagnosticsText(Object error) {
         'ServerException HTTP $statusCode${message != null ? '\n$message' : ''}',
     };
   }
-  return error.toString();
+  return 'Unknown error (${error.runtimeType}); raw details omitted.';
 }

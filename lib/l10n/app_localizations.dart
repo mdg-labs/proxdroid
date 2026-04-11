@@ -484,6 +484,42 @@ abstract class AppLocalizations {
   /// **'Allow self-signed certificate'**
   String get serverAllowSelfSigned;
 
+  /// Label for the TLS leaf certificate SHA-256 pin field.
+  ///
+  /// In en, this message translates to:
+  /// **'Certificate fingerprint (SHA-256)'**
+  String get serverTlsPinLabel;
+
+  /// Helper under the TLS pin field.
+  ///
+  /// In en, this message translates to:
+  /// **'64 hex characters. Tap fetch after entering host and port. Re-fetch if the server certificate is renewed.'**
+  String get serverTlsPinHint;
+
+  /// Button to load the server leaf cert SHA-256 over TLS.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch certificate fingerprint'**
+  String get serverTlsPinFetch;
+
+  /// Snackbar when save or test is blocked without a valid pin.
+  ///
+  /// In en, this message translates to:
+  /// **'When self-signed is enabled, fetch or paste the certificate fingerprint.'**
+  String get serverTlsPinErrorRequired;
+
+  /// Snackbar when TLS pin fetch fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not read the server certificate. Check host, port, and network.'**
+  String get serverTlsPinFetchFailed;
+
+  /// Snackbar after a successful TLS pin fetch.
+  ///
+  /// In en, this message translates to:
+  /// **'Fingerprint loaded. Save the server to keep it.'**
+  String get serverTlsPinFetchSuccess;
+
   /// Validation when host is empty.
   ///
   /// In en, this message translates to:

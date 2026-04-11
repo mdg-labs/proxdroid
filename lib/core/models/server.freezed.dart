@@ -14,7 +14,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Server {
 
- String get id; String get name; String get host; int get port; ServerAuthType get authType; bool get allowSelfSigned;
+ String get id; String get name; String get host; int get port; ServerAuthType get authType; bool get allowSelfSigned;/// SHA-256 (hex) of the leaf TLS certificate DER when [allowSelfSigned] is true.
+ String? get pinnedTlsSha256;
 /// Create a copy of Server
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +26,16 @@ $ServerCopyWith<Server> get copyWith => _$ServerCopyWithImpl<Server>(this as Ser
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Server&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.host, host) || other.host == host)&&(identical(other.port, port) || other.port == port)&&(identical(other.authType, authType) || other.authType == authType)&&(identical(other.allowSelfSigned, allowSelfSigned) || other.allowSelfSigned == allowSelfSigned));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Server&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.host, host) || other.host == host)&&(identical(other.port, port) || other.port == port)&&(identical(other.authType, authType) || other.authType == authType)&&(identical(other.allowSelfSigned, allowSelfSigned) || other.allowSelfSigned == allowSelfSigned)&&(identical(other.pinnedTlsSha256, pinnedTlsSha256) || other.pinnedTlsSha256 == pinnedTlsSha256));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,name,host,port,authType,allowSelfSigned);
+int get hashCode => Object.hash(runtimeType,id,name,host,port,authType,allowSelfSigned,pinnedTlsSha256);
 
 @override
 String toString() {
-  return 'Server(id: $id, name: $name, host: $host, port: $port, authType: $authType, allowSelfSigned: $allowSelfSigned)';
+  return 'Server(id: $id, name: $name, host: $host, port: $port, authType: $authType, allowSelfSigned: $allowSelfSigned, pinnedTlsSha256: $pinnedTlsSha256)';
 }
 
 
@@ -45,7 +46,7 @@ abstract mixin class $ServerCopyWith<$Res>  {
   factory $ServerCopyWith(Server value, $Res Function(Server) _then) = _$ServerCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String host, int port, ServerAuthType authType, bool allowSelfSigned
+ String id, String name, String host, int port, ServerAuthType authType, bool allowSelfSigned, String? pinnedTlsSha256
 });
 
 
@@ -62,7 +63,7 @@ class _$ServerCopyWithImpl<$Res>
 
 /// Create a copy of Server
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? host = null,Object? port = null,Object? authType = null,Object? allowSelfSigned = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? host = null,Object? port = null,Object? authType = null,Object? allowSelfSigned = null,Object? pinnedTlsSha256 = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -70,7 +71,8 @@ as String,host: null == host ? _self.host : host // ignore: cast_nullable_to_non
 as String,port: null == port ? _self.port : port // ignore: cast_nullable_to_non_nullable
 as int,authType: null == authType ? _self.authType : authType // ignore: cast_nullable_to_non_nullable
 as ServerAuthType,allowSelfSigned: null == allowSelfSigned ? _self.allowSelfSigned : allowSelfSigned // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,pinnedTlsSha256: freezed == pinnedTlsSha256 ? _self.pinnedTlsSha256 : pinnedTlsSha256 // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -152,10 +154,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String host,  int port,  ServerAuthType authType,  bool allowSelfSigned)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String host,  int port,  ServerAuthType authType,  bool allowSelfSigned,  String? pinnedTlsSha256)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Server() when $default != null:
-return $default(_that.id,_that.name,_that.host,_that.port,_that.authType,_that.allowSelfSigned);case _:
+return $default(_that.id,_that.name,_that.host,_that.port,_that.authType,_that.allowSelfSigned,_that.pinnedTlsSha256);case _:
   return orElse();
 
 }
@@ -173,10 +175,10 @@ return $default(_that.id,_that.name,_that.host,_that.port,_that.authType,_that.a
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String host,  int port,  ServerAuthType authType,  bool allowSelfSigned)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String host,  int port,  ServerAuthType authType,  bool allowSelfSigned,  String? pinnedTlsSha256)  $default,) {final _that = this;
 switch (_that) {
 case _Server():
-return $default(_that.id,_that.name,_that.host,_that.port,_that.authType,_that.allowSelfSigned);}
+return $default(_that.id,_that.name,_that.host,_that.port,_that.authType,_that.allowSelfSigned,_that.pinnedTlsSha256);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -190,10 +192,10 @@ return $default(_that.id,_that.name,_that.host,_that.port,_that.authType,_that.a
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String host,  int port,  ServerAuthType authType,  bool allowSelfSigned)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String host,  int port,  ServerAuthType authType,  bool allowSelfSigned,  String? pinnedTlsSha256)?  $default,) {final _that = this;
 switch (_that) {
 case _Server() when $default != null:
-return $default(_that.id,_that.name,_that.host,_that.port,_that.authType,_that.allowSelfSigned);case _:
+return $default(_that.id,_that.name,_that.host,_that.port,_that.authType,_that.allowSelfSigned,_that.pinnedTlsSha256);case _:
   return null;
 
 }
@@ -205,7 +207,7 @@ return $default(_that.id,_that.name,_that.host,_that.port,_that.authType,_that.a
 
 
 class _Server implements Server {
-  const _Server({required this.id, required this.name, required this.host, required this.port, required this.authType, required this.allowSelfSigned});
+  const _Server({required this.id, required this.name, required this.host, required this.port, required this.authType, required this.allowSelfSigned, this.pinnedTlsSha256});
   
 
 @override final  String id;
@@ -214,6 +216,8 @@ class _Server implements Server {
 @override final  int port;
 @override final  ServerAuthType authType;
 @override final  bool allowSelfSigned;
+/// SHA-256 (hex) of the leaf TLS certificate DER when [allowSelfSigned] is true.
+@override final  String? pinnedTlsSha256;
 
 /// Create a copy of Server
 /// with the given fields replaced by the non-null parameter values.
@@ -225,16 +229,16 @@ _$ServerCopyWith<_Server> get copyWith => __$ServerCopyWithImpl<_Server>(this, _
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Server&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.host, host) || other.host == host)&&(identical(other.port, port) || other.port == port)&&(identical(other.authType, authType) || other.authType == authType)&&(identical(other.allowSelfSigned, allowSelfSigned) || other.allowSelfSigned == allowSelfSigned));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Server&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.host, host) || other.host == host)&&(identical(other.port, port) || other.port == port)&&(identical(other.authType, authType) || other.authType == authType)&&(identical(other.allowSelfSigned, allowSelfSigned) || other.allowSelfSigned == allowSelfSigned)&&(identical(other.pinnedTlsSha256, pinnedTlsSha256) || other.pinnedTlsSha256 == pinnedTlsSha256));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,name,host,port,authType,allowSelfSigned);
+int get hashCode => Object.hash(runtimeType,id,name,host,port,authType,allowSelfSigned,pinnedTlsSha256);
 
 @override
 String toString() {
-  return 'Server(id: $id, name: $name, host: $host, port: $port, authType: $authType, allowSelfSigned: $allowSelfSigned)';
+  return 'Server(id: $id, name: $name, host: $host, port: $port, authType: $authType, allowSelfSigned: $allowSelfSigned, pinnedTlsSha256: $pinnedTlsSha256)';
 }
 
 
@@ -245,7 +249,7 @@ abstract mixin class _$ServerCopyWith<$Res> implements $ServerCopyWith<$Res> {
   factory _$ServerCopyWith(_Server value, $Res Function(_Server) _then) = __$ServerCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String host, int port, ServerAuthType authType, bool allowSelfSigned
+ String id, String name, String host, int port, ServerAuthType authType, bool allowSelfSigned, String? pinnedTlsSha256
 });
 
 
@@ -262,7 +266,7 @@ class __$ServerCopyWithImpl<$Res>
 
 /// Create a copy of Server
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? host = null,Object? port = null,Object? authType = null,Object? allowSelfSigned = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? host = null,Object? port = null,Object? authType = null,Object? allowSelfSigned = null,Object? pinnedTlsSha256 = freezed,}) {
   return _then(_Server(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -270,7 +274,8 @@ as String,host: null == host ? _self.host : host // ignore: cast_nullable_to_non
 as String,port: null == port ? _self.port : port // ignore: cast_nullable_to_non_nullable
 as int,authType: null == authType ? _self.authType : authType // ignore: cast_nullable_to_non_nullable
 as ServerAuthType,allowSelfSigned: null == allowSelfSigned ? _self.allowSelfSigned : allowSelfSigned // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,pinnedTlsSha256: freezed == pinnedTlsSha256 ? _self.pinnedTlsSha256 : pinnedTlsSha256 // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

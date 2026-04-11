@@ -30,7 +30,7 @@ This document defines the technical architecture of ProxDroid. All decisions fol
 | Framework | Flutter (Dart) | Android-native UI, Material 3, performant |
 | State Management | **Riverpod** | Modern, minimal boilerplate, ideal for solo dev |
 | Navigation | **go_router** | Official Flutter standard, deep link support |
-| HTTP Client | **Dio** | SSL override for self-signed certs, interceptors |
+| HTTP Client | **Dio** | TLS pin for self-signed mode, interceptors |
 | Data Models | **Freezed** | Immutable, auto-generates copyWith/toJson |
 | Charts | **fl_chart** | Lightweight, highly customizable |
 | Local Storage | **hive_ce** + **flutter_secure_storage** | hive_ce (community-maintained Hive fork) for non-sensitive data; flutter_secure_storage for credentials (Android Keystore) |
@@ -260,32 +260,13 @@ Core models: `Server`, `Node`, `Vm`, `Container`, `Task`, `BackupJob`, `BackupCo
 
 ## 7. API Client & SSL Handling
 
-The Proxmox API client is provided as a singleton via Riverpod. SSL override for self-signed certificates is a mandatory requirement and is handled via `IOHttpClientAdapter` (Dio v5+):
+The Proxmox API client is provided via Riverpod. For **self-signed** (or otherwise non–public-CA) servers, the user enables **Allow self-signed** and must store a **TLS pin** on the `Server` record: `pinnedTlsSha256` — lowercase hex, 64 characters, **SHA-256 of the leaf certificate DER**. The server editor can **fetch** this fingerprint over TLS (one-time trust-on-first-use style handshake) before saving.
 
-```dart
-import 'dart:io';
-import 'package:dio/dio.dart';
-import 'package:dio/io.dart'; // required for IOHttpClientAdapter
+When `allowSelfSigned` is true, `ProxmoxApiClient` uses `IOHttpClientAdapter` (Dio v5+) with `badCertificateCallback` that returns **only** if the presented certificate matches `pinnedTlsSha256` (`certificateMatchesPin` in `lib/core/network/tls_pinning.dart`). Unconditional `true` is never used — that would allow trivial MITM.
 
-final dio = Dio(BaseOptions(
-  baseUrl: 'https://$host:$port/api2/json',
-  connectTimeout: const Duration(seconds: 10),
-  receiveTimeout: const Duration(seconds: 30),
-));
+Default CA validation applies when `allowSelfSigned` is false (standard `IOHttpClientAdapter()`).
 
-if (allowSelfSigned) {
-  dio.httpClientAdapter = IOHttpClientAdapter(
-    createHttpClient: () {
-      final client = HttpClient();
-      // Accept self-signed certificates – user explicitly opts in per-server
-      client.badCertificateCallback = (cert, host, port) => true;
-      return client;
-    },
-  );
-}
-```
-
-> **Security note:** `badCertificateCallback = true` disables certificate validation entirely. This is intentional for homelab use, where self-signed certs are the norm. Users who need stricter validation can leave `allowSelfSigned` off and rely on system CAs. A future enhancement could support certificate pinning (store the expected cert fingerprint per server).
+> **Operational note:** If the server renews its certificate to a new leaf, the stored pin no longer matches — the user must **re-fetch** the fingerprint in the server editor (same as after changing hostname/port).
 
 > **Deprecated API:** Dio v4 used `DefaultHttpClientAdapter` with `onHttpClientCreate`. Dio v5 replaced this with `IOHttpClientAdapter` and `createHttpClient`. Do **not** use the v4 pattern.
 

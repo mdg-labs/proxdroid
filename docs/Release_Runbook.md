@@ -50,7 +50,7 @@ On every push and PR to `main` or `beta` (no path filter), CI runs first on the 
 
 1. Flutter **3.41.6** stable is set up; then `pub get`, `build_runner`, and `gen-l10n`.
 2. Android release signing is applied from the repository secrets. Missing `KEYSTORE_BASE64` fails fast with a pointer to `docs/Android_release_signing.md`.
-3. `flutter build apk --release` produces a signed APK, renamed to `proxdroid-v<VERSION>.apk` where `<VERSION>` is the semver part after stripping build metadata (no `+...`).
+3. `flutter build apk --release --obfuscate --split-debug-info=build/app/debug-info` produces a signed APK; the workflow uploads `build/app/debug-info` as an artifact for stack trace symbolication. The APK is renamed to `proxdroid-v<VERSION>.apk` where `<VERSION>` is the semver part after stripping build metadata (no `+...`).
 4. Release notes list commits since the previous tag (or all commits if there is no previous tag):
 
 ```bash
@@ -77,7 +77,7 @@ Same as for beta: on push/PR to `main` or `beta`, CI runs `flutter pub get`, `da
 
 **What the build workflow does on `main` (when the gate passes)**
 
-1. Same Flutter version, `pub get`, `build_runner`, `gen-l10n`, signing, and `flutter build apk --release` as on beta; APK is still named `proxdroid-v<VERSION>.apk`.
+1. Same Flutter version, `pub get`, `build_runner`, `gen-l10n`, signing, and obfuscated `flutter build apk --release` as on beta (including the split debug info artifact); APK is still named `proxdroid-v<VERSION>.apk`.
 2. Release notes aggregate beta pre-releases merged into `main` since the previous stable tag. For each beta tag, the workflow tries to use the existing GitHub Release body; if that body is empty, it falls back to:
 
 ```bash

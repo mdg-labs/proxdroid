@@ -26,6 +26,13 @@ class ServerAdapter extends TypeAdapter<Server> {
       _authUsernamePassword => ServerAuthType.usernamePassword,
       _ => ServerAuthType.apiToken,
     };
+    String? pinnedTlsSha256;
+    if (reader.availableBytes > 0) {
+      final s = reader.readString();
+      if (s.isNotEmpty) {
+        pinnedTlsSha256 = s;
+      }
+    }
     return Server(
       id: id,
       name: name,
@@ -33,6 +40,7 @@ class ServerAdapter extends TypeAdapter<Server> {
       port: port,
       authType: authType,
       allowSelfSigned: allowSelfSigned,
+      pinnedTlsSha256: pinnedTlsSha256,
     );
   }
 
@@ -47,5 +55,6 @@ class ServerAdapter extends TypeAdapter<Server> {
       ServerAuthType.usernamePassword => _authUsernamePassword,
     });
     writer.writeBool(obj.allowSelfSigned);
+    writer.writeString(obj.pinnedTlsSha256 ?? '');
   }
 }

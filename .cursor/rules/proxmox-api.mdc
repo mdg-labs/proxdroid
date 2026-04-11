@@ -16,27 +16,16 @@ from host + port). Surface a clear error for either. Android API 28+ blocks
 cleartext HTTP at the OS level with cryptic errors. Do not add
 `android:usesCleartextTraffic` to the manifest.
 
-## Dio v5: IOHttpClientAdapter
+## Dio v5: IOHttpClientAdapter and TLS pins
 
-For self-signed certificate override, use Dio v5's `IOHttpClientAdapter` with
-the `createHttpClient` callback. **Never** use `DefaultHttpClientAdapter` —
+When `Server.allowSelfSigned` is true, the app **must** have a valid
+`Server.pinnedTlsSha256` (64 hex chars, SHA-256 of the leaf certificate DER).
+Use `IOHttpClientAdapter` with `createHttpClient` and set
+`badCertificateCallback` to accept the connection **only** when
+`certificateMatchesPin(cert, pin)` is true — **never** use
+`(cert, host, port) => true`. See `lib/core/network/tls_pinning.dart` and
+`ProxmoxApiClient._adapterForServer`. **Never** use `DefaultHttpClientAdapter` —
 that is the Dio v4 API and was removed in v5.
-
-```dart
-import 'dart:io';
-import 'package:dio/dio.dart';
-import 'package:dio/io.dart'; // required for IOHttpClientAdapter
-
-if (allowSelfSigned) {
-  dio.httpClientAdapter = IOHttpClientAdapter(
-    createHttpClient: () {
-      final client = HttpClient();
-      client.badCertificateCallback = (cert, host, port) => true;
-      return client;
-    },
-  );
-}
-```
 
 ## Preferred API Calls for List Screens
 

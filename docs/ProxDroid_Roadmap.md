@@ -84,7 +84,7 @@
   - `flutter pub get`
   - `dart run build_runner build --delete-conflicting-outputs` (must run before build; generates Freezed/Riverpod code)
   - `flutter gen-l10n`
-  - Build release APK (`flutter build apk --release`)
+  - Build release APK (`flutter build apk --release --obfuscate --split-debug-info=build/app/debug-info`); upload `build/app/debug-info` as a workflow artifact for symbolication
   - Upload as GitHub Release asset named `proxdroid-<tag>.apk` (e.g. `proxdroid-v1.0.0-beta.12+1.apk`)
 - [x] Confirm both workflows pass on a clean run (verified locally: `flutter pub get`, format check, `build_runner`, `gen-l10n`, `flutter analyze`, `flutter test` — all exit 0; first GitHub Actions run should still be watched by maintainers)
 
@@ -95,7 +95,7 @@
 **Goal:** The user can add a Proxmox server (by hostname/IP, port, API token or username/password), the app connects to it, authenticates successfully, and stores the configuration locally. Self-signed certificates must work.
 
 ### 1.1 Core Data Models
-- [x] Implement `Server` model in `core/models/server.dart` (Freezed) – hive_ce-persisted fields only: id, name, host, port, authType, allowSelfSigned
+- [x] Implement `Server` model in `core/models/server.dart` (Freezed) – hive_ce-persisted fields only: id, name, host, port, authType, allowSelfSigned, pinnedTlsSha256 (TLS pin when self-signed is enabled)
   - **Note:** credentials (`apiToken`, `password`) are NOT fields on the `Server` model – they are stored separately in `flutter_secure_storage` keyed by server id, and loaded at runtime when building the `ProxmoxApiClient`
 - [x] Implement `Node` model in `core/models/node.dart` (Freezed) – fields: name, status, cpu, maxCpu, mem, maxMem, uptime
 - [x] Add `ServerAuthType` enum: `apiToken`, `usernamePassword`
@@ -113,8 +113,8 @@
 
 ### 1.3 Proxmox API Client
 - [x] Implement `ProxmoxApiClient` with Dio
-- [x] Add `BaseOptions`: base URL (`https://$host:$port/api2/json`), timeouts (connect: 10s, receive: 30s)
-- [x] Implement SSL override using `IOHttpClientAdapter` + `createHttpClient` (Dio v5 API) for self-signed certs
+- [x] Add `BaseOptions`: base URL (`https://$host:$port/api2/json`), timeouts (connect: 10s, send: 30s, receive: 30s)
+- [x] Implement self-signed TLS using `IOHttpClientAdapter` + `createHttpClient` (Dio v5 API) with **certificate pin** (`pinnedTlsSha256`); never accept all certificates
   - **Do not use** `DefaultHttpClientAdapter` – that is the Dio v4 API and was removed in v5
 - [x] Enforce HTTPS-only: validate in `AddServerScreen` / `ServerEditorPage` that the host does not contain `http://` or `https://` and surface a clear error if it does (Android API 28+ blocks cleartext HTTP at OS level with cryptic errors) — **Phase 1.5** (client already rejects `http://` in host when building the base URL)
 - [x] Implement `ApiInterceptor` for:
@@ -343,6 +343,7 @@
 - [x] Handle empty states on all list screens
 - [x] Implement persistent offline banner: when `connectivityProvider` reports no network, show a non-dismissible top banner across all screens; auto-dismiss when connectivity is restored
 - [x] Connection diagnostics: surface Proxmox/Dio `message` in snackbars; realm selector (`user@realm`) on server form; Settings toggle for verbose connection-test dialog; HTML/proxy detection in error mapping; docs for `/api2/json` behind reverse proxies
+- [x] Security baseline: TLS leaf certificate pin for self-signed mode (`pinnedTlsSha256` + fetch in server editor), `FLAG_SECURE` on add/edit server screens, `android:allowBackup="false"`, R8 minify/shrink for release, CI `--obfuscate` + split debug info artifact, Gradle release requires `android/key.properties` (no debug-signed release APKs)
 
 ### 6.2 UX Polish
 - [x] Add smooth page transitions (go_router transitions)

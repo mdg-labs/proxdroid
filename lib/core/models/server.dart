@@ -17,5 +17,8 @@ sealed class Server with _$Server {
     required int port,
     required ServerAuthType authType,
     required bool allowSelfSigned,
+
+    /// SHA-256 (hex) of the leaf TLS certificate DER when [allowSelfSigned] is true.
+    String? pinnedTlsSha256,
   }) = _Server;
 }

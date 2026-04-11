@@ -18,6 +18,8 @@ import 'package:proxdroid/core/models/proxmox_version.dart';
 import 'package:proxdroid/core/models/qemu_vm_config.dart';
 import 'package:proxdroid/core/models/guest_create_result.dart';
 import 'package:proxdroid/core/models/vm.dart';
+import 'package:proxdroid/core/network/proxmox_server_host.dart';
+import 'package:proxdroid/core/network/tls_pinning.dart';
 import 'package:proxdroid/shared/constants/api_endpoints.dart';
 
 export 'package:proxdroid/core/models/proxmox_version.dart' show ProxmoxVersion;
@@ -127,6 +129,15 @@ class ProxmoxApiClient {
     Dio? dioOverride,
     HttpClientAdapter? httpClientAdapterOverride,
   }) {
+    if (server.allowSelfSigned) {
+      if (!isValidPinnedTlsSha256Format(server.pinnedTlsSha256)) {
+        throw ArgumentError(
+          'allowSelfSigned requires pinnedTlsSha256: a 64-character '
+          'hexadecimal SHA-256 fingerprint of the server leaf certificate '
+          '(use Fetch certificate fingerprint in the server editor).',
+        );
+      }
+    }
     final baseUrl = _buildBaseUrl(server);
     final ownDio = dioOverride == null;
     final dio =
@@ -135,6 +146,7 @@ class ProxmoxApiClient {
           BaseOptions(
             baseUrl: baseUrl,
             connectTimeout: const Duration(seconds: 10),
+            sendTimeout: const Duration(seconds: 30),
             receiveTimeout: const Duration(seconds: 30),
           ),
         );
@@ -142,6 +154,7 @@ class ProxmoxApiClient {
     dio.options
       ..baseUrl = baseUrl
       ..connectTimeout = const Duration(seconds: 10)
+      ..sendTimeout = const Duration(seconds: 30)
       ..receiveTimeout = const Duration(seconds: 30);
 
     if (httpClientAdapterOverride != null) {
@@ -172,7 +185,7 @@ class ProxmoxApiClient {
   }
 
   static String _buildBaseUrl(Server server) {
-    final host = _normalizeHost(server.host);
+    final host = normalizeProxmoxServerHost(server.host);
     final uri = Uri(
       scheme: 'https',
       host: host,
@@ -186,45 +199,20 @@ class ProxmoxApiClient {
     return s;
   }
 
-  /// Strips accidental scheme; rejects cleartext. IPv6 may be stored with or
-  /// without brackets — [Uri] expects the host without brackets.
-  static String _normalizeHost(String raw) {
-    var h = raw.trim();
-    if (h.isEmpty) {
-      throw ArgumentError('Server host is empty');
-    }
-    final lower = h.toLowerCase();
-    if (lower.startsWith('http://')) {
-      throw ArgumentError(
-        'Cleartext HTTP is not supported. Enter host without http:// — '
-        'the app always uses HTTPS.',
-      );
-    }
-    if (lower.startsWith('https://')) {
-      h = h.substring(8);
-      final slash = h.indexOf('/');
-      if (slash >= 0) {
-        h = h.substring(0, slash);
-      }
-    }
-    if (h.startsWith('[') && h.endsWith(']')) {
-      h = h.substring(1, h.length - 1);
-    }
-    return h;
-  }
-
   static HttpClientAdapter _adapterForServer(Server server) {
-    if (server.allowSelfSigned) {
-      return IOHttpClientAdapter(
-        createHttpClient: () {
-          final client = HttpClient();
-          client.badCertificateCallback =
-              (X509Certificate cert, String host, int port) => true;
-          return client;
-        },
-      );
+    if (!server.allowSelfSigned) {
+      return IOHttpClientAdapter();
     }
-    return IOHttpClientAdapter();
+    final pin = normalizePinnedTlsSha256(server.pinnedTlsSha256)!;
+    return IOHttpClientAdapter(
+      createHttpClient: () {
+        final client = HttpClient();
+        client.badCertificateCallback =
+            (X509Certificate cert, String host, int port) =>
+                certificateMatchesPin(cert, pin);
+        return client;
+      },
+    );
   }
 
   /// Clears in-memory ticket session (e.g. after logout). No-op for API token.

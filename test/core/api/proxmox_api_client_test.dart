@@ -125,6 +125,21 @@ void main() {
     );
   });
 
+  test('rejects allowSelfSigned without pinnedTlsSha256', () {
+    final bad = Server(
+      id: 'x',
+      name: 'X',
+      host: 'pve.example',
+      port: 8006,
+      authType: ServerAuthType.apiToken,
+      allowSelfSigned: true,
+    );
+    expect(
+      () => ProxmoxApiClient.withApiToken(server: bad, apiToken: 't'),
+      throwsA(isA<ArgumentError>()),
+    );
+  });
+
   test(
     'username/password: 401 on GET refreshes ticket once then succeeds',
     () async {

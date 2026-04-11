@@ -8,6 +8,10 @@ import 'package:proxdroid/core/storage/server_storage.dart';
 
 import '../../support/in_memory_secure_storage.dart';
 
+/// Valid 64-char hex pin for tests (not tied to a real certificate).
+const _kTestTlsPin =
+    '0000000000000000000000000000000000000000000000000000000000000000';
+
 void main() {
   late Directory tempDir;
   late Box<Server> box;
@@ -55,6 +59,7 @@ void main() {
       port: 8006,
       authType: ServerAuthType.apiToken,
       allowSelfSigned: true,
+      pinnedTlsSha256: _kTestTlsPin,
     );
     await storage.save(b);
     await storage.save(a);
@@ -71,6 +76,7 @@ void main() {
       port: 8006,
       authType: ServerAuthType.apiToken,
       allowSelfSigned: true,
+      pinnedTlsSha256: _kTestTlsPin,
     );
     await storage.save(server, apiToken: 'secret-token');
 
@@ -130,6 +136,7 @@ void main() {
       port: 443,
       authType: ServerAuthType.usernamePassword,
       allowSelfSigned: true,
+      pinnedTlsSha256: _kTestTlsPin,
     );
     await storage.save(server, username: 'u', password: 'p');
     await storage.delete('gone');
