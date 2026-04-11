@@ -29,6 +29,26 @@ void main() {
       },
     );
 
+    test('nvme0 is modeled as a disk line and can delta', () {
+      final original = QemuVmConfig.fromProxmoxConfigData(<String, dynamic>{
+        'vmid': 1,
+        'name': 'nv',
+        'nvme0': 'local-lvm:vm-1-disk-0,size=32G',
+      });
+      expect(original.diskLines.single.apiKey, 'nvme0');
+      final edited = original.copyWith(
+        diskLines: <GuestConfigIndexedLine>[
+          const GuestConfigIndexedLine(
+            apiKey: 'nvme0',
+            value: 'local-lvm:vm-1-disk-0,size=64G',
+          ),
+        ],
+      );
+      final r = qemuVmConfigDeltaResult(original, edited);
+      expect(r.deleteKeys, isEmpty);
+      expect(r.body.keys, unorderedEquals(<String>['nvme0']));
+    });
+
     test('changing scsi0 value emits only scsi0 in body', () {
       final original = QemuVmConfig.fromProxmoxConfigData(<String, dynamic>{
         'vmid': 1,

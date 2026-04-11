@@ -20,8 +20,10 @@ class GuestConfigIndexedLine {
 }
 
 final RegExp _netKey = RegExp(r'^net(\d+)$');
+
+/// Proxmox QEMU disk-like config keys (see PVE `qm` config reference).
 final RegExp _qemuDiskKey = RegExp(
-  r'^(ide|scsi|virtio|sata|efidisk|tpmstate)(\d+)$',
+  r'^(ide|scsi|virtio|sata|nvme|efidisk|tpmstate)(\d+)$',
 );
 final RegExp _lxcMpKey = RegExp(r'^mp(\d+)$');
 

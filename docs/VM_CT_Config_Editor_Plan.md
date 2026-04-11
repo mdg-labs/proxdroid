@@ -85,7 +85,7 @@ Use the detailed phase sections below for full tasks; this table is optional hig
   - [x] Identity: `name`, `description`, `tags` (QEMU); `hostname`, `description`, `tags` (LXC)
   - [x] Resources: `memory`, `cores` (+ LXC: `swap`, `cpulimit`, `cpuunits` if present)
   - [x] QEMU: `sockets`, `vcpus`, `cpu`, `ostype`, `onboot`, `startup`, `agent` (as strings if compound)
-  - [x] LXC: `ostype`, `arch`, `onboot`, `startup`, `unprivileged`, `features` (string), `rootfs` (string — read-only in UI until Phase 9 unless product decides otherwise)
+  - [x] LXC: `ostype`, `arch`, `onboot`, `startup`, `unprivileged`, `features` (string), `rootfs` (string — editable in UI when the CT is **stopped** from Phase 9 onward; see Phase 9)
 - [x] **Passthrough map:** all keys from GET not assigned to structured fields remain in `Map<String, String>` (or values normalized to string per `proxmox_json_helpers` patterns).
 - [x] `build_runner` generates clean; no analyzer issues in new files.
 
@@ -272,7 +272,7 @@ Expand structured fields **per phase**; always keep passthrough until Tier B is 
 
 ### 15.2 Acceptance criteria
 
-- [ ] Documented manual test on non-production guest; CI passes.
+- [ ] Documented manual test on non-production guest.
 - [x] CI passes.
 
 ---

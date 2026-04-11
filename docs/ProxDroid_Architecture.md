@@ -123,11 +123,13 @@ lib/
 │   │   ├── data/
 │   │   │   └── vm_repository.dart
 │   │   ├── providers/
-│   │   │   └── vm_providers.dart
+│   │   │   ├── vm_providers.dart
+│   │   │   └── vm_config_providers.dart
 │   │   └── ui/
 │   │       ├── vm_list_screen.dart
 │   │       ├── vm_detail_screen.dart
 │   │       ├── vm_edit_screen.dart
+│   │       ├── vm_create_screen.dart
 │   │       └── widgets/
 │   │           ├── vm_status_badge.dart
 │   │           ├── cpu_chart.dart
@@ -137,8 +139,15 @@ lib/
 │   │
 │   ├── containers/                   # LXC container management
 │   │   ├── data/
+│   │   │   └── container_repository.dart
 │   │   ├── providers/
+│   │   │   ├── container_providers.dart
+│   │   │   └── container_config_providers.dart
 │   │   └── ui/
+│   │       ├── container_list_screen.dart
+│   │       ├── container_detail_screen.dart
+│   │       ├── container_edit_screen.dart
+│   │       ├── container_create_screen.dart
 │   │       └── widgets/              # chart wrappers (parallel to vms/widgets)
 │   │
 │   ├── storage/                      # Storage overview
