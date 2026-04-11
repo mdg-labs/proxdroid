@@ -382,6 +382,19 @@ class AppLocalizationsEn extends AppLocalizations {
       'This VM is not in the current list. Go back and refresh the list.';
 
   @override
+  String get nodeDetailTitle => 'Node';
+
+  @override
+  String get nodeNotFoundTitle => 'Node not found';
+
+  @override
+  String get nodeNotFoundMessage =>
+      'This node is not in the current list. Go back and refresh the list.';
+
+  @override
+  String get labelNodeHostStatus => 'Status';
+
+  @override
   String get containerNotFoundTitle => 'Container not found';
 
   @override

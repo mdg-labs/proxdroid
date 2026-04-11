@@ -108,7 +108,13 @@ lib/
 │   │   │   ├── dashboard_providers.dart
 │   │   │   └── rrd_providers.dart      # Chart data + 60s polling
 │   │   └── ui/
-│   │       └── dashboard_screen.dart
+│   │       ├── dashboard_screen.dart
+│   │       ├── node_detail_screen.dart
+│   │       └── widgets/              # node-level chart wrappers (node RRD)
+│   │           ├── node_cpu_chart.dart
+│   │           ├── node_memory_chart.dart
+│   │           ├── node_network_chart.dart
+│   │           └── node_disk_io_chart.dart
 │   │
 │   ├── vms/                          # VM management
 │   │   ├── data/
@@ -289,6 +295,7 @@ if (allowSelfSigned) {
 /servers/add                        → Add server
 /servers/edit/:serverId             → Edit server (name, host, port, credentials, SSL toggle)
 /dashboard                          → Node overview (after server selection)
+/dashboard/:node                    → Node detail + resource charts (same branch as overview)
 /vms                                → VM list (all nodes)
 /vms/:node/:vmid                    → VM detail + charts
 /containers                         → Container list (all nodes)
@@ -301,7 +308,7 @@ if (allowSelfSigned) {
 /settings                           → Settings
 ```
 
-> **Shell AppBar leading:** On section roots (`/vms`, `/dashboard`, `/servers`, …) the app bar shows the drawer (hamburger). On nested routes (`/servers/add`, `/vms/:node/:vmid`, …) it shows back. The implementation keys off `GoRouterState.uri.path` and `isShellDrawerRootPath` — not `GoRouter.canPop()`, which can stay true on section roots after redirects or pops and would incorrectly show only the back affordance.
+> **Shell AppBar leading:** On section roots (`/vms`, `/dashboard`, `/servers`, …) the app bar shows the drawer (hamburger). On nested routes (`/servers/add`, `/dashboard/:node`, `/vms/:node/:vmid`, …) it shows back. The implementation keys off `GoRouterState.uri.path` and `isShellDrawerRootPath` — not `GoRouter.canPop()`, which can stay true on section roots after redirects or pops and would incorrectly show only the back affordance.
 
 > **Note:** All Proxmox API calls require both `node` and the resource ID. Routes include `:node` to keep all navigation self-contained without relying on provider state for the node lookup.
 

@@ -16,6 +16,7 @@ Route paths must match the table in `docs/ProxDroid_Architecture.md §8`:
 /servers/add               → Add server
 /servers/edit/:serverId    → Edit server
 /dashboard                 → Node overview
+/dashboard/:node           → Node detail + charts
 /vms                       → VM list
 /vms/:node/:vmid           → VM detail + charts
 /containers                → Container list

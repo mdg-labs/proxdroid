@@ -796,6 +796,30 @@ abstract class AppLocalizations {
   /// **'This VM is not in the current list. Go back and refresh the list.'**
   String get vmNotFoundMessage;
 
+  /// App bar title for cluster node detail screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Node'**
+  String get nodeDetailTitle;
+
+  /// Detail screen when node name is not in the current list.
+  ///
+  /// In en, this message translates to:
+  /// **'Node not found'**
+  String get nodeNotFoundTitle;
+
+  /// Body when a node cannot be resolved from the list.
+  ///
+  /// In en, this message translates to:
+  /// **'This node is not in the current list. Go back and refresh the list.'**
+  String get nodeNotFoundMessage;
+
+  /// Metric grid label for Proxmox node online/offline state.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get labelNodeHostStatus;
+
   /// Detail screen when container id or route is invalid.
   ///
   /// In en, this message translates to:

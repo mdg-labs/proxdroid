@@ -15,6 +15,7 @@ void main() {
 
   test('isShellDrawerRootPath is false for nested routes', () {
     expect(isShellDrawerRootPath('/vms/n1/100'), isFalse);
+    expect(isShellDrawerRootPath('/dashboard/pve1'), isFalse);
     expect(isShellDrawerRootPath('/servers/add'), isFalse);
     expect(isShellDrawerRootPath('/servers/edit/x'), isFalse);
     expect(isShellDrawerRootPath('/storage/n1/local'), isFalse);

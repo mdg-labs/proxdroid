@@ -7,6 +7,7 @@ import 'package:proxdroid/features/backups/ui/backup_list_screen.dart';
 import 'package:proxdroid/features/containers/ui/container_detail_screen.dart';
 import 'package:proxdroid/features/containers/ui/container_list_screen.dart';
 import 'package:proxdroid/features/dashboard/ui/dashboard_screen.dart';
+import 'package:proxdroid/features/dashboard/ui/node_detail_screen.dart';
 import 'package:proxdroid/features/servers/providers/server_providers.dart';
 import 'package:proxdroid/features/servers/ui/add_server_screen.dart';
 import 'package:proxdroid/features/servers/ui/edit_server_screen.dart';
@@ -121,6 +122,20 @@ GoRouter router(Ref ref) {
                 pageBuilder:
                     (BuildContext context, GoRouterState state) =>
                         _fadeShellPage(state, const DashboardScreen()),
+                routes: <RouteBase>[
+                  GoRoute(
+                    path: ':node',
+                    pageBuilder: (BuildContext context, GoRouterState state) {
+                      final node = Uri.decodeComponent(
+                        state.pathParameters['node']!,
+                      );
+                      return _fadeShellPage(
+                        state,
+                        NodeDetailScreen(node: node),
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),

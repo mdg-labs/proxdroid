@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:proxdroid/app/theme/app_colors.dart';
 import 'package:proxdroid/app/theme/app_theme.dart';
 import 'package:proxdroid/core/models/node.dart';
@@ -173,12 +174,24 @@ class DashboardScreen extends ConsumerWidget {
 
                   return Padding(
                     padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                    child: _NodeCard(
-                      node: node,
-                      online: online,
-                      cpuFrac: cpuFrac,
-                      memFrac: memFrac,
-                      l10n: l10n,
+                    child: Material(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(16),
+                      clipBehavior: Clip.antiAlias,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap:
+                            () => context.push(
+                              '/dashboard/${Uri.encodeComponent(node.name)}',
+                            ),
+                        child: _NodeCard(
+                          node: node,
+                          online: online,
+                          cpuFrac: cpuFrac,
+                          memFrac: memFrac,
+                          l10n: l10n,
+                        ),
+                      ),
                     ),
                   );
                 }, childCount: nodes.length),

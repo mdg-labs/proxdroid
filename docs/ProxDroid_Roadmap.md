@@ -186,7 +186,8 @@
 - [x] Each node card: name, online/offline badge, CPU usage bar, RAM usage bar, uptime
 - [x] Show cluster-wide summary at top (total VMs, running VMs, total containers)
 - [x] Handle loading state (shimmer), error state (retry button), empty state
-- [x] Wire up go_router: `/dashboard` → `DashboardScreen`
+- [x] Wire up go_router: `/dashboard` → `DashboardScreen`, `/dashboard/:node` → `NodeDetailScreen` (node name URL-encoded)
+- [x] `NodeDetailScreen` — VM-style layout: hero, metric grid, CPU/memory/network/disk charts with timeframe selectors, backup sheet entry; tap-through from dashboard node cards (no host power actions)
 
 ### 2.5 VM List & Detail
 - [x] Build `VmListScreen` – filterable list of all VMs across all nodes

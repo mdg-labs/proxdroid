@@ -502,6 +502,22 @@
   "@vmNotFoundMessage": {
     "description": "Body when VM cannot be resolved."
   },
+  "nodeDetailTitle": "Node",
+  "@nodeDetailTitle": {
+    "description": "App bar title for cluster node detail screen."
+  },
+  "nodeNotFoundTitle": "Node not found",
+  "@nodeNotFoundTitle": {
+    "description": "Detail screen when node name is not in the current list."
+  },
+  "nodeNotFoundMessage": "This node is not in the current list. Go back and refresh the list.",
+  "@nodeNotFoundMessage": {
+    "description": "Body when a node cannot be resolved from the list."
+  },
+  "labelNodeHostStatus": "Status",
+  "@labelNodeHostStatus": {
+    "description": "Metric grid label for Proxmox node online/offline state."
+  },
   "containerNotFoundTitle": "Container not found",
   "@containerNotFoundTitle": {
     "description": "Detail screen when container id or route is invalid."
