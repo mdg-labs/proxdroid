@@ -95,4 +95,26 @@ abstract final class ApiEndpoints {
   /// `POST /nodes/{node}/vzdump` — run a manual backup (form body).
   static String nodeVzdump(String node) =>
       '/nodes/${Uri.encodeComponent(node)}/vzdump';
+
+  /// `GET|PUT /nodes/{node}/qemu/{vmid}/config` — QEMU VM configuration.
+  static String nodeQemuVmConfig(String node, int vmid) =>
+      '/nodes/${Uri.encodeComponent(node)}/qemu/'
+      '${Uri.encodeComponent(vmid.toString())}/config';
+
+  /// `GET|PUT /nodes/{node}/lxc/{vmid}/config` — LXC CT configuration (CT id
+  /// is API `vmid`).
+  static String nodeLxcCtConfig(String node, int vmid) =>
+      '/nodes/${Uri.encodeComponent(node)}/lxc/'
+      '${Uri.encodeComponent(vmid.toString())}/config';
+
+  /// `POST /nodes/{node}/qemu` — create QEMU VM (form body).
+  static String nodeQemuCreate(String node) =>
+      '/nodes/${Uri.encodeComponent(node)}/qemu';
+
+  /// `POST /nodes/{node}/lxc` — create LXC container (form body).
+  static String nodeLxcCreate(String node) =>
+      '/nodes/${Uri.encodeComponent(node)}/lxc';
+
+  /// `GET /cluster/nextid` — next free guest ID.
+  static const String clusterNextId = '/cluster/nextid';
 }

@@ -100,6 +100,17 @@ class _VmListScreenState extends ConsumerState<VmListScreen> {
 
     return ShellSectionBody(
       title: Text(l10n.sectionVms),
+      floatingActionButton: FloatingActionButton(
+        tooltip: l10n.guestCreateFabVm,
+        onPressed: () {
+          final q =
+              _nodeFilter != null
+                  ? '?node=${Uri.encodeComponent(_nodeFilter!)}'
+                  : '';
+          context.push('/vms/create$q');
+        },
+        child: const Icon(Icons.add),
+      ),
       body: async.when(
         loading:
             () => RefreshIndicator(

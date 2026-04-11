@@ -1593,6 +1593,354 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tags'**
   String get sectionGuestTags;
+
+  /// Tooltip / label to open VM or LXC config editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit configuration'**
+  String get actionEditGuestConfig;
+
+  /// App bar title for QEMU VM Tier-A config editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit VM'**
+  String get screenEditVmConfig;
+
+  /// App bar title for LXC Tier-A config editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit container'**
+  String get screenEditContainerConfig;
+
+  /// Grouped form section: name, description, tags.
+  ///
+  /// In en, this message translates to:
+  /// **'Identity'**
+  String get guestConfigSectionIdentity;
+
+  /// Grouped form section: memory, swap, etc.
+  ///
+  /// In en, this message translates to:
+  /// **'Resources'**
+  String get guestConfigSectionResources;
+
+  /// Grouped form section: sockets, cores, limits.
+  ///
+  /// In en, this message translates to:
+  /// **'CPU'**
+  String get guestConfigSectionCpu;
+
+  /// Grouped form section: on boot, startup order.
+  ///
+  /// In en, this message translates to:
+  /// **'Boot'**
+  String get guestConfigSectionBoot;
+
+  /// Grouped form section: agent, features, etc.
+  ///
+  /// In en, this message translates to:
+  /// **'Options'**
+  String get guestConfigSectionOptions;
+
+  /// QEMU VM config field label for name.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get guestConfigFieldVmName;
+
+  /// LXC config field label for hostname.
+  ///
+  /// In en, this message translates to:
+  /// **'Hostname'**
+  String get guestConfigFieldHostname;
+
+  /// Guest config notes / description field.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get guestConfigFieldDescription;
+
+  /// Proxmox tags string (semicolon-separated in API).
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get guestConfigFieldTags;
+
+  /// RAM size field for VM or CT.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory (MiB)'**
+  String get guestConfigFieldMemory;
+
+  /// QEMU CPU socket count.
+  ///
+  /// In en, this message translates to:
+  /// **'CPU sockets'**
+  String get guestConfigFieldSockets;
+
+  /// QEMU cores per socket.
+  ///
+  /// In en, this message translates to:
+  /// **'Cores per socket'**
+  String get guestConfigFieldCores;
+
+  /// QEMU vCPU count override.
+  ///
+  /// In en, this message translates to:
+  /// **'vCPUs'**
+  String get guestConfigFieldVcpus;
+
+  /// QEMU cpu= argument (e.g. host).
+  ///
+  /// In en, this message translates to:
+  /// **'CPU type'**
+  String get guestConfigFieldCpuType;
+
+  /// ostype= for QEMU or LXC.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest OS'**
+  String get guestConfigFieldGuestOs;
+
+  /// LXC arch= field.
+  ///
+  /// In en, this message translates to:
+  /// **'Architecture'**
+  String get guestConfigFieldArchitecture;
+
+  /// LXC swap size.
+  ///
+  /// In en, this message translates to:
+  /// **'Swap (MiB)'**
+  String get guestConfigFieldSwap;
+
+  /// LXC cpulimit (0–800 or 0 for unlimited).
+  ///
+  /// In en, this message translates to:
+  /// **'CPU limit'**
+  String get guestConfigFieldCpuLimit;
+
+  /// LXC cpuunits scheduling weight.
+  ///
+  /// In en, this message translates to:
+  /// **'CPU units'**
+  String get guestConfigFieldCpuUnits;
+
+  /// Proxmox startup= ordering string.
+  ///
+  /// In en, this message translates to:
+  /// **'Startup order'**
+  String get guestConfigFieldStartupOrder;
+
+  /// Whether the guest starts when the node boots.
+  ///
+  /// In en, this message translates to:
+  /// **'Start at boot'**
+  String get guestConfigFieldOnBoot;
+
+  /// agent= string for QEMU.
+  ///
+  /// In en, this message translates to:
+  /// **'QEMU guest agent'**
+  String get guestConfigFieldQemuAgent;
+
+  /// LXC unprivileged flag.
+  ///
+  /// In en, this message translates to:
+  /// **'Unprivileged container'**
+  String get guestConfigFieldUnprivileged;
+
+  /// LXC features= string.
+  ///
+  /// In en, this message translates to:
+  /// **'Features'**
+  String get guestConfigFieldFeatures;
+
+  /// LXC rootfs= (read-only in Tier A editor).
+  ///
+  /// In en, this message translates to:
+  /// **'Root filesystem'**
+  String get guestConfigFieldRootfs;
+
+  /// Helper under read-only rootfs field.
+  ///
+  /// In en, this message translates to:
+  /// **'Root filesystem cannot be edited here yet.'**
+  String get guestConfigRootfsReadOnlyHint;
+
+  /// Reset form to last loaded server values.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get guestConfigActionDiscard;
+
+  /// Snackbar after successful PUT config.
+  ///
+  /// In en, this message translates to:
+  /// **'Configuration saved'**
+  String get guestConfigSaveSuccess;
+
+  /// Snackbar when save tapped with empty delta.
+  ///
+  /// In en, this message translates to:
+  /// **'No changes to save'**
+  String get guestConfigSaveNothingChanged;
+
+  /// Generic required field validation.
+  ///
+  /// In en, this message translates to:
+  /// **'This field is required.'**
+  String get validationFieldRequired;
+
+  /// Validation for integer fields such as memory.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a positive whole number.'**
+  String get validationIntegerPositive;
+
+  /// Proxmox VM/CT id lower bound hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest ID must be at least 100.'**
+  String get validationVmidMin;
+
+  /// App bar title for minimal QEMU create form.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Virtual Machine'**
+  String get guestCreateVmTitle;
+
+  /// App bar title for minimal LXC create form.
+  ///
+  /// In en, this message translates to:
+  /// **'Create container'**
+  String get guestCreateCtTitle;
+
+  /// Primary button on create VM/CT forms.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get guestCreateSubmit;
+
+  /// FAB tooltip on VM list.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Virtual Machine'**
+  String get guestCreateFabVm;
+
+  /// FAB tooltip on container list.
+  ///
+  /// In en, this message translates to:
+  /// **'Create container'**
+  String get guestCreateFabCt;
+
+  /// Form section: node and guest id.
+  ///
+  /// In en, this message translates to:
+  /// **'Target'**
+  String get guestCreateSectionTarget;
+
+  /// Form section for QEMU disk and net0.
+  ///
+  /// In en, this message translates to:
+  /// **'Disk and network'**
+  String get guestCreateSectionDiskNet;
+
+  /// QEMU scsihw= field label.
+  ///
+  /// In en, this message translates to:
+  /// **'SCSI controller (scsihw)'**
+  String get guestCreateFieldScsihw;
+
+  /// Helper for scsihw field.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty to omit; virtio-scsi is common with scsi0.'**
+  String get guestCreateFieldScsihwHint;
+
+  /// QEMU boot disk volume string.
+  ///
+  /// In en, this message translates to:
+  /// **'Disk (scsi0)'**
+  String get guestCreateFieldScsi0;
+
+  /// Example scsi0 Proxmox volume string.
+  ///
+  /// In en, this message translates to:
+  /// **'Example: local-lvm:32'**
+  String get guestCreateFieldScsi0Hint;
+
+  /// QEMU/LXC net0 string label.
+  ///
+  /// In en, this message translates to:
+  /// **'Network (net0)'**
+  String get guestCreateFieldNet0;
+
+  /// QEMU net0 example.
+  ///
+  /// In en, this message translates to:
+  /// **'Example: virtio,bridge=vmbr0'**
+  String get guestCreateFieldNet0Hint;
+
+  /// LXC net0 example.
+  ///
+  /// In en, this message translates to:
+  /// **'Example: name=eth0,bridge=vmbr0,ip=dhcp'**
+  String get guestCreateFieldNet0HintCt;
+
+  /// LXC create root password field.
+  ///
+  /// In en, this message translates to:
+  /// **'Root password'**
+  String get guestCreateFieldRootPassword;
+
+  /// LXC rootfs volume example.
+  ///
+  /// In en, this message translates to:
+  /// **'Example: local-lvm:8'**
+  String get guestCreateFieldRootfsHint;
+
+  /// QEMU ostype helper.
+  ///
+  /// In en, this message translates to:
+  /// **'Example: l26 (Linux 2.6+), win11, other.'**
+  String get guestCreateVmOstypeHint;
+
+  /// LXC ostype helper.
+  ///
+  /// In en, this message translates to:
+  /// **'Template id, e.g. debian or ubuntu.'**
+  String get guestCreateCtOstypeHint;
+
+  /// Footer note on create VM screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating a VM runs a server task. Ensure disk and network strings match your node.'**
+  String get guestCreateVmDisclaimer;
+
+  /// Footer note on create CT screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating a container runs a server task. Match rootfs and templates to your cluster.'**
+  String get guestCreateCtDisclaimer;
+
+  /// Empty node list on create guest screen.
+  ///
+  /// In en, this message translates to:
+  /// **'No cluster nodes are available.'**
+  String get guestCreateNoNodes;
+
+  /// Short name for success snackbar (powerActionCompleted).
+  ///
+  /// In en, this message translates to:
+  /// **'Create Virtual Machine'**
+  String get guestCreateVmActionName;
+
+  /// Short name for success snackbar after CT create.
+  ///
+  /// In en, this message translates to:
+  /// **'Create container'**
+  String get guestCreateCtActionName;
 }
 
 class _AppLocalizationsDelegate

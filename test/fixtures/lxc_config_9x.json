@@ -1,0 +1,22 @@
+{
+  "digest": "bb:cc:dd:ee:ff:00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd",
+  "vmid": 201,
+  "hostname": "app-9",
+  "description": "nine",
+  "tags": "app;blue",
+  "memory": "2048",
+  "swap": "512",
+  "cores": "4",
+  "cpulimit": "4",
+  "cpuunits": "2048",
+  "ostype": "ubuntu",
+  "arch": "amd64",
+  "onboot": "0",
+  "startup": "order=5",
+  "unprivileged": "1",
+  "features": "nesting=1,keyctl=1",
+  "rootfs": "zfspool:subvol-201-disk-0,size=16G",
+  "net0": "name=eth0,bridge=vmbr1,firewall=1",
+  "pct_mode": "app",
+  "dev0": "/dev/ttyUSB0,mp=/dev/ttyUSB0"
+}

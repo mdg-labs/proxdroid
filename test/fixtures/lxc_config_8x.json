@@ -1,0 +1,22 @@
+{
+  "digest": "aa:bb:cc:dd:ee:ff:00:11:22:33:44:55:66:77:88:99:00:11:22:33",
+  "vmid": 200,
+  "hostname": "db-8",
+  "description": "lxc tier a",
+  "tags": "db",
+  "memory": 1024,
+  "swap": 256,
+  "cores": 2,
+  "cpulimit": "1.5",
+  "cpuunits": 1024,
+  "ostype": "debian",
+  "arch": "amd64",
+  "onboot": 1,
+  "startup": "order=3",
+  "unprivileged": 1,
+  "features": "nesting=1",
+  "rootfs": "local-lvm:vm-200-disk-0,size=8G",
+  "net0": "name=eth0,bridge=vmbr0,ip=dhcp",
+  "lxc.cgroup.relative": "0",
+  "hookscript": ""
+}

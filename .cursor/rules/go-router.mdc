@@ -18,9 +18,13 @@ Route paths must match the table in `docs/ProxDroid_Architecture.md §8`:
 /dashboard                 → Node overview
 /dashboard/:node           → Node detail + charts
 /vms                       → VM list
+/vms/create                → Create VM (optional `?node=` query)
 /vms/:node/:vmid           → VM detail + charts
+/vms/:node/:vmid/edit      → VM Tier-A config editor
 /containers                → Container list
+/containers/create         → Create LXC (optional `?node=` query)
 /containers/:node/:ctid    → Container detail
+/containers/:node/:ctid/edit → LXC Tier-A config editor
 /storage                   → Storage overview
 /storage/:node/:storage    → Storage detail
 /backups                   → Backup list

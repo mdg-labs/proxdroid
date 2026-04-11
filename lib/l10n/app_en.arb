@@ -1093,5 +1093,237 @@
   "sectionGuestTags": "Tags",
   "@sectionGuestTags": {
     "description": "Section title for Proxmox guest tags on VM / container detail screens."
+  },
+  "actionEditGuestConfig": "Edit configuration",
+  "@actionEditGuestConfig": {
+    "description": "Tooltip / label to open VM or LXC config editor."
+  },
+  "screenEditVmConfig": "Edit VM",
+  "@screenEditVmConfig": {
+    "description": "App bar title for QEMU VM Tier-A config editor."
+  },
+  "screenEditContainerConfig": "Edit container",
+  "@screenEditContainerConfig": {
+    "description": "App bar title for LXC Tier-A config editor."
+  },
+  "guestConfigSectionIdentity": "Identity",
+  "@guestConfigSectionIdentity": {
+    "description": "Grouped form section: name, description, tags."
+  },
+  "guestConfigSectionResources": "Resources",
+  "@guestConfigSectionResources": {
+    "description": "Grouped form section: memory, swap, etc."
+  },
+  "guestConfigSectionCpu": "CPU",
+  "@guestConfigSectionCpu": {
+    "description": "Grouped form section: sockets, cores, limits."
+  },
+  "guestConfigSectionBoot": "Boot",
+  "@guestConfigSectionBoot": {
+    "description": "Grouped form section: on boot, startup order."
+  },
+  "guestConfigSectionOptions": "Options",
+  "@guestConfigSectionOptions": {
+    "description": "Grouped form section: agent, features, etc."
+  },
+  "guestConfigFieldVmName": "Name",
+  "@guestConfigFieldVmName": {
+    "description": "QEMU VM config field label for name."
+  },
+  "guestConfigFieldHostname": "Hostname",
+  "@guestConfigFieldHostname": {
+    "description": "LXC config field label for hostname."
+  },
+  "guestConfigFieldDescription": "Description",
+  "@guestConfigFieldDescription": {
+    "description": "Guest config notes / description field."
+  },
+  "guestConfigFieldTags": "Tags",
+  "@guestConfigFieldTags": {
+    "description": "Proxmox tags string (semicolon-separated in API)."
+  },
+  "guestConfigFieldMemory": "Memory (MiB)",
+  "@guestConfigFieldMemory": {
+    "description": "RAM size field for VM or CT."
+  },
+  "guestConfigFieldSockets": "CPU sockets",
+  "@guestConfigFieldSockets": {
+    "description": "QEMU CPU socket count."
+  },
+  "guestConfigFieldCores": "Cores per socket",
+  "@guestConfigFieldCores": {
+    "description": "QEMU cores per socket."
+  },
+  "guestConfigFieldVcpus": "vCPUs",
+  "@guestConfigFieldVcpus": {
+    "description": "QEMU vCPU count override."
+  },
+  "guestConfigFieldCpuType": "CPU type",
+  "@guestConfigFieldCpuType": {
+    "description": "QEMU cpu= argument (e.g. host)."
+  },
+  "guestConfigFieldGuestOs": "Guest OS",
+  "@guestConfigFieldGuestOs": {
+    "description": "ostype= for QEMU or LXC."
+  },
+  "guestConfigFieldArchitecture": "Architecture",
+  "@guestConfigFieldArchitecture": {
+    "description": "LXC arch= field."
+  },
+  "guestConfigFieldSwap": "Swap (MiB)",
+  "@guestConfigFieldSwap": {
+    "description": "LXC swap size."
+  },
+  "guestConfigFieldCpuLimit": "CPU limit",
+  "@guestConfigFieldCpuLimit": {
+    "description": "LXC cpulimit (0–800 or 0 for unlimited)."
+  },
+  "guestConfigFieldCpuUnits": "CPU units",
+  "@guestConfigFieldCpuUnits": {
+    "description": "LXC cpuunits scheduling weight."
+  },
+  "guestConfigFieldStartupOrder": "Startup order",
+  "@guestConfigFieldStartupOrder": {
+    "description": "Proxmox startup= ordering string."
+  },
+  "guestConfigFieldOnBoot": "Start at boot",
+  "@guestConfigFieldOnBoot": {
+    "description": "Whether the guest starts when the node boots."
+  },
+  "guestConfigFieldQemuAgent": "QEMU guest agent",
+  "@guestConfigFieldQemuAgent": {
+    "description": "agent= string for QEMU."
+  },
+  "guestConfigFieldUnprivileged": "Unprivileged container",
+  "@guestConfigFieldUnprivileged": {
+    "description": "LXC unprivileged flag."
+  },
+  "guestConfigFieldFeatures": "Features",
+  "@guestConfigFieldFeatures": {
+    "description": "LXC features= string."
+  },
+  "guestConfigFieldRootfs": "Root filesystem",
+  "@guestConfigFieldRootfs": {
+    "description": "LXC rootfs= (read-only in Tier A editor)."
+  },
+  "guestConfigRootfsReadOnlyHint": "Root filesystem cannot be edited here yet.",
+  "@guestConfigRootfsReadOnlyHint": {
+    "description": "Helper under read-only rootfs field."
+  },
+  "guestConfigActionDiscard": "Discard",
+  "@guestConfigActionDiscard": {
+    "description": "Reset form to last loaded server values."
+  },
+  "guestConfigSaveSuccess": "Configuration saved",
+  "@guestConfigSaveSuccess": {
+    "description": "Snackbar after successful PUT config."
+  },
+  "guestConfigSaveNothingChanged": "No changes to save",
+  "@guestConfigSaveNothingChanged": {
+    "description": "Snackbar when save tapped with empty delta."
+  },
+  "validationFieldRequired": "This field is required.",
+  "@validationFieldRequired": {
+    "description": "Generic required field validation."
+  },
+  "validationIntegerPositive": "Enter a positive whole number.",
+  "@validationIntegerPositive": {
+    "description": "Validation for integer fields such as memory."
+  },
+  "validationVmidMin": "Guest ID must be at least 100.",
+  "@validationVmidMin": {
+    "description": "Proxmox VM/CT id lower bound hint."
+  },
+  "guestCreateVmTitle": "Create Virtual Machine",
+  "@guestCreateVmTitle": {
+    "description": "App bar title for minimal QEMU create form."
+  },
+  "guestCreateCtTitle": "Create container",
+  "@guestCreateCtTitle": {
+    "description": "App bar title for minimal LXC create form."
+  },
+  "guestCreateSubmit": "Create",
+  "@guestCreateSubmit": {
+    "description": "Primary button on create VM/CT forms."
+  },
+  "guestCreateFabVm": "Create Virtual Machine",
+  "@guestCreateFabVm": {
+    "description": "FAB tooltip on VM list."
+  },
+  "guestCreateFabCt": "Create container",
+  "@guestCreateFabCt": {
+    "description": "FAB tooltip on container list."
+  },
+  "guestCreateSectionTarget": "Target",
+  "@guestCreateSectionTarget": {
+    "description": "Form section: node and guest id."
+  },
+  "guestCreateSectionDiskNet": "Disk and network",
+  "@guestCreateSectionDiskNet": {
+    "description": "Form section for QEMU disk and net0."
+  },
+  "guestCreateFieldScsihw": "SCSI controller (scsihw)",
+  "@guestCreateFieldScsihw": {
+    "description": "QEMU scsihw= field label."
+  },
+  "guestCreateFieldScsihwHint": "Leave empty to omit; virtio-scsi is common with scsi0.",
+  "@guestCreateFieldScsihwHint": {
+    "description": "Helper for scsihw field."
+  },
+  "guestCreateFieldScsi0": "Disk (scsi0)",
+  "@guestCreateFieldScsi0": {
+    "description": "QEMU boot disk volume string."
+  },
+  "guestCreateFieldScsi0Hint": "Example: local-lvm:32",
+  "@guestCreateFieldScsi0Hint": {
+    "description": "Example scsi0 Proxmox volume string."
+  },
+  "guestCreateFieldNet0": "Network (net0)",
+  "@guestCreateFieldNet0": {
+    "description": "QEMU/LXC net0 string label."
+  },
+  "guestCreateFieldNet0Hint": "Example: virtio,bridge=vmbr0",
+  "@guestCreateFieldNet0Hint": {
+    "description": "QEMU net0 example."
+  },
+  "guestCreateFieldNet0HintCt": "Example: name=eth0,bridge=vmbr0,ip=dhcp",
+  "@guestCreateFieldNet0HintCt": {
+    "description": "LXC net0 example."
+  },
+  "guestCreateFieldRootPassword": "Root password",
+  "@guestCreateFieldRootPassword": {
+    "description": "LXC create root password field."
+  },
+  "guestCreateFieldRootfsHint": "Example: local-lvm:8",
+  "@guestCreateFieldRootfsHint": {
+    "description": "LXC rootfs volume example."
+  },
+  "guestCreateVmOstypeHint": "Example: l26 (Linux 2.6+), win11, other.",
+  "@guestCreateVmOstypeHint": {
+    "description": "QEMU ostype helper."
+  },
+  "guestCreateCtOstypeHint": "Template id, e.g. debian or ubuntu.",
+  "@guestCreateCtOstypeHint": {
+    "description": "LXC ostype helper."
+  },
+  "guestCreateVmDisclaimer": "Creating a VM runs a server task. Ensure disk and network strings match your node.",
+  "@guestCreateVmDisclaimer": {
+    "description": "Footer note on create VM screen."
+  },
+  "guestCreateCtDisclaimer": "Creating a container runs a server task. Match rootfs and templates to your cluster.",
+  "@guestCreateCtDisclaimer": {
+    "description": "Footer note on create CT screen."
+  },
+  "guestCreateNoNodes": "No cluster nodes are available.",
+  "@guestCreateNoNodes": {
+    "description": "Empty node list on create guest screen."
+  },
+  "guestCreateVmActionName": "Create Virtual Machine",
+  "@guestCreateVmActionName": {
+    "description": "Short name for success snackbar (powerActionCompleted)."
+  },
+  "guestCreateCtActionName": "Create container",
+  "@guestCreateCtActionName": {
+    "description": "Short name for success snackbar after CT create."
   }
 }

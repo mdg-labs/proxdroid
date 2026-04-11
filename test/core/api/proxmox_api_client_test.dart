@@ -1,7 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'dart:convert';
+
 import 'package:proxdroid/core/api/api_exceptions.dart';
 import 'package:proxdroid/core/api/proxmox_api_client.dart';
+import 'package:proxdroid/core/models/guest_create_result.dart';
 import 'package:proxdroid/core/models/server.dart';
 import 'package:proxdroid/shared/constants/api_endpoints.dart';
 
@@ -204,5 +207,274 @@ void main() {
     );
 
     expect(client.fetchVersion(), throwsA(isA<PermissionException>()));
+  });
+
+  test('fetchQemuVmConfig parses data envelope', () async {
+    final inner = <String, dynamic>{
+      'vmid': 100,
+      'name': 'vm1',
+      'memory': 2048,
+      'cores': 2,
+      'net0': 'virtio=AA:BB,bridge=vmbr0',
+    };
+    final adapter = FakeHttpClientAdapter([
+      ResponseBody.fromString(
+        jsonEncode({'data': inner}),
+        200,
+        headers: {
+          Headers.contentTypeHeader: [Headers.jsonContentType],
+        },
+      ),
+    ]);
+    final dio = Dio()..httpClientAdapter = adapter;
+    final client = ProxmoxApiClient.withApiToken(
+      server: serverToken,
+      apiToken: 'root@pam!tok=secret',
+      dioOverride: dio,
+    );
+
+    final cfg = await client.fetchQemuVmConfig('node-1', 100);
+    expect(cfg.name, 'vm1');
+    expect(cfg.memory, '2048');
+    expect(cfg.cores, '2');
+    expect(cfg.passthrough['net0'], contains('vmbr0'));
+    expect(
+      adapter.requests.single.path,
+      ApiEndpoints.nodeQemuVmConfig('node-1', 100),
+    );
+  });
+
+  test('fetchLxcConfig parses data envelope', () async {
+    final inner = <String, dynamic>{
+      'vmid': 200,
+      'hostname': 'ct1',
+      'memory': 512,
+      'rootfs': 'local:200/vm-200-disk-0.raw,size=4G',
+      'mp0': 'local:snippets,mp=/snippets',
+    };
+    final adapter = FakeHttpClientAdapter([
+      ResponseBody.fromString(
+        jsonEncode({'data': inner}),
+        200,
+        headers: {
+          Headers.contentTypeHeader: [Headers.jsonContentType],
+        },
+      ),
+    ]);
+    final dio = Dio()..httpClientAdapter = adapter;
+    final client = ProxmoxApiClient.withApiToken(
+      server: serverToken,
+      apiToken: 'root@pam!tok=secret',
+      dioOverride: dio,
+    );
+
+    final cfg = await client.fetchLxcConfig('n2', 200);
+    expect(cfg.hostname, 'ct1');
+    expect(cfg.memory, '512');
+    expect(cfg.passthrough['mp0'], contains('snippets'));
+    expect(
+      adapter.requests.single.path,
+      ApiEndpoints.nodeLxcCtConfig('n2', 200),
+    );
+  });
+
+  test('403 on GET qemu config maps to PermissionException', () async {
+    final adapter = FakeHttpClientAdapter([
+      ResponseBody.fromString(
+        '{}',
+        403,
+        headers: {
+          Headers.contentTypeHeader: [Headers.jsonContentType],
+        },
+      ),
+    ]);
+    final dio = Dio()..httpClientAdapter = adapter;
+    final client = ProxmoxApiClient.withApiToken(
+      server: serverToken,
+      apiToken: 't',
+      dioOverride: dio,
+    );
+    expect(
+      client.fetchQemuVmConfig('n', 1),
+      throwsA(isA<PermissionException>()),
+    );
+  });
+
+  test('updateQemuVmConfig PUT form body contains only changed keys', () async {
+    final adapter = FakeHttpClientAdapter([
+      ResponseBody.fromString(
+        jsonEncode({'data': null}),
+        200,
+        headers: {
+          Headers.contentTypeHeader: [Headers.jsonContentType],
+        },
+      ),
+    ]);
+    final dio = Dio()..httpClientAdapter = adapter;
+    final client = ProxmoxApiClient.withApiToken(
+      server: serverToken,
+      apiToken: 'root@pam!tok=secret',
+      dioOverride: dio,
+    );
+
+    await client.updateQemuVmConfig('my-node', 100, {'name': 'only-name'});
+    final req = adapter.requests.single;
+    expect(req.method, 'PUT');
+    expect(req.path, ApiEndpoints.nodeQemuVmConfig('my-node', 100));
+    expect(req.data, isA<Map>());
+    expect((req.data as Map).length, 1);
+    expect((req.data as Map)['name'], 'only-name');
+    expect(
+      req.headers['content-type'],
+      contains('application/x-www-form-urlencoded'),
+    );
+  });
+
+  test('updateQemuVmConfig passes delete=net1 query when requested', () async {
+    final adapter = FakeHttpClientAdapter([
+      ResponseBody.fromString(
+        jsonEncode({'data': null}),
+        200,
+        headers: {
+          Headers.contentTypeHeader: [Headers.jsonContentType],
+        },
+      ),
+    ]);
+    final dio = Dio()..httpClientAdapter = adapter;
+    final client = ProxmoxApiClient.withApiToken(
+      server: serverToken,
+      apiToken: 'root@pam!tok=secret',
+      dioOverride: dio,
+    );
+
+    await client.updateQemuVmConfig(
+      'n',
+      50,
+      {'name': 'x'},
+      deleteKeys: ['net1'],
+    );
+    final req = adapter.requests.single;
+    expect(req.queryParameters['delete'], 'net1');
+  });
+
+  test('fetchClusterNextId parses numeric data', () async {
+    final adapter = FakeHttpClientAdapter([
+      ResponseBody.fromString(
+        jsonEncode({'data': 150}),
+        200,
+        headers: {
+          Headers.contentTypeHeader: [Headers.jsonContentType],
+        },
+      ),
+    ]);
+    final dio = Dio()..httpClientAdapter = adapter;
+    final client = ProxmoxApiClient.withApiToken(
+      server: serverToken,
+      apiToken: 'root@pam!tok=secret',
+      dioOverride: dio,
+    );
+    expect(await client.fetchClusterNextId(), 150);
+    expect(adapter.requests.single.path, ApiEndpoints.clusterNextId);
+  });
+
+  test('createQemuVm POST form body and parses UPID string in data', () async {
+    const upid = 'UPID:pve:00123456:0789ABCD:qmcreate:100:root@pam:';
+    final adapter = FakeHttpClientAdapter([
+      ResponseBody.fromString(
+        jsonEncode({'data': upid}),
+        200,
+        headers: {
+          Headers.contentTypeHeader: [Headers.jsonContentType],
+        },
+      ),
+    ]);
+    final dio = Dio()..httpClientAdapter = adapter;
+    final client = ProxmoxApiClient.withApiToken(
+      server: serverToken,
+      apiToken: 'root@pam!tok=secret',
+      dioOverride: dio,
+    );
+    final body = <String, dynamic>{
+      'vmid': 100,
+      'name': 'vm-new',
+      'memory': 512,
+      'ostype': 'l26',
+      'net0': 'virtio,bridge=vmbr0',
+      'scsi0': 'local-lvm:8',
+      'scsihw': 'virtio-scsi-single',
+    };
+    final r = await client.createQemuVm('node-a', body);
+    expect(r, isA<GuestCreateResult>());
+    expect(r.vmid, 100);
+    expect(r.upid, upid);
+    final req = adapter.requests.single;
+    expect(req.path, ApiEndpoints.nodeQemuCreate('node-a'));
+    expect(req.method, 'POST');
+    expect(
+      req.headers['content-type']?.toLowerCase(),
+      contains('application/x-www-form-urlencoded'),
+    );
+    expect(req.data, isA<Map>());
+    expect((req.data as Map)['vmid'], 100);
+    expect((req.data as Map)['name'], 'vm-new');
+  });
+
+  test('createQemuVm null data yields result without UPID', () async {
+    final adapter = FakeHttpClientAdapter([
+      ResponseBody.fromString(
+        jsonEncode({'data': null}),
+        200,
+        headers: {
+          Headers.contentTypeHeader: [Headers.jsonContentType],
+        },
+      ),
+    ]);
+    final dio = Dio()..httpClientAdapter = adapter;
+    final client = ProxmoxApiClient.withApiToken(
+      server: serverToken,
+      apiToken: 't',
+      dioOverride: dio,
+    );
+    final r = await client.createQemuVm('n', {
+      'vmid': 101,
+      'name': 'x',
+      'memory': 128,
+      'ostype': 'l26',
+      'net0': 'virtio,bridge=vmbr0',
+      'scsi0': 'local:1',
+    });
+    expect(r.vmid, 101);
+    expect(r.upid, isNull);
+  });
+
+  test('createLxc POST uses nodeLxcCreate path', () async {
+    const upid = 'UPID:pve:::::lxc_create:200:root@pam:';
+    final adapter = FakeHttpClientAdapter([
+      ResponseBody.fromString(
+        jsonEncode({'data': upid}),
+        200,
+        headers: {
+          Headers.contentTypeHeader: [Headers.jsonContentType],
+        },
+      ),
+    ]);
+    final dio = Dio()..httpClientAdapter = adapter;
+    final client = ProxmoxApiClient.withApiToken(
+      server: serverToken,
+      apiToken: 't',
+      dioOverride: dio,
+    );
+    final r = await client.createLxc('n2', {
+      'vmid': 200,
+      'hostname': 'ct-new',
+      'password': 'secret',
+      'ostype': 'debian',
+      'rootfs': 'local-lvm:8',
+      'memory': 512,
+      'net0': 'name=eth0,bridge=vmbr0',
+      'unprivileged': 1,
+    });
+    expect(r.upid, upid);
+    expect(adapter.requests.single.path, ApiEndpoints.nodeLxcCreate('n2'));
   });
 }

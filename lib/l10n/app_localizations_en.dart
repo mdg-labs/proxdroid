@@ -813,4 +813,184 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sectionGuestTags => 'Tags';
+
+  @override
+  String get actionEditGuestConfig => 'Edit configuration';
+
+  @override
+  String get screenEditVmConfig => 'Edit VM';
+
+  @override
+  String get screenEditContainerConfig => 'Edit container';
+
+  @override
+  String get guestConfigSectionIdentity => 'Identity';
+
+  @override
+  String get guestConfigSectionResources => 'Resources';
+
+  @override
+  String get guestConfigSectionCpu => 'CPU';
+
+  @override
+  String get guestConfigSectionBoot => 'Boot';
+
+  @override
+  String get guestConfigSectionOptions => 'Options';
+
+  @override
+  String get guestConfigFieldVmName => 'Name';
+
+  @override
+  String get guestConfigFieldHostname => 'Hostname';
+
+  @override
+  String get guestConfigFieldDescription => 'Description';
+
+  @override
+  String get guestConfigFieldTags => 'Tags';
+
+  @override
+  String get guestConfigFieldMemory => 'Memory (MiB)';
+
+  @override
+  String get guestConfigFieldSockets => 'CPU sockets';
+
+  @override
+  String get guestConfigFieldCores => 'Cores per socket';
+
+  @override
+  String get guestConfigFieldVcpus => 'vCPUs';
+
+  @override
+  String get guestConfigFieldCpuType => 'CPU type';
+
+  @override
+  String get guestConfigFieldGuestOs => 'Guest OS';
+
+  @override
+  String get guestConfigFieldArchitecture => 'Architecture';
+
+  @override
+  String get guestConfigFieldSwap => 'Swap (MiB)';
+
+  @override
+  String get guestConfigFieldCpuLimit => 'CPU limit';
+
+  @override
+  String get guestConfigFieldCpuUnits => 'CPU units';
+
+  @override
+  String get guestConfigFieldStartupOrder => 'Startup order';
+
+  @override
+  String get guestConfigFieldOnBoot => 'Start at boot';
+
+  @override
+  String get guestConfigFieldQemuAgent => 'QEMU guest agent';
+
+  @override
+  String get guestConfigFieldUnprivileged => 'Unprivileged container';
+
+  @override
+  String get guestConfigFieldFeatures => 'Features';
+
+  @override
+  String get guestConfigFieldRootfs => 'Root filesystem';
+
+  @override
+  String get guestConfigRootfsReadOnlyHint =>
+      'Root filesystem cannot be edited here yet.';
+
+  @override
+  String get guestConfigActionDiscard => 'Discard';
+
+  @override
+  String get guestConfigSaveSuccess => 'Configuration saved';
+
+  @override
+  String get guestConfigSaveNothingChanged => 'No changes to save';
+
+  @override
+  String get validationFieldRequired => 'This field is required.';
+
+  @override
+  String get validationIntegerPositive => 'Enter a positive whole number.';
+
+  @override
+  String get validationVmidMin => 'Guest ID must be at least 100.';
+
+  @override
+  String get guestCreateVmTitle => 'Create Virtual Machine';
+
+  @override
+  String get guestCreateCtTitle => 'Create container';
+
+  @override
+  String get guestCreateSubmit => 'Create';
+
+  @override
+  String get guestCreateFabVm => 'Create Virtual Machine';
+
+  @override
+  String get guestCreateFabCt => 'Create container';
+
+  @override
+  String get guestCreateSectionTarget => 'Target';
+
+  @override
+  String get guestCreateSectionDiskNet => 'Disk and network';
+
+  @override
+  String get guestCreateFieldScsihw => 'SCSI controller (scsihw)';
+
+  @override
+  String get guestCreateFieldScsihwHint =>
+      'Leave empty to omit; virtio-scsi is common with scsi0.';
+
+  @override
+  String get guestCreateFieldScsi0 => 'Disk (scsi0)';
+
+  @override
+  String get guestCreateFieldScsi0Hint => 'Example: local-lvm:32';
+
+  @override
+  String get guestCreateFieldNet0 => 'Network (net0)';
+
+  @override
+  String get guestCreateFieldNet0Hint => 'Example: virtio,bridge=vmbr0';
+
+  @override
+  String get guestCreateFieldNet0HintCt =>
+      'Example: name=eth0,bridge=vmbr0,ip=dhcp';
+
+  @override
+  String get guestCreateFieldRootPassword => 'Root password';
+
+  @override
+  String get guestCreateFieldRootfsHint => 'Example: local-lvm:8';
+
+  @override
+  String get guestCreateVmOstypeHint =>
+      'Example: l26 (Linux 2.6+), win11, other.';
+
+  @override
+  String get guestCreateCtOstypeHint => 'Template id, e.g. debian or ubuntu.';
+
+  @override
+  String get guestCreateVmDisclaimer =>
+      'Creating a VM runs a server task. Ensure disk and network strings match your node.';
+
+  @override
+  String get guestCreateCtDisclaimer =>
+      'Creating a container runs a server task. Match rootfs and templates to your cluster.';
+
+  @override
+  String get guestCreateNoNodes => 'No cluster nodes are available.';
+
+  @override
+  String get guestCreateVmActionName => 'Create Virtual Machine';
+
+  @override
+  String get guestCreateCtActionName => 'Create container';
 }

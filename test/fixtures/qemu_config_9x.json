@@ -1,0 +1,21 @@
+{
+  "digest": "ea:49:b4:ff:6f:7c:5c:1e:43:66:c0:fg:06:71:29:01:bg:18:e1:1a",
+  "vmid": 101,
+  "name": "web-9",
+  "description": "",
+  "tags": "prod",
+  "memory": "8192",
+  "sockets": "2",
+  "cores": "8",
+  "vcpus": "8",
+  "cpu": "x86-64-v2-AES",
+  "ostype": "l26",
+  "onboot": "0",
+  "startup": "order=2",
+  "agent": "1",
+  "net0": "virtio=BC:24:11:00:00:02,bridge=vmbr0",
+  "virtio0": "local-zfs:vm-101-disk-0,cache=writeback,size=64G",
+  "boot": "order=virtio0;ide2",
+  "vmgenid": "auto",
+  "balloon": 8192
+}

@@ -304,6 +304,16 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
               title: Text(l10n.entityVirtualMachine),
               actions: [
                 IconButton(
+                  tooltip: l10n.actionEditGuestConfig,
+                  icon: const Icon(Icons.edit_outlined),
+                  onPressed:
+                      _powerBusy
+                          ? null
+                          : () => context.push(
+                            '/vms/${Uri.encodeComponent(vm.node)}/${Uri.encodeComponent(vm.vmid.toString())}/edit',
+                          ),
+                ),
+                IconButton(
                   tooltip: l10n.actionBackup,
                   icon: const Icon(Icons.backup_outlined),
                   onPressed:

@@ -99,6 +99,17 @@ class _ContainerListScreenState extends ConsumerState<ContainerListScreen> {
 
     return ShellSectionBody(
       title: Text(l10n.sectionContainers),
+      floatingActionButton: FloatingActionButton(
+        tooltip: l10n.guestCreateFabCt,
+        onPressed: () {
+          final q =
+              _nodeFilter != null
+                  ? '?node=${Uri.encodeComponent(_nodeFilter!)}'
+                  : '';
+          context.push('/containers/create$q');
+        },
+        child: const Icon(Icons.add),
+      ),
       body: async.when(
         loading:
             () => RefreshIndicator(

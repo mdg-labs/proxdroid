@@ -310,6 +310,16 @@ class _ContainerDetailScreenState extends ConsumerState<ContainerDetailScreen> {
               title: Text(l10n.entityContainer),
               actions: [
                 IconButton(
+                  tooltip: l10n.actionEditGuestConfig,
+                  icon: const Icon(Icons.edit_outlined),
+                  onPressed:
+                      _powerBusy
+                          ? null
+                          : () => context.push(
+                            '/containers/${Uri.encodeComponent(ct.node)}/${Uri.encodeComponent(ct.vmid.toString())}/edit',
+                          ),
+                ),
+                IconButton(
                   tooltip: l10n.actionBackup,
                   icon: const Icon(Icons.backup_outlined),
                   onPressed:

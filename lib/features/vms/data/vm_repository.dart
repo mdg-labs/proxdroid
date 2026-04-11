@@ -1,4 +1,6 @@
 import 'package:proxdroid/core/api/proxmox_api_client.dart';
+import 'package:proxdroid/core/models/guest_create_result.dart';
+import 'package:proxdroid/core/models/qemu_vm_config.dart';
 import 'package:proxdroid/core/models/vm.dart';
 
 class VmRepository {
@@ -23,4 +25,21 @@ class VmRepository {
 
   Future<String> rebootVm(String node, int vmid) =>
       _client.rebootVm(node, vmid);
+
+  Future<QemuVmConfig> getQemuConfig(String node, int vmid) =>
+      _client.fetchQemuVmConfig(node, vmid);
+
+  Future<void> updateQemuConfig(
+    String node,
+    int vmid,
+    Map<String, dynamic> body, {
+    List<String>? deleteKeys,
+  }) => _client.updateQemuVmConfig(node, vmid, body, deleteKeys: deleteKeys);
+
+  /// Next free cluster guest id (`GET /cluster/nextid`).
+  Future<int> fetchNextGuestId() => _client.fetchClusterNextId();
+
+  /// `POST /nodes/{node}/qemu` — create VM; see [ProxmoxApiClient.createQemuVm].
+  Future<GuestCreateResult> createVm(String node, Map<String, dynamic> body) =>
+      _client.createQemuVm(node, body);
 }

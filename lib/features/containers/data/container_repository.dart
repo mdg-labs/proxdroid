@@ -1,5 +1,7 @@
 import 'package:proxdroid/core/api/proxmox_api_client.dart';
 import 'package:proxdroid/core/models/container.dart';
+import 'package:proxdroid/core/models/guest_create_result.dart';
+import 'package:proxdroid/core/models/lxc_container_config.dart';
 
 class ContainerRepository {
   ContainerRepository(this._client);
@@ -26,4 +28,23 @@ class ContainerRepository {
 
   Future<String> rebootContainer(String node, int ctid) =>
       _client.rebootLxc(node, ctid);
+
+  Future<LxcContainerConfig> getLxcConfig(String node, int ctid) =>
+      _client.fetchLxcConfig(node, ctid);
+
+  Future<void> updateLxcConfig(
+    String node,
+    int ctid,
+    Map<String, dynamic> body, {
+    List<String>? deleteKeys,
+  }) => _client.updateLxcConfig(node, ctid, body, deleteKeys: deleteKeys);
+
+  /// Next free cluster guest id (`GET /cluster/nextid`).
+  Future<int> fetchNextGuestId() => _client.fetchClusterNextId();
+
+  /// `POST /nodes/{node}/lxc` — create CT; see [ProxmoxApiClient.createLxc].
+  Future<GuestCreateResult> createContainer(
+    String node,
+    Map<String, dynamic> body,
+  ) => _client.createLxc(node, body);
 }

@@ -1,6 +1,6 @@
 # VM & LXC config editor — implementation plan
 
-**Plan status:** Draft — execution checkboxes below start **unchecked** (`[ ]`). Mark `[x]` when done.  
+**Plan status:** In progress — Phases **0–7** automated tasks complete in repo; optional manual Tier-1 cluster rows may stay open until release QA.  
 **Date:** April 2026  
 **Audience:** Cursor / implementers. Follow **phases in order** unless a phase explicitly allows skipping.
 
@@ -57,20 +57,20 @@ Use the detailed phase sections below for full tasks; this table is optional hig
 
 ### 3.1 Tasks
 
-- [ ] Add to `lib/shared/constants/api_endpoints.dart` (names illustrative; keep consistent style):
-  - [ ] `GET|PUT` path builder for `/nodes/{node}/qemu/{vmid}/config`
-  - [ ] `GET|PUT` path builder for `/nodes/{node}/lxc/{vmid}/config` (CT id is API `vmid`)
-  - [ ] `POST` create `/nodes/{node}/qemu` and `/nodes/{node}/lxc`
-  - [ ] `GET /cluster/nextid`
-- [ ] `ProxmoxApiClient`: methods to **GET** QEMU and LXC config; parse Proxmox envelope and return the inner `data` map (or typed DTO used by Phase 1).
-- [ ] `VmRepository` / `ContainerRepository`: `getQemuConfig` / `getLxcConfig` (names align with codebase conventions).
-- [ ] Map `DioException` → `ProxmoxException` only (no raw Dio in UI).
+- [x] Add to `lib/shared/constants/api_endpoints.dart` (names illustrative; keep consistent style):
+  - [x] `GET|PUT` path builder for `/nodes/{node}/qemu/{vmid}/config`
+  - [x] `GET|PUT` path builder for `/nodes/{node}/lxc/{vmid}/config` (CT id is API `vmid`)
+  - [x] `POST` create `/nodes/{node}/qemu` and `/nodes/{node}/lxc`
+  - [x] `GET /cluster/nextid`
+- [x] `ProxmoxApiClient`: methods to **GET** QEMU and LXC config; parse Proxmox envelope and return the inner `data` map (or typed DTO used by Phase 1).
+- [x] `VmRepository` / `ContainerRepository`: `getQemuConfig` / `getLxcConfig` (names align with codebase conventions).
+- [x] Map `DioException` → `ProxmoxException` only (no raw Dio in UI).
 
 ### 3.2 Acceptance criteria (Phase 0 complete when all checked)
 
-- [ ] No API path strings outside `api_endpoints.dart`.
-- [ ] Unit tests (mock Dio) prove GET config success and error mapping (`403` → permission path, etc.).
-- [ ] `flutter analyze` and `flutter test` pass after this phase.
+- [x] No API path strings outside `api_endpoints.dart`.
+- [x] Unit tests (mock Dio) prove GET config success and error mapping (`403` → permission path, etc.).
+- [x] `flutter analyze` and `flutter test` pass after this phase.
 
 ---
 
@@ -80,21 +80,21 @@ Use the detailed phase sections below for full tasks; this table is optional hig
 
 ### 4.1 Tasks
 
-- [ ] Add Freezed models under `lib/core/models/` (e.g. `qemu_vm_config.dart`, `lxc_container_config.dart`) with `part` files per project rules.
-- [ ] **Tier A (initial)** — parse at minimum for **both** QEMU and LXC:
-  - [ ] Identity: `name`, `description`, `tags` (QEMU); `hostname`, `description`, `tags` (LXC)
-  - [ ] Resources: `memory`, `cores` (+ LXC: `swap`, `cpulimit`, `cpuunits` if present)
-  - [ ] QEMU: `sockets`, `vcpus`, `cpu`, `ostype`, `onboot`, `startup`, `agent` (as strings if compound)
-  - [ ] LXC: `ostype`, `arch`, `onboot`, `startup`, `unprivileged`, `features` (string), `rootfs` (string — read-only in UI until Phase 9 unless product decides otherwise)
-- [ ] **Passthrough map:** all keys from GET not assigned to structured fields remain in `Map<String, String>` (or values normalized to string per `proxmox_json_helpers` patterns).
-- [ ] `build_runner` generates clean; no analyzer issues in new files.
+- [x] Add Freezed models under `lib/core/models/` (e.g. `qemu_vm_config.dart`, `lxc_container_config.dart`) with `part` files per project rules.
+- [x] **Tier A (initial)** — parse at minimum for **both** QEMU and LXC:
+  - [x] Identity: `name`, `description`, `tags` (QEMU); `hostname`, `description`, `tags` (LXC)
+  - [x] Resources: `memory`, `cores` (+ LXC: `swap`, `cpulimit`, `cpuunits` if present)
+  - [x] QEMU: `sockets`, `vcpus`, `cpu`, `ostype`, `onboot`, `startup`, `agent` (as strings if compound)
+  - [x] LXC: `ostype`, `arch`, `onboot`, `startup`, `unprivileged`, `features` (string), `rootfs` (string — read-only in UI until Phase 9 unless product decides otherwise)
+- [x] **Passthrough map:** all keys from GET not assigned to structured fields remain in `Map<String, String>` (or values normalized to string per `proxmox_json_helpers` patterns).
+- [x] `build_runner` generates clean; no analyzer issues in new files.
 
 ### 4.2 Acceptance criteria
 
-- [ ] From a representative **QEMU** `GET` JSON fixture, parsing preserves **every** key-value pair (either in structured fields or passthrough).
-- [ ] Same for **LXC** fixture.
-- [ ] Include **two** fixture flavours (e.g. “8.x-shaped” and “9.x-shaped”) differing in at least one optional key to lock permissive parsing.
-- [ ] `flutter test` passes.
+- [x] From a representative **QEMU** `GET` JSON fixture, parsing preserves **every** key-value pair (either in structured fields or passthrough).
+- [x] Same for **LXC** fixture.
+- [x] Include **two** fixture flavours (e.g. “8.x-shaped” and “9.x-shaped”) differing in at least one optional key to lock permissive parsing.
+- [x] `flutter test` passes.
 
 ---
 
@@ -104,15 +104,15 @@ Use the detailed phase sections below for full tasks; this table is optional hig
 
 ### 5.1 Tasks
 
-- [ ] Implement **diff builder**: given `original` vs `edited` config objects, produce `Map<String, dynamic>` (or string map) of **only** keys that changed, suitable for `x-www-form-urlencoded` PUT.
-- [ ] `ProxmoxApiClient` + repositories: `updateQemuConfig` / `updateLxcConfig` accepting body map + optional `delete` query (comma-separated key names per PVE).
-- [ ] Ensure **passthrough** keys untouched by the user are **not** dropped: either omit from PUT or re-send unchanged (document chosen strategy in code comment; **prefer omit** for unchanged passthrough keys if PVE treats missing as “leave unchanged” — verify against PVE PUT semantics for your fields; if unsafe for certain keys, re-send merged full passthrough for stability).
+- [x] Implement **diff builder**: given `original` vs `edited` config objects, produce `Map<String, dynamic>` (or string map) of **only** keys that changed, suitable for `x-www-form-urlencoded` PUT.
+- [x] `ProxmoxApiClient` + repositories: `updateQemuConfig` / `updateLxcConfig` accepting body map + optional `delete` query (comma-separated key names per PVE).
+- [x] Ensure **passthrough** keys untouched by the user are **not** dropped: either omit from PUT or re-send unchanged (document chosen strategy in code comment; **prefer omit** for unchanged passthrough keys if PVE treats missing as “leave unchanged” — verify against PVE PUT semantics for your fields; if unsafe for certain keys, re-send merged full passthrough for stability).
 
 ### 5.2 Acceptance criteria
 
-- [ ] Unit test: changing only `name` results in PUT body containing **only** `name` (plus auth), not full config dump of dozens of keys.
-- [ ] Unit test: `delete` query includes `net1` when caller requests removal (stub for Phase 8; implement when Phase 8 lands, or add minimal hook now).
-- [ ] `flutter test` passes.
+- [x] Unit test: changing only `name` results in PUT body containing **only** `name` (plus auth), not full config dump of dozens of keys.
+- [x] Unit test: `delete` query includes `net1` when caller requests removal (stub for Phase 8; implement when Phase 8 lands, or add minimal hook now).
+- [x] `flutter test` passes.
 
 ---
 
@@ -122,16 +122,16 @@ Use the detailed phase sections below for full tasks; this table is optional hig
 
 ### 6.1 Tasks
 
-- [ ] `@riverpod` family (or equivalent codegen) for **fetch** QEMU config and LXC config by `(node, id)`.
-- [ ] Notifier or controller pattern for **draft** state (mutable editing buffer) separate from immutable parsed snapshot, **or** documented `copyWith` flow.
-- [ ] `save()` triggers repository PUT, then `ref.invalidate` on success: at minimum `allVmsProvider` / `allContainersProvider` and the config provider for that guest.
-- [ ] Surface `ProxmoxException` as `AsyncValue` error or SnackBar-ready message (reuse `proxmoxExceptionMessage`).
+- [x] `@riverpod` family (or equivalent codegen) for **fetch** QEMU config and LXC config by `(node, id)`.
+- [x] Notifier or controller pattern for **draft** state (mutable editing buffer) separate from immutable parsed snapshot, **or** documented `copyWith` flow.
+- [x] `save()` triggers repository PUT, then `ref.invalidate` on success: at minimum `allVmsProvider` / `allContainersProvider` and the config provider for that guest.
+- [x] Surface `ProxmoxException` as `AsyncValue` error or SnackBar-ready message (reuse `proxmoxExceptionMessage`).
 
 ### 6.2 Acceptance criteria
 
-- [ ] Widget-less test or notifier test: mock repo → save → invalidation contract verified where feasible.
-- [ ] No `Dio` / path strings in provider files.
-- [ ] `flutter analyze` / `test` pass.
+- [x] Widget-less test or notifier test: mock repo → save → invalidation contract verified where feasible.
+- [x] No `Dio` / path strings in provider files.
+- [x] `flutter analyze` / `test` pass.
 
 ---
 
@@ -141,17 +141,17 @@ Use the detailed phase sections below for full tasks; this table is optional hig
 
 ### 7.1 Tasks
 
-- [ ] Add go_router routes (exact paths **must** be added to `docs/ProxDroid_Architecture.md` §8): e.g. `/vms/:node/:vmid/edit`.
-- [ ] New screen under `lib/features/vms/ui/` (e.g. `vm_edit_screen.dart`) using `Form`, `GroupedSection`, `SectionHeader`, `LoadingShimmer`, `ErrorView`, pattern from `ServerEditorPage`.
-- [ ] All labels / buttons / errors in `lib/l10n/app_en.arb` + `gen-l10n`.
-- [ ] Entry point: `VmDetailScreen` → navigate to edit (icon button or menu).
-- [ ] On success: SnackBar or inline success feedback; invalidate providers from Phase 3.
+- [x] Add go_router routes (exact paths **must** be added to `docs/ProxDroid_Architecture.md` §8): e.g. `/vms/:node/:vmid/edit`.
+- [x] New screen under `lib/features/vms/ui/` (e.g. `vm_edit_screen.dart`) using `Form`, `GroupedSection`, `SectionHeader`, `LoadingShimmer`, `ErrorView`, pattern from `ServerEditorPage`.
+- [x] All labels / buttons / errors in `lib/l10n/app_en.arb` + `gen-l10n`.
+- [x] Entry point: `VmDetailScreen` → navigate to edit (icon button or menu).
+- [x] On success: SnackBar or inline success feedback; invalidate providers from Phase 3.
 
 ### 7.2 Acceptance criteria
 
 - [ ] With a real **PVE 8.x or 9.x** cluster (manual): open edit, change `name` or `description`, save, confirm in Proxmox UI or list row.
-- [ ] Router redirect behaviour unchanged for null server (edit routes require selected server like other API routes).
-- [ ] CI sequence passes; no hard-coded user strings.
+- [x] Router redirect behaviour unchanged for null server (edit routes require selected server like other API routes).
+- [x] CI sequence passes; no hard-coded user strings.
 
 ---
 
@@ -161,15 +161,15 @@ Use the detailed phase sections below for full tasks; this table is optional hig
 
 ### 8.1 Tasks
 
-- [ ] Routes: e.g. `/containers/:node/:ctid/edit` + Architecture doc update.
-- [ ] `ContainerEditScreen` under `features/containers/ui/`.
-- [ ] ARB strings (reuse shared keys where identical concepts, e.g. “Save”, “Discard”).
-- [ ] Entry from `ContainerDetailScreen`.
+- [x] Routes: e.g. `/containers/:node/:ctid/edit` + Architecture doc update.
+- [x] `ContainerEditScreen` under `features/containers/ui/`.
+- [x] ARB strings (reuse shared keys where identical concepts, e.g. “Save”, “Discard”).
+- [x] Entry from `ContainerDetailScreen`.
 
 ### 8.2 Acceptance criteria
 
 - [ ] Manual save on 8.x or 9.x changes at least one Tier-A field (e.g. `hostname` or `memory`).
-- [ ] CI passes.
+- [x] CI passes.
 
 ---
 
@@ -179,16 +179,16 @@ Use the detailed phase sections below for full tasks; this table is optional hig
 
 ### 9.1 Tasks
 
-- [ ] Repository + client: `GET /cluster/nextid`; `POST /nodes/{node}/qemu` with documented minimal body (align with PVE docs for your test matrix: **vmid**, **name**, **memory**, **net0**, **ostype** / **ide** / **scsihw** — **document exact minimal set in code comment** after verifying against PVE 8.4 + 9.x).
-- [ ] Screen + route: e.g. `/vms/create?node=…` or node picker step + form.
-- [ ] If POST returns **UPID**: poll `taskStatusProvider` like power actions; on `ok` invalidate VM list.
-- [ ] l10n + error handling.
+- [x] Repository + client: `GET /cluster/nextid`; `POST /nodes/{node}/qemu` with documented minimal body (align with PVE docs for your test matrix: **vmid**, **name**, **memory**, **net0**, **ostype** / **ide** / **scsihw** — **document exact minimal set in code comment** after verifying against PVE 8.4 + 9.x).
+- [x] Screen + route: e.g. `/vms/create?node=…` or node picker step + form.
+- [x] If POST returns **UPID**: poll `taskStatusProvider` like power actions; on `ok` invalidate VM list.
+- [x] l10n + error handling.
 
 ### 9.2 Acceptance criteria
 
 - [ ] Manual: create VM on **Tier-1** cluster (§11); VM appears in list; failed create shows readable error.
 - [ ] If UPID path exists: task failure surfaces appropriately (no silent success).
-- [ ] CI passes.
+- [x] CI passes.
 
 ---
 
@@ -198,14 +198,14 @@ Use the detailed phase sections below for full tasks; this table is optional hig
 
 ### 10.1 Tasks
 
-- [ ] Client/repo POST create LXC.
-- [ ] Route + screen: e.g. `/containers/create`.
-- [ ] UPID handling if applicable.
+- [x] Client/repo POST create LXC.
+- [x] Route + screen: e.g. `/containers/create`.
+- [x] UPID handling if applicable.
 
 ### 10.2 Acceptance criteria
 
 - [ ] Manual create on Tier-1 cluster; CT appears in list.
-- [ ] CI passes.
+- [x] CI passes.
 
 ---
 
@@ -290,11 +290,11 @@ Expand structured fields **per phase**; always keep passthrough until Tier B is 
 
 ## 17. Per-PR hygiene (always)
 
-- [ ] `dart format` / CI format step clean  
-- [ ] `dart run build_runner build --delete-conflicting-outputs` if models/providers changed  
-- [ ] `flutter gen-l10n` after ARB edits  
-- [ ] `flutter analyze` + `flutter test`  
-- [ ] No credentials in models; HTTPS-only unchanged  
+- [x] `dart format` / CI format step clean  
+- [x] `dart run build_runner build --delete-conflicting-outputs` if models/providers changed  
+- [x] `flutter gen-l10n` after ARB edits  
+- [x] `flutter analyze` + `flutter test`  
+- [x] No credentials in models; HTTPS-only unchanged  
 
 ---
 

@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:proxdroid/app/app_shell.dart';
 import 'package:proxdroid/core/models/server.dart';
 import 'package:proxdroid/features/backups/ui/backup_list_screen.dart';
+import 'package:proxdroid/features/containers/ui/container_create_screen.dart';
 import 'package:proxdroid/features/containers/ui/container_detail_screen.dart';
+import 'package:proxdroid/features/containers/ui/container_edit_screen.dart';
 import 'package:proxdroid/features/containers/ui/container_list_screen.dart';
 import 'package:proxdroid/features/dashboard/ui/dashboard_screen.dart';
 import 'package:proxdroid/features/dashboard/ui/node_detail_screen.dart';
@@ -18,7 +20,9 @@ import 'package:proxdroid/features/storage/ui/storage_detail_screen.dart';
 import 'package:proxdroid/features/storage/ui/storage_list_screen.dart';
 import 'package:proxdroid/features/tasks/ui/task_detail_screen.dart';
 import 'package:proxdroid/features/tasks/ui/task_list_screen.dart';
+import 'package:proxdroid/features/vms/ui/vm_create_screen.dart';
 import 'package:proxdroid/features/vms/ui/vm_detail_screen.dart';
+import 'package:proxdroid/features/vms/ui/vm_edit_screen.dart';
 import 'package:proxdroid/features/vms/ui/vm_list_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -151,6 +155,16 @@ GoRouter router(Ref ref) {
                         _fadeShellPage(state, const VmListScreen()),
                 routes: <RouteBase>[
                   GoRoute(
+                    path: 'create',
+                    pageBuilder: (BuildContext context, GoRouterState state) {
+                      final node = state.uri.queryParameters['node'];
+                      return _fadeShellPage(
+                        state,
+                        VmCreateScreen(initialNode: node),
+                      );
+                    },
+                  ),
+                  GoRoute(
                     path: ':node/:vmid',
                     pageBuilder: (BuildContext context, GoRouterState state) {
                       final node = Uri.decodeComponent(
@@ -164,6 +178,26 @@ GoRouter router(Ref ref) {
                         VmDetailScreen(node: node, vmid: vmid),
                       );
                     },
+                    routes: <RouteBase>[
+                      GoRoute(
+                        path: 'edit',
+                        pageBuilder: (
+                          BuildContext context,
+                          GoRouterState state,
+                        ) {
+                          final node = Uri.decodeComponent(
+                            state.pathParameters['node']!,
+                          );
+                          final vmid = Uri.decodeComponent(
+                            state.pathParameters['vmid']!,
+                          );
+                          return _fadeShellPage(
+                            state,
+                            VmEditScreen(node: node, vmid: vmid),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -180,6 +214,16 @@ GoRouter router(Ref ref) {
                         _fadeShellPage(state, const ContainerListScreen()),
                 routes: <RouteBase>[
                   GoRoute(
+                    path: 'create',
+                    pageBuilder: (BuildContext context, GoRouterState state) {
+                      final node = state.uri.queryParameters['node'];
+                      return _fadeShellPage(
+                        state,
+                        ContainerCreateScreen(initialNode: node),
+                      );
+                    },
+                  ),
+                  GoRoute(
                     path: ':node/:ctid',
                     pageBuilder: (BuildContext context, GoRouterState state) {
                       final node = Uri.decodeComponent(
@@ -193,6 +237,26 @@ GoRouter router(Ref ref) {
                         ContainerDetailScreen(node: node, ctid: ctid),
                       );
                     },
+                    routes: <RouteBase>[
+                      GoRoute(
+                        path: 'edit',
+                        pageBuilder: (
+                          BuildContext context,
+                          GoRouterState state,
+                        ) {
+                          final node = Uri.decodeComponent(
+                            state.pathParameters['node']!,
+                          );
+                          final ctid = Uri.decodeComponent(
+                            state.pathParameters['ctid']!,
+                          );
+                          return _fadeShellPage(
+                            state,
+                            ContainerEditScreen(node: node, ctid: ctid),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ],
               ),

@@ -17,7 +17,7 @@ final Server kTestProxmoxServer = Server(
 );
 
 /// JSON envelope Proxmox uses: `{ "data": ... }`.
-String proxmoxEnvelopeJson(Object data) => jsonEncode({'data': data});
+String proxmoxEnvelopeJson(Object? data) => jsonEncode({'data': data});
 
 /// [ProxmoxApiClient] with canned [responses] (API token auth, fake HTTP).
 (ProxmoxApiClient client, FakeHttpClientAdapter adapter)
@@ -33,7 +33,7 @@ proxmoxClientWithFakeAdapter(List<ResponseBody> responses) {
   return (client, adapter);
 }
 
-ResponseBody jsonResponse(Object data, [int status = 200]) =>
+ResponseBody jsonResponse(Object? data, [int status = 200]) =>
     ResponseBody.fromString(
       proxmoxEnvelopeJson(data),
       status,

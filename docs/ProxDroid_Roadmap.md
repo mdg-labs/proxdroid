@@ -432,6 +432,7 @@ These are tracked here for planning purposes but are not in scope for v1.0.
 ### VM & LXC config editor (create + edit)
 
 - **Plan:** [`VM_CT_Config_Editor_Plan.md`](VM_CT_Config_Editor_Plan.md) — Phases **0–7** with `[ ]`/`[x]` tasks and acceptance criteria (API → models → delta PUT → Riverpod → VM/CT edit UI → create VM/CT); optional **8–10** (networks, disks, cloud-init). CI hygiene per plan §17.
+- **Progress:** Phases **0–7** (through minimal create VM/CT + `nextid` + UPID follow-up) are implemented in app code and CI; Tier-1 manual create checks in the plan may remain until cluster QA.
 - [ ] Implement per plan through **Phase 7** minimum; optional phases **8+** as scoped
 
 ### Console Access

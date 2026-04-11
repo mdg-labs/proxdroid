@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:proxdroid/core/api/api_exceptions.dart';
 import 'package:proxdroid/core/models/container.dart';
 import 'package:proxdroid/features/containers/data/container_repository.dart';
 import 'package:proxdroid/shared/constants/api_endpoints.dart';
@@ -111,5 +112,69 @@ void main() {
     expect(list.single.vmid, 300);
     expect(adapter.requests, hasLength(1));
     expect(adapter.requests.single.queryParameters['type'], 'lxc');
+  });
+
+  test('getLxcConfig returns parsed config from client', () async {
+    final (client, adapter) = proxmoxClientWithFakeAdapter([
+      jsonResponse(<String, dynamic>{
+        'hostname': 'ct-x',
+        'memory': 256,
+        'net0': 'bridge=vmbr0',
+      }),
+    ]);
+    final cfg = await ContainerRepository(client).getLxcConfig('node-b', 202);
+    expect(cfg.hostname, 'ct-x');
+    expect(cfg.memory, '256');
+    expect(cfg.passthrough['net0'], 'bridge=vmbr0');
+    expect(
+      adapter.requests.single.path,
+      ApiEndpoints.nodeLxcCtConfig('node-b', 202),
+    );
+  });
+
+  test('getLxcConfig maps 403 to PermissionException', () async {
+    final (client, _) = proxmoxClientWithFakeAdapter([
+      ResponseBody.fromString(
+        jsonEncode(<String, dynamic>{}),
+        403,
+        headers: {
+          Headers.contentTypeHeader: [Headers.jsonContentType],
+        },
+      ),
+    ]);
+    await expectLater(
+      ContainerRepository(client).getLxcConfig('n', 2),
+      throwsA(isA<PermissionException>()),
+    );
+  });
+
+  test('updateLxcConfig passes delete query to client', () async {
+    final (client, adapter) = proxmoxClientWithFakeAdapter([
+      jsonResponse(null),
+    ]);
+    await ContainerRepository(
+      client,
+    ).updateLxcConfig('n', 7, {'hostname': 'h'}, deleteKeys: ['net1']);
+    expect(adapter.requests.single.queryParameters['delete'], 'net1');
+  });
+
+  test('createContainer POST returns UPID from envelope', () async {
+    const upid = 'UPID:n:::::lxc_create:300:root@pam:';
+    final (client, adapter) = proxmoxClientWithFakeAdapter([
+      jsonResponse(upid),
+    ]);
+    final r = await ContainerRepository(client).createContainer('node-y', {
+      'vmid': 300,
+      'hostname': 'ct',
+      'password': 'pw',
+      'ostype': 'ubuntu',
+      'rootfs': 'local-lvm:4',
+      'memory': 256,
+      'net0': 'name=eth0,bridge=vmbr0,ip=dhcp',
+      'unprivileged': 1,
+    });
+    expect(r.vmid, 300);
+    expect(r.upid, upid);
+    expect(adapter.requests.single.path, ApiEndpoints.nodeLxcCreate('node-y'));
   });
 }

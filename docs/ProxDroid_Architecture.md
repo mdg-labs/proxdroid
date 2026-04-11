@@ -127,6 +127,7 @@ lib/
 │   │   └── ui/
 │   │       ├── vm_list_screen.dart
 │   │       ├── vm_detail_screen.dart
+│   │       ├── vm_edit_screen.dart
 │   │       └── widgets/
 │   │           ├── vm_status_badge.dart
 │   │           ├── cpu_chart.dart
@@ -301,9 +302,13 @@ if (allowSelfSigned) {
 /dashboard                          → Node overview (after server selection)
 /dashboard/:node                    → Node detail + resource charts (host Disk I/O from rrddata may be absent on PVE 9+; see dashboard feature note above)
 /vms                                → VM list (all nodes)
+/vms/create                         → Create VM (optional `?node=` query for default node)
 /vms/:node/:vmid                    → VM detail + charts
+/vms/:node/:vmid/edit               → VM Tier-A config editor
 /containers                         → Container list (all nodes)
+/containers/create                  → Create LXC (optional `?node=` query)
 /containers/:node/:ctid             → Container detail
+/containers/:node/:ctid/edit       → LXC Tier-A config editor
 /storage                            → Storage overview
 /storage/:node/:storage             → Storage detail + content list
 /backups                            → Backup list

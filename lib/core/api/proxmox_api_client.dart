@@ -13,7 +13,10 @@ import 'package:proxdroid/core/models/storage.dart';
 import 'package:proxdroid/core/models/resource_data_point.dart';
 import 'package:proxdroid/core/models/server.dart';
 import 'package:proxdroid/core/models/task.dart';
+import 'package:proxdroid/core/models/lxc_container_config.dart';
 import 'package:proxdroid/core/models/proxmox_version.dart';
+import 'package:proxdroid/core/models/qemu_vm_config.dart';
+import 'package:proxdroid/core/models/guest_create_result.dart';
 import 'package:proxdroid/core/models/vm.dart';
 import 'package:proxdroid/shared/constants/api_endpoints.dart';
 
@@ -368,6 +371,142 @@ class ProxmoxApiClient {
     }).toList();
   }
 
+  /// `GET /nodes/{node}/qemu/{vmid}/config` — QEMU VM configuration.
+  Future<QemuVmConfig> fetchQemuVmConfig(String node, int vmid) async {
+    final response = await _unwrap(
+      _dio.get<Map<String, dynamic>>(ApiEndpoints.nodeQemuVmConfig(node, vmid)),
+    );
+    final raw = response.data?['data'];
+    if (raw is! Map) {
+      throw const ServerException(502, message: 'Invalid QEMU config response');
+    }
+    return QemuVmConfig.fromProxmoxConfigData(Map<String, dynamic>.from(raw));
+  }
+
+  /// `PUT /nodes/{node}/qemu/{vmid}/config` — partial update (form body).
+  ///
+  /// [deleteKeys] becomes query `delete` (comma-separated) per PVE API.
+  Future<void> updateQemuVmConfig(
+    String node,
+    int vmid,
+    Map<String, dynamic> body, {
+    List<String>? deleteKeys,
+  }) async {
+    final query = <String, dynamic>{};
+    if (deleteKeys != null && deleteKeys.isNotEmpty) {
+      query['delete'] = deleteKeys.join(',');
+    }
+    await _unwrap(
+      _dio.put<Map<String, dynamic>>(
+        ApiEndpoints.nodeQemuVmConfig(node, vmid),
+        queryParameters: query.isEmpty ? null : query,
+        data: body,
+        options: Options(contentType: Headers.formUrlEncodedContentType),
+      ),
+    );
+  }
+
+  /// `GET /nodes/{node}/lxc/{vmid}/config` — LXC CT configuration ([vmid] is
+  /// the CT id).
+  Future<LxcContainerConfig> fetchLxcConfig(String node, int vmid) async {
+    final response = await _unwrap(
+      _dio.get<Map<String, dynamic>>(ApiEndpoints.nodeLxcCtConfig(node, vmid)),
+    );
+    final raw = response.data?['data'];
+    if (raw is! Map) {
+      throw const ServerException(502, message: 'Invalid LXC config response');
+    }
+    return LxcContainerConfig.fromProxmoxConfigData(
+      Map<String, dynamic>.from(raw),
+    );
+  }
+
+  /// `PUT /nodes/{node}/lxc/{vmid}/config` — partial update (form body).
+  Future<void> updateLxcConfig(
+    String node,
+    int vmid,
+    Map<String, dynamic> body, {
+    List<String>? deleteKeys,
+  }) async {
+    final query = <String, dynamic>{};
+    if (deleteKeys != null && deleteKeys.isNotEmpty) {
+      query['delete'] = deleteKeys.join(',');
+    }
+    await _unwrap(
+      _dio.put<Map<String, dynamic>>(
+        ApiEndpoints.nodeLxcCtConfig(node, vmid),
+        queryParameters: query.isEmpty ? null : query,
+        data: body,
+        options: Options(contentType: Headers.formUrlEncodedContentType),
+      ),
+    );
+  }
+
+  /// `POST /nodes/{node}/qemu` — create QEMU VM (x-www-form-urlencoded body).
+  ///
+  /// **Minimal field set (PVE 8.x / 9.x)** used by the create-VM form and
+  /// expected by the API for a simple guest: `vmid`, `name`, `memory`, `ostype`,
+  /// `net0`, and a boot disk key (`scsi0` plus `scsihw=virtio-scsi-single`, or
+  /// alternatively `virtio0` / `ide0` without `scsihw`). Additional keys may be
+  /// required for specific storage types; the server returns standard API errors.
+  ///
+  /// Response: `data` is usually the task **UPID** string; if `data` is absent,
+  /// the create is treated as complete without task polling.
+  Future<GuestCreateResult> createQemuVm(
+    String node,
+    Map<String, dynamic> body,
+  ) async {
+    final vmid = proxmoxInt(body['vmid']);
+    if (vmid == null) {
+      throw ArgumentError.value(body['vmid'], 'vmid', 'vmid is required');
+    }
+    final response = await _unwrap(
+      _dio.post<Map<String, dynamic>>(
+        ApiEndpoints.nodeQemuCreate(node),
+        data: body,
+        options: Options(contentType: Headers.formUrlEncodedContentType),
+      ),
+    );
+    return _parseCreateGuestResponse(response.data, vmid);
+  }
+
+  /// `POST /nodes/{node}/lxc` — create LXC container (x-www-form-urlencoded).
+  ///
+  /// **Minimal field set (PVE 8.x / 9.x)** for a typical unprivileged CT:
+  /// `vmid`, `hostname`, `password` (root), `ostype`, `rootfs`, `memory`, `net0`,
+  /// and `unprivileged` (`0`/`1`). Privileged templates or SSH-key-only flows may
+  /// need different keys; errors come from the API.
+  Future<GuestCreateResult> createLxc(
+    String node,
+    Map<String, dynamic> body,
+  ) async {
+    final vmid = proxmoxInt(body['vmid']);
+    if (vmid == null) {
+      throw ArgumentError.value(body['vmid'], 'vmid', 'vmid is required');
+    }
+    final response = await _unwrap(
+      _dio.post<Map<String, dynamic>>(
+        ApiEndpoints.nodeLxcCreate(node),
+        data: body,
+        options: Options(contentType: Headers.formUrlEncodedContentType),
+      ),
+    );
+    return _parseCreateGuestResponse(response.data, vmid);
+  }
+
+  /// `GET /cluster/nextid` — next free VM/CT ID.
+  Future<int> fetchClusterNextId() async {
+    final response = await _unwrap(
+      _dio.get<Map<String, dynamic>>(ApiEndpoints.clusterNextId),
+    );
+    final data = response.data?['data'];
+    final id = proxmoxInt(data);
+    if (id == null) {
+      throw const ServerException(502, message: 'Invalid nextid response');
+    }
+    return id;
+  }
+
   /// `GET /nodes/{node}/lxc` — containers on one node.
   Future<List<Container>> fetchContainersForNode(String node) async {
     final response = await _unwrap(
@@ -666,6 +805,20 @@ class ProxmoxApiClient {
       502,
       message: 'Invalid power action response (expected UPID string in data)',
     );
+  }
+
+  GuestCreateResult _parseCreateGuestResponse(
+    Map<String, dynamic>? body,
+    int vmid,
+  ) {
+    if (body == null) {
+      return GuestCreateResult(vmid: vmid);
+    }
+    final data = body['data'];
+    if (data is String && data.isNotEmpty) {
+      return GuestCreateResult(vmid: vmid, upid: data);
+    }
+    return GuestCreateResult(vmid: vmid);
   }
 
   Future<Response<T>> _unwrap<T>(Future<Response<T>> future) async {
