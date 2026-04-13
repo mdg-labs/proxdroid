@@ -93,4 +93,49 @@ void main() {
       ChartTimeframe.hour,
     );
   });
+
+  test('getLocalePreference defaults to system when box empty', () {
+    final repo = AppSettingsRepository(box: box);
+    expect(repo.getLocalePreference(), LocalePreference.system);
+  });
+
+  test('setLocalePreference roundtrips via Hive', () async {
+    final repo = AppSettingsRepository(box: box);
+    await repo.setLocalePreference(LocalePreference.german);
+    expect(repo.getLocalePreference(), LocalePreference.german);
+
+    final repo2 = AppSettingsRepository(box: box);
+    expect(repo2.getLocalePreference(), LocalePreference.german);
+  });
+
+  test('localePreferenceFromStorage maps stored strings', () {
+    expect(
+      AppSettingsRepository.localePreferenceFromStorage('en'),
+      LocalePreference.english,
+    );
+    expect(
+      AppSettingsRepository.localePreferenceFromStorage('de'),
+      LocalePreference.german,
+    );
+    expect(
+      AppSettingsRepository.localePreferenceFromStorage('system'),
+      LocalePreference.system,
+    );
+    expect(
+      AppSettingsRepository.localePreferenceFromStorage(null),
+      LocalePreference.system,
+    );
+  });
+
+  test('materialLocaleForPreference maps to Material locales', () {
+    expect(materialLocaleForPreference(LocalePreference.system), isNull);
+    expect(
+      materialLocaleForPreference(LocalePreference.english),
+      const Locale('en'),
+    );
+    expect(
+      materialLocaleForPreference(LocalePreference.german),
+      const Locale('de'),
+    );
+  });
 }

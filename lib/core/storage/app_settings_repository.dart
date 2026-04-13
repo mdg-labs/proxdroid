@@ -6,7 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_settings_repository.g.dart';
 
-/// Hive box name for app preferences (theme, diagnostics toggles; no credentials).
+/// Hive box name for app preferences (theme, locale, diagnostics toggles; no credentials).
 const String kSettingsHiveBoxName = 'settings';
 
 /// Hive key for persisted [ThemeMode] string value.
@@ -18,9 +18,21 @@ const String kVerboseConnectionErrorsKey = 'verboseConnectionErrors';
 /// Hive key for default RRD chart [ChartTimeframe] (`hour` / `day` / …).
 const String kDefaultChartTimeframeKey = 'defaultChartTimeframe';
 
+/// Hive key for UI language override (`system` / `en` / `de`).
+const String kLocalePreferenceKey = 'localePreference';
+
 const String _valueDark = 'dark';
 const String _valueLight = 'light';
 const String _valueSystem = 'system';
+
+const String _localeSystem = 'system';
+const String _localeEn = 'en';
+const String _localeDe = 'de';
+
+/// Persisted UI language for [MaterialApp.router].
+///
+/// [system] follows the device locale when supported, otherwise a supported fallback.
+enum LocalePreference { system, english, german }
 
 /// Non-sensitive preferences backed by hive_ce.
 class AppSettingsRepository {
@@ -53,6 +65,16 @@ class AppSettingsRepository {
 
   Future<void> setDefaultChartTimeframe(ChartTimeframe tf) async {
     await _box.put(kDefaultChartTimeframeKey, chartTimeframeToStorage(tf));
+  }
+
+  /// Active UI language; unknown or null → [LocalePreference.system].
+  LocalePreference getLocalePreference() {
+    final raw = _box.get(kLocalePreferenceKey);
+    return localePreferenceFromStorage(raw);
+  }
+
+  Future<void> setLocalePreference(LocalePreference value) async {
+    await _box.put(kLocalePreferenceKey, localePreferenceToStorage(value));
   }
 
   /// Parses stored theme string; unknown or null → [ThemeMode.dark].
@@ -88,6 +110,41 @@ class AppSettingsRepository {
   }
 
   static String chartTimeframeToStorage(ChartTimeframe tf) => tf.apiValue;
+
+  static LocalePreference localePreferenceFromStorage(String? value) {
+    switch (value) {
+      case _localeEn:
+        return LocalePreference.english;
+      case _localeDe:
+        return LocalePreference.german;
+      case _localeSystem:
+      default:
+        return LocalePreference.system;
+    }
+  }
+
+  static String localePreferenceToStorage(LocalePreference value) {
+    switch (value) {
+      case LocalePreference.english:
+        return _localeEn;
+      case LocalePreference.german:
+        return _localeDe;
+      case LocalePreference.system:
+        return _localeSystem;
+    }
+  }
+}
+
+/// [Locale] passed to [MaterialApp.router]; `null` follows the platform.
+Locale? materialLocaleForPreference(LocalePreference preference) {
+  switch (preference) {
+    case LocalePreference.system:
+      return null;
+    case LocalePreference.english:
+      return const Locale('en');
+    case LocalePreference.german:
+      return const Locale('de');
+  }
 }
 
 /// Must be overridden in [main] after the settings Hive box is opened.

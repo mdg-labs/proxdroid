@@ -88,4 +88,31 @@ void main() {
       expect(repo.getDefaultChartTimeframe(), ChartTimeframe.month);
     },
   );
+
+  test(
+    'AppLocalePreference reflects repository and setLocalePreference updates both',
+    () async {
+      final repo = AppSettingsRepository(box: box);
+      await repo.setLocalePreference(LocalePreference.english);
+
+      final container = ProviderContainer(
+        overrides: [appSettingsRepositoryProvider.overrideWithValue(repo)],
+      );
+      addTearDown(container.dispose);
+
+      expect(
+        container.read(appLocalePreferenceProvider),
+        LocalePreference.english,
+      );
+
+      await container
+          .read(appLocalePreferenceProvider.notifier)
+          .setLocalePreference(LocalePreference.german);
+      expect(
+        container.read(appLocalePreferenceProvider),
+        LocalePreference.german,
+      );
+      expect(repo.getLocalePreference(), LocalePreference.german);
+    },
+  );
 }

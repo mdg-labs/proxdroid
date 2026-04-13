@@ -81,5 +81,25 @@ final defaultChartTimeframeProvider =
     );
 
 typedef _$DefaultChartTimeframe = Notifier<ChartTimeframe>;
+String _$appLocalePreferenceHash() =>
+    r'f6b9edf1b38ca2bfef7be3875025df1b37384c23';
+
+/// Active [LocalePreference] for [MaterialApp.router]; persisted in hive_ce.
+///
+/// Copied from [AppLocalePreference].
+@ProviderFor(AppLocalePreference)
+final appLocalePreferenceProvider =
+    NotifierProvider<AppLocalePreference, LocalePreference>.internal(
+      AppLocalePreference.new,
+      name: r'appLocalePreferenceProvider',
+      debugGetCreateSourceHash:
+          const bool.fromEnvironment('dart.vm.product')
+              ? null
+              : _$appLocalePreferenceHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$AppLocalePreference = Notifier<LocalePreference>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

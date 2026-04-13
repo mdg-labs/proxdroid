@@ -1,1607 +1,1623 @@
 {
-  "@@locale": "en",
-  "appTitle": "ProxDroid",
-  "@appTitle": {
-    "description": "Application title shown in the system UI (e.g. task switcher, launcher label)."
+  "@@locale" : "en",
+  "actionBackup" : "Backup",
+  "@actionBackup" : {
+    "description" : "Open manual vzdump backup flow from VM/container detail or backups screen."
   },
-  "appDrawerSubtitle": "Proxmox cluster client",
-  "@appDrawerSubtitle": {
-    "description": "Short tagline under the app name in the navigation drawer."
+  "actionCancel" : "Cancel",
+  "@actionCancel" : {
+    "description" : "Dialog button to dismiss without acting."
   },
-  "shellConnectedLabel": "Connected",
-  "@shellConnectedLabel": {
-    "description": "Short status label in the shell section header when a Proxmox server is selected (Phase B chrome)."
+  "actionClose" : "Close",
+  "@actionClose" : {
+    "description" : "Dismiss a dialog (e.g. license summary)."
   },
-  "shellServerPillTooltip": "Switch or manage servers",
-  "@shellServerPillTooltip": {
-    "description": "Tooltip for the connected-server pill in ShellSectionBody."
+  "actionConfirm" : "Confirm",
+  "@actionConfirm" : {
+    "description" : "Dialog button to confirm a destructive or important action."
   },
-  "shellOpenNavigationMenu": "Open navigation menu",
-  "@shellOpenNavigationMenu": {
-    "description": "Tooltip and screen reader label for the shell AppBar menu icon on drawer-root routes (Phase H a11y)."
+  "actionEditGuestConfig" : "Edit configuration",
+  "@actionEditGuestConfig" : {
+    "description" : "Tooltip / label to open VM or LXC config editor."
   },
-  "shellConnectedPillSemantics": "Connected to {serverName}. Switch or manage servers.",
-  "@shellConnectedPillSemantics": {
-    "description": "Screen reader label for the connected-server pill (server name + action).",
-    "placeholders": {
-      "serverName": {
-        "type": "String"
+  "actionForceStop" : "Force stop",
+  "@actionForceStop" : {
+    "description" : "Action to forcibly stop a VM or container (hard stop)."
+  },
+  "actionGoBack" : "Go back",
+  "@actionGoBack" : {
+    "description" : "Button to leave a screen after an error or missing entity."
+  },
+  "actionReboot" : "Reboot",
+  "@actionReboot" : {
+    "description" : "Action to reboot a VM or container."
+  },
+  "actionRetry" : "Retry",
+  "@actionRetry" : {
+    "description" : "Button label to retry a failed load."
+  },
+  "actionSave" : "Save",
+  "@actionSave" : {
+    "description" : "Button label to save server configuration."
+  },
+  "actionStart" : "Start",
+  "@actionStart" : {
+    "description" : "Action to start a VM or container."
+  },
+  "actionStop" : "Stop",
+  "@actionStop" : {
+    "description" : "Action to gracefully stop a VM or container."
+  },
+  "actionTestConnection" : "Test connection",
+  "@actionTestConnection" : {
+    "description" : "Button to verify Proxmox connectivity via GET /version."
+  },
+  "actionUndo" : "Undo",
+  "@actionUndo" : {
+    "description" : "SnackBar action to undo a destructive operation."
+  },
+  "appDrawerSubtitle" : "Proxmox cluster client",
+  "@appDrawerSubtitle" : {
+    "description" : "Short tagline under the app name in the navigation drawer."
+  },
+  "appTitle" : "ProxDroid",
+  "@appTitle" : {
+    "description" : "Application title shown in the system UI (e.g. task switcher, launcher label)."
+  },
+  "backupCompressGzip" : "Gzip",
+  "@backupCompressGzip" : {
+    "description" : "Compression option label."
+  },
+  "backupCompressLzo" : "LZO",
+  "@backupCompressLzo" : {
+    "description" : "Compression option label."
+  },
+  "backupCompressNone" : "None",
+  "@backupCompressNone" : {
+    "description" : "No compression."
+  },
+  "backupCompressZstd" : "Zstandard (zstd)",
+  "@backupCompressZstd" : {
+    "description" : "Compression option label."
+  },
+  "backupFabTooltip" : "Run backup",
+  "@backupFabTooltip" : {
+    "description" : "FAB on backup list screen."
+  },
+  "backupFieldCompress" : "Compression",
+  "@backupFieldCompress" : {
+    "description" : "Vzdump compression option."
+  },
+  "backupFieldGuest" : "Guest",
+  "@backupFieldGuest" : {
+    "description" : "Field label for VM or LXC selection."
+  },
+  "backupFieldMode" : "Backup mode",
+  "@backupFieldMode" : {
+    "description" : "Vzdump mode snapshot/suspend/stop."
+  },
+  "backupFieldStorage" : "Destination storage",
+  "@backupFieldStorage" : {
+    "description" : "Field label for backup target storage pool."
+  },
+  "backupGroupedUnknownGuest" : "Other",
+  "@backupGroupedUnknownGuest" : {
+    "description" : "Group title when backup has no vmid (e.g. manual uploads)."
+  },
+  "backupJobLastRun" : "Last run: {when}",
+  "@backupJobLastRun" : {
+    "description" : "Last backup job run time when API provides it.",
+    "placeholders" : {
+      "when" : {
+        "type" : "String",
+        "example" : "Apr 9, 2026 03:00"
       }
     }
   },
-  "searchClearTooltip": "Clear search",
-  "@searchClearTooltip": {
-    "description": "Tooltip for the icon-only clear control in VM/container list SearchBar."
-  },
-  "drawerSectionInfrastructure": "Infrastructure",
-  "@drawerSectionInfrastructure": {
-    "description": "Navigation drawer group label for servers, dashboard, VMs, containers, storage."
-  },
-  "drawerSectionOperations": "Operations",
-  "@drawerSectionOperations": {
-    "description": "Navigation drawer group label for backups, tasks, settings."
-  },
-  "offlineBannerMessage": "No network connection. Some actions may not work until you are back online.",
-  "@offlineBannerMessage": {
-    "description": "Persistent banner when the device has no connectivity (Phase 6.1)."
-  },
-  "entityNode": "Node",
-  "@entityNode": {
-    "description": "Proxmox cluster node entity label (matches PVE terminology)."
-  },
-  "entityVirtualMachine": "Virtual Machine",
-  "@entityVirtualMachine": {
-    "description": "QEMU/KVM virtual machine entity label (matches PVE terminology)."
-  },
-  "entityContainer": "Container",
-  "@entityContainer": {
-    "description": "LXC container entity label (matches PVE terminology)."
-  },
-  "entityStorage": "Storage",
-  "@entityStorage": {
-    "description": "Storage pool or volume entity label (matches PVE terminology)."
-  },
-  "entityTask": "Task",
-  "@entityTask": {
-    "description": "Proxmox task (UPID) entity label (matches PVE terminology)."
-  },
-  "entityBackup": "Backup",
-  "@entityBackup": {
-    "description": "Backup job or backup content entity label (matches PVE terminology)."
-  },
-  "actionStart": "Start",
-  "@actionStart": {
-    "description": "Action to start a VM or container."
-  },
-  "actionStop": "Stop",
-  "@actionStop": {
-    "description": "Action to gracefully stop a VM or container."
-  },
-  "actionForceStop": "Force stop",
-  "@actionForceStop": {
-    "description": "Action to forcibly stop a VM or container (hard stop)."
-  },
-  "actionReboot": "Reboot",
-  "@actionReboot": {
-    "description": "Action to reboot a VM or container."
-  },
-  "statusRunning": "Running",
-  "@statusRunning": {
-    "description": "Resource is running."
-  },
-  "statusStopped": "Stopped",
-  "@statusStopped": {
-    "description": "Resource is stopped."
-  },
-  "statusPaused": "Paused",
-  "@statusPaused": {
-    "description": "VM is paused (not used for LXC in MVP)."
-  },
-  "statusUnknown": "Unknown",
-  "@statusUnknown": {
-    "description": "Status could not be determined."
-  },
-  "statusOnline": "Online",
-  "@statusOnline": {
-    "description": "Node or service is reachable (online)."
-  },
-  "statusOffline": "Offline",
-  "@statusOffline": {
-    "description": "Node or service is not reachable (offline)."
-  },
-  "metricCpu": "CPU",
-  "@metricCpu": {
-    "description": "Label for CPU usage metric."
-  },
-  "metricMemory": "Memory",
-  "@metricMemory": {
-    "description": "Label for memory (RAM) usage metric."
-  },
-  "metricDisk": "Disk",
-  "@metricDisk": {
-    "description": "Label for disk usage or I/O metric."
-  },
-  "metricNetwork": "Network",
-  "@metricNetwork": {
-    "description": "Label for network traffic metric."
-  },
-  "metricUptime": "Uptime",
-  "@metricUptime": {
-    "description": "Label for uptime duration metric."
-  },
-  "sectionDashboard": "Dashboard",
-  "@sectionDashboard": {
-    "description": "Navigation or screen title for the cluster/node dashboard."
-  },
-  "sectionSettings": "Settings",
-  "@sectionSettings": {
-    "description": "Navigation or screen title for app settings."
-  },
-  "sectionAbout": "About",
-  "@sectionAbout": {
-    "description": "Navigation or screen title for about / app info."
-  },
-  "sectionServers": "Servers",
-  "@sectionServers": {
-    "description": "Navigation or screen title for configured Proxmox servers list."
-  },
-  "sectionVms": "Virtual machines",
-  "@sectionVms": {
-    "description": "Navigation or screen title for the VM list."
-  },
-  "sectionContainers": "Containers",
-  "@sectionContainers": {
-    "description": "Navigation or screen title for the LXC container list."
-  },
-  "sectionBackups": "Backups",
-  "@sectionBackups": {
-    "description": "Navigation or screen title for backup content and jobs."
-  },
-  "sectionTasks": "Tasks",
-  "@sectionTasks": {
-    "description": "Navigation or screen title for the Proxmox task viewer."
-  },
-  "screenAddServer": "Add server",
-  "@screenAddServer": {
-    "description": "App bar title for adding a Proxmox server."
-  },
-  "screenEditServer": "Edit server",
-  "@screenEditServer": {
-    "description": "App bar title for editing a saved server."
-  },
-  "debugScreenBody": "Placeholder — {name}",
-  "@debugScreenBody": {
-    "description": "Short debug label for Phase 0 placeholder screens.",
-    "placeholders": {
-      "name": {
-        "type": "String",
-        "example": "Server list"
+  "backupJobNextRun" : "Next run: {when}",
+  "@backupJobNextRun" : {
+    "description" : "Next scheduled backup run time.",
+    "placeholders" : {
+      "when" : {
+        "type" : "String",
+        "example" : "Apr 10, 2026 03:00"
       }
     }
   },
-  "actionRetry": "Retry",
-  "@actionRetry": {
-    "description": "Button label to retry a failed load."
+  "backupJobVmids" : "Guests: {ids}",
+  "@backupJobVmids" : {
+    "description" : "Comma-separated vmids covered by a backup job.",
+    "placeholders" : {
+      "ids" : {
+        "type" : "String",
+        "example" : "100, 101"
+      }
+    }
   },
-  "actionSave": "Save",
-  "@actionSave": {
-    "description": "Button label to save server configuration."
+  "backupListEmptyMessage" : "No backup volumes were found on storages that support backups.",
+  "@backupListEmptyMessage" : {
+    "description" : "Body when backup file list is empty."
   },
-  "actionTestConnection": "Test connection",
-  "@actionTestConnection": {
-    "description": "Button to verify Proxmox connectivity via GET /version."
+  "backupListEmptyTitle" : "No backup files",
+  "@backupListEmptyTitle" : {
+    "description" : "When no backup content rows were aggregated."
   },
-  "actionUndo": "Undo",
-  "@actionUndo": {
-    "description": "SnackBar action to undo a destructive operation."
+  "backupModeSnapshot" : "Snapshot",
+  "@backupModeSnapshot" : {
+    "description" : "Vzdump snapshot mode."
   },
-  "actionGoBack": "Go back",
-  "@actionGoBack": {
-    "description": "Button to leave a screen after an error or missing entity."
+  "backupModeStop" : "Stop",
+  "@backupModeStop" : {
+    "description" : "Vzdump stop mode."
   },
-  "serversFabAddTooltip": "Add server",
-  "@serversFabAddTooltip": {
-    "description": "Tooltip for the server list floating action button."
+  "backupModeSuspend" : "Suspend",
+  "@backupModeSuspend" : {
+    "description" : "Vzdump suspend mode."
   },
-  "serversEmptyTitle": "No servers yet",
-  "@serversEmptyTitle": {
-    "description": "Title when no Proxmox servers are configured."
+  "backupNoDestinationStorage" : "No storage supports backups in this cluster.",
+  "@backupNoDestinationStorage" : {
+    "description" : "When no pool has backup content type for vzdump target."
   },
-  "serversEmptyMessage": "Add a server to connect to your Proxmox cluster.",
-  "@serversEmptyMessage": {
-    "description": "Body text for empty server list."
+  "backupSectionFiles" : "Backup files",
+  "@backupSectionFiles" : {
+    "description" : "Header for aggregated backup content."
   },
-  "serversEmptyCta": "Add server",
-  "@serversEmptyCta": {
-    "description": "CTA button on empty server list."
+  "backupSectionRecentTasks" : "Recent backup tasks",
+  "@backupSectionRecentTasks" : {
+    "description" : "Header for vzdump task history."
   },
-  "serversLoadError": "Could not load servers.",
-  "@serversLoadError": {
-    "description": "Generic error when server list fails to load."
+  "backupSectionScheduledJobs" : "Scheduled jobs",
+  "@backupSectionScheduledJobs" : {
+    "description" : "Header for cluster backup job list from GET /cluster/backup."
   },
-  "serverDeletedSnackbar": "Server removed",
-  "@serverDeletedSnackbar": {
-    "description": "SnackBar after swipe-to-delete on a server."
+  "backupTriggerStart" : "Start backup",
+  "@backupTriggerStart" : {
+    "description" : "Submit button for vzdump bottom sheet."
   },
-  "serverListHostPortSubtitle": "{host}:{port}",
-  "@serverListHostPortSubtitle": {
-    "description": "Server list tile subtitle: host and API port (no scheme).",
-    "placeholders": {
-      "host": {
-        "type": "String",
-        "example": "pve.home"
+  "backupTriggerTitle" : "Run backup",
+  "@backupTriggerTitle" : {
+    "description" : "Bottom sheet title for manual vzdump."
+  },
+  "chartDiskIoSectionTitle" : "Disk I/O",
+  "@chartDiskIoSectionTitle" : {
+    "description" : "Section title for disk throughput chart (distinct from disk usage)."
+  },
+  "chartDiskIoUnavailableOnNode" : "Host disk throughput is not included in node statistics on newer Proxmox VE versions (node RRD no longer exposes read/write rates). Per-guest Disk I/O charts still work on VM and container detail screens.",
+  "@chartDiskIoUnavailableOnNode" : {
+    "description" : "Explains empty node-level Disk I/O chart on Proxmox VE 9+."
+  },
+  "chartDiskRead" : "Read",
+  "@chartDiskRead" : {
+    "description" : "Disk I/O chart legend for read rate."
+  },
+  "chartDiskWrite" : "Write",
+  "@chartDiskWrite" : {
+    "description" : "Disk I/O chart legend for write rate."
+  },
+  "chartLoadError" : "Could not load chart data.",
+  "@chartLoadError" : {
+    "description" : "When rrddata request fails on a chart."
+  },
+  "chartNetworkIn" : "In",
+  "@chartNetworkIn" : {
+    "description" : "Network chart legend for inbound traffic."
+  },
+  "chartNetworkOut" : "Out",
+  "@chartNetworkOut" : {
+    "description" : "Network chart legend for outbound traffic."
+  },
+  "chartNoData" : "No chart data for this period.",
+  "@chartNoData" : {
+    "description" : "When RRD series is empty or all-null."
+  },
+  "chartTimeframeDay" : "1d",
+  "@chartTimeframeDay" : {
+    "description" : "RRD chart range: last day."
+  },
+  "chartTimeframeHour" : "1h",
+  "@chartTimeframeHour" : {
+    "description" : "RRD chart range: last hour."
+  },
+  "chartTimeframeMonth" : "1m",
+  "@chartTimeframeMonth" : {
+    "description" : "RRD chart range: last month."
+  },
+  "chartTimeframeWeek" : "1w",
+  "@chartTimeframeWeek" : {
+    "description" : "RRD chart range: last week."
+  },
+  "connectionDiagnosticsTitle" : "Connection diagnostics",
+  "@connectionDiagnosticsTitle" : {
+    "description" : "AlertDialog title after failed test when verbose is on."
+  },
+  "containerListEmptyMessage" : "No LXC containers were returned for this cluster.",
+  "@containerListEmptyMessage" : {
+    "description" : "Empty container list body."
+  },
+  "containerListEmptyTitle" : "No containers",
+  "@containerListEmptyTitle" : {
+    "description" : "Empty container list title."
+  },
+  "containerNotFoundMessage" : "This container is not in the current list. Go back and refresh the list.",
+  "@containerNotFoundMessage" : {
+    "description" : "Body when container cannot be resolved."
+  },
+  "containerNotFoundTitle" : "Container not found",
+  "@containerNotFoundTitle" : {
+    "description" : "Detail screen when container id or route is invalid."
+  },
+  "dashboardClusterSummary" : "Cluster summary",
+  "@dashboardClusterSummary" : {
+    "description" : "Title for the dashboard summary card."
+  },
+  "dashboardEmptyNodesMessage" : "No node data was returned for this server.",
+  "@dashboardEmptyNodesMessage" : {
+    "description" : "Body for empty dashboard node list."
+  },
+  "dashboardEmptyNodesTitle" : "No nodes",
+  "@dashboardEmptyNodesTitle" : {
+    "description" : "Empty state when cluster returns no node resources."
+  },
+  "dashboardSummaryOnlineNodes" : "Online nodes",
+  "@dashboardSummaryOnlineNodes" : {
+    "description" : "Label for count of cluster nodes reporting online on the dashboard."
+  },
+  "dashboardSummaryRunningVms" : "Running VMs",
+  "@dashboardSummaryRunningVms" : {
+    "description" : "Label for running (including paused) VM count."
+  },
+  "dashboardSummaryTotalContainers" : "Total containers",
+  "@dashboardSummaryTotalContainers" : {
+    "description" : "Label for total LXC container count."
+  },
+  "dashboardSummaryTotalVms" : "Total VMs",
+  "@dashboardSummaryTotalVms" : {
+    "description" : "Label for total VM count on dashboard."
+  },
+  "debugScreenBody" : "Placeholder — {name}",
+  "@debugScreenBody" : {
+    "description" : "Short debug label for Phase 0 placeholder screens.",
+    "placeholders" : {
+      "name" : {
+        "type" : "String",
+        "example" : "Server list"
+      }
+    }
+  },
+  "drawerSectionInfrastructure" : "Infrastructure",
+  "@drawerSectionInfrastructure" : {
+    "description" : "Navigation drawer group label for servers, dashboard, VMs, containers, storage."
+  },
+  "drawerSectionOperations" : "Operations",
+  "@drawerSectionOperations" : {
+    "description" : "Navigation drawer group label for backups, tasks, settings."
+  },
+  "entityBackup" : "Backup",
+  "@entityBackup" : {
+    "description" : "Backup job or backup content entity label (matches PVE terminology)."
+  },
+  "entityContainer" : "Container",
+  "@entityContainer" : {
+    "description" : "LXC container entity label (matches PVE terminology)."
+  },
+  "entityNode" : "Node",
+  "@entityNode" : {
+    "description" : "Proxmox cluster node entity label (matches PVE terminology)."
+  },
+  "entityStorage" : "Storage",
+  "@entityStorage" : {
+    "description" : "Storage pool or volume entity label (matches PVE terminology)."
+  },
+  "entityTask" : "Task",
+  "@entityTask" : {
+    "description" : "Proxmox task (UPID) entity label (matches PVE terminology)."
+  },
+  "entityVirtualMachine" : "Virtual Machine",
+  "@entityVirtualMachine" : {
+    "description" : "QEMU/KVM virtual machine entity label (matches PVE terminology)."
+  },
+  "errorProxmoxAuth" : "Authentication failed. Check your token or password.",
+  "@errorProxmoxAuth" : {
+    "description" : "Mapped message for AuthException."
+  },
+  "errorProxmoxNetwork" : "Network error. Check the host, port, and connectivity.",
+  "@errorProxmoxNetwork" : {
+    "description" : "Mapped message for NetworkException."
+  },
+  "errorProxmoxPermission" : "Permission denied for this account.",
+  "@errorProxmoxPermission" : {
+    "description" : "Mapped message for PermissionException."
+  },
+  "errorProxmoxServer" : "Server returned HTTP {statusCode}.",
+  "@errorProxmoxServer" : {
+    "description" : "Mapped message for ServerException.",
+    "placeholders" : {
+      "statusCode" : {
+        "type" : "int",
+        "example" : "500"
+      }
+    }
+  },
+  "errorProxmoxTechnicalDetails" : "{detail}",
+  "@errorProxmoxTechnicalDetails" : {
+    "description" : "Second line after summary; detail may be English from Proxmox, Dio, or a proxy.",
+    "placeholders" : {
+      "detail" : {
+        "type" : "String",
+        "example" : "Connection refused"
+      }
+    }
+  },
+  "errorProxmoxTimeout" : "The request timed out. Try again.",
+  "@errorProxmoxTimeout" : {
+    "description" : "Mapped message for ApiTimeoutException."
+  },
+  "errorProxmoxUnknown" : "Something went wrong. Try again.",
+  "@errorProxmoxUnknown" : {
+    "description" : "Fallback for unexpected errors."
+  },
+  "filterAll" : "All",
+  "@filterAll" : {
+    "description" : "Filter option meaning no restriction."
+  },
+  "filterByNode" : "Node",
+  "@filterByNode" : {
+    "description" : "Label for node filter dropdown."
+  },
+  "filterByStatus" : "Status",
+  "@filterByStatus" : {
+    "description" : "Label for status filter dropdown."
+  },
+  "filterRunning" : "Running",
+  "@filterRunning" : {
+    "description" : "Status filter: running (VMs include paused)."
+  },
+  "filterStopped" : "Stopped",
+  "@filterStopped" : {
+    "description" : "Status filter: stopped only."
+  },
+  "guestConfigActionDiscard" : "Discard",
+  "@guestConfigActionDiscard" : {
+    "description" : "Reset form to last loaded server values."
+  },
+  "guestConfigAddDisk" : "Add disk (SCSI)",
+  "@guestConfigAddDisk" : {
+    "description" : "Button to append a new scsiN disk row on QEMU editor."
+  },
+  "guestConfigAddMountPoint" : "Add mount point",
+  "@guestConfigAddMountPoint" : {
+    "description" : "Button to append a new mpN row on LXC editor."
+  },
+  "guestConfigAddNetwork" : "Add interface",
+  "@guestConfigAddNetwork" : {
+    "description" : "Button to append a new netN row."
+  },
+  "guestConfigDisksLockedWhileRunning" : "Stop the machine to add, remove, or reorder disk definitions.",
+  "@guestConfigDisksLockedWhileRunning" : {
+    "description" : "Explains why QEMU disk rows are read-only while running."
+  },
+  "guestConfigFieldArchitecture" : "Architecture",
+  "@guestConfigFieldArchitecture" : {
+    "description" : "LXC arch= field."
+  },
+  "guestConfigFieldCores" : "Cores per socket",
+  "@guestConfigFieldCores" : {
+    "description" : "QEMU cores per socket."
+  },
+  "guestConfigFieldCpuLimit" : "CPU limit",
+  "@guestConfigFieldCpuLimit" : {
+    "description" : "LXC cpulimit (0–800 or 0 for unlimited)."
+  },
+  "guestConfigFieldCpuType" : "CPU type",
+  "@guestConfigFieldCpuType" : {
+    "description" : "QEMU cpu= argument (e.g. host)."
+  },
+  "guestConfigFieldCpuUnits" : "CPU units",
+  "@guestConfigFieldCpuUnits" : {
+    "description" : "LXC cpuunits scheduling weight."
+  },
+  "guestConfigFieldDescription" : "Description",
+  "@guestConfigFieldDescription" : {
+    "description" : "Guest config notes / description field."
+  },
+  "guestConfigFieldFeatures" : "Features",
+  "@guestConfigFieldFeatures" : {
+    "description" : "LXC features= string."
+  },
+  "guestConfigFieldGuestOs" : "Guest OS",
+  "@guestConfigFieldGuestOs" : {
+    "description" : "ostype= for QEMU or LXC."
+  },
+  "guestConfigFieldHostname" : "Hostname",
+  "@guestConfigFieldHostname" : {
+    "description" : "LXC config field label for hostname."
+  },
+  "guestConfigFieldMemory" : "Memory (MiB)",
+  "@guestConfigFieldMemory" : {
+    "description" : "RAM size field for VM or CT."
+  },
+  "guestConfigFieldOnBoot" : "Start at boot",
+  "@guestConfigFieldOnBoot" : {
+    "description" : "Whether the guest starts when the node boots."
+  },
+  "guestConfigFieldQemuAgent" : "QEMU guest agent",
+  "@guestConfigFieldQemuAgent" : {
+    "description" : "agent= string for QEMU."
+  },
+  "guestConfigFieldRootfs" : "Root filesystem",
+  "@guestConfigFieldRootfs" : {
+    "description" : "LXC rootfs= (read-only in Tier A editor)."
+  },
+  "guestConfigFieldSockets" : "CPU sockets",
+  "@guestConfigFieldSockets" : {
+    "description" : "QEMU CPU socket count."
+  },
+  "guestConfigFieldStartupOrder" : "Startup order",
+  "@guestConfigFieldStartupOrder" : {
+    "description" : "Proxmox startup= ordering string."
+  },
+  "guestConfigFieldSwap" : "Swap (MiB)",
+  "@guestConfigFieldSwap" : {
+    "description" : "LXC swap size."
+  },
+  "guestConfigFieldTags" : "Tags",
+  "@guestConfigFieldTags" : {
+    "description" : "Proxmox tags string (semicolon-separated in API)."
+  },
+  "guestConfigFieldUnprivileged" : "Unprivileged container",
+  "@guestConfigFieldUnprivileged" : {
+    "description" : "LXC unprivileged flag."
+  },
+  "guestConfigFieldVcpus" : "vCPUs",
+  "@guestConfigFieldVcpus" : {
+    "description" : "QEMU vCPU count override."
+  },
+  "guestConfigFieldVmName" : "Name",
+  "@guestConfigFieldVmName" : {
+    "description" : "QEMU VM config field label for name."
+  },
+  "guestConfigMountsLockedWhileRunning" : "Stop the container to add, remove, or reorder mount points.",
+  "@guestConfigMountsLockedWhileRunning" : {
+    "description" : "Explains why LXC mp rows are read-only while running."
+  },
+  "guestConfigNetworkLineLabel" : "Interface ({name})",
+  "@guestConfigNetworkLineLabel" : {
+    "description" : "Label for a single QEMU/LXC netN row; {name} is e.g. net0.",
+    "placeholders" : {
+      "name" : {
+        "type" : "String"
+      }
+    }
+  },
+  "guestConfigNetworksLockedWhileRunning" : "Stop the machine to add, remove, or reorder network interfaces.",
+  "@guestConfigNetworksLockedWhileRunning" : {
+    "description" : "Explains why QEMU network rows are read-only while running."
+  },
+  "guestConfigRemoveDisk" : "Remove disk",
+  "@guestConfigRemoveDisk" : {
+    "description" : "Tooltip for delete on a QEMU disk row."
+  },
+  "guestConfigRemoveInterface" : "Remove interface",
+  "@guestConfigRemoveInterface" : {
+    "description" : "Tooltip for delete on a net row."
+  },
+  "guestConfigRemoveMountPoint" : "Remove mount point",
+  "@guestConfigRemoveMountPoint" : {
+    "description" : "Tooltip for delete on an LXC mp row."
+  },
+  "guestConfigRiskConfirmAction" : "Apply changes",
+  "@guestConfigRiskConfirmAction" : {
+    "description" : "Confirm button on high-risk save dialog."
+  },
+  "guestConfigRiskConfirmBody" : "Network, disk, mount point, or root filesystem changes can break a guest or destroy data. Continue only if you understand the impact.",
+  "@guestConfigRiskConfirmBody" : {
+    "description" : "Body for high-risk save confirmation."
+  },
+  "guestConfigRiskConfirmTitle" : "Apply high-risk changes?",
+  "@guestConfigRiskConfirmTitle" : {
+    "description" : "Title for confirm dialog before saving disk/net/mp/rootfs mutations."
+  },
+  "guestConfigRootfsEditHint" : "Changing rootfs is dangerous; confirm before saving.",
+  "@guestConfigRootfsEditHint" : {
+    "description" : "Helper when LXC rootfs is editable (guest stopped)."
+  },
+  "guestConfigRootfsLockedWhileRunning" : "Stop the container to edit the root filesystem string.",
+  "@guestConfigRootfsLockedWhileRunning" : {
+    "description" : "Explains why LXC rootfs field is read-only while running."
+  },
+  "guestConfigRootfsReadOnlyHint" : "Root filesystem cannot be edited here yet.",
+  "@guestConfigRootfsReadOnlyHint" : {
+    "description" : "Helper under read-only rootfs field."
+  },
+  "guestConfigSaveNothingChanged" : "No changes to save",
+  "@guestConfigSaveNothingChanged" : {
+    "description" : "Snackbar when save tapped with empty delta."
+  },
+  "guestConfigSaveSuccess" : "Configuration saved",
+  "@guestConfigSaveSuccess" : {
+    "description" : "Snackbar after successful PUT config."
+  },
+  "guestConfigSectionBoot" : "Boot",
+  "@guestConfigSectionBoot" : {
+    "description" : "Grouped form section: on boot, startup order."
+  },
+  "guestConfigSectionCpu" : "CPU",
+  "@guestConfigSectionCpu" : {
+    "description" : "Grouped form section: sockets, cores, limits."
+  },
+  "guestConfigSectionDisks" : "Disks",
+  "@guestConfigSectionDisks" : {
+    "description" : "Grouped section title for QEMU disk keys on VM config editor."
+  },
+  "guestConfigSectionIdentity" : "Identity",
+  "@guestConfigSectionIdentity" : {
+    "description" : "Grouped form section: name, description, tags."
+  },
+  "guestConfigSectionMounts" : "Mount points",
+  "@guestConfigSectionMounts" : {
+    "description" : "Grouped section title for LXC mpN lines."
+  },
+  "guestConfigSectionNetworks" : "Network interfaces",
+  "@guestConfigSectionNetworks" : {
+    "description" : "Grouped section title for net0.. on VM/LXC config editor."
+  },
+  "guestConfigSectionOptions" : "Options",
+  "@guestConfigSectionOptions" : {
+    "description" : "Grouped form section: agent, features, etc."
+  },
+  "guestConfigSectionResources" : "Resources",
+  "@guestConfigSectionResources" : {
+    "description" : "Grouped form section: memory, swap, etc."
+  },
+  "guestCreateCtActionName" : "Create container",
+  "@guestCreateCtActionName" : {
+    "description" : "Short name for success snackbar after CT create."
+  },
+  "guestCreateCtDisclaimer" : "Creating a container runs a server task. Match rootfs and templates to your cluster.",
+  "@guestCreateCtDisclaimer" : {
+    "description" : "Footer note on create CT screen."
+  },
+  "guestCreateCtOstypeHint" : "Template id, e.g. debian or ubuntu.",
+  "@guestCreateCtOstypeHint" : {
+    "description" : "LXC ostype helper."
+  },
+  "guestCreateCtTitle" : "Create container",
+  "@guestCreateCtTitle" : {
+    "description" : "App bar title for minimal LXC create form."
+  },
+  "guestCreateFabCt" : "Create container",
+  "@guestCreateFabCt" : {
+    "description" : "FAB tooltip on container list."
+  },
+  "guestCreateFabVm" : "Create Virtual Machine",
+  "@guestCreateFabVm" : {
+    "description" : "FAB tooltip on VM list."
+  },
+  "guestCreateFieldNet0" : "Network (net0)",
+  "@guestCreateFieldNet0" : {
+    "description" : "QEMU/LXC net0 string label."
+  },
+  "guestCreateFieldNet0Hint" : "Example: virtio,bridge=vmbr0",
+  "@guestCreateFieldNet0Hint" : {
+    "description" : "QEMU net0 example."
+  },
+  "guestCreateFieldNet0HintCt" : "Example: name=eth0,bridge=vmbr0,ip=dhcp",
+  "@guestCreateFieldNet0HintCt" : {
+    "description" : "LXC net0 example."
+  },
+  "guestCreateFieldRootPassword" : "Root password",
+  "@guestCreateFieldRootPassword" : {
+    "description" : "LXC create root password field."
+  },
+  "guestCreateFieldRootfsHint" : "Example: local-lvm:8",
+  "@guestCreateFieldRootfsHint" : {
+    "description" : "LXC rootfs volume example."
+  },
+  "guestCreateFieldScsi0" : "Disk (scsi0)",
+  "@guestCreateFieldScsi0" : {
+    "description" : "QEMU boot disk volume string."
+  },
+  "guestCreateFieldScsi0Hint" : "Example: local-lvm:32",
+  "@guestCreateFieldScsi0Hint" : {
+    "description" : "Example scsi0 Proxmox volume string."
+  },
+  "guestCreateFieldScsihw" : "SCSI controller (scsihw)",
+  "@guestCreateFieldScsihw" : {
+    "description" : "QEMU scsihw= field label."
+  },
+  "guestCreateFieldScsihwHint" : "Leave empty to omit; virtio-scsi is common with scsi0.",
+  "@guestCreateFieldScsihwHint" : {
+    "description" : "Helper for scsihw field."
+  },
+  "guestCreateNoNodes" : "No cluster nodes are available.",
+  "@guestCreateNoNodes" : {
+    "description" : "Empty node list on create guest screen."
+  },
+  "guestCreateSectionDiskNet" : "Disk and network",
+  "@guestCreateSectionDiskNet" : {
+    "description" : "Form section for QEMU disk and net0."
+  },
+  "guestCreateSectionTarget" : "Target",
+  "@guestCreateSectionTarget" : {
+    "description" : "Form section: node and guest id."
+  },
+  "guestCreateSubmit" : "Create",
+  "@guestCreateSubmit" : {
+    "description" : "Primary button on create VM/CT forms."
+  },
+  "guestCreateVmActionName" : "Create Virtual Machine",
+  "@guestCreateVmActionName" : {
+    "description" : "Short name for success snackbar (powerActionCompleted)."
+  },
+  "guestCreateVmDisclaimer" : "Creating a VM runs a server task. Ensure disk and network strings match your node.",
+  "@guestCreateVmDisclaimer" : {
+    "description" : "Footer note on create VM screen."
+  },
+  "guestCreateVmOstypeHint" : "Example: l26 (Linux 2.6+), win11, other.",
+  "@guestCreateVmOstypeHint" : {
+    "description" : "QEMU ostype helper."
+  },
+  "guestCreateVmTitle" : "Create Virtual Machine",
+  "@guestCreateVmTitle" : {
+    "description" : "App bar title for minimal QEMU create form."
+  },
+  "guestDetailMetricGridSemantics" : "CPU, memory, network, and disk activity for this guest.",
+  "@guestDetailMetricGridSemantics" : {
+    "description" : "Semantics label for the 2×2 guest detail metric instrument grid (VM / LXC)."
+  },
+  "guestPickerAdvancedRaw" : "Advanced (raw string)",
+  "@guestPickerAdvancedRaw" : {
+    "description" : "Toggle or tile to edit Proxmox value as free text."
+  },
+  "guestPickerBridge" : "Bridge",
+  "@guestPickerBridge" : {
+    "description" : "Label for Linux bridge iface dropdown."
+  },
+  "guestPickerDiskModeExisting" : "Existing volume",
+  "@guestPickerDiskModeExisting" : {
+    "description" : "Radio option to attach an existing storage volume."
+  },
+  "guestPickerDiskModeNew" : "New volume (size in GiB)",
+  "@guestPickerDiskModeNew" : {
+    "description" : "Radio option to allocate a new disk by size."
+  },
+  "guestPickerIfaceName" : "Interface name",
+  "@guestPickerIfaceName" : {
+    "description" : "LXC eth name inside container (name=)."
+  },
+  "guestPickerLoadingBridges" : "Loading bridges…",
+  "@guestPickerLoadingBridges" : {
+    "description" : "Placeholder while node network list loads."
+  },
+  "guestPickerNetIpDhcp" : "DHCP",
+  "@guestPickerNetIpDhcp" : {
+    "description" : "LXC net ip=dhcp option."
+  },
+  "guestPickerNetIpMode" : "IPv4",
+  "@guestPickerNetIpMode" : {
+    "description" : "Section label for LXC IP mode."
+  },
+  "guestPickerNetIpNone" : "Omit IP (bridge only)",
+  "@guestPickerNetIpNone" : {
+    "description" : "LXC net line without ip= key."
+  },
+  "guestPickerNetIpStatic" : "Static",
+  "@guestPickerNetIpStatic" : {
+    "description" : "LXC static ip= value."
+  },
+  "guestPickerNetStaticHint" : "e.g. 192.168.1.50/24",
+  "@guestPickerNetStaticHint" : {
+    "description" : "Hint for LXC static CIDR field."
+  },
+  "guestPickerNicModel" : "Network model",
+  "@guestPickerNicModel" : {
+    "description" : "QEMU NIC hardware model dropdown."
+  },
+  "guestPickerNoBridges" : "No bridge interfaces found. Use advanced raw entry.",
+  "@guestPickerNoBridges" : {
+    "description" : "Empty bridge list hint."
+  },
+  "guestPickerNoStoragePools" : "No storage pools on this node support this content type. Use advanced raw entry.",
+  "@guestPickerNoStoragePools" : {
+    "description" : "Empty filtered storage list for guest disk/rootfs."
+  },
+  "guestPickerParseFallbackHint" : "This value uses options the simplified editor does not handle. Edit as raw or adjust in Proxmox.",
+  "@guestPickerParseFallbackHint" : {
+    "description" : "Shown when net/disk string cannot be parsed for structured UI."
+  },
+  "guestPickerSizeGiB" : "Size (GiB)",
+  "@guestPickerSizeGiB" : {
+    "description" : "Numeric size for new disk or rootfs."
+  },
+  "guestPickerStaticIpLabel" : "Static CIDR",
+  "@guestPickerStaticIpLabel" : {
+    "description" : "Label for LXC static IP text field."
+  },
+  "guestPickerStoragePool" : "Storage pool",
+  "@guestPickerStoragePool" : {
+    "description" : "Label for storage dropdown on guest forms."
+  },
+  "guestPickerUseSimpleEditor" : "Use simplified editor",
+  "@guestPickerUseSimpleEditor" : {
+    "description" : "Leave raw string mode when the value parses cleanly."
+  },
+  "guestPickerVolume" : "Volume",
+  "@guestPickerVolume" : {
+    "description" : "Dropdown of volid from storage content."
+  },
+  "labelContainerOsType" : "OS type",
+  "@labelContainerOsType" : {
+    "description" : "Label for LXC ostype field."
+  },
+  "labelContentKind" : "Kind",
+  "@labelContentKind" : {
+    "description" : "Storage content kind (backup, iso, …)."
+  },
+  "labelCtid" : "CT ID",
+  "@labelCtid" : {
+    "description" : "Label for LXC container ID."
+  },
+  "labelFormat" : "Format",
+  "@labelFormat" : {
+    "description" : "Generic format label (backup vma/tar, …)."
+  },
+  "labelNodeHostStatus" : "Status",
+  "@labelNodeHostStatus" : {
+    "description" : "Metric grid label for Proxmox node online/offline state."
+  },
+  "labelVmid" : "VM ID",
+  "@labelVmid" : {
+    "description" : "Label for QEMU guest ID."
+  },
+  "labelVolumeId" : "Volume",
+  "@labelVolumeId" : {
+    "description" : "Proxmox volume id / path label."
+  },
+  "listFilteredEmptyMessage" : "Try changing search or filters.",
+  "@listFilteredEmptyMessage" : {
+    "description" : "Hint when filtered list is empty."
+  },
+  "listFilteredEmptyTitle" : "No matches",
+  "@listFilteredEmptyTitle" : {
+    "description" : "When filters exclude every row."
+  },
+  "metricCpu" : "CPU",
+  "@metricCpu" : {
+    "description" : "Label for CPU usage metric."
+  },
+  "metricDisk" : "Disk",
+  "@metricDisk" : {
+    "description" : "Label for disk usage or I/O metric."
+  },
+  "metricGuestContainers" : "Containers",
+  "@metricGuestContainers" : {
+    "description" : "Label for LXC count on this node."
+  },
+  "metricGuestVms" : "Virtual machines",
+  "@metricGuestVms" : {
+    "description" : "Label for QEMU guest count on this node."
+  },
+  "metricIoWait" : "I/O wait",
+  "@metricIoWait" : {
+    "description" : "Label for CPU I/O wait when shown on node detail."
+  },
+  "metricLoadAvg1m" : "Load (1m)",
+  "@metricLoadAvg1m" : {
+    "description" : "Label for one-minute load average."
+  },
+  "metricMemory" : "Memory",
+  "@metricMemory" : {
+    "description" : "Label for memory (RAM) usage metric."
+  },
+  "metricNetwork" : "Network",
+  "@metricNetwork" : {
+    "description" : "Label for network traffic metric."
+  },
+  "metricSwap" : "Swap",
+  "@metricSwap" : {
+    "description" : "Label for swap usage on node detail."
+  },
+  "metricUptime" : "Uptime",
+  "@metricUptime" : {
+    "description" : "Label for uptime duration metric."
+  },
+  "navContainers" : "Containers",
+  "@navContainers" : {
+    "description" : "Bottom navigation bar label for the LXC Containers tab."
+  },
+  "navDashboard" : "Dashboard",
+  "@navDashboard" : {
+    "description" : "Bottom navigation bar label for the Dashboard tab."
+  },
+  "navMore" : "More",
+  "@navMore" : {
+    "description" : "Bottom navigation bar label for the More tab, which opens the full navigation drawer."
+  },
+  "navTasks" : "Tasks",
+  "@navTasks" : {
+    "description" : "Bottom navigation bar label for the Proxmox Tasks tab."
+  },
+  "navVMs" : "VMs",
+  "@navVMs" : {
+    "description" : "Bottom navigation bar label for the Virtual Machines tab (abbreviated for space)."
+  },
+  "nodeDetailRunningTotalCount" : "{running} running · {total} total",
+  "@nodeDetailRunningTotalCount" : {
+    "description" : "Running vs total guest count for node detail grid.",
+    "placeholders" : {
+      "total" : {
+        "type" : "int",
+        "example" : "5"
       },
-      "port": {
-        "type": "int",
-        "example": "8006"
+      "running" : {
+        "type" : "int",
+        "example" : "2"
       }
     }
   },
-  "serverFieldName": "Display name",
-  "@serverFieldName": {
-    "description": "Label for the friendly server name field."
+  "nodeDetailTitle" : "Node",
+  "@nodeDetailTitle" : {
+    "description" : "App bar title for cluster node detail screen."
   },
-  "serverFieldNameHint": "e.g. Home lab",
-  "@serverFieldNameHint": {
-    "description": "Hint for display name field."
+  "nodeNotFoundMessage" : "This node is not in the current list. Go back and refresh the list.",
+  "@nodeNotFoundMessage" : {
+    "description" : "Body when a node cannot be resolved from the list."
   },
-  "serverFieldHost": "Host",
-  "@serverFieldHost": {
-    "description": "Label for hostname or IP (HTTPS only, no scheme)."
+  "nodeNotFoundTitle" : "Node not found",
+  "@nodeNotFoundTitle" : {
+    "description" : "Detail screen when node name is not in the current list."
   },
-  "serverFieldHostHint": "proxmox.example.com or 192.168.1.10",
-  "@serverFieldHostHint": {
-    "description": "Hint for host field."
+  "offlineBannerMessage" : "No network connection. Some actions may not work until you are back online.",
+  "@offlineBannerMessage" : {
+    "description" : "Persistent banner when the device has no connectivity (Phase 6.1)."
   },
-  "serverFieldPort": "Port",
-  "@serverFieldPort": {
-    "description": "Label for HTTPS API port."
-  },
-  "serverFieldApiTokenId": "Token ID",
-  "@serverFieldApiTokenId": {
-    "description": "Label for Proxmox API token ID (USER@REALM!name)."
-  },
-  "serverFieldApiTokenIdHint": "e.g. root@pam!mytoken",
-  "@serverFieldApiTokenIdHint": {
-    "description": "Hint for API token ID field."
-  },
-  "serverFieldApiTokenSecret": "Secret",
-  "@serverFieldApiTokenSecret": {
-    "description": "Label for Proxmox API token secret (UUID)."
-  },
-  "serverFieldApiTokenSecretHint": "UUID shown when the token was created",
-  "@serverFieldApiTokenSecretHint": {
-    "description": "Hint for API token secret field."
-  },
-  "serverApiTokenPasteFull": "Paste full token",
-  "@serverApiTokenPasteFull": {
-    "description": "Button to paste USER@REALM!NAME=SECRET from clipboard."
-  },
-  "serverApiTokenPasteInvalid": "Clipboard text did not look like USER@REALM!NAME=SECRET.",
-  "@serverApiTokenPasteInvalid": {
-    "description": "Snackbar when paste full token could not be parsed."
-  },
-  "serverApiTokenPasteClipboardEmpty": "Clipboard is empty.",
-  "@serverApiTokenPasteClipboardEmpty": {
-    "description": "Snackbar when paste full token but clipboard has no text."
-  },
-  "serverApiTokenIdErrorEmpty": "Enter the Token ID.",
-  "@serverApiTokenIdErrorEmpty": {
-    "description": "Validator when token ID is empty on add."
-  },
-  "serverApiTokenIdErrorInvalid": "Token ID must look like USER@REALM!name and must not include =.",
-  "@serverApiTokenIdErrorInvalid": {
-    "description": "Validator when token ID shape is wrong."
-  },
-  "serverApiTokenSecretErrorEmpty": "Enter the secret.",
-  "@serverApiTokenSecretErrorEmpty": {
-    "description": "Validator when secret is empty on add."
-  },
-  "serverApiTokenErrorPartial": "Enter both Token ID and Secret, or leave both blank to keep the current token.",
-  "@serverApiTokenErrorPartial": {
-    "description": "Snackbar when only one API token field is filled on edit or test."
-  },
-  "serverFieldUsername": "User name",
-  "@serverFieldUsername": {
-    "description": "Label for Proxmox username (e.g. root@pam)."
-  },
-  "serverFieldUsernameHint": "e.g. root",
-  "@serverFieldUsernameHint": {
-    "description": "Hint for username field."
-  },
-  "serverFieldPassword": "Password",
-  "@serverFieldPassword": {
-    "description": "Label for password field."
-  },
-  "serverAuthTypeApiToken": "API token",
-  "@serverAuthTypeApiToken": {
-    "description": "Segment label for API token authentication."
-  },
-  "serverAuthTypeUsernamePassword": "Password",
-  "@serverAuthTypeUsernamePassword": {
-    "description": "Segment label for username/password authentication."
-  },
-  "serverAuthTfaUseApiTokenHint": "If this account has two-factor authentication (TFA) enabled, use API token sign-in instead. Create a token in the Proxmox web UI (Datacenter or your user → API Tokens).",
-  "@serverAuthTfaUseApiTokenHint": {
-    "description": "Helper under password auth: password login does not support TFA; recommend API tokens."
-  },
-  "serverFormIdentitySection": "Identity",
-  "@serverFormIdentitySection": {
-    "description": "Section header for server name, host, and port fields."
-  },
-  "serverFormAuthentication": "Authentication",
-  "@serverFormAuthentication": {
-    "description": "Section title above auth type and credential fields."
-  },
-  "serverFormSecuritySection": "Security",
-  "@serverFormSecuritySection": {
-    "description": "Section header for SSL / certificate options."
-  },
-  "serverAllowSelfSigned": "Allow self-signed certificate",
-  "@serverAllowSelfSigned": {
-    "description": "Switch label to trust self-signed TLS certificates."
-  },
-  "serverTlsPinLabel": "Certificate fingerprint (SHA-256)",
-  "@serverTlsPinLabel": {
-    "description": "Label for the TLS leaf certificate SHA-256 pin field."
-  },
-  "serverTlsPinHint": "64 hex characters. Tap fetch after entering host and port. Re-fetch if the server certificate is renewed.",
-  "@serverTlsPinHint": {
-    "description": "Helper under the TLS pin field."
-  },
-  "serverTlsPinFetch": "Fetch certificate fingerprint",
-  "@serverTlsPinFetch": {
-    "description": "Button to load the server leaf cert SHA-256 over TLS."
-  },
-  "serverTlsPinErrorRequired": "When self-signed is enabled, fetch or paste the certificate fingerprint.",
-  "@serverTlsPinErrorRequired": {
-    "description": "Snackbar when save or test is blocked without a valid pin."
-  },
-  "serverTlsPinFetchFailed": "Could not read the server certificate. Check host, port, and network.",
-  "@serverTlsPinFetchFailed": {
-    "description": "Snackbar when TLS pin fetch fails."
-  },
-  "serverTlsPinFetchSuccess": "Fingerprint loaded. Save the server to keep it.",
-  "@serverTlsPinFetchSuccess": {
-    "description": "Snackbar after a successful TLS pin fetch."
-  },
-  "serverHostErrorEmpty": "Enter a host name or IP address.",
-  "@serverHostErrorEmpty": {
-    "description": "Validation when host is empty."
-  },
-  "serverHostErrorHttp": "Do not include http://. The app always uses HTTPS.",
-  "@serverHostErrorHttp": {
-    "description": "Validation when host contains http://."
-  },
-  "serverHostErrorHttps": "Enter the host without https:// (scheme is added automatically).",
-  "@serverHostErrorHttps": {
-    "description": "Validation when host contains https://."
-  },
-  "serverPortErrorInvalid": "Enter a valid port number (1–65535).",
-  "@serverPortErrorInvalid": {
-    "description": "Validation when port is not a valid integer in range."
-  },
-  "serverNameErrorEmpty": "Enter a display name.",
-  "@serverNameErrorEmpty": {
-    "description": "Validation when display name is empty."
-  },
-  "serverApiTokenErrorBothRequired": "Enter both Token ID and Secret.",
-  "@serverApiTokenErrorBothRequired": {
-    "description": "Snackbar when API token test/save needs credentials but both fields are empty on add."
-  },
-  "serverFieldRealm": "Realm",
-  "@serverFieldRealm": {
-    "description": "Proxmox auth realm (pam, pve, ldap, …)."
-  },
-  "serverRealmPam": "Linux PAM (pam)",
-  "@serverRealmPam": {
-    "description": "Preset realm label for pam."
-  },
-  "serverRealmPve": "Proxmox VE (pve)",
-  "@serverRealmPve": {
-    "description": "Preset realm label for pve."
-  },
-  "serverRealmOther": "Other…",
-  "@serverRealmOther": {
-    "description": "Custom realm option in dropdown."
-  },
-  "serverFieldRealmCustom": "Custom realm",
-  "@serverFieldRealmCustom": {
-    "description": "Label for text field when realm is Other."
-  },
-  "serverFieldRealmCustomHint": "e.g. ldap",
-  "@serverFieldRealmCustomHint": {
-    "description": "Hint for custom realm."
-  },
-  "serverRealmErrorEmpty": "Enter a realm.",
-  "@serverRealmErrorEmpty": {
-    "description": "Validator when custom realm is empty."
-  },
-  "serverRealmErrorInvalid": "Realm must not contain spaces or @.",
-  "@serverRealmErrorInvalid": {
-    "description": "Validator for custom realm characters."
-  },
-  "serverLoginComposeHint": "Sign-in uses login@realm (set below).",
-  "@serverLoginComposeHint": {
-    "description": "Helper under username/realm for password auth."
-  },
-  "serverUsernameErrorContainsAt": "Enter only the login name here. Choose the realm below.",
-  "@serverUsernameErrorContainsAt": {
-    "description": "Validator when user types @ in login field."
-  },
-  "serverUsernameErrorEmpty": "Enter your Proxmox user name.",
-  "@serverUsernameErrorEmpty": {
-    "description": "Validation when username is required but empty."
-  },
-  "serverPasswordErrorEmpty": "Enter your password.",
-  "@serverPasswordErrorEmpty": {
-    "description": "Validation when password is required on add."
-  },
-  "serverPasswordLeaveBlankHint": "Leave blank to keep the current password.",
-  "@serverPasswordLeaveBlankHint": {
-    "description": "Hint on edit when password optional."
-  },
-  "serverApiTokenLeaveBlankHint": "Leave both fields blank to keep the current token.",
-  "@serverApiTokenLeaveBlankHint": {
-    "description": "Hint on edit when API token optional."
-  },
-  "serverNotFound": "This server was not found.",
-  "@serverNotFound": {
-    "description": "Shown when edit route id does not exist."
-  },
-  "serverEditLoadError": "Could not open this server for editing.",
-  "@serverEditLoadError": {
-    "description": "Error loading server metadata for edit screen."
-  },
-  "errorProxmoxAuth": "Authentication failed. Check your token or password.",
-  "@errorProxmoxAuth": {
-    "description": "Mapped message for AuthException."
-  },
-  "errorProxmoxNetwork": "Network error. Check the host, port, and connectivity.",
-  "@errorProxmoxNetwork": {
-    "description": "Mapped message for NetworkException."
-  },
-  "errorProxmoxTimeout": "The request timed out. Try again.",
-  "@errorProxmoxTimeout": {
-    "description": "Mapped message for ApiTimeoutException."
-  },
-  "errorProxmoxPermission": "Permission denied for this account.",
-  "@errorProxmoxPermission": {
-    "description": "Mapped message for PermissionException."
-  },
-  "errorProxmoxServer": "Server returned HTTP {statusCode}.",
-  "@errorProxmoxServer": {
-    "description": "Mapped message for ServerException.",
-    "placeholders": {
-      "statusCode": {
-        "type": "int",
-        "example": "500"
+  "powerActionCompleted" : "{actionName} finished successfully.",
+  "@powerActionCompleted" : {
+    "description" : "SnackBar after a power task completes with OK status.",
+    "placeholders" : {
+      "actionName" : {
+        "type" : "String",
+        "example" : "Start"
       }
     }
   },
-  "errorProxmoxUnknown": "Something went wrong. Try again.",
-  "@errorProxmoxUnknown": {
-    "description": "Fallback for unexpected errors."
+  "powerActionTaskFailed" : "The operation finished with an error on the server.",
+  "@powerActionTaskFailed" : {
+    "description" : "SnackBar or message when Proxmox task status is error."
   },
-  "errorProxmoxTechnicalDetails": "{detail}",
-  "@errorProxmoxTechnicalDetails": {
-    "description": "Second line after summary; detail may be English from Proxmox, Dio, or a proxy.",
-    "placeholders": {
-      "detail": {
-        "type": "String",
-        "example": "Connection refused"
+  "powerActionTaskUnknown" : "Could not confirm the final task status.",
+  "@powerActionTaskUnknown" : {
+    "description" : "When task polling ends in unknown state."
+  },
+  "powerConfirmForceStopBody" : "The guest will be powered off immediately without a clean shutdown.",
+  "@powerConfirmForceStopBody" : {
+    "description" : "Alert body for force stop."
+  },
+  "powerConfirmForceStopTitle" : "Force stop?",
+  "@powerConfirmForceStopTitle" : {
+    "description" : "Alert title for immediate power-off."
+  },
+  "powerConfirmForceStopWarning" : "Unsaved data may be lost. This is equivalent to pulling the power cord.",
+  "@powerConfirmForceStopWarning" : {
+    "description" : "Extra warning in force-stop dialog about data loss."
+  },
+  "powerConfirmRebootBody" : "The guest will restart. Unsaved work may be lost if applications do not shut down cleanly.",
+  "@powerConfirmRebootBody" : {
+    "description" : "Alert body for reboot confirmation."
+  },
+  "powerConfirmRebootTitle" : "Reboot guest?",
+  "@powerConfirmRebootTitle" : {
+    "description" : "Alert title for reboot confirmation."
+  },
+  "powerConfirmStopBody" : "This sends a shutdown signal so the operating system can stop cleanly.",
+  "@powerConfirmStopBody" : {
+    "description" : "Alert body for graceful shutdown."
+  },
+  "powerConfirmStopTitle" : "Shut down guest?",
+  "@powerConfirmStopTitle" : {
+    "description" : "Alert title for graceful shutdown confirmation."
+  },
+  "preferencesChartsSection" : "Charts",
+  "@preferencesChartsSection" : {
+    "description" : "Preferences section for chart-related defaults."
+  },
+  "preferencesDefaultChartTimeframeSubtitle" : "Used for CPU, memory, network, and disk charts on VM, container, and node detail screens.",
+  "@preferencesDefaultChartTimeframeSubtitle" : {
+    "description" : "Explains where the default chart timeframe applies."
+  },
+  "preferencesDefaultChartTimeframeTitle" : "Default time range",
+  "@preferencesDefaultChartTimeframeTitle" : {
+    "description" : "Label for the default RRD chart timeframe control."
+  },
+  "preferencesScreenTitle" : "Preferences",
+  "@preferencesScreenTitle" : {
+    "description" : "App bar title on the Preferences screen."
+  },
+  "screenAddServer" : "Add server",
+  "@screenAddServer" : {
+    "description" : "App bar title for adding a Proxmox server."
+  },
+  "screenEditContainerConfig" : "Edit container",
+  "@screenEditContainerConfig" : {
+    "description" : "App bar title for LXC Tier-A config editor."
+  },
+  "screenEditServer" : "Edit server",
+  "@screenEditServer" : {
+    "description" : "App bar title for editing a saved server."
+  },
+  "screenEditVmConfig" : "Edit VM",
+  "@screenEditVmConfig" : {
+    "description" : "App bar title for QEMU VM Tier-A config editor."
+  },
+  "searchClearTooltip" : "Clear search",
+  "@searchClearTooltip" : {
+    "description" : "Tooltip for the icon-only clear control in VM/container list SearchBar."
+  },
+  "searchContainersHint" : "Search by name",
+  "@searchContainersHint" : {
+    "description" : "Hint for container list search field."
+  },
+  "searchVmsHint" : "Search by name",
+  "@searchVmsHint" : {
+    "description" : "Hint for VM list search field."
+  },
+  "sectionAbout" : "About",
+  "@sectionAbout" : {
+    "description" : "Navigation or screen title for about / app info."
+  },
+  "sectionBackups" : "Backups",
+  "@sectionBackups" : {
+    "description" : "Navigation or screen title for backup content and jobs."
+  },
+  "sectionContainers" : "Containers",
+  "@sectionContainers" : {
+    "description" : "Navigation or screen title for the LXC container list."
+  },
+  "sectionDashboard" : "Dashboard",
+  "@sectionDashboard" : {
+    "description" : "Navigation or screen title for the cluster/node dashboard."
+  },
+  "sectionGuestTags" : "Tags",
+  "@sectionGuestTags" : {
+    "description" : "Section title for Proxmox guest tags on VM / container detail screens."
+  },
+  "sectionServers" : "Servers",
+  "@sectionServers" : {
+    "description" : "Navigation or screen title for configured Proxmox servers list."
+  },
+  "sectionSettings" : "Settings",
+  "@sectionSettings" : {
+    "description" : "Navigation or screen title for app settings."
+  },
+  "sectionTasks" : "Tasks",
+  "@sectionTasks" : {
+    "description" : "Navigation or screen title for the Proxmox task viewer."
+  },
+  "sectionVms" : "Virtual machines",
+  "@sectionVms" : {
+    "description" : "Navigation or screen title for the VM list."
+  },
+  "serverAllowSelfSigned" : "Allow self-signed certificate",
+  "@serverAllowSelfSigned" : {
+    "description" : "Switch label to trust self-signed TLS certificates."
+  },
+  "serverApiTokenErrorBothRequired" : "Enter both Token ID and Secret.",
+  "@serverApiTokenErrorBothRequired" : {
+    "description" : "Snackbar when API token test/save needs credentials but both fields are empty on add."
+  },
+  "serverApiTokenErrorPartial" : "Enter both Token ID and Secret, or leave both blank to keep the current token.",
+  "@serverApiTokenErrorPartial" : {
+    "description" : "Snackbar when only one API token field is filled on edit or test."
+  },
+  "serverApiTokenIdErrorEmpty" : "Enter the Token ID.",
+  "@serverApiTokenIdErrorEmpty" : {
+    "description" : "Validator when token ID is empty on add."
+  },
+  "serverApiTokenIdErrorInvalid" : "Token ID must look like USER@REALM!name and must not include =.",
+  "@serverApiTokenIdErrorInvalid" : {
+    "description" : "Validator when token ID shape is wrong."
+  },
+  "serverApiTokenLeaveBlankHint" : "Leave both fields blank to keep the current token.",
+  "@serverApiTokenLeaveBlankHint" : {
+    "description" : "Hint on edit when API token optional."
+  },
+  "serverApiTokenPasteClipboardEmpty" : "Clipboard is empty.",
+  "@serverApiTokenPasteClipboardEmpty" : {
+    "description" : "Snackbar when paste full token but clipboard has no text."
+  },
+  "serverApiTokenPasteFull" : "Paste full token",
+  "@serverApiTokenPasteFull" : {
+    "description" : "Button to paste USER@REALM!NAME=SECRET from clipboard."
+  },
+  "serverApiTokenPasteInvalid" : "Clipboard text did not look like USER@REALM!NAME=SECRET.",
+  "@serverApiTokenPasteInvalid" : {
+    "description" : "Snackbar when paste full token could not be parsed."
+  },
+  "serverApiTokenSecretErrorEmpty" : "Enter the secret.",
+  "@serverApiTokenSecretErrorEmpty" : {
+    "description" : "Validator when secret is empty on add."
+  },
+  "serverAuthTfaUseApiTokenHint" : "If this account has two-factor authentication (TFA) enabled, use API token sign-in instead. Create a token in the Proxmox web UI (Datacenter or your user → API Tokens).",
+  "@serverAuthTfaUseApiTokenHint" : {
+    "description" : "Helper under password auth: password login does not support TFA; recommend API tokens."
+  },
+  "serverAuthTypeApiToken" : "API token",
+  "@serverAuthTypeApiToken" : {
+    "description" : "Segment label for API token authentication."
+  },
+  "serverAuthTypeUsernamePassword" : "Password",
+  "@serverAuthTypeUsernamePassword" : {
+    "description" : "Segment label for username/password authentication."
+  },
+  "serverConnectionTestInProgress" : "Testing connection…",
+  "@serverConnectionTestInProgress" : {
+    "description" : "Shown while connection test runs."
+  },
+  "serverConnectionTestSuccess" : "Connected. Proxmox version {version}.",
+  "@serverConnectionTestSuccess" : {
+    "description" : "SnackBar after successful GET /version.",
+    "placeholders" : {
+      "version" : {
+        "type" : "String",
+        "example" : "8.2.4"
       }
     }
   },
-  "serverConnectionTestSuccess": "Connected. Proxmox version {version}.",
-  "@serverConnectionTestSuccess": {
-    "description": "SnackBar after successful GET /version.",
-    "placeholders": {
-      "version": {
-        "type": "String",
-        "example": "8.2.4"
-      }
-    }
+  "serverDeletedSnackbar" : "Server removed",
+  "@serverDeletedSnackbar" : {
+    "description" : "SnackBar after swipe-to-delete on a server."
   },
-  "serverConnectionTestInProgress": "Testing connection…",
-  "@serverConnectionTestInProgress": {
-    "description": "Shown while connection test runs."
+  "serverEditLoadError" : "Could not open this server for editing.",
+  "@serverEditLoadError" : {
+    "description" : "Error loading server metadata for edit screen."
   },
-  "dashboardClusterSummary": "Cluster summary",
-  "@dashboardClusterSummary": {
-    "description": "Title for the dashboard summary card."
+  "serverFieldApiTokenId" : "Token ID",
+  "@serverFieldApiTokenId" : {
+    "description" : "Label for Proxmox API token ID (USER@REALM!name)."
   },
-  "dashboardSummaryTotalVms": "Total VMs",
-  "@dashboardSummaryTotalVms": {
-    "description": "Label for total VM count on dashboard."
+  "serverFieldApiTokenIdHint" : "e.g. root@pam!mytoken",
+  "@serverFieldApiTokenIdHint" : {
+    "description" : "Hint for API token ID field."
   },
-  "dashboardSummaryRunningVms": "Running VMs",
-  "@dashboardSummaryRunningVms": {
-    "description": "Label for running (including paused) VM count."
+  "serverFieldApiTokenSecret" : "Secret",
+  "@serverFieldApiTokenSecret" : {
+    "description" : "Label for Proxmox API token secret (UUID)."
   },
-  "dashboardSummaryTotalContainers": "Total containers",
-  "@dashboardSummaryTotalContainers": {
-    "description": "Label for total LXC container count."
+  "serverFieldApiTokenSecretHint" : "UUID shown when the token was created",
+  "@serverFieldApiTokenSecretHint" : {
+    "description" : "Hint for API token secret field."
   },
-  "dashboardSummaryOnlineNodes": "Online nodes",
-  "@dashboardSummaryOnlineNodes": {
-    "description": "Label for count of cluster nodes reporting online on the dashboard."
+  "serverFieldHost" : "Host",
+  "@serverFieldHost" : {
+    "description" : "Label for hostname or IP (HTTPS only, no scheme)."
   },
-  "dashboardEmptyNodesTitle": "No nodes",
-  "@dashboardEmptyNodesTitle": {
-    "description": "Empty state when cluster returns no node resources."
+  "serverFieldHostHint" : "proxmox.example.com or 192.168.1.10",
+  "@serverFieldHostHint" : {
+    "description" : "Hint for host field."
   },
-  "dashboardEmptyNodesMessage": "No node data was returned for this server.",
-  "@dashboardEmptyNodesMessage": {
-    "description": "Body for empty dashboard node list."
+  "serverFieldName" : "Display name",
+  "@serverFieldName" : {
+    "description" : "Label for the friendly server name field."
   },
-  "filterAll": "All",
-  "@filterAll": {
-    "description": "Filter option meaning no restriction."
+  "serverFieldNameHint" : "e.g. Home lab",
+  "@serverFieldNameHint" : {
+    "description" : "Hint for display name field."
   },
-  "filterByNode": "Node",
-  "@filterByNode": {
-    "description": "Label for node filter dropdown."
+  "serverFieldPassword" : "Password",
+  "@serverFieldPassword" : {
+    "description" : "Label for password field."
   },
-  "filterByStatus": "Status",
-  "@filterByStatus": {
-    "description": "Label for status filter dropdown."
+  "serverFieldPort" : "Port",
+  "@serverFieldPort" : {
+    "description" : "Label for HTTPS API port."
   },
-  "filterRunning": "Running",
-  "@filterRunning": {
-    "description": "Status filter: running (VMs include paused)."
+  "serverFieldRealm" : "Realm",
+  "@serverFieldRealm" : {
+    "description" : "Proxmox auth realm (pam, pve, ldap, …)."
   },
-  "filterStopped": "Stopped",
-  "@filterStopped": {
-    "description": "Status filter: stopped only."
+  "serverFieldRealmCustom" : "Custom realm",
+  "@serverFieldRealmCustom" : {
+    "description" : "Label for text field when realm is Other."
   },
-  "searchVmsHint": "Search by name",
-  "@searchVmsHint": {
-    "description": "Hint for VM list search field."
+  "serverFieldRealmCustomHint" : "e.g. ldap",
+  "@serverFieldRealmCustomHint" : {
+    "description" : "Hint for custom realm."
   },
-  "searchContainersHint": "Search by name",
-  "@searchContainersHint": {
-    "description": "Hint for container list search field."
+  "serverFieldUsername" : "User name",
+  "@serverFieldUsername" : {
+    "description" : "Label for Proxmox username (e.g. root@pam)."
   },
-  "vmListEmptyTitle": "No virtual machines",
-  "@vmListEmptyTitle": {
-    "description": "Empty VM list title."
+  "serverFieldUsernameHint" : "e.g. root",
+  "@serverFieldUsernameHint" : {
+    "description" : "Hint for username field."
   },
-  "vmListEmptyMessage": "No VMs were returned for this cluster.",
-  "@vmListEmptyMessage": {
-    "description": "Empty VM list body."
+  "serverFormAuthentication" : "Authentication",
+  "@serverFormAuthentication" : {
+    "description" : "Section title above auth type and credential fields."
   },
-  "containerListEmptyTitle": "No containers",
-  "@containerListEmptyTitle": {
-    "description": "Empty container list title."
+  "serverFormIdentitySection" : "Identity",
+  "@serverFormIdentitySection" : {
+    "description" : "Section header for server name, host, and port fields."
   },
-  "containerListEmptyMessage": "No LXC containers were returned for this cluster.",
-  "@containerListEmptyMessage": {
-    "description": "Empty container list body."
+  "serverFormSecuritySection" : "Security",
+  "@serverFormSecuritySection" : {
+    "description" : "Section header for SSL / certificate options."
   },
-  "listFilteredEmptyTitle": "No matches",
-  "@listFilteredEmptyTitle": {
-    "description": "When filters exclude every row."
+  "serverHostErrorEmpty" : "Enter a host name or IP address.",
+  "@serverHostErrorEmpty" : {
+    "description" : "Validation when host is empty."
   },
-  "listFilteredEmptyMessage": "Try changing search or filters.",
-  "@listFilteredEmptyMessage": {
-    "description": "Hint when filtered list is empty."
+  "serverHostErrorHttp" : "Do not include http://. The app always uses HTTPS.",
+  "@serverHostErrorHttp" : {
+    "description" : "Validation when host contains http://."
   },
-  "vmNotFoundTitle": "VM not found",
-  "@vmNotFoundTitle": {
-    "description": "Detail screen when VM id or route is invalid."
+  "serverHostErrorHttps" : "Enter the host without https:// (scheme is added automatically).",
+  "@serverHostErrorHttps" : {
+    "description" : "Validation when host contains https://."
   },
-  "vmNotFoundMessage": "This VM is not in the current list. Go back and refresh the list.",
-  "@vmNotFoundMessage": {
-    "description": "Body when VM cannot be resolved."
-  },
-  "nodeDetailTitle": "Node",
-  "@nodeDetailTitle": {
-    "description": "App bar title for cluster node detail screen."
-  },
-  "nodeNotFoundTitle": "Node not found",
-  "@nodeNotFoundTitle": {
-    "description": "Detail screen when node name is not in the current list."
-  },
-  "nodeNotFoundMessage": "This node is not in the current list. Go back and refresh the list.",
-  "@nodeNotFoundMessage": {
-    "description": "Body when a node cannot be resolved from the list."
-  },
-  "labelNodeHostStatus": "Status",
-  "@labelNodeHostStatus": {
-    "description": "Metric grid label for Proxmox node online/offline state."
-  },
-  "metricSwap": "Swap",
-  "@metricSwap": {
-    "description": "Label for swap usage on node detail."
-  },
-  "metricLoadAvg1m": "Load (1m)",
-  "@metricLoadAvg1m": {
-    "description": "Label for one-minute load average."
-  },
-  "metricIoWait": "I/O wait",
-  "@metricIoWait": {
-    "description": "Label for CPU I/O wait when shown on node detail."
-  },
-  "metricGuestVms": "Virtual machines",
-  "@metricGuestVms": {
-    "description": "Label for QEMU guest count on this node."
-  },
-  "metricGuestContainers": "Containers",
-  "@metricGuestContainers": {
-    "description": "Label for LXC count on this node."
-  },
-  "nodeDetailRunningTotalCount": "{running} running · {total} total",
-  "@nodeDetailRunningTotalCount": {
-    "description": "Running vs total guest count for node detail grid.",
-    "placeholders": {
-      "running": {
-        "type": "int",
-        "example": "2"
+  "serverListHostPortSubtitle" : "{host}:{port}",
+  "@serverListHostPortSubtitle" : {
+    "description" : "Server list tile subtitle: host and API port (no scheme).",
+    "placeholders" : {
+      "host" : {
+        "type" : "String",
+        "example" : "pve.home"
       },
-      "total": {
-        "type": "int",
-        "example": "5"
+      "port" : {
+        "type" : "int",
+        "example" : "8006"
       }
     }
   },
-  "chartDiskIoUnavailableOnNode": "Host disk throughput is not included in node statistics on newer Proxmox VE versions (node RRD no longer exposes read/write rates). Per-guest Disk I/O charts still work on VM and container detail screens.",
-  "@chartDiskIoUnavailableOnNode": {
-    "description": "Explains empty node-level Disk I/O chart on Proxmox VE 9+."
+  "serverLoginComposeHint" : "Sign-in uses login@realm (set below).",
+  "@serverLoginComposeHint" : {
+    "description" : "Helper under username/realm for password auth."
   },
-  "containerNotFoundTitle": "Container not found",
-  "@containerNotFoundTitle": {
-    "description": "Detail screen when container id or route is invalid."
+  "serverNameErrorEmpty" : "Enter a display name.",
+  "@serverNameErrorEmpty" : {
+    "description" : "Validation when display name is empty."
   },
-  "containerNotFoundMessage": "This container is not in the current list. Go back and refresh the list.",
-  "@containerNotFoundMessage": {
-    "description": "Body when container cannot be resolved."
+  "serverNotFound" : "This server was not found.",
+  "@serverNotFound" : {
+    "description" : "Shown when edit route id does not exist."
   },
-  "labelVmid": "VM ID",
-  "@labelVmid": {
-    "description": "Label for QEMU guest ID."
+  "serverPasswordErrorEmpty" : "Enter your password.",
+  "@serverPasswordErrorEmpty" : {
+    "description" : "Validation when password is required on add."
   },
-  "labelCtid": "CT ID",
-  "@labelCtid": {
-    "description": "Label for LXC container ID."
+  "serverPasswordLeaveBlankHint" : "Leave blank to keep the current password.",
+  "@serverPasswordLeaveBlankHint" : {
+    "description" : "Hint on edit when password optional."
   },
-  "labelContainerOsType": "OS type",
-  "@labelContainerOsType": {
-    "description": "Label for LXC ostype field."
+  "serverPortErrorInvalid" : "Enter a valid port number (1–65535).",
+  "@serverPortErrorInvalid" : {
+    "description" : "Validation when port is not a valid integer in range."
   },
-  "valueUnavailable": "—",
-  "@valueUnavailable": {
-    "description": "Placeholder when a numeric or text value is missing."
+  "serverRealmErrorEmpty" : "Enter a realm.",
+  "@serverRealmErrorEmpty" : {
+    "description" : "Validator when custom realm is empty."
   },
-  "guestDetailMetricGridSemantics": "CPU, memory, network, and disk activity for this guest.",
-  "@guestDetailMetricGridSemantics": {
-    "description": "Semantics label for the 2×2 guest detail metric instrument grid (VM / LXC)."
+  "serverRealmErrorInvalid" : "Realm must not contain spaces or @.",
+  "@serverRealmErrorInvalid" : {
+    "description" : "Validator for custom realm characters."
   },
-  "actionCancel": "Cancel",
-  "@actionCancel": {
-    "description": "Dialog button to dismiss without acting."
+  "serverRealmOther" : "Other…",
+  "@serverRealmOther" : {
+    "description" : "Custom realm option in dropdown."
   },
-  "actionConfirm": "Confirm",
-  "@actionConfirm": {
-    "description": "Dialog button to confirm a destructive or important action."
+  "serverRealmPam" : "Linux PAM (pam)",
+  "@serverRealmPam" : {
+    "description" : "Preset realm label for pam."
   },
-  "powerConfirmStopTitle": "Shut down guest?",
-  "@powerConfirmStopTitle": {
-    "description": "Alert title for graceful shutdown confirmation."
+  "serverRealmPve" : "Proxmox VE (pve)",
+  "@serverRealmPve" : {
+    "description" : "Preset realm label for pve."
   },
-  "powerConfirmStopBody": "This sends a shutdown signal so the operating system can stop cleanly.",
-  "@powerConfirmStopBody": {
-    "description": "Alert body for graceful shutdown."
+  "serverTlsPinErrorRequired" : "When self-signed is enabled, fetch or paste the certificate fingerprint.",
+  "@serverTlsPinErrorRequired" : {
+    "description" : "Snackbar when save or test is blocked without a valid pin."
   },
-  "powerConfirmForceStopTitle": "Force stop?",
-  "@powerConfirmForceStopTitle": {
-    "description": "Alert title for immediate power-off."
+  "serverTlsPinFetch" : "Fetch certificate fingerprint",
+  "@serverTlsPinFetch" : {
+    "description" : "Button to load the server leaf cert SHA-256 over TLS."
   },
-  "powerConfirmForceStopBody": "The guest will be powered off immediately without a clean shutdown.",
-  "@powerConfirmForceStopBody": {
-    "description": "Alert body for force stop."
+  "serverTlsPinFetchFailed" : "Could not read the server certificate. Check host, port, and network.",
+  "@serverTlsPinFetchFailed" : {
+    "description" : "Snackbar when TLS pin fetch fails."
   },
-  "powerConfirmForceStopWarning": "Unsaved data may be lost. This is equivalent to pulling the power cord.",
-  "@powerConfirmForceStopWarning": {
-    "description": "Extra warning in force-stop dialog about data loss."
+  "serverTlsPinFetchSuccess" : "Fingerprint loaded. Save the server to keep it.",
+  "@serverTlsPinFetchSuccess" : {
+    "description" : "Snackbar after a successful TLS pin fetch."
   },
-  "powerConfirmRebootTitle": "Reboot guest?",
-  "@powerConfirmRebootTitle": {
-    "description": "Alert title for reboot confirmation."
+  "serverTlsPinHint" : "64 hex characters. Tap fetch after entering host and port. Re-fetch if the server certificate is renewed.",
+  "@serverTlsPinHint" : {
+    "description" : "Helper under the TLS pin field."
   },
-  "powerConfirmRebootBody": "The guest will restart. Unsaved work may be lost if applications do not shut down cleanly.",
-  "@powerConfirmRebootBody": {
-    "description": "Alert body for reboot confirmation."
+  "serverTlsPinLabel" : "Certificate fingerprint (SHA-256)",
+  "@serverTlsPinLabel" : {
+    "description" : "Label for the TLS leaf certificate SHA-256 pin field."
   },
-  "powerActionCompleted": "{actionName} finished successfully.",
-  "@powerActionCompleted": {
-    "description": "SnackBar after a power task completes with OK status.",
-    "placeholders": {
-      "actionName": {
-        "type": "String",
-        "example": "Start"
-      }
-    }
+  "serverUsernameErrorContainsAt" : "Enter only the login name here. Choose the realm below.",
+  "@serverUsernameErrorContainsAt" : {
+    "description" : "Validator when user types @ in login field."
   },
-  "powerActionTaskFailed": "The operation finished with an error on the server.",
-  "@powerActionTaskFailed": {
-    "description": "SnackBar or message when Proxmox task status is error."
+  "serverUsernameErrorEmpty" : "Enter your Proxmox user name.",
+  "@serverUsernameErrorEmpty" : {
+    "description" : "Validation when username is required but empty."
   },
-  "powerActionTaskUnknown": "Could not confirm the final task status.",
-  "@powerActionTaskUnknown": {
-    "description": "When task polling ends in unknown state."
+  "serversEmptyCta" : "Add server",
+  "@serversEmptyCta" : {
+    "description" : "CTA button on empty server list."
   },
-  "taskListEmptyTitle": "No tasks",
-  "@taskListEmptyTitle": {
-    "description": "Empty state title for merged task list."
+  "serversEmptyMessage" : "Add a server to connect to your Proxmox cluster.",
+  "@serversEmptyMessage" : {
+    "description" : "Body text for empty server list."
   },
-  "taskListEmptyMessage": "No recent tasks were returned for this cluster.",
-  "@taskListEmptyMessage": {
-    "description": "Empty state body for task list."
+  "serversEmptyTitle" : "No servers yet",
+  "@serversEmptyTitle" : {
+    "description" : "Title when no Proxmox servers are configured."
   },
-  "taskListLoadError": "Could not load tasks.",
-  "@taskListLoadError": {
-    "description": "Error when task list fails to load."
+  "serversFabAddTooltip" : "Add server",
+  "@serversFabAddTooltip" : {
+    "description" : "Tooltip for the server list floating action button."
   },
-  "taskFilterByGuest": "Filter by guest",
-  "@taskFilterByGuest": {
-    "description": "Tooltip / label for opening the task list guest filter."
+  "serversLoadError" : "Could not load servers.",
+  "@serversLoadError" : {
+    "description" : "Generic error when server list fails to load."
   },
-  "taskFilterAllGuests": "All guests",
-  "@taskFilterAllGuests": {
-    "description": "Clears the task list guest filter to show every guest."
+  "settingsAboutSection" : "About",
+  "@settingsAboutSection" : {
+    "description" : "Settings section: version and project info."
   },
-  "taskGuestFilterTitle": "Guest",
-  "@taskGuestFilterTitle": {
-    "description": "Title for the task list guest filter bottom sheet."
+  "settingsAppearanceSection" : "Appearance",
+  "@settingsAppearanceSection" : {
+    "description" : "Settings section: theme / display."
   },
-  "taskRowGuest": "Guest",
-  "@taskRowGuest": {
-    "description": "Label for resolved VM/CT name or ID in task row."
+  "settingsCouldNotOpenLink" : "Could not open link",
+  "@settingsCouldNotOpenLink" : {
+    "description" : "Snackbar when url_launcher fails."
   },
-  "taskRowStatus": "Status",
-  "@taskRowStatus": {
-    "description": "Label for task status in row."
+  "settingsLanguageEnglish" : "English",
+  "@settingsLanguageEnglish" : {
+    "description" : "Preferences: force app UI language to English."
   },
-  "taskRowStarted": "Started",
-  "@taskRowStarted": {
-    "description": "Label for task start time."
+  "settingsLanguageGerman" : "German",
+  "@settingsLanguageGerman" : {
+    "description" : "Preferences: force app UI language to German."
   },
-  "taskRowDuration": "Duration",
-  "@taskRowDuration": {
-    "description": "Label for task duration."
+  "settingsLanguageSection" : "Language",
+  "@settingsLanguageSection" : {
+    "description" : "Preferences section: app UI language."
   },
-  "taskStatusCompleted": "OK",
-  "@taskStatusCompleted": {
-    "description": "Task finished successfully (terminal ok)."
+  "settingsLanguageSystem" : "System default",
+  "@settingsLanguageSystem" : {
+    "description" : "Preferences: follow the device language when supported."
   },
-  "taskStatusFailed": "Error",
-  "@taskStatusFailed": {
-    "description": "Task finished with error."
+  "settingsLicenseSummary" : "ProxDroid is licensed under the MIT License. You may use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, subject to including the copyright notice and permission notice in all copies. The software is provided \"as is\", without warranty of any kind. See the LICENSE file in the repository for the full text.",
+  "@settingsLicenseSummary" : {
+    "description" : "Short MIT summary in About dialog (not full legal text)."
   },
-  "taskDetailNodeLabel": "Node",
-  "@taskDetailNodeLabel": {
-    "description": "Label for node name on task detail."
+  "settingsLicenseTileSubtitle" : "MIT License — tap for summary",
+  "@settingsLicenseTileSubtitle" : {
+    "description" : "Subtitle on license row in Settings."
   },
-  "taskDetailUpidLabel": "UPID",
-  "@taskDetailUpidLabel": {
-    "description": "Label for raw UPID on task detail."
+  "settingsLicenseTitle" : "License",
+  "@settingsLicenseTitle" : {
+    "description" : "MIT license dialog title and list tile title."
   },
-  "taskDetailLogTitle": "Log",
-  "@taskDetailLogTitle": {
-    "description": "Section title for task log output."
+  "settingsLoading" : "Loading…",
+  "@settingsLoading" : {
+    "description" : "Placeholder while package info loads."
   },
-  "taskDetailLogLoading": "Loading log…",
-  "@taskDetailLogLoading": {
-    "description": "Placeholder while task log is fetched."
+  "settingsPreferencesSubtitle" : "Theme, language, default chart time range, and other app preferences.",
+  "@settingsPreferencesSubtitle" : {
+    "description" : "Subtitle for Settings row that opens Preferences (appearance + language + charts)."
   },
-  "taskDetailLogError": "Could not load the task log.",
-  "@taskDetailLogError": {
-    "description": "Error when task log request fails."
+  "settingsPreferencesTitle" : "Preferences",
+  "@settingsPreferencesTitle" : {
+    "description" : "Settings row title for the Preferences screen."
   },
-  "taskDetailLogEmpty": "No log output.",
-  "@taskDetailLogEmpty": {
-    "description": "When log endpoint returns no lines."
+  "settingsServersSubtitle" : "Add, edit, or switch the active Proxmox server.",
+  "@settingsServersSubtitle" : {
+    "description" : "Subtitle for Settings row that opens the server list."
   },
-  "chartTimeframeHour": "1h",
-  "@chartTimeframeHour": {
-    "description": "RRD chart range: last hour."
+  "settingsSourceCode" : "Source code",
+  "@settingsSourceCode" : {
+    "description" : "Link to GitHub repository."
   },
-  "chartTimeframeDay": "1d",
-  "@chartTimeframeDay": {
-    "description": "RRD chart range: last day."
+  "settingsSupportGithubSponsors" : "GitHub Sponsors",
+  "@settingsSupportGithubSponsors" : {
+    "description" : "Support link title for GitHub Sponsors."
   },
-  "chartTimeframeWeek": "1w",
-  "@chartTimeframeWeek": {
-    "description": "RRD chart range: last week."
+  "settingsSupportKofi" : "Ko-fi",
+  "@settingsSupportKofi" : {
+    "description" : "Support link title for Ko-fi."
   },
-  "chartTimeframeMonth": "1m",
-  "@chartTimeframeMonth": {
-    "description": "RRD chart range: last month."
+  "settingsSupportSection" : "Support",
+  "@settingsSupportSection" : {
+    "description" : "Settings section: donations / sponsorship."
   },
-  "chartNoData": "No chart data for this period.",
-  "@chartNoData": {
-    "description": "When RRD series is empty or all-null."
+  "settingsThemeDark" : "Dark",
+  "@settingsThemeDark" : {
+    "description" : "Theme option: dark mode."
   },
-  "chartLoadError": "Could not load chart data.",
-  "@chartLoadError": {
-    "description": "When rrddata request fails on a chart."
+  "settingsThemeLight" : "Light",
+  "@settingsThemeLight" : {
+    "description" : "Theme option: light mode."
   },
-  "chartNetworkIn": "In",
-  "@chartNetworkIn": {
-    "description": "Network chart legend for inbound traffic."
+  "settingsThemeSystem" : "System",
+  "@settingsThemeSystem" : {
+    "description" : "Theme option: follow OS light/dark (short label for segmented control)."
   },
-  "chartNetworkOut": "Out",
-  "@chartNetworkOut": {
-    "description": "Network chart legend for outbound traffic."
+  "settingsTroubleshootingSection" : "Troubleshooting",
+  "@settingsTroubleshootingSection" : {
+    "description" : "Settings section: connection diagnostics and advanced options."
   },
-  "chartDiskRead": "Read",
-  "@chartDiskRead": {
-    "description": "Disk I/O chart legend for read rate."
+  "settingsVerboseConnectionErrors" : "Verbose connection errors",
+  "@settingsVerboseConnectionErrors" : {
+    "description" : "Toggle: show a technical dialog after a failed Test connection."
   },
-  "chartDiskWrite": "Write",
-  "@chartDiskWrite": {
-    "description": "Disk I/O chart legend for write rate."
+  "settingsVerboseConnectionErrorsSubtitle" : "After a failed connection test, show technical details in a dialog (types, messages, HTTP status). Passwords are never shown.",
+  "@settingsVerboseConnectionErrorsSubtitle" : {
+    "description" : "Subtitle for verbose connection errors toggle."
   },
-  "chartDiskIoSectionTitle": "Disk I/O",
-  "@chartDiskIoSectionTitle": {
-    "description": "Section title for disk throughput chart (distinct from disk usage)."
+  "settingsVersion" : "Version",
+  "@settingsVersion" : {
+    "description" : "Label for app version row in Settings."
   },
-  "actionBackup": "Backup",
-  "@actionBackup": {
-    "description": "Open manual vzdump backup flow from VM/container detail or backups screen."
-  },
-  "storageEmptyTitle": "No storage pools",
-  "@storageEmptyTitle": {
-    "description": "Empty state when no storage is returned for the cluster."
-  },
-  "storageEmptyMessage": "No storage pools were found on any online node.",
-  "@storageEmptyMessage": {
-    "description": "Body for empty storage list."
-  },
-  "storageUsageSection": "Usage",
-  "@storageUsageSection": {
-    "description": "Label above storage usage bar on list cards."
-  },
-  "storageContentTypesLabel": "Content types",
-  "@storageContentTypesLabel": {
-    "description": "Label for supported content kinds (backup, images, …)."
-  },
-  "storageActive": "Active",
-  "@storageActive": {
-    "description": "Badge when storage pool is active."
-  },
-  "storageInactive": "Inactive",
-  "@storageInactive": {
-    "description": "Badge when storage pool is not active."
-  },
-  "storageDetailContentTitle": "Content",
-  "@storageDetailContentTitle": {
-    "description": "Section title for storage content list."
-  },
-  "storageContentEmpty": "No volumes in this pool.",
-  "@storageContentEmpty": {
-    "description": "When storage content API returns an empty list."
-  },
-  "storageTypeLabel": "Type",
-  "@storageTypeLabel": {
-    "description": "Storage pool type (lvm, dir, pbs, …)."
-  },
-  "storagePoolOnNode": "{pool} · {node}",
-  "@storagePoolOnNode": {
-    "description": "Storage id and owning node for dropdown labels.",
-    "placeholders": {
-      "pool": {
-        "type": "String",
-        "example": "local"
+  "settingsVersionSubtitle" : "{version} ({buildNumber})",
+  "@settingsVersionSubtitle" : {
+    "description" : "About row subtitle: semantic version and build number.",
+    "placeholders" : {
+      "version" : {
+        "type" : "String",
+        "example" : "0.1.0"
       },
-      "node": {
-        "type": "String",
-        "example": "pve"
+      "buildNumber" : {
+        "type" : "String",
+        "example" : "1"
       }
     }
   },
-  "storageClusterHeroTitle": "Cluster capacity",
-  "@storageClusterHeroTitle": {
-    "description": "Title for storage list hero band (summed used/total from pools that report both)."
+  "settingsVersionUnavailable" : "Unavailable",
+  "@settingsVersionUnavailable" : {
+    "description" : "When package version could not be read."
   },
-  "storageClusterHeroSubtitle": "Sum of pools that report used and total",
-  "@storageClusterHeroSubtitle": {
-    "description": "Subtitle clarifying how cluster capacity numbers are aggregated."
+  "shellConnectedLabel" : "Connected",
+  "@shellConnectedLabel" : {
+    "description" : "Short status label in the shell section header when a Proxmox server is selected (Phase B chrome)."
   },
-  "storagePoolHealthHealthyLabel": "Healthy",
-  "@storagePoolHealthHealthyLabel": {
-    "description": "Summary tile: pools that are active and below the usage warning threshold."
-  },
-  "storagePoolHealthAtRiskLabel": "At risk",
-  "@storagePoolHealthAtRiskLabel": {
-    "description": "Summary tile: inactive pools or pools at/above the usage warning threshold."
-  },
-  "storagePoolsSectionTitle": "Storage pools",
-  "@storagePoolsSectionTitle": {
-    "description": "Section header above the per-pool card list on the storage overview screen."
-  },
-  "storageNodeDistributionTitle": "Used space by node",
-  "@storageNodeDistributionTitle": {
-    "description": "Section title for horizontal bars showing summed used bytes per node."
-  },
-  "backupListEmptyTitle": "No backup files",
-  "@backupListEmptyTitle": {
-    "description": "When no backup content rows were aggregated."
-  },
-  "backupListEmptyMessage": "No backup volumes were found on storages that support backups.",
-  "@backupListEmptyMessage": {
-    "description": "Body when backup file list is empty."
-  },
-  "backupSectionScheduledJobs": "Scheduled jobs",
-  "@backupSectionScheduledJobs": {
-    "description": "Header for cluster backup job list from GET /cluster/backup."
-  },
-  "backupSectionFiles": "Backup files",
-  "@backupSectionFiles": {
-    "description": "Header for aggregated backup content."
-  },
-  "backupSectionRecentTasks": "Recent backup tasks",
-  "@backupSectionRecentTasks": {
-    "description": "Header for vzdump task history."
-  },
-  "backupGroupedUnknownGuest": "Other",
-  "@backupGroupedUnknownGuest": {
-    "description": "Group title when backup has no vmid (e.g. manual uploads)."
-  },
-  "backupJobVmids": "Guests: {ids}",
-  "@backupJobVmids": {
-    "description": "Comma-separated vmids covered by a backup job.",
-    "placeholders": {
-      "ids": {
-        "type": "String",
-        "example": "100, 101"
+  "shellConnectedPillSemantics" : "Connected to {serverName}. Switch or manage servers.",
+  "@shellConnectedPillSemantics" : {
+    "description" : "Screen reader label for the connected-server pill (server name + action).",
+    "placeholders" : {
+      "serverName" : {
+        "type" : "String"
       }
     }
   },
-  "backupJobNextRun": "Next run: {when}",
-  "@backupJobNextRun": {
-    "description": "Next scheduled backup run time.",
-    "placeholders": {
-      "when": {
-        "type": "String",
-        "example": "Apr 10, 2026 03:00"
+  "shellOpenNavigationMenu" : "Open navigation menu",
+  "@shellOpenNavigationMenu" : {
+    "description" : "Tooltip and screen reader label for the shell AppBar menu icon on drawer-root routes (Phase H a11y)."
+  },
+  "shellServerPillTooltip" : "Switch or manage servers",
+  "@shellServerPillTooltip" : {
+    "description" : "Tooltip for the connected-server pill in ShellSectionBody."
+  },
+  "statusOffline" : "Offline",
+  "@statusOffline" : {
+    "description" : "Node or service is not reachable (offline)."
+  },
+  "statusOnline" : "Online",
+  "@statusOnline" : {
+    "description" : "Node or service is reachable (online)."
+  },
+  "statusPaused" : "Paused",
+  "@statusPaused" : {
+    "description" : "VM is paused (not used for LXC in MVP)."
+  },
+  "statusRunning" : "Running",
+  "@statusRunning" : {
+    "description" : "Resource is running."
+  },
+  "statusStopped" : "Stopped",
+  "@statusStopped" : {
+    "description" : "Resource is stopped."
+  },
+  "statusUnknown" : "Unknown",
+  "@statusUnknown" : {
+    "description" : "Status could not be determined."
+  },
+  "storageActive" : "Active",
+  "@storageActive" : {
+    "description" : "Badge when storage pool is active."
+  },
+  "storageAvailableSpace" : "Available: {size}",
+  "@storageAvailableSpace" : {
+    "description" : "Free space on a storage pool.",
+    "placeholders" : {
+      "size" : {
+        "type" : "String",
+        "example" : "120 GB"
       }
     }
   },
-  "backupJobLastRun": "Last run: {when}",
-  "@backupJobLastRun": {
-    "description": "Last backup job run time when API provides it.",
-    "placeholders": {
-      "when": {
-        "type": "String",
-        "example": "Apr 9, 2026 03:00"
-      }
-    }
+  "storageClusterHeroSubtitle" : "Sum of pools that report used and total",
+  "@storageClusterHeroSubtitle" : {
+    "description" : "Subtitle clarifying how cluster capacity numbers are aggregated."
   },
-  "backupTriggerTitle": "Run backup",
-  "@backupTriggerTitle": {
-    "description": "Bottom sheet title for manual vzdump."
+  "storageClusterHeroTitle" : "Cluster capacity",
+  "@storageClusterHeroTitle" : {
+    "description" : "Title for storage list hero band (summed used/total from pools that report both)."
   },
-  "backupFieldGuest": "Guest",
-  "@backupFieldGuest": {
-    "description": "Field label for VM or LXC selection."
+  "storageContentEmpty" : "No volumes in this pool.",
+  "@storageContentEmpty" : {
+    "description" : "When storage content API returns an empty list."
   },
-  "backupFieldStorage": "Destination storage",
-  "@backupFieldStorage": {
-    "description": "Field label for backup target storage pool."
+  "storageContentTypesLabel" : "Content types",
+  "@storageContentTypesLabel" : {
+    "description" : "Label for supported content kinds (backup, images, …)."
   },
-  "backupFieldCompress": "Compression",
-  "@backupFieldCompress": {
-    "description": "Vzdump compression option."
+  "storageDetailContentTitle" : "Content",
+  "@storageDetailContentTitle" : {
+    "description" : "Section title for storage content list."
   },
-  "backupFieldMode": "Backup mode",
-  "@backupFieldMode": {
-    "description": "Vzdump mode snapshot/suspend/stop."
+  "storageEmptyMessage" : "No storage pools were found on any online node.",
+  "@storageEmptyMessage" : {
+    "description" : "Body for empty storage list."
   },
-  "backupCompressZstd": "Zstandard (zstd)",
-  "@backupCompressZstd": {
-    "description": "Compression option label."
+  "storageEmptyTitle" : "No storage pools",
+  "@storageEmptyTitle" : {
+    "description" : "Empty state when no storage is returned for the cluster."
   },
-  "backupCompressLzo": "LZO",
-  "@backupCompressLzo": {
-    "description": "Compression option label."
+  "storageInactive" : "Inactive",
+  "@storageInactive" : {
+    "description" : "Badge when storage pool is not active."
   },
-  "backupCompressGzip": "Gzip",
-  "@backupCompressGzip": {
-    "description": "Compression option label."
+  "storageLabelAvailable" : "Available",
+  "@storageLabelAvailable" : {
+    "description" : "Label for free space on a storage pool."
   },
-  "backupCompressNone": "None",
-  "@backupCompressNone": {
-    "description": "No compression."
+  "storageNodeDistributionTitle" : "Used space by node",
+  "@storageNodeDistributionTitle" : {
+    "description" : "Section title for horizontal bars showing summed used bytes per node."
   },
-  "backupModeSnapshot": "Snapshot",
-  "@backupModeSnapshot": {
-    "description": "Vzdump snapshot mode."
+  "storagePoolHealthAtRiskLabel" : "At risk",
+  "@storagePoolHealthAtRiskLabel" : {
+    "description" : "Summary tile: inactive pools or pools at/above the usage warning threshold."
   },
-  "backupModeSuspend": "Suspend",
-  "@backupModeSuspend": {
-    "description": "Vzdump suspend mode."
+  "storagePoolHealthHealthyLabel" : "Healthy",
+  "@storagePoolHealthHealthyLabel" : {
+    "description" : "Summary tile: pools that are active and below the usage warning threshold."
   },
-  "backupModeStop": "Stop",
-  "@backupModeStop": {
-    "description": "Vzdump stop mode."
-  },
-  "backupTriggerStart": "Start backup",
-  "@backupTriggerStart": {
-    "description": "Submit button for vzdump bottom sheet."
-  },
-  "backupNoDestinationStorage": "No storage supports backups in this cluster.",
-  "@backupNoDestinationStorage": {
-    "description": "When no pool has backup content type for vzdump target."
-  },
-  "backupFabTooltip": "Run backup",
-  "@backupFabTooltip": {
-    "description": "FAB on backup list screen."
-  },
-  "labelFormat": "Format",
-  "@labelFormat": {
-    "description": "Generic format label (backup vma/tar, …)."
-  },
-  "labelVolumeId": "Volume",
-  "@labelVolumeId": {
-    "description": "Proxmox volume id / path label."
-  },
-  "labelContentKind": "Kind",
-  "@labelContentKind": {
-    "description": "Storage content kind (backup, iso, …)."
-  },
-  "storageLabelAvailable": "Available",
-  "@storageLabelAvailable": {
-    "description": "Label for free space on a storage pool."
-  },
-  "storageAvailableSpace": "Available: {size}",
-  "@storageAvailableSpace": {
-    "description": "Free space on a storage pool.",
-    "placeholders": {
-      "size": {
-        "type": "String",
-        "example": "120 GB"
-      }
-    }
-  },
-  "actionClose": "Close",
-  "@actionClose": {
-    "description": "Dismiss a dialog (e.g. license summary)."
-  },
-  "settingsServersSubtitle": "Add, edit, or switch the active Proxmox server.",
-  "@settingsServersSubtitle": {
-    "description": "Subtitle for Settings row that opens the server list."
-  },
-  "settingsPreferencesTitle": "Preferences",
-  "@settingsPreferencesTitle": {
-    "description": "Settings row title for the Preferences screen."
-  },
-  "settingsPreferencesSubtitle": "Theme, default chart time range, and other app preferences.",
-  "@settingsPreferencesSubtitle": {
-    "description": "Subtitle for Settings row that opens Preferences (appearance + charts)."
-  },
-  "preferencesScreenTitle": "Preferences",
-  "@preferencesScreenTitle": {
-    "description": "App bar title on the Preferences screen."
-  },
-  "preferencesChartsSection": "Charts",
-  "@preferencesChartsSection": {
-    "description": "Preferences section for chart-related defaults."
-  },
-  "preferencesDefaultChartTimeframeTitle": "Default time range",
-  "@preferencesDefaultChartTimeframeTitle": {
-    "description": "Label for the default RRD chart timeframe control."
-  },
-  "preferencesDefaultChartTimeframeSubtitle": "Used for CPU, memory, network, and disk charts on VM, container, and node detail screens.",
-  "@preferencesDefaultChartTimeframeSubtitle": {
-    "description": "Explains where the default chart timeframe applies."
-  },
-  "settingsAppearanceSection": "Appearance",
-  "@settingsAppearanceSection": {
-    "description": "Settings section: theme / display."
-  },
-  "settingsTroubleshootingSection": "Troubleshooting",
-  "@settingsTroubleshootingSection": {
-    "description": "Settings section: connection diagnostics and advanced options."
-  },
-  "settingsVerboseConnectionErrors": "Verbose connection errors",
-  "@settingsVerboseConnectionErrors": {
-    "description": "Toggle: show a technical dialog after a failed Test connection."
-  },
-  "settingsVerboseConnectionErrorsSubtitle": "After a failed connection test, show technical details in a dialog (types, messages, HTTP status). Passwords are never shown.",
-  "@settingsVerboseConnectionErrorsSubtitle": {
-    "description": "Subtitle for verbose connection errors toggle."
-  },
-  "connectionDiagnosticsTitle": "Connection diagnostics",
-  "@connectionDiagnosticsTitle": {
-    "description": "AlertDialog title after failed test when verbose is on."
-  },
-  "settingsThemeDark": "Dark",
-  "@settingsThemeDark": {
-    "description": "Theme option: dark mode."
-  },
-  "settingsThemeLight": "Light",
-  "@settingsThemeLight": {
-    "description": "Theme option: light mode."
-  },
-  "settingsThemeSystem": "System",
-  "@settingsThemeSystem": {
-    "description": "Theme option: follow OS light/dark (short label for segmented control)."
-  },
-  "settingsAboutSection": "About",
-  "@settingsAboutSection": {
-    "description": "Settings section: version and project info."
-  },
-  "settingsVersion": "Version",
-  "@settingsVersion": {
-    "description": "Label for app version row in Settings."
-  },
-  "settingsVersionSubtitle": "{version} ({buildNumber})",
-  "@settingsVersionSubtitle": {
-    "description": "About row subtitle: semantic version and build number.",
-    "placeholders": {
-      "version": {
-        "type": "String",
-        "example": "0.1.0"
+  "storagePoolOnNode" : "{pool} · {node}",
+  "@storagePoolOnNode" : {
+    "description" : "Storage id and owning node for dropdown labels.",
+    "placeholders" : {
+      "node" : {
+        "type" : "String",
+        "example" : "pve"
       },
-      "buildNumber": {
-        "type": "String",
-        "example": "1"
+      "pool" : {
+        "type" : "String",
+        "example" : "local"
       }
     }
   },
-  "settingsLoading": "Loading…",
-  "@settingsLoading": {
-    "description": "Placeholder while package info loads."
-  },
-  "settingsVersionUnavailable": "Unavailable",
-  "@settingsVersionUnavailable": {
-    "description": "When package version could not be read."
-  },
-  "settingsSourceCode": "Source code",
-  "@settingsSourceCode": {
-    "description": "Link to GitHub repository."
-  },
-  "settingsLicenseTitle": "License",
-  "@settingsLicenseTitle": {
-    "description": "MIT license dialog title and list tile title."
-  },
-  "settingsLicenseTileSubtitle": "MIT License — tap for summary",
-  "@settingsLicenseTileSubtitle": {
-    "description": "Subtitle on license row in Settings."
-  },
-  "settingsLicenseSummary": "ProxDroid is licensed under the MIT License. You may use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, subject to including the copyright notice and permission notice in all copies. The software is provided \"as is\", without warranty of any kind. See the LICENSE file in the repository for the full text.",
-  "@settingsLicenseSummary": {
-    "description": "Short MIT summary in About dialog (not full legal text)."
-  },
-  "settingsSupportSection": "Support",
-  "@settingsSupportSection": {
-    "description": "Settings section: donations / sponsorship."
-  },
-  "settingsSupportKofi": "Ko-fi",
-  "@settingsSupportKofi": {
-    "description": "Support link title for Ko-fi."
-  },
-  "settingsSupportGithubSponsors": "GitHub Sponsors",
-  "@settingsSupportGithubSponsors": {
-    "description": "Support link title for GitHub Sponsors."
-  },
-  "settingsCouldNotOpenLink": "Could not open link",
-  "@settingsCouldNotOpenLink": {
-    "description": "Snackbar when url_launcher fails."
-  },
-  "navDashboard": "Dashboard",
-  "@navDashboard": {
-    "description": "Bottom navigation bar label for the Dashboard tab."
-  },
-  "navVMs": "VMs",
-  "@navVMs": {
-    "description": "Bottom navigation bar label for the Virtual Machines tab (abbreviated for space)."
-  },
-  "navContainers": "Containers",
-  "@navContainers": {
-    "description": "Bottom navigation bar label for the LXC Containers tab."
-  },
-  "navTasks": "Tasks",
-  "@navTasks": {
-    "description": "Bottom navigation bar label for the Proxmox Tasks tab."
-  },
-  "navMore": "More",
-  "@navMore": {
-    "description": "Bottom navigation bar label for the More tab, which opens the full navigation drawer."
-  },
-  "sectionGuestTags": "Tags",
-  "@sectionGuestTags": {
-    "description": "Section title for Proxmox guest tags on VM / container detail screens."
-  },
-  "actionEditGuestConfig": "Edit configuration",
-  "@actionEditGuestConfig": {
-    "description": "Tooltip / label to open VM or LXC config editor."
-  },
-  "screenEditVmConfig": "Edit VM",
-  "@screenEditVmConfig": {
-    "description": "App bar title for QEMU VM Tier-A config editor."
-  },
-  "screenEditContainerConfig": "Edit container",
-  "@screenEditContainerConfig": {
-    "description": "App bar title for LXC Tier-A config editor."
-  },
-  "guestConfigSectionIdentity": "Identity",
-  "@guestConfigSectionIdentity": {
-    "description": "Grouped form section: name, description, tags."
-  },
-  "guestConfigSectionResources": "Resources",
-  "@guestConfigSectionResources": {
-    "description": "Grouped form section: memory, swap, etc."
-  },
-  "guestConfigSectionCpu": "CPU",
-  "@guestConfigSectionCpu": {
-    "description": "Grouped form section: sockets, cores, limits."
-  },
-  "guestConfigSectionBoot": "Boot",
-  "@guestConfigSectionBoot": {
-    "description": "Grouped form section: on boot, startup order."
-  },
-  "guestConfigSectionOptions": "Options",
-  "@guestConfigSectionOptions": {
-    "description": "Grouped form section: agent, features, etc."
-  },
-  "guestConfigFieldVmName": "Name",
-  "@guestConfigFieldVmName": {
-    "description": "QEMU VM config field label for name."
-  },
-  "guestConfigFieldHostname": "Hostname",
-  "@guestConfigFieldHostname": {
-    "description": "LXC config field label for hostname."
-  },
-  "guestConfigFieldDescription": "Description",
-  "@guestConfigFieldDescription": {
-    "description": "Guest config notes / description field."
-  },
-  "guestConfigFieldTags": "Tags",
-  "@guestConfigFieldTags": {
-    "description": "Proxmox tags string (semicolon-separated in API)."
-  },
-  "guestConfigFieldMemory": "Memory (MiB)",
-  "@guestConfigFieldMemory": {
-    "description": "RAM size field for VM or CT."
-  },
-  "guestConfigFieldSockets": "CPU sockets",
-  "@guestConfigFieldSockets": {
-    "description": "QEMU CPU socket count."
-  },
-  "guestConfigFieldCores": "Cores per socket",
-  "@guestConfigFieldCores": {
-    "description": "QEMU cores per socket."
-  },
-  "guestConfigFieldVcpus": "vCPUs",
-  "@guestConfigFieldVcpus": {
-    "description": "QEMU vCPU count override."
-  },
-  "guestConfigFieldCpuType": "CPU type",
-  "@guestConfigFieldCpuType": {
-    "description": "QEMU cpu= argument (e.g. host)."
-  },
-  "guestConfigFieldGuestOs": "Guest OS",
-  "@guestConfigFieldGuestOs": {
-    "description": "ostype= for QEMU or LXC."
-  },
-  "guestConfigFieldArchitecture": "Architecture",
-  "@guestConfigFieldArchitecture": {
-    "description": "LXC arch= field."
-  },
-  "guestConfigFieldSwap": "Swap (MiB)",
-  "@guestConfigFieldSwap": {
-    "description": "LXC swap size."
-  },
-  "guestConfigFieldCpuLimit": "CPU limit",
-  "@guestConfigFieldCpuLimit": {
-    "description": "LXC cpulimit (0–800 or 0 for unlimited)."
-  },
-  "guestConfigFieldCpuUnits": "CPU units",
-  "@guestConfigFieldCpuUnits": {
-    "description": "LXC cpuunits scheduling weight."
-  },
-  "guestConfigFieldStartupOrder": "Startup order",
-  "@guestConfigFieldStartupOrder": {
-    "description": "Proxmox startup= ordering string."
-  },
-  "guestConfigFieldOnBoot": "Start at boot",
-  "@guestConfigFieldOnBoot": {
-    "description": "Whether the guest starts when the node boots."
-  },
-  "guestConfigFieldQemuAgent": "QEMU guest agent",
-  "@guestConfigFieldQemuAgent": {
-    "description": "agent= string for QEMU."
-  },
-  "guestConfigFieldUnprivileged": "Unprivileged container",
-  "@guestConfigFieldUnprivileged": {
-    "description": "LXC unprivileged flag."
-  },
-  "guestConfigFieldFeatures": "Features",
-  "@guestConfigFieldFeatures": {
-    "description": "LXC features= string."
-  },
-  "guestConfigFieldRootfs": "Root filesystem",
-  "@guestConfigFieldRootfs": {
-    "description": "LXC rootfs= (read-only in Tier A editor)."
-  },
-  "guestConfigRootfsReadOnlyHint": "Root filesystem cannot be edited here yet.",
-  "@guestConfigRootfsReadOnlyHint": {
-    "description": "Helper under read-only rootfs field."
-  },
-  "guestConfigRootfsEditHint": "Changing rootfs is dangerous; confirm before saving.",
-  "@guestConfigRootfsEditHint": {
-    "description": "Helper when LXC rootfs is editable (guest stopped)."
-  },
-  "guestConfigActionDiscard": "Discard",
-  "@guestConfigActionDiscard": {
-    "description": "Reset form to last loaded server values."
-  },
-  "guestConfigSaveSuccess": "Configuration saved",
-  "@guestConfigSaveSuccess": {
-    "description": "Snackbar after successful PUT config."
-  },
-  "guestConfigSaveNothingChanged": "No changes to save",
-  "@guestConfigSaveNothingChanged": {
-    "description": "Snackbar when save tapped with empty delta."
-  },
-  "guestConfigSectionNetworks": "Network interfaces",
-  "@guestConfigSectionNetworks": {
-    "description": "Grouped section title for net0.. on VM/LXC config editor."
-  },
-  "guestConfigSectionDisks": "Disks",
-  "@guestConfigSectionDisks": {
-    "description": "Grouped section title for QEMU disk keys on VM config editor."
-  },
-  "guestConfigSectionMounts": "Mount points",
-  "@guestConfigSectionMounts": {
-    "description": "Grouped section title for LXC mpN lines."
-  },
-  "guestConfigNetworksLockedWhileRunning": "Stop the machine to add, remove, or reorder network interfaces.",
-  "@guestConfigNetworksLockedWhileRunning": {
-    "description": "Explains why QEMU network rows are read-only while running."
-  },
-  "guestConfigDisksLockedWhileRunning": "Stop the machine to add, remove, or reorder disk definitions.",
-  "@guestConfigDisksLockedWhileRunning": {
-    "description": "Explains why QEMU disk rows are read-only while running."
-  },
-  "guestConfigMountsLockedWhileRunning": "Stop the container to add, remove, or reorder mount points.",
-  "@guestConfigMountsLockedWhileRunning": {
-    "description": "Explains why LXC mp rows are read-only while running."
-  },
-  "guestConfigRootfsLockedWhileRunning": "Stop the container to edit the root filesystem string.",
-  "@guestConfigRootfsLockedWhileRunning": {
-    "description": "Explains why LXC rootfs field is read-only while running."
-  },
-  "guestConfigNetworkLineLabel": "Interface ({name})",
-  "@guestConfigNetworkLineLabel": {
-    "description": "Label for a single QEMU/LXC netN row; {name} is e.g. net0.",
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "guestConfigAddNetwork": "Add interface",
-  "@guestConfigAddNetwork": {
-    "description": "Button to append a new netN row."
-  },
-  "guestConfigRemoveInterface": "Remove interface",
-  "@guestConfigRemoveInterface": {
-    "description": "Tooltip for delete on a net row."
-  },
-  "guestConfigAddDisk": "Add disk (SCSI)",
-  "@guestConfigAddDisk": {
-    "description": "Button to append a new scsiN disk row on QEMU editor."
-  },
-  "guestConfigRemoveDisk": "Remove disk",
-  "@guestConfigRemoveDisk": {
-    "description": "Tooltip for delete on a QEMU disk row."
-  },
-  "guestConfigAddMountPoint": "Add mount point",
-  "@guestConfigAddMountPoint": {
-    "description": "Button to append a new mpN row on LXC editor."
-  },
-  "guestConfigRemoveMountPoint": "Remove mount point",
-  "@guestConfigRemoveMountPoint": {
-    "description": "Tooltip for delete on an LXC mp row."
-  },
-  "guestConfigRiskConfirmTitle": "Apply high-risk changes?",
-  "@guestConfigRiskConfirmTitle": {
-    "description": "Title for confirm dialog before saving disk/net/mp/rootfs mutations."
-  },
-  "guestConfigRiskConfirmBody": "Network, disk, mount point, or root filesystem changes can break a guest or destroy data. Continue only if you understand the impact.",
-  "@guestConfigRiskConfirmBody": {
-    "description": "Body for high-risk save confirmation."
-  },
-  "guestConfigRiskConfirmAction": "Apply changes",
-  "@guestConfigRiskConfirmAction": {
-    "description": "Confirm button on high-risk save dialog."
-  },
-  "guestPickerStoragePool": "Storage pool",
-  "@guestPickerStoragePool": {
-    "description": "Label for storage dropdown on guest forms."
-  },
-  "guestPickerBridge": "Bridge",
-  "@guestPickerBridge": {
-    "description": "Label for Linux bridge iface dropdown."
-  },
-  "guestPickerNicModel": "Network model",
-  "@guestPickerNicModel": {
-    "description": "QEMU NIC hardware model dropdown."
-  },
-  "guestPickerIfaceName": "Interface name",
-  "@guestPickerIfaceName": {
-    "description": "LXC eth name inside container (name=)."
-  },
-  "guestPickerDiskModeNew": "New volume (size in GiB)",
-  "@guestPickerDiskModeNew": {
-    "description": "Radio option to allocate a new disk by size."
-  },
-  "guestPickerDiskModeExisting": "Existing volume",
-  "@guestPickerDiskModeExisting": {
-    "description": "Radio option to attach an existing storage volume."
-  },
-  "guestPickerVolume": "Volume",
-  "@guestPickerVolume": {
-    "description": "Dropdown of volid from storage content."
-  },
-  "guestPickerSizeGiB": "Size (GiB)",
-  "@guestPickerSizeGiB": {
-    "description": "Numeric size for new disk or rootfs."
-  },
-  "guestPickerAdvancedRaw": "Advanced (raw string)",
-  "@guestPickerAdvancedRaw": {
-    "description": "Toggle or tile to edit Proxmox value as free text."
-  },
-  "guestPickerUseSimpleEditor": "Use simplified editor",
-  "@guestPickerUseSimpleEditor": {
-    "description": "Leave raw string mode when the value parses cleanly."
-  },
-  "guestPickerStaticIpLabel": "Static CIDR",
-  "@guestPickerStaticIpLabel": {
-    "description": "Label for LXC static IP text field."
-  },
-  "guestPickerNetIpMode": "IPv4",
-  "@guestPickerNetIpMode": {
-    "description": "Section label for LXC IP mode."
-  },
-  "guestPickerNetIpDhcp": "DHCP",
-  "@guestPickerNetIpDhcp": {
-    "description": "LXC net ip=dhcp option."
-  },
-  "guestPickerNetIpStatic": "Static",
-  "@guestPickerNetIpStatic": {
-    "description": "LXC static ip= value."
-  },
-  "guestPickerNetIpNone": "Omit IP (bridge only)",
-  "@guestPickerNetIpNone": {
-    "description": "LXC net line without ip= key."
-  },
-  "guestPickerNetStaticHint": "e.g. 192.168.1.50/24",
-  "@guestPickerNetStaticHint": {
-    "description": "Hint for LXC static CIDR field."
-  },
-  "guestPickerLoadingBridges": "Loading bridges…",
-  "@guestPickerLoadingBridges": {
-    "description": "Placeholder while node network list loads."
-  },
-  "guestPickerNoBridges": "No bridge interfaces found. Use advanced raw entry.",
-  "@guestPickerNoBridges": {
-    "description": "Empty bridge list hint."
-  },
-  "guestPickerNoStoragePools": "No storage pools on this node support this content type. Use advanced raw entry.",
-  "@guestPickerNoStoragePools": {
-    "description": "Empty filtered storage list for guest disk/rootfs."
-  },
-  "guestPickerParseFallbackHint": "This value uses options the simplified editor does not handle. Edit as raw or adjust in Proxmox.",
-  "@guestPickerParseFallbackHint": {
-    "description": "Shown when net/disk string cannot be parsed for structured UI."
-  },
-  "validationFieldRequired": "This field is required.",
-  "@validationFieldRequired": {
-    "description": "Generic required field validation."
-  },
-  "validationIntegerPositive": "Enter a positive whole number.",
-  "@validationIntegerPositive": {
-    "description": "Validation for integer fields such as memory."
-  },
-  "validationVmidMin": "Guest ID must be at least 100.",
-  "@validationVmidMin": {
-    "description": "Proxmox VM/CT id lower bound hint."
-  },
-  "guestCreateVmTitle": "Create Virtual Machine",
-  "@guestCreateVmTitle": {
-    "description": "App bar title for minimal QEMU create form."
-  },
-  "guestCreateCtTitle": "Create container",
-  "@guestCreateCtTitle": {
-    "description": "App bar title for minimal LXC create form."
-  },
-  "guestCreateSubmit": "Create",
-  "@guestCreateSubmit": {
-    "description": "Primary button on create VM/CT forms."
-  },
-  "guestCreateFabVm": "Create Virtual Machine",
-  "@guestCreateFabVm": {
-    "description": "FAB tooltip on VM list."
-  },
-  "guestCreateFabCt": "Create container",
-  "@guestCreateFabCt": {
-    "description": "FAB tooltip on container list."
-  },
-  "guestCreateSectionTarget": "Target",
-  "@guestCreateSectionTarget": {
-    "description": "Form section: node and guest id."
-  },
-  "guestCreateSectionDiskNet": "Disk and network",
-  "@guestCreateSectionDiskNet": {
-    "description": "Form section for QEMU disk and net0."
-  },
-  "guestCreateFieldScsihw": "SCSI controller (scsihw)",
-  "@guestCreateFieldScsihw": {
-    "description": "QEMU scsihw= field label."
-  },
-  "guestCreateFieldScsihwHint": "Leave empty to omit; virtio-scsi is common with scsi0.",
-  "@guestCreateFieldScsihwHint": {
-    "description": "Helper for scsihw field."
-  },
-  "guestCreateFieldScsi0": "Disk (scsi0)",
-  "@guestCreateFieldScsi0": {
-    "description": "QEMU boot disk volume string."
-  },
-  "guestCreateFieldScsi0Hint": "Example: local-lvm:32",
-  "@guestCreateFieldScsi0Hint": {
-    "description": "Example scsi0 Proxmox volume string."
-  },
-  "guestCreateFieldNet0": "Network (net0)",
-  "@guestCreateFieldNet0": {
-    "description": "QEMU/LXC net0 string label."
-  },
-  "guestCreateFieldNet0Hint": "Example: virtio,bridge=vmbr0",
-  "@guestCreateFieldNet0Hint": {
-    "description": "QEMU net0 example."
-  },
-  "guestCreateFieldNet0HintCt": "Example: name=eth0,bridge=vmbr0,ip=dhcp",
-  "@guestCreateFieldNet0HintCt": {
-    "description": "LXC net0 example."
-  },
-  "guestCreateFieldRootPassword": "Root password",
-  "@guestCreateFieldRootPassword": {
-    "description": "LXC create root password field."
-  },
-  "guestCreateFieldRootfsHint": "Example: local-lvm:8",
-  "@guestCreateFieldRootfsHint": {
-    "description": "LXC rootfs volume example."
-  },
-  "guestCreateVmOstypeHint": "Example: l26 (Linux 2.6+), win11, other.",
-  "@guestCreateVmOstypeHint": {
-    "description": "QEMU ostype helper."
-  },
-  "guestCreateCtOstypeHint": "Template id, e.g. debian or ubuntu.",
-  "@guestCreateCtOstypeHint": {
-    "description": "LXC ostype helper."
-  },
-  "guestCreateVmDisclaimer": "Creating a VM runs a server task. Ensure disk and network strings match your node.",
-  "@guestCreateVmDisclaimer": {
-    "description": "Footer note on create VM screen."
-  },
-  "guestCreateCtDisclaimer": "Creating a container runs a server task. Match rootfs and templates to your cluster.",
-  "@guestCreateCtDisclaimer": {
-    "description": "Footer note on create CT screen."
-  },
-  "guestCreateNoNodes": "No cluster nodes are available.",
-  "@guestCreateNoNodes": {
-    "description": "Empty node list on create guest screen."
-  },
-  "guestCreateVmActionName": "Create Virtual Machine",
-  "@guestCreateVmActionName": {
-    "description": "Short name for success snackbar (powerActionCompleted)."
-  },
-  "guestCreateCtActionName": "Create container",
-  "@guestCreateCtActionName": {
-    "description": "Short name for success snackbar after CT create."
+  "storagePoolsSectionTitle" : "Storage pools",
+  "@storagePoolsSectionTitle" : {
+    "description" : "Section header above the per-pool card list on the storage overview screen."
+  },
+  "storageTypeLabel" : "Type",
+  "@storageTypeLabel" : {
+    "description" : "Storage pool type (lvm, dir, pbs, …)."
+  },
+  "storageUsageSection" : "Usage",
+  "@storageUsageSection" : {
+    "description" : "Label above storage usage bar on list cards."
+  },
+  "taskDetailLogEmpty" : "No log output.",
+  "@taskDetailLogEmpty" : {
+    "description" : "When log endpoint returns no lines."
+  },
+  "taskDetailLogError" : "Could not load the task log.",
+  "@taskDetailLogError" : {
+    "description" : "Error when task log request fails."
+  },
+  "taskDetailLogLoading" : "Loading log…",
+  "@taskDetailLogLoading" : {
+    "description" : "Placeholder while task log is fetched."
+  },
+  "taskDetailLogTitle" : "Log",
+  "@taskDetailLogTitle" : {
+    "description" : "Section title for task log output."
+  },
+  "taskDetailNodeLabel" : "Node",
+  "@taskDetailNodeLabel" : {
+    "description" : "Label for node name on task detail."
+  },
+  "taskDetailUpidLabel" : "UPID",
+  "@taskDetailUpidLabel" : {
+    "description" : "Label for raw UPID on task detail."
+  },
+  "taskFilterAllGuests" : "All guests",
+  "@taskFilterAllGuests" : {
+    "description" : "Clears the task list guest filter to show every guest."
+  },
+  "taskFilterByGuest" : "Filter by guest",
+  "@taskFilterByGuest" : {
+    "description" : "Tooltip / label for opening the task list guest filter."
+  },
+  "taskGuestFilterTitle" : "Guest",
+  "@taskGuestFilterTitle" : {
+    "description" : "Title for the task list guest filter bottom sheet."
+  },
+  "taskListEmptyMessage" : "No recent tasks were returned for this cluster.",
+  "@taskListEmptyMessage" : {
+    "description" : "Empty state body for task list."
+  },
+  "taskListEmptyTitle" : "No tasks",
+  "@taskListEmptyTitle" : {
+    "description" : "Empty state title for merged task list."
+  },
+  "taskListLoadError" : "Could not load tasks.",
+  "@taskListLoadError" : {
+    "description" : "Error when task list fails to load."
+  },
+  "taskRowDuration" : "Duration",
+  "@taskRowDuration" : {
+    "description" : "Label for task duration."
+  },
+  "taskRowGuest" : "Guest",
+  "@taskRowGuest" : {
+    "description" : "Label for resolved VM/CT name or ID in task row."
+  },
+  "taskRowStarted" : "Started",
+  "@taskRowStarted" : {
+    "description" : "Label for task start time."
+  },
+  "taskRowStatus" : "Status",
+  "@taskRowStatus" : {
+    "description" : "Label for task status in row."
+  },
+  "taskStatusCompleted" : "OK",
+  "@taskStatusCompleted" : {
+    "description" : "Task finished successfully (terminal ok)."
+  },
+  "taskStatusFailed" : "Error",
+  "@taskStatusFailed" : {
+    "description" : "Task finished with error."
+  },
+  "validationFieldRequired" : "This field is required.",
+  "@validationFieldRequired" : {
+    "description" : "Generic required field validation."
+  },
+  "validationIntegerPositive" : "Enter a positive whole number.",
+  "@validationIntegerPositive" : {
+    "description" : "Validation for integer fields such as memory."
+  },
+  "validationVmidMin" : "Guest ID must be at least 100.",
+  "@validationVmidMin" : {
+    "description" : "Proxmox VM/CT id lower bound hint."
+  },
+  "valueUnavailable" : "—",
+  "@valueUnavailable" : {
+    "description" : "Placeholder when a numeric or text value is missing."
+  },
+  "vmListEmptyMessage" : "No VMs were returned for this cluster.",
+  "@vmListEmptyMessage" : {
+    "description" : "Empty VM list body."
+  },
+  "vmListEmptyTitle" : "No virtual machines",
+  "@vmListEmptyTitle" : {
+    "description" : "Empty VM list title."
+  },
+  "vmNotFoundMessage" : "This VM is not in the current list. Go back and refresh the list.",
+  "@vmNotFoundMessage" : {
+    "description" : "Body when VM cannot be resolved."
+  },
+  "vmNotFoundTitle" : "VM not found",
+  "@vmNotFoundTitle" : {
+    "description" : "Detail screen when VM id or route is invalid."
   }
 }

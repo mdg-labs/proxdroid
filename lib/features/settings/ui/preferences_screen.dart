@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:proxdroid/app/theme/app_theme.dart';
+import 'package:proxdroid/core/storage/app_settings_repository.dart';
 import 'package:proxdroid/features/settings/providers/settings_providers.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/widgets/grouped_section.dart';
@@ -18,6 +19,7 @@ class PreferencesScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final themeMode = ref.watch(appThemeModeProvider);
+    final localePreference = ref.watch(appLocalePreferenceProvider);
     final chartTf = ref.watch(defaultChartTimeframeProvider);
 
     return ShellSectionBody(
@@ -65,6 +67,45 @@ class PreferencesScreen extends ConsumerWidget {
                       ref
                           .read(appThemeModeProvider.notifier)
                           .setThemeMode(mode);
+                    },
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            GroupedSection(
+              topSpacing: 0,
+              header: SectionHeader(title: l10n.settingsLanguageSection),
+              child: Material(
+                color: scheme.surfaceContainer,
+                borderRadius: BorderRadius.circular(16),
+                clipBehavior: Clip.antiAlias,
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: PillSegmentedButton<LocalePreference>(
+                    segments: [
+                      ButtonSegment<LocalePreference>(
+                        value: LocalePreference.system,
+                        label: Text(l10n.settingsLanguageSystem),
+                        icon: const Icon(Icons.language_outlined),
+                      ),
+                      ButtonSegment<LocalePreference>(
+                        value: LocalePreference.english,
+                        label: Text(l10n.settingsLanguageEnglish),
+                        icon: const Icon(Icons.abc_outlined),
+                      ),
+                      ButtonSegment<LocalePreference>(
+                        value: LocalePreference.german,
+                        label: Text(l10n.settingsLanguageGerman),
+                        icon: const Icon(Icons.abc_outlined),
+                      ),
+                    ],
+                    selected: {localePreference},
+                    onSelectionChanged: (Set<LocalePreference> selected) {
+                      final choice = selected.first;
+                      ref
+                          .read(appLocalePreferenceProvider.notifier)
+                          .setLocalePreference(choice);
                     },
                   ),
                 ),

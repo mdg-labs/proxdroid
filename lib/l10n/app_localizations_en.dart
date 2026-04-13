@@ -9,135 +9,28 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'ProxDroid';
+  String get actionBackup => 'Backup';
 
   @override
-  String get appDrawerSubtitle => 'Proxmox cluster client';
+  String get actionCancel => 'Cancel';
 
   @override
-  String get shellConnectedLabel => 'Connected';
+  String get actionClose => 'Close';
 
   @override
-  String get shellServerPillTooltip => 'Switch or manage servers';
+  String get actionConfirm => 'Confirm';
 
   @override
-  String get shellOpenNavigationMenu => 'Open navigation menu';
-
-  @override
-  String shellConnectedPillSemantics(String serverName) {
-    return 'Connected to $serverName. Switch or manage servers.';
-  }
-
-  @override
-  String get searchClearTooltip => 'Clear search';
-
-  @override
-  String get drawerSectionInfrastructure => 'Infrastructure';
-
-  @override
-  String get drawerSectionOperations => 'Operations';
-
-  @override
-  String get offlineBannerMessage =>
-      'No network connection. Some actions may not work until you are back online.';
-
-  @override
-  String get entityNode => 'Node';
-
-  @override
-  String get entityVirtualMachine => 'Virtual Machine';
-
-  @override
-  String get entityContainer => 'Container';
-
-  @override
-  String get entityStorage => 'Storage';
-
-  @override
-  String get entityTask => 'Task';
-
-  @override
-  String get entityBackup => 'Backup';
-
-  @override
-  String get actionStart => 'Start';
-
-  @override
-  String get actionStop => 'Stop';
+  String get actionEditGuestConfig => 'Edit configuration';
 
   @override
   String get actionForceStop => 'Force stop';
 
   @override
+  String get actionGoBack => 'Go back';
+
+  @override
   String get actionReboot => 'Reboot';
-
-  @override
-  String get statusRunning => 'Running';
-
-  @override
-  String get statusStopped => 'Stopped';
-
-  @override
-  String get statusPaused => 'Paused';
-
-  @override
-  String get statusUnknown => 'Unknown';
-
-  @override
-  String get statusOnline => 'Online';
-
-  @override
-  String get statusOffline => 'Offline';
-
-  @override
-  String get metricCpu => 'CPU';
-
-  @override
-  String get metricMemory => 'Memory';
-
-  @override
-  String get metricDisk => 'Disk';
-
-  @override
-  String get metricNetwork => 'Network';
-
-  @override
-  String get metricUptime => 'Uptime';
-
-  @override
-  String get sectionDashboard => 'Dashboard';
-
-  @override
-  String get sectionSettings => 'Settings';
-
-  @override
-  String get sectionAbout => 'About';
-
-  @override
-  String get sectionServers => 'Servers';
-
-  @override
-  String get sectionVms => 'Virtual machines';
-
-  @override
-  String get sectionContainers => 'Containers';
-
-  @override
-  String get sectionBackups => 'Backups';
-
-  @override
-  String get sectionTasks => 'Tasks';
-
-  @override
-  String get screenAddServer => 'Add server';
-
-  @override
-  String get screenEditServer => 'Edit server';
-
-  @override
-  String debugScreenBody(String name) {
-    return 'Placeholder — $name';
-  }
 
   @override
   String get actionRetry => 'Retry';
@@ -146,214 +39,207 @@ class AppLocalizationsEn extends AppLocalizations {
   String get actionSave => 'Save';
 
   @override
+  String get actionStart => 'Start';
+
+  @override
+  String get actionStop => 'Stop';
+
+  @override
   String get actionTestConnection => 'Test connection';
 
   @override
   String get actionUndo => 'Undo';
 
   @override
-  String get actionGoBack => 'Go back';
+  String get appDrawerSubtitle => 'Proxmox cluster client';
 
   @override
-  String get serversFabAddTooltip => 'Add server';
+  String get appTitle => 'ProxDroid';
 
   @override
-  String get serversEmptyTitle => 'No servers yet';
+  String get backupCompressGzip => 'Gzip';
 
   @override
-  String get serversEmptyMessage =>
-      'Add a server to connect to your Proxmox cluster.';
+  String get backupCompressLzo => 'LZO';
 
   @override
-  String get serversEmptyCta => 'Add server';
+  String get backupCompressNone => 'None';
 
   @override
-  String get serversLoadError => 'Could not load servers.';
+  String get backupCompressZstd => 'Zstandard (zstd)';
 
   @override
-  String get serverDeletedSnackbar => 'Server removed';
+  String get backupFabTooltip => 'Run backup';
 
   @override
-  String serverListHostPortSubtitle(String host, int port) {
-    return '$host:$port';
+  String get backupFieldCompress => 'Compression';
+
+  @override
+  String get backupFieldGuest => 'Guest';
+
+  @override
+  String get backupFieldMode => 'Backup mode';
+
+  @override
+  String get backupFieldStorage => 'Destination storage';
+
+  @override
+  String get backupGroupedUnknownGuest => 'Other';
+
+  @override
+  String backupJobLastRun(String when) {
+    return 'Last run: $when';
   }
 
   @override
-  String get serverFieldName => 'Display name';
+  String backupJobNextRun(String when) {
+    return 'Next run: $when';
+  }
 
   @override
-  String get serverFieldNameHint => 'e.g. Home lab';
+  String backupJobVmids(String ids) {
+    return 'Guests: $ids';
+  }
 
   @override
-  String get serverFieldHost => 'Host';
+  String get backupListEmptyMessage =>
+      'No backup volumes were found on storages that support backups.';
 
   @override
-  String get serverFieldHostHint => 'proxmox.example.com or 192.168.1.10';
+  String get backupListEmptyTitle => 'No backup files';
 
   @override
-  String get serverFieldPort => 'Port';
+  String get backupModeSnapshot => 'Snapshot';
 
   @override
-  String get serverFieldApiTokenId => 'Token ID';
+  String get backupModeStop => 'Stop';
 
   @override
-  String get serverFieldApiTokenIdHint => 'e.g. root@pam!mytoken';
+  String get backupModeSuspend => 'Suspend';
 
   @override
-  String get serverFieldApiTokenSecret => 'Secret';
+  String get backupNoDestinationStorage =>
+      'No storage supports backups in this cluster.';
 
   @override
-  String get serverFieldApiTokenSecretHint =>
-      'UUID shown when the token was created';
+  String get backupSectionFiles => 'Backup files';
 
   @override
-  String get serverApiTokenPasteFull => 'Paste full token';
+  String get backupSectionRecentTasks => 'Recent backup tasks';
 
   @override
-  String get serverApiTokenPasteInvalid =>
-      'Clipboard text did not look like USER@REALM!NAME=SECRET.';
+  String get backupSectionScheduledJobs => 'Scheduled jobs';
 
   @override
-  String get serverApiTokenPasteClipboardEmpty => 'Clipboard is empty.';
+  String get backupTriggerStart => 'Start backup';
 
   @override
-  String get serverApiTokenIdErrorEmpty => 'Enter the Token ID.';
+  String get backupTriggerTitle => 'Run backup';
 
   @override
-  String get serverApiTokenIdErrorInvalid =>
-      'Token ID must look like USER@REALM!name and must not include =.';
+  String get chartDiskIoSectionTitle => 'Disk I/O';
 
   @override
-  String get serverApiTokenSecretErrorEmpty => 'Enter the secret.';
+  String get chartDiskIoUnavailableOnNode =>
+      'Host disk throughput is not included in node statistics on newer Proxmox VE versions (node RRD no longer exposes read/write rates). Per-guest Disk I/O charts still work on VM and container detail screens.';
 
   @override
-  String get serverApiTokenErrorPartial =>
-      'Enter both Token ID and Secret, or leave both blank to keep the current token.';
+  String get chartDiskRead => 'Read';
 
   @override
-  String get serverFieldUsername => 'User name';
+  String get chartDiskWrite => 'Write';
 
   @override
-  String get serverFieldUsernameHint => 'e.g. root';
+  String get chartLoadError => 'Could not load chart data.';
 
   @override
-  String get serverFieldPassword => 'Password';
+  String get chartNetworkIn => 'In';
 
   @override
-  String get serverAuthTypeApiToken => 'API token';
+  String get chartNetworkOut => 'Out';
 
   @override
-  String get serverAuthTypeUsernamePassword => 'Password';
+  String get chartNoData => 'No chart data for this period.';
 
   @override
-  String get serverAuthTfaUseApiTokenHint =>
-      'If this account has two-factor authentication (TFA) enabled, use API token sign-in instead. Create a token in the Proxmox web UI (Datacenter or your user → API Tokens).';
+  String get chartTimeframeDay => '1d';
 
   @override
-  String get serverFormIdentitySection => 'Identity';
+  String get chartTimeframeHour => '1h';
 
   @override
-  String get serverFormAuthentication => 'Authentication';
+  String get chartTimeframeMonth => '1m';
 
   @override
-  String get serverFormSecuritySection => 'Security';
+  String get chartTimeframeWeek => '1w';
 
   @override
-  String get serverAllowSelfSigned => 'Allow self-signed certificate';
+  String get connectionDiagnosticsTitle => 'Connection diagnostics';
 
   @override
-  String get serverTlsPinLabel => 'Certificate fingerprint (SHA-256)';
+  String get containerListEmptyMessage =>
+      'No LXC containers were returned for this cluster.';
 
   @override
-  String get serverTlsPinHint =>
-      '64 hex characters. Tap fetch after entering host and port. Re-fetch if the server certificate is renewed.';
+  String get containerListEmptyTitle => 'No containers';
 
   @override
-  String get serverTlsPinFetch => 'Fetch certificate fingerprint';
+  String get containerNotFoundMessage =>
+      'This container is not in the current list. Go back and refresh the list.';
 
   @override
-  String get serverTlsPinErrorRequired =>
-      'When self-signed is enabled, fetch or paste the certificate fingerprint.';
+  String get containerNotFoundTitle => 'Container not found';
 
   @override
-  String get serverTlsPinFetchFailed =>
-      'Could not read the server certificate. Check host, port, and network.';
+  String get dashboardClusterSummary => 'Cluster summary';
 
   @override
-  String get serverTlsPinFetchSuccess =>
-      'Fingerprint loaded. Save the server to keep it.';
+  String get dashboardEmptyNodesMessage =>
+      'No node data was returned for this server.';
 
   @override
-  String get serverHostErrorEmpty => 'Enter a host name or IP address.';
+  String get dashboardEmptyNodesTitle => 'No nodes';
 
   @override
-  String get serverHostErrorHttp =>
-      'Do not include http://. The app always uses HTTPS.';
+  String get dashboardSummaryOnlineNodes => 'Online nodes';
 
   @override
-  String get serverHostErrorHttps =>
-      'Enter the host without https:// (scheme is added automatically).';
+  String get dashboardSummaryRunningVms => 'Running VMs';
 
   @override
-  String get serverPortErrorInvalid => 'Enter a valid port number (1–65535).';
+  String get dashboardSummaryTotalContainers => 'Total containers';
 
   @override
-  String get serverNameErrorEmpty => 'Enter a display name.';
+  String get dashboardSummaryTotalVms => 'Total VMs';
 
   @override
-  String get serverApiTokenErrorBothRequired =>
-      'Enter both Token ID and Secret.';
+  String debugScreenBody(String name) {
+    return 'Placeholder — $name';
+  }
 
   @override
-  String get serverFieldRealm => 'Realm';
+  String get drawerSectionInfrastructure => 'Infrastructure';
 
   @override
-  String get serverRealmPam => 'Linux PAM (pam)';
+  String get drawerSectionOperations => 'Operations';
 
   @override
-  String get serverRealmPve => 'Proxmox VE (pve)';
+  String get entityBackup => 'Backup';
 
   @override
-  String get serverRealmOther => 'Other…';
+  String get entityContainer => 'Container';
 
   @override
-  String get serverFieldRealmCustom => 'Custom realm';
+  String get entityNode => 'Node';
 
   @override
-  String get serverFieldRealmCustomHint => 'e.g. ldap';
+  String get entityStorage => 'Storage';
 
   @override
-  String get serverRealmErrorEmpty => 'Enter a realm.';
+  String get entityTask => 'Task';
 
   @override
-  String get serverRealmErrorInvalid => 'Realm must not contain spaces or @.';
-
-  @override
-  String get serverLoginComposeHint => 'Sign-in uses login@realm (set below).';
-
-  @override
-  String get serverUsernameErrorContainsAt =>
-      'Enter only the login name here. Choose the realm below.';
-
-  @override
-  String get serverUsernameErrorEmpty => 'Enter your Proxmox user name.';
-
-  @override
-  String get serverPasswordErrorEmpty => 'Enter your password.';
-
-  @override
-  String get serverPasswordLeaveBlankHint =>
-      'Leave blank to keep the current password.';
-
-  @override
-  String get serverApiTokenLeaveBlankHint =>
-      'Leave both fields blank to keep the current token.';
-
-  @override
-  String get serverNotFound => 'This server was not found.';
-
-  @override
-  String get serverEditLoadError => 'Could not open this server for editing.';
+  String get entityVirtualMachine => 'Virtual Machine';
 
   @override
   String get errorProxmoxAuth =>
@@ -364,9 +250,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Network error. Check the host, port, and connectivity.';
 
   @override
-  String get errorProxmoxTimeout => 'The request timed out. Try again.';
-
-  @override
   String get errorProxmoxPermission => 'Permission denied for this account.';
 
   @override
@@ -375,42 +258,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get errorProxmoxUnknown => 'Something went wrong. Try again.';
-
-  @override
   String errorProxmoxTechnicalDetails(String detail) {
     return '$detail';
   }
 
   @override
-  String serverConnectionTestSuccess(String version) {
-    return 'Connected. Proxmox version $version.';
-  }
+  String get errorProxmoxTimeout => 'The request timed out. Try again.';
 
   @override
-  String get serverConnectionTestInProgress => 'Testing connection…';
-
-  @override
-  String get dashboardClusterSummary => 'Cluster summary';
-
-  @override
-  String get dashboardSummaryTotalVms => 'Total VMs';
-
-  @override
-  String get dashboardSummaryRunningVms => 'Running VMs';
-
-  @override
-  String get dashboardSummaryTotalContainers => 'Total containers';
-
-  @override
-  String get dashboardSummaryOnlineNodes => 'Online nodes';
-
-  @override
-  String get dashboardEmptyNodesTitle => 'No nodes';
-
-  @override
-  String get dashboardEmptyNodesMessage =>
-      'No node data was returned for this server.';
+  String get errorProxmoxUnknown => 'Something went wrong. Try again.';
 
   @override
   String get filterAll => 'All';
@@ -428,561 +284,50 @@ class AppLocalizationsEn extends AppLocalizations {
   String get filterStopped => 'Stopped';
 
   @override
-  String get searchVmsHint => 'Search by name';
+  String get guestConfigActionDiscard => 'Discard';
 
   @override
-  String get searchContainersHint => 'Search by name';
+  String get guestConfigAddDisk => 'Add disk (SCSI)';
 
   @override
-  String get vmListEmptyTitle => 'No virtual machines';
+  String get guestConfigAddMountPoint => 'Add mount point';
 
   @override
-  String get vmListEmptyMessage => 'No VMs were returned for this cluster.';
+  String get guestConfigAddNetwork => 'Add interface';
 
   @override
-  String get containerListEmptyTitle => 'No containers';
-
-  @override
-  String get containerListEmptyMessage =>
-      'No LXC containers were returned for this cluster.';
-
-  @override
-  String get listFilteredEmptyTitle => 'No matches';
-
-  @override
-  String get listFilteredEmptyMessage => 'Try changing search or filters.';
-
-  @override
-  String get vmNotFoundTitle => 'VM not found';
-
-  @override
-  String get vmNotFoundMessage =>
-      'This VM is not in the current list. Go back and refresh the list.';
-
-  @override
-  String get nodeDetailTitle => 'Node';
-
-  @override
-  String get nodeNotFoundTitle => 'Node not found';
-
-  @override
-  String get nodeNotFoundMessage =>
-      'This node is not in the current list. Go back and refresh the list.';
-
-  @override
-  String get labelNodeHostStatus => 'Status';
-
-  @override
-  String get metricSwap => 'Swap';
-
-  @override
-  String get metricLoadAvg1m => 'Load (1m)';
-
-  @override
-  String get metricIoWait => 'I/O wait';
-
-  @override
-  String get metricGuestVms => 'Virtual machines';
-
-  @override
-  String get metricGuestContainers => 'Containers';
-
-  @override
-  String nodeDetailRunningTotalCount(int running, int total) {
-    return '$running running · $total total';
-  }
-
-  @override
-  String get chartDiskIoUnavailableOnNode =>
-      'Host disk throughput is not included in node statistics on newer Proxmox VE versions (node RRD no longer exposes read/write rates). Per-guest Disk I/O charts still work on VM and container detail screens.';
-
-  @override
-  String get containerNotFoundTitle => 'Container not found';
-
-  @override
-  String get containerNotFoundMessage =>
-      'This container is not in the current list. Go back and refresh the list.';
-
-  @override
-  String get labelVmid => 'VM ID';
-
-  @override
-  String get labelCtid => 'CT ID';
-
-  @override
-  String get labelContainerOsType => 'OS type';
-
-  @override
-  String get valueUnavailable => '—';
-
-  @override
-  String get guestDetailMetricGridSemantics =>
-      'CPU, memory, network, and disk activity for this guest.';
-
-  @override
-  String get actionCancel => 'Cancel';
-
-  @override
-  String get actionConfirm => 'Confirm';
-
-  @override
-  String get powerConfirmStopTitle => 'Shut down guest?';
-
-  @override
-  String get powerConfirmStopBody =>
-      'This sends a shutdown signal so the operating system can stop cleanly.';
-
-  @override
-  String get powerConfirmForceStopTitle => 'Force stop?';
-
-  @override
-  String get powerConfirmForceStopBody =>
-      'The guest will be powered off immediately without a clean shutdown.';
-
-  @override
-  String get powerConfirmForceStopWarning =>
-      'Unsaved data may be lost. This is equivalent to pulling the power cord.';
-
-  @override
-  String get powerConfirmRebootTitle => 'Reboot guest?';
-
-  @override
-  String get powerConfirmRebootBody =>
-      'The guest will restart. Unsaved work may be lost if applications do not shut down cleanly.';
-
-  @override
-  String powerActionCompleted(String actionName) {
-    return '$actionName finished successfully.';
-  }
-
-  @override
-  String get powerActionTaskFailed =>
-      'The operation finished with an error on the server.';
-
-  @override
-  String get powerActionTaskUnknown =>
-      'Could not confirm the final task status.';
-
-  @override
-  String get taskListEmptyTitle => 'No tasks';
-
-  @override
-  String get taskListEmptyMessage =>
-      'No recent tasks were returned for this cluster.';
-
-  @override
-  String get taskListLoadError => 'Could not load tasks.';
-
-  @override
-  String get taskFilterByGuest => 'Filter by guest';
-
-  @override
-  String get taskFilterAllGuests => 'All guests';
-
-  @override
-  String get taskGuestFilterTitle => 'Guest';
-
-  @override
-  String get taskRowGuest => 'Guest';
-
-  @override
-  String get taskRowStatus => 'Status';
-
-  @override
-  String get taskRowStarted => 'Started';
-
-  @override
-  String get taskRowDuration => 'Duration';
-
-  @override
-  String get taskStatusCompleted => 'OK';
-
-  @override
-  String get taskStatusFailed => 'Error';
-
-  @override
-  String get taskDetailNodeLabel => 'Node';
-
-  @override
-  String get taskDetailUpidLabel => 'UPID';
-
-  @override
-  String get taskDetailLogTitle => 'Log';
-
-  @override
-  String get taskDetailLogLoading => 'Loading log…';
-
-  @override
-  String get taskDetailLogError => 'Could not load the task log.';
-
-  @override
-  String get taskDetailLogEmpty => 'No log output.';
-
-  @override
-  String get chartTimeframeHour => '1h';
-
-  @override
-  String get chartTimeframeDay => '1d';
-
-  @override
-  String get chartTimeframeWeek => '1w';
-
-  @override
-  String get chartTimeframeMonth => '1m';
-
-  @override
-  String get chartNoData => 'No chart data for this period.';
-
-  @override
-  String get chartLoadError => 'Could not load chart data.';
-
-  @override
-  String get chartNetworkIn => 'In';
-
-  @override
-  String get chartNetworkOut => 'Out';
-
-  @override
-  String get chartDiskRead => 'Read';
-
-  @override
-  String get chartDiskWrite => 'Write';
-
-  @override
-  String get chartDiskIoSectionTitle => 'Disk I/O';
-
-  @override
-  String get actionBackup => 'Backup';
-
-  @override
-  String get storageEmptyTitle => 'No storage pools';
-
-  @override
-  String get storageEmptyMessage =>
-      'No storage pools were found on any online node.';
-
-  @override
-  String get storageUsageSection => 'Usage';
-
-  @override
-  String get storageContentTypesLabel => 'Content types';
-
-  @override
-  String get storageActive => 'Active';
-
-  @override
-  String get storageInactive => 'Inactive';
-
-  @override
-  String get storageDetailContentTitle => 'Content';
-
-  @override
-  String get storageContentEmpty => 'No volumes in this pool.';
-
-  @override
-  String get storageTypeLabel => 'Type';
-
-  @override
-  String storagePoolOnNode(String pool, String node) {
-    return '$pool · $node';
-  }
-
-  @override
-  String get storageClusterHeroTitle => 'Cluster capacity';
-
-  @override
-  String get storageClusterHeroSubtitle =>
-      'Sum of pools that report used and total';
-
-  @override
-  String get storagePoolHealthHealthyLabel => 'Healthy';
-
-  @override
-  String get storagePoolHealthAtRiskLabel => 'At risk';
-
-  @override
-  String get storagePoolsSectionTitle => 'Storage pools';
-
-  @override
-  String get storageNodeDistributionTitle => 'Used space by node';
-
-  @override
-  String get backupListEmptyTitle => 'No backup files';
-
-  @override
-  String get backupListEmptyMessage =>
-      'No backup volumes were found on storages that support backups.';
-
-  @override
-  String get backupSectionScheduledJobs => 'Scheduled jobs';
-
-  @override
-  String get backupSectionFiles => 'Backup files';
-
-  @override
-  String get backupSectionRecentTasks => 'Recent backup tasks';
-
-  @override
-  String get backupGroupedUnknownGuest => 'Other';
-
-  @override
-  String backupJobVmids(String ids) {
-    return 'Guests: $ids';
-  }
-
-  @override
-  String backupJobNextRun(String when) {
-    return 'Next run: $when';
-  }
-
-  @override
-  String backupJobLastRun(String when) {
-    return 'Last run: $when';
-  }
-
-  @override
-  String get backupTriggerTitle => 'Run backup';
-
-  @override
-  String get backupFieldGuest => 'Guest';
-
-  @override
-  String get backupFieldStorage => 'Destination storage';
-
-  @override
-  String get backupFieldCompress => 'Compression';
-
-  @override
-  String get backupFieldMode => 'Backup mode';
-
-  @override
-  String get backupCompressZstd => 'Zstandard (zstd)';
-
-  @override
-  String get backupCompressLzo => 'LZO';
-
-  @override
-  String get backupCompressGzip => 'Gzip';
-
-  @override
-  String get backupCompressNone => 'None';
-
-  @override
-  String get backupModeSnapshot => 'Snapshot';
-
-  @override
-  String get backupModeSuspend => 'Suspend';
-
-  @override
-  String get backupModeStop => 'Stop';
-
-  @override
-  String get backupTriggerStart => 'Start backup';
-
-  @override
-  String get backupNoDestinationStorage =>
-      'No storage supports backups in this cluster.';
-
-  @override
-  String get backupFabTooltip => 'Run backup';
-
-  @override
-  String get labelFormat => 'Format';
-
-  @override
-  String get labelVolumeId => 'Volume';
-
-  @override
-  String get labelContentKind => 'Kind';
-
-  @override
-  String get storageLabelAvailable => 'Available';
-
-  @override
-  String storageAvailableSpace(String size) {
-    return 'Available: $size';
-  }
-
-  @override
-  String get actionClose => 'Close';
-
-  @override
-  String get settingsServersSubtitle =>
-      'Add, edit, or switch the active Proxmox server.';
-
-  @override
-  String get settingsPreferencesTitle => 'Preferences';
-
-  @override
-  String get settingsPreferencesSubtitle =>
-      'Theme, default chart time range, and other app preferences.';
-
-  @override
-  String get preferencesScreenTitle => 'Preferences';
-
-  @override
-  String get preferencesChartsSection => 'Charts';
-
-  @override
-  String get preferencesDefaultChartTimeframeTitle => 'Default time range';
-
-  @override
-  String get preferencesDefaultChartTimeframeSubtitle =>
-      'Used for CPU, memory, network, and disk charts on VM, container, and node detail screens.';
-
-  @override
-  String get settingsAppearanceSection => 'Appearance';
-
-  @override
-  String get settingsTroubleshootingSection => 'Troubleshooting';
-
-  @override
-  String get settingsVerboseConnectionErrors => 'Verbose connection errors';
-
-  @override
-  String get settingsVerboseConnectionErrorsSubtitle =>
-      'After a failed connection test, show technical details in a dialog (types, messages, HTTP status). Passwords are never shown.';
-
-  @override
-  String get connectionDiagnosticsTitle => 'Connection diagnostics';
-
-  @override
-  String get settingsThemeDark => 'Dark';
-
-  @override
-  String get settingsThemeLight => 'Light';
-
-  @override
-  String get settingsThemeSystem => 'System';
-
-  @override
-  String get settingsAboutSection => 'About';
-
-  @override
-  String get settingsVersion => 'Version';
-
-  @override
-  String settingsVersionSubtitle(String version, String buildNumber) {
-    return '$version ($buildNumber)';
-  }
-
-  @override
-  String get settingsLoading => 'Loading…';
-
-  @override
-  String get settingsVersionUnavailable => 'Unavailable';
-
-  @override
-  String get settingsSourceCode => 'Source code';
-
-  @override
-  String get settingsLicenseTitle => 'License';
-
-  @override
-  String get settingsLicenseTileSubtitle => 'MIT License — tap for summary';
-
-  @override
-  String get settingsLicenseSummary =>
-      'ProxDroid is licensed under the MIT License. You may use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, subject to including the copyright notice and permission notice in all copies. The software is provided \"as is\", without warranty of any kind. See the LICENSE file in the repository for the full text.';
-
-  @override
-  String get settingsSupportSection => 'Support';
-
-  @override
-  String get settingsSupportKofi => 'Ko-fi';
-
-  @override
-  String get settingsSupportGithubSponsors => 'GitHub Sponsors';
-
-  @override
-  String get settingsCouldNotOpenLink => 'Could not open link';
-
-  @override
-  String get navDashboard => 'Dashboard';
-
-  @override
-  String get navVMs => 'VMs';
-
-  @override
-  String get navContainers => 'Containers';
-
-  @override
-  String get navTasks => 'Tasks';
-
-  @override
-  String get navMore => 'More';
-
-  @override
-  String get sectionGuestTags => 'Tags';
-
-  @override
-  String get actionEditGuestConfig => 'Edit configuration';
-
-  @override
-  String get screenEditVmConfig => 'Edit VM';
-
-  @override
-  String get screenEditContainerConfig => 'Edit container';
-
-  @override
-  String get guestConfigSectionIdentity => 'Identity';
-
-  @override
-  String get guestConfigSectionResources => 'Resources';
-
-  @override
-  String get guestConfigSectionCpu => 'CPU';
-
-  @override
-  String get guestConfigSectionBoot => 'Boot';
-
-  @override
-  String get guestConfigSectionOptions => 'Options';
-
-  @override
-  String get guestConfigFieldVmName => 'Name';
-
-  @override
-  String get guestConfigFieldHostname => 'Hostname';
-
-  @override
-  String get guestConfigFieldDescription => 'Description';
-
-  @override
-  String get guestConfigFieldTags => 'Tags';
-
-  @override
-  String get guestConfigFieldMemory => 'Memory (MiB)';
-
-  @override
-  String get guestConfigFieldSockets => 'CPU sockets';
-
-  @override
-  String get guestConfigFieldCores => 'Cores per socket';
-
-  @override
-  String get guestConfigFieldVcpus => 'vCPUs';
-
-  @override
-  String get guestConfigFieldCpuType => 'CPU type';
-
-  @override
-  String get guestConfigFieldGuestOs => 'Guest OS';
+  String get guestConfigDisksLockedWhileRunning =>
+      'Stop the machine to add, remove, or reorder disk definitions.';
 
   @override
   String get guestConfigFieldArchitecture => 'Architecture';
 
   @override
-  String get guestConfigFieldSwap => 'Swap (MiB)';
+  String get guestConfigFieldCores => 'Cores per socket';
 
   @override
   String get guestConfigFieldCpuLimit => 'CPU limit';
 
   @override
+  String get guestConfigFieldCpuType => 'CPU type';
+
+  @override
   String get guestConfigFieldCpuUnits => 'CPU units';
 
   @override
-  String get guestConfigFieldStartupOrder => 'Startup order';
+  String get guestConfigFieldDescription => 'Description';
+
+  @override
+  String get guestConfigFieldFeatures => 'Features';
+
+  @override
+  String get guestConfigFieldGuestOs => 'Guest OS';
+
+  @override
+  String get guestConfigFieldHostname => 'Hostname';
+
+  @override
+  String get guestConfigFieldMemory => 'Memory (MiB)';
 
   @override
   String get guestConfigFieldOnBoot => 'Start at boot';
@@ -991,55 +336,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get guestConfigFieldQemuAgent => 'QEMU guest agent';
 
   @override
-  String get guestConfigFieldUnprivileged => 'Unprivileged container';
-
-  @override
-  String get guestConfigFieldFeatures => 'Features';
-
-  @override
   String get guestConfigFieldRootfs => 'Root filesystem';
 
   @override
-  String get guestConfigRootfsReadOnlyHint =>
-      'Root filesystem cannot be edited here yet.';
+  String get guestConfigFieldSockets => 'CPU sockets';
 
   @override
-  String get guestConfigRootfsEditHint =>
-      'Changing rootfs is dangerous; confirm before saving.';
+  String get guestConfigFieldStartupOrder => 'Startup order';
 
   @override
-  String get guestConfigActionDiscard => 'Discard';
+  String get guestConfigFieldSwap => 'Swap (MiB)';
 
   @override
-  String get guestConfigSaveSuccess => 'Configuration saved';
+  String get guestConfigFieldTags => 'Tags';
 
   @override
-  String get guestConfigSaveNothingChanged => 'No changes to save';
+  String get guestConfigFieldUnprivileged => 'Unprivileged container';
 
   @override
-  String get guestConfigSectionNetworks => 'Network interfaces';
+  String get guestConfigFieldVcpus => 'vCPUs';
 
   @override
-  String get guestConfigSectionDisks => 'Disks';
-
-  @override
-  String get guestConfigSectionMounts => 'Mount points';
-
-  @override
-  String get guestConfigNetworksLockedWhileRunning =>
-      'Stop the machine to add, remove, or reorder network interfaces.';
-
-  @override
-  String get guestConfigDisksLockedWhileRunning =>
-      'Stop the machine to add, remove, or reorder disk definitions.';
+  String get guestConfigFieldVmName => 'Name';
 
   @override
   String get guestConfigMountsLockedWhileRunning =>
       'Stop the container to add, remove, or reorder mount points.';
-
-  @override
-  String get guestConfigRootfsLockedWhileRunning =>
-      'Stop the container to edit the root filesystem string.';
 
   @override
   String guestConfigNetworkLineLabel(String name) {
@@ -1047,138 +369,88 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get guestConfigAddNetwork => 'Add interface';
-
-  @override
-  String get guestConfigRemoveInterface => 'Remove interface';
-
-  @override
-  String get guestConfigAddDisk => 'Add disk (SCSI)';
+  String get guestConfigNetworksLockedWhileRunning =>
+      'Stop the machine to add, remove, or reorder network interfaces.';
 
   @override
   String get guestConfigRemoveDisk => 'Remove disk';
 
   @override
-  String get guestConfigAddMountPoint => 'Add mount point';
+  String get guestConfigRemoveInterface => 'Remove interface';
 
   @override
   String get guestConfigRemoveMountPoint => 'Remove mount point';
 
   @override
-  String get guestConfigRiskConfirmTitle => 'Apply high-risk changes?';
+  String get guestConfigRiskConfirmAction => 'Apply changes';
 
   @override
   String get guestConfigRiskConfirmBody =>
       'Network, disk, mount point, or root filesystem changes can break a guest or destroy data. Continue only if you understand the impact.';
 
   @override
-  String get guestConfigRiskConfirmAction => 'Apply changes';
+  String get guestConfigRiskConfirmTitle => 'Apply high-risk changes?';
 
   @override
-  String get guestPickerStoragePool => 'Storage pool';
+  String get guestConfigRootfsEditHint =>
+      'Changing rootfs is dangerous; confirm before saving.';
 
   @override
-  String get guestPickerBridge => 'Bridge';
+  String get guestConfigRootfsLockedWhileRunning =>
+      'Stop the container to edit the root filesystem string.';
 
   @override
-  String get guestPickerNicModel => 'Network model';
+  String get guestConfigRootfsReadOnlyHint =>
+      'Root filesystem cannot be edited here yet.';
 
   @override
-  String get guestPickerIfaceName => 'Interface name';
+  String get guestConfigSaveNothingChanged => 'No changes to save';
 
   @override
-  String get guestPickerDiskModeNew => 'New volume (size in GiB)';
+  String get guestConfigSaveSuccess => 'Configuration saved';
 
   @override
-  String get guestPickerDiskModeExisting => 'Existing volume';
+  String get guestConfigSectionBoot => 'Boot';
 
   @override
-  String get guestPickerVolume => 'Volume';
+  String get guestConfigSectionCpu => 'CPU';
 
   @override
-  String get guestPickerSizeGiB => 'Size (GiB)';
+  String get guestConfigSectionDisks => 'Disks';
 
   @override
-  String get guestPickerAdvancedRaw => 'Advanced (raw string)';
+  String get guestConfigSectionIdentity => 'Identity';
 
   @override
-  String get guestPickerUseSimpleEditor => 'Use simplified editor';
+  String get guestConfigSectionMounts => 'Mount points';
 
   @override
-  String get guestPickerStaticIpLabel => 'Static CIDR';
+  String get guestConfigSectionNetworks => 'Network interfaces';
 
   @override
-  String get guestPickerNetIpMode => 'IPv4';
+  String get guestConfigSectionOptions => 'Options';
 
   @override
-  String get guestPickerNetIpDhcp => 'DHCP';
+  String get guestConfigSectionResources => 'Resources';
 
   @override
-  String get guestPickerNetIpStatic => 'Static';
+  String get guestCreateCtActionName => 'Create container';
 
   @override
-  String get guestPickerNetIpNone => 'Omit IP (bridge only)';
+  String get guestCreateCtDisclaimer =>
+      'Creating a container runs a server task. Match rootfs and templates to your cluster.';
 
   @override
-  String get guestPickerNetStaticHint => 'e.g. 192.168.1.50/24';
-
-  @override
-  String get guestPickerLoadingBridges => 'Loading bridges…';
-
-  @override
-  String get guestPickerNoBridges =>
-      'No bridge interfaces found. Use advanced raw entry.';
-
-  @override
-  String get guestPickerNoStoragePools =>
-      'No storage pools on this node support this content type. Use advanced raw entry.';
-
-  @override
-  String get guestPickerParseFallbackHint =>
-      'This value uses options the simplified editor does not handle. Edit as raw or adjust in Proxmox.';
-
-  @override
-  String get validationFieldRequired => 'This field is required.';
-
-  @override
-  String get validationIntegerPositive => 'Enter a positive whole number.';
-
-  @override
-  String get validationVmidMin => 'Guest ID must be at least 100.';
-
-  @override
-  String get guestCreateVmTitle => 'Create Virtual Machine';
+  String get guestCreateCtOstypeHint => 'Template id, e.g. debian or ubuntu.';
 
   @override
   String get guestCreateCtTitle => 'Create container';
 
   @override
-  String get guestCreateSubmit => 'Create';
-
-  @override
-  String get guestCreateFabVm => 'Create Virtual Machine';
-
-  @override
   String get guestCreateFabCt => 'Create container';
 
   @override
-  String get guestCreateSectionTarget => 'Target';
-
-  @override
-  String get guestCreateSectionDiskNet => 'Disk and network';
-
-  @override
-  String get guestCreateFieldScsihw => 'SCSI controller (scsihw)';
-
-  @override
-  String get guestCreateFieldScsihwHint =>
-      'Leave empty to omit; virtio-scsi is common with scsi0.';
-
-  @override
-  String get guestCreateFieldScsi0 => 'Disk (scsi0)';
-
-  @override
-  String get guestCreateFieldScsi0Hint => 'Example: local-lvm:32';
+  String get guestCreateFabVm => 'Create Virtual Machine';
 
   @override
   String get guestCreateFieldNet0 => 'Network (net0)';
@@ -1197,26 +469,766 @@ class AppLocalizationsEn extends AppLocalizations {
   String get guestCreateFieldRootfsHint => 'Example: local-lvm:8';
 
   @override
-  String get guestCreateVmOstypeHint =>
-      'Example: l26 (Linux 2.6+), win11, other.';
+  String get guestCreateFieldScsi0 => 'Disk (scsi0)';
 
   @override
-  String get guestCreateCtOstypeHint => 'Template id, e.g. debian or ubuntu.';
+  String get guestCreateFieldScsi0Hint => 'Example: local-lvm:32';
+
+  @override
+  String get guestCreateFieldScsihw => 'SCSI controller (scsihw)';
+
+  @override
+  String get guestCreateFieldScsihwHint =>
+      'Leave empty to omit; virtio-scsi is common with scsi0.';
+
+  @override
+  String get guestCreateNoNodes => 'No cluster nodes are available.';
+
+  @override
+  String get guestCreateSectionDiskNet => 'Disk and network';
+
+  @override
+  String get guestCreateSectionTarget => 'Target';
+
+  @override
+  String get guestCreateSubmit => 'Create';
+
+  @override
+  String get guestCreateVmActionName => 'Create Virtual Machine';
 
   @override
   String get guestCreateVmDisclaimer =>
       'Creating a VM runs a server task. Ensure disk and network strings match your node.';
 
   @override
-  String get guestCreateCtDisclaimer =>
-      'Creating a container runs a server task. Match rootfs and templates to your cluster.';
+  String get guestCreateVmOstypeHint =>
+      'Example: l26 (Linux 2.6+), win11, other.';
 
   @override
-  String get guestCreateNoNodes => 'No cluster nodes are available.';
+  String get guestCreateVmTitle => 'Create Virtual Machine';
 
   @override
-  String get guestCreateVmActionName => 'Create Virtual Machine';
+  String get guestDetailMetricGridSemantics =>
+      'CPU, memory, network, and disk activity for this guest.';
 
   @override
-  String get guestCreateCtActionName => 'Create container';
+  String get guestPickerAdvancedRaw => 'Advanced (raw string)';
+
+  @override
+  String get guestPickerBridge => 'Bridge';
+
+  @override
+  String get guestPickerDiskModeExisting => 'Existing volume';
+
+  @override
+  String get guestPickerDiskModeNew => 'New volume (size in GiB)';
+
+  @override
+  String get guestPickerIfaceName => 'Interface name';
+
+  @override
+  String get guestPickerLoadingBridges => 'Loading bridges…';
+
+  @override
+  String get guestPickerNetIpDhcp => 'DHCP';
+
+  @override
+  String get guestPickerNetIpMode => 'IPv4';
+
+  @override
+  String get guestPickerNetIpNone => 'Omit IP (bridge only)';
+
+  @override
+  String get guestPickerNetIpStatic => 'Static';
+
+  @override
+  String get guestPickerNetStaticHint => 'e.g. 192.168.1.50/24';
+
+  @override
+  String get guestPickerNicModel => 'Network model';
+
+  @override
+  String get guestPickerNoBridges =>
+      'No bridge interfaces found. Use advanced raw entry.';
+
+  @override
+  String get guestPickerNoStoragePools =>
+      'No storage pools on this node support this content type. Use advanced raw entry.';
+
+  @override
+  String get guestPickerParseFallbackHint =>
+      'This value uses options the simplified editor does not handle. Edit as raw or adjust in Proxmox.';
+
+  @override
+  String get guestPickerSizeGiB => 'Size (GiB)';
+
+  @override
+  String get guestPickerStaticIpLabel => 'Static CIDR';
+
+  @override
+  String get guestPickerStoragePool => 'Storage pool';
+
+  @override
+  String get guestPickerUseSimpleEditor => 'Use simplified editor';
+
+  @override
+  String get guestPickerVolume => 'Volume';
+
+  @override
+  String get labelContainerOsType => 'OS type';
+
+  @override
+  String get labelContentKind => 'Kind';
+
+  @override
+  String get labelCtid => 'CT ID';
+
+  @override
+  String get labelFormat => 'Format';
+
+  @override
+  String get labelNodeHostStatus => 'Status';
+
+  @override
+  String get labelVmid => 'VM ID';
+
+  @override
+  String get labelVolumeId => 'Volume';
+
+  @override
+  String get listFilteredEmptyMessage => 'Try changing search or filters.';
+
+  @override
+  String get listFilteredEmptyTitle => 'No matches';
+
+  @override
+  String get metricCpu => 'CPU';
+
+  @override
+  String get metricDisk => 'Disk';
+
+  @override
+  String get metricGuestContainers => 'Containers';
+
+  @override
+  String get metricGuestVms => 'Virtual machines';
+
+  @override
+  String get metricIoWait => 'I/O wait';
+
+  @override
+  String get metricLoadAvg1m => 'Load (1m)';
+
+  @override
+  String get metricMemory => 'Memory';
+
+  @override
+  String get metricNetwork => 'Network';
+
+  @override
+  String get metricSwap => 'Swap';
+
+  @override
+  String get metricUptime => 'Uptime';
+
+  @override
+  String get navContainers => 'Containers';
+
+  @override
+  String get navDashboard => 'Dashboard';
+
+  @override
+  String get navMore => 'More';
+
+  @override
+  String get navTasks => 'Tasks';
+
+  @override
+  String get navVMs => 'VMs';
+
+  @override
+  String nodeDetailRunningTotalCount(int total, int running) {
+    return '$running running · $total total';
+  }
+
+  @override
+  String get nodeDetailTitle => 'Node';
+
+  @override
+  String get nodeNotFoundMessage =>
+      'This node is not in the current list. Go back and refresh the list.';
+
+  @override
+  String get nodeNotFoundTitle => 'Node not found';
+
+  @override
+  String get offlineBannerMessage =>
+      'No network connection. Some actions may not work until you are back online.';
+
+  @override
+  String powerActionCompleted(String actionName) {
+    return '$actionName finished successfully.';
+  }
+
+  @override
+  String get powerActionTaskFailed =>
+      'The operation finished with an error on the server.';
+
+  @override
+  String get powerActionTaskUnknown =>
+      'Could not confirm the final task status.';
+
+  @override
+  String get powerConfirmForceStopBody =>
+      'The guest will be powered off immediately without a clean shutdown.';
+
+  @override
+  String get powerConfirmForceStopTitle => 'Force stop?';
+
+  @override
+  String get powerConfirmForceStopWarning =>
+      'Unsaved data may be lost. This is equivalent to pulling the power cord.';
+
+  @override
+  String get powerConfirmRebootBody =>
+      'The guest will restart. Unsaved work may be lost if applications do not shut down cleanly.';
+
+  @override
+  String get powerConfirmRebootTitle => 'Reboot guest?';
+
+  @override
+  String get powerConfirmStopBody =>
+      'This sends a shutdown signal so the operating system can stop cleanly.';
+
+  @override
+  String get powerConfirmStopTitle => 'Shut down guest?';
+
+  @override
+  String get preferencesChartsSection => 'Charts';
+
+  @override
+  String get preferencesDefaultChartTimeframeSubtitle =>
+      'Used for CPU, memory, network, and disk charts on VM, container, and node detail screens.';
+
+  @override
+  String get preferencesDefaultChartTimeframeTitle => 'Default time range';
+
+  @override
+  String get preferencesScreenTitle => 'Preferences';
+
+  @override
+  String get screenAddServer => 'Add server';
+
+  @override
+  String get screenEditContainerConfig => 'Edit container';
+
+  @override
+  String get screenEditServer => 'Edit server';
+
+  @override
+  String get screenEditVmConfig => 'Edit VM';
+
+  @override
+  String get searchClearTooltip => 'Clear search';
+
+  @override
+  String get searchContainersHint => 'Search by name';
+
+  @override
+  String get searchVmsHint => 'Search by name';
+
+  @override
+  String get sectionAbout => 'About';
+
+  @override
+  String get sectionBackups => 'Backups';
+
+  @override
+  String get sectionContainers => 'Containers';
+
+  @override
+  String get sectionDashboard => 'Dashboard';
+
+  @override
+  String get sectionGuestTags => 'Tags';
+
+  @override
+  String get sectionServers => 'Servers';
+
+  @override
+  String get sectionSettings => 'Settings';
+
+  @override
+  String get sectionTasks => 'Tasks';
+
+  @override
+  String get sectionVms => 'Virtual machines';
+
+  @override
+  String get serverAllowSelfSigned => 'Allow self-signed certificate';
+
+  @override
+  String get serverApiTokenErrorBothRequired =>
+      'Enter both Token ID and Secret.';
+
+  @override
+  String get serverApiTokenErrorPartial =>
+      'Enter both Token ID and Secret, or leave both blank to keep the current token.';
+
+  @override
+  String get serverApiTokenIdErrorEmpty => 'Enter the Token ID.';
+
+  @override
+  String get serverApiTokenIdErrorInvalid =>
+      'Token ID must look like USER@REALM!name and must not include =.';
+
+  @override
+  String get serverApiTokenLeaveBlankHint =>
+      'Leave both fields blank to keep the current token.';
+
+  @override
+  String get serverApiTokenPasteClipboardEmpty => 'Clipboard is empty.';
+
+  @override
+  String get serverApiTokenPasteFull => 'Paste full token';
+
+  @override
+  String get serverApiTokenPasteInvalid =>
+      'Clipboard text did not look like USER@REALM!NAME=SECRET.';
+
+  @override
+  String get serverApiTokenSecretErrorEmpty => 'Enter the secret.';
+
+  @override
+  String get serverAuthTfaUseApiTokenHint =>
+      'If this account has two-factor authentication (TFA) enabled, use API token sign-in instead. Create a token in the Proxmox web UI (Datacenter or your user → API Tokens).';
+
+  @override
+  String get serverAuthTypeApiToken => 'API token';
+
+  @override
+  String get serverAuthTypeUsernamePassword => 'Password';
+
+  @override
+  String get serverConnectionTestInProgress => 'Testing connection…';
+
+  @override
+  String serverConnectionTestSuccess(String version) {
+    return 'Connected. Proxmox version $version.';
+  }
+
+  @override
+  String get serverDeletedSnackbar => 'Server removed';
+
+  @override
+  String get serverEditLoadError => 'Could not open this server for editing.';
+
+  @override
+  String get serverFieldApiTokenId => 'Token ID';
+
+  @override
+  String get serverFieldApiTokenIdHint => 'e.g. root@pam!mytoken';
+
+  @override
+  String get serverFieldApiTokenSecret => 'Secret';
+
+  @override
+  String get serverFieldApiTokenSecretHint =>
+      'UUID shown when the token was created';
+
+  @override
+  String get serverFieldHost => 'Host';
+
+  @override
+  String get serverFieldHostHint => 'proxmox.example.com or 192.168.1.10';
+
+  @override
+  String get serverFieldName => 'Display name';
+
+  @override
+  String get serverFieldNameHint => 'e.g. Home lab';
+
+  @override
+  String get serverFieldPassword => 'Password';
+
+  @override
+  String get serverFieldPort => 'Port';
+
+  @override
+  String get serverFieldRealm => 'Realm';
+
+  @override
+  String get serverFieldRealmCustom => 'Custom realm';
+
+  @override
+  String get serverFieldRealmCustomHint => 'e.g. ldap';
+
+  @override
+  String get serverFieldUsername => 'User name';
+
+  @override
+  String get serverFieldUsernameHint => 'e.g. root';
+
+  @override
+  String get serverFormAuthentication => 'Authentication';
+
+  @override
+  String get serverFormIdentitySection => 'Identity';
+
+  @override
+  String get serverFormSecuritySection => 'Security';
+
+  @override
+  String get serverHostErrorEmpty => 'Enter a host name or IP address.';
+
+  @override
+  String get serverHostErrorHttp =>
+      'Do not include http://. The app always uses HTTPS.';
+
+  @override
+  String get serverHostErrorHttps =>
+      'Enter the host without https:// (scheme is added automatically).';
+
+  @override
+  String serverListHostPortSubtitle(String host, int port) {
+    return '$host:$port';
+  }
+
+  @override
+  String get serverLoginComposeHint => 'Sign-in uses login@realm (set below).';
+
+  @override
+  String get serverNameErrorEmpty => 'Enter a display name.';
+
+  @override
+  String get serverNotFound => 'This server was not found.';
+
+  @override
+  String get serverPasswordErrorEmpty => 'Enter your password.';
+
+  @override
+  String get serverPasswordLeaveBlankHint =>
+      'Leave blank to keep the current password.';
+
+  @override
+  String get serverPortErrorInvalid => 'Enter a valid port number (1–65535).';
+
+  @override
+  String get serverRealmErrorEmpty => 'Enter a realm.';
+
+  @override
+  String get serverRealmErrorInvalid => 'Realm must not contain spaces or @.';
+
+  @override
+  String get serverRealmOther => 'Other…';
+
+  @override
+  String get serverRealmPam => 'Linux PAM (pam)';
+
+  @override
+  String get serverRealmPve => 'Proxmox VE (pve)';
+
+  @override
+  String get serverTlsPinErrorRequired =>
+      'When self-signed is enabled, fetch or paste the certificate fingerprint.';
+
+  @override
+  String get serverTlsPinFetch => 'Fetch certificate fingerprint';
+
+  @override
+  String get serverTlsPinFetchFailed =>
+      'Could not read the server certificate. Check host, port, and network.';
+
+  @override
+  String get serverTlsPinFetchSuccess =>
+      'Fingerprint loaded. Save the server to keep it.';
+
+  @override
+  String get serverTlsPinHint =>
+      '64 hex characters. Tap fetch after entering host and port. Re-fetch if the server certificate is renewed.';
+
+  @override
+  String get serverTlsPinLabel => 'Certificate fingerprint (SHA-256)';
+
+  @override
+  String get serverUsernameErrorContainsAt =>
+      'Enter only the login name here. Choose the realm below.';
+
+  @override
+  String get serverUsernameErrorEmpty => 'Enter your Proxmox user name.';
+
+  @override
+  String get serversEmptyCta => 'Add server';
+
+  @override
+  String get serversEmptyMessage =>
+      'Add a server to connect to your Proxmox cluster.';
+
+  @override
+  String get serversEmptyTitle => 'No servers yet';
+
+  @override
+  String get serversFabAddTooltip => 'Add server';
+
+  @override
+  String get serversLoadError => 'Could not load servers.';
+
+  @override
+  String get settingsAboutSection => 'About';
+
+  @override
+  String get settingsAppearanceSection => 'Appearance';
+
+  @override
+  String get settingsCouldNotOpenLink => 'Could not open link';
+
+  @override
+  String get settingsLanguageEnglish => 'English';
+
+  @override
+  String get settingsLanguageGerman => 'German';
+
+  @override
+  String get settingsLanguageSection => 'Language';
+
+  @override
+  String get settingsLanguageSystem => 'System default';
+
+  @override
+  String get settingsLicenseSummary =>
+      'ProxDroid is licensed under the MIT License. You may use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, subject to including the copyright notice and permission notice in all copies. The software is provided \"as is\", without warranty of any kind. See the LICENSE file in the repository for the full text.';
+
+  @override
+  String get settingsLicenseTileSubtitle => 'MIT License — tap for summary';
+
+  @override
+  String get settingsLicenseTitle => 'License';
+
+  @override
+  String get settingsLoading => 'Loading…';
+
+  @override
+  String get settingsPreferencesSubtitle =>
+      'Theme, language, default chart time range, and other app preferences.';
+
+  @override
+  String get settingsPreferencesTitle => 'Preferences';
+
+  @override
+  String get settingsServersSubtitle =>
+      'Add, edit, or switch the active Proxmox server.';
+
+  @override
+  String get settingsSourceCode => 'Source code';
+
+  @override
+  String get settingsSupportGithubSponsors => 'GitHub Sponsors';
+
+  @override
+  String get settingsSupportKofi => 'Ko-fi';
+
+  @override
+  String get settingsSupportSection => 'Support';
+
+  @override
+  String get settingsThemeDark => 'Dark';
+
+  @override
+  String get settingsThemeLight => 'Light';
+
+  @override
+  String get settingsThemeSystem => 'System';
+
+  @override
+  String get settingsTroubleshootingSection => 'Troubleshooting';
+
+  @override
+  String get settingsVerboseConnectionErrors => 'Verbose connection errors';
+
+  @override
+  String get settingsVerboseConnectionErrorsSubtitle =>
+      'After a failed connection test, show technical details in a dialog (types, messages, HTTP status). Passwords are never shown.';
+
+  @override
+  String get settingsVersion => 'Version';
+
+  @override
+  String settingsVersionSubtitle(String version, String buildNumber) {
+    return '$version ($buildNumber)';
+  }
+
+  @override
+  String get settingsVersionUnavailable => 'Unavailable';
+
+  @override
+  String get shellConnectedLabel => 'Connected';
+
+  @override
+  String shellConnectedPillSemantics(String serverName) {
+    return 'Connected to $serverName. Switch or manage servers.';
+  }
+
+  @override
+  String get shellOpenNavigationMenu => 'Open navigation menu';
+
+  @override
+  String get shellServerPillTooltip => 'Switch or manage servers';
+
+  @override
+  String get statusOffline => 'Offline';
+
+  @override
+  String get statusOnline => 'Online';
+
+  @override
+  String get statusPaused => 'Paused';
+
+  @override
+  String get statusRunning => 'Running';
+
+  @override
+  String get statusStopped => 'Stopped';
+
+  @override
+  String get statusUnknown => 'Unknown';
+
+  @override
+  String get storageActive => 'Active';
+
+  @override
+  String storageAvailableSpace(String size) {
+    return 'Available: $size';
+  }
+
+  @override
+  String get storageClusterHeroSubtitle =>
+      'Sum of pools that report used and total';
+
+  @override
+  String get storageClusterHeroTitle => 'Cluster capacity';
+
+  @override
+  String get storageContentEmpty => 'No volumes in this pool.';
+
+  @override
+  String get storageContentTypesLabel => 'Content types';
+
+  @override
+  String get storageDetailContentTitle => 'Content';
+
+  @override
+  String get storageEmptyMessage =>
+      'No storage pools were found on any online node.';
+
+  @override
+  String get storageEmptyTitle => 'No storage pools';
+
+  @override
+  String get storageInactive => 'Inactive';
+
+  @override
+  String get storageLabelAvailable => 'Available';
+
+  @override
+  String get storageNodeDistributionTitle => 'Used space by node';
+
+  @override
+  String get storagePoolHealthAtRiskLabel => 'At risk';
+
+  @override
+  String get storagePoolHealthHealthyLabel => 'Healthy';
+
+  @override
+  String storagePoolOnNode(String node, String pool) {
+    return '$pool · $node';
+  }
+
+  @override
+  String get storagePoolsSectionTitle => 'Storage pools';
+
+  @override
+  String get storageTypeLabel => 'Type';
+
+  @override
+  String get storageUsageSection => 'Usage';
+
+  @override
+  String get taskDetailLogEmpty => 'No log output.';
+
+  @override
+  String get taskDetailLogError => 'Could not load the task log.';
+
+  @override
+  String get taskDetailLogLoading => 'Loading log…';
+
+  @override
+  String get taskDetailLogTitle => 'Log';
+
+  @override
+  String get taskDetailNodeLabel => 'Node';
+
+  @override
+  String get taskDetailUpidLabel => 'UPID';
+
+  @override
+  String get taskFilterAllGuests => 'All guests';
+
+  @override
+  String get taskFilterByGuest => 'Filter by guest';
+
+  @override
+  String get taskGuestFilterTitle => 'Guest';
+
+  @override
+  String get taskListEmptyMessage =>
+      'No recent tasks were returned for this cluster.';
+
+  @override
+  String get taskListEmptyTitle => 'No tasks';
+
+  @override
+  String get taskListLoadError => 'Could not load tasks.';
+
+  @override
+  String get taskRowDuration => 'Duration';
+
+  @override
+  String get taskRowGuest => 'Guest';
+
+  @override
+  String get taskRowStarted => 'Started';
+
+  @override
+  String get taskRowStatus => 'Status';
+
+  @override
+  String get taskStatusCompleted => 'OK';
+
+  @override
+  String get taskStatusFailed => 'Error';
+
+  @override
+  String get validationFieldRequired => 'This field is required.';
+
+  @override
+  String get validationIntegerPositive => 'Enter a positive whole number.';
+
+  @override
+  String get validationVmidMin => 'Guest ID must be at least 100.';
+
+  @override
+  String get valueUnavailable => '—';
+
+  @override
+  String get vmListEmptyMessage => 'No VMs were returned for this cluster.';
+
+  @override
+  String get vmListEmptyTitle => 'No virtual machines';
+
+  @override
+  String get vmNotFoundMessage =>
+      'This VM is not in the current list. Go back and refresh the list.';
+
+  @override
+  String get vmNotFoundTitle => 'VM not found';
 }

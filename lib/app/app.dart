@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:proxdroid/app/theme/app_colors.dart';
 import 'package:proxdroid/app/router.dart';
 import 'package:proxdroid/app/theme/app_theme.dart';
+import 'package:proxdroid/core/storage/app_settings_repository.dart';
 import 'package:proxdroid/features/settings/providers/settings_providers.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
 
@@ -15,12 +16,14 @@ class ProxDroidApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
     final themeMode = ref.watch(appThemeModeProvider);
+    final localePreference = ref.watch(appLocalePreferenceProvider);
 
     return MaterialApp.router(
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: themeMode,
       routerConfig: router,
+      locale: materialLocaleForPreference(localePreference),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,

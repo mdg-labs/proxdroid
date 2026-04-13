@@ -52,3 +52,16 @@ class DefaultChartTimeframe extends _$DefaultChartTimeframe {
     state = tf;
   }
 }
+
+/// Active [LocalePreference] for [MaterialApp.router]; persisted in hive_ce.
+@Riverpod(keepAlive: true)
+class AppLocalePreference extends _$AppLocalePreference {
+  @override
+  LocalePreference build() =>
+      ref.watch(appSettingsRepositoryProvider).getLocalePreference();
+
+  Future<void> setLocalePreference(LocalePreference value) async {
+    await ref.read(appSettingsRepositoryProvider).setLocalePreference(value);
+    state = value;
+  }
+}
