@@ -7,6 +7,8 @@
 
 ProxDroid fills the gap of high-quality, modern Proxmox VE clients on Android. Built with Flutter and Material 3, it offers VM and container management, real-time resource charts, multi-server support, and a clean dark-theme UI.
 
+**Requirements:** Android **8.0+** (API 26+). A Proxmox VE host you can reach from the device (LAN, VPN, or tunneled HTTPS).
+
 ---
 
 ## Features
@@ -27,14 +29,24 @@ ProxDroid fills the gap of high-quality, modern Proxmox VE clients on Android. B
 
 ## Download
 
-**GitHub Releases:** Prebuilt APKs are attached as **`proxdroid-<tag>.apk`** (for example `proxdroid-v1.0.0-beta.12+1.apk`, matching the `version:` line in `pubspec.yaml`). See [Releases](https://github.com/mdg-labs/proxdroid/releases).
+### Obtainium
+
+[Obtainium](https://github.com/ImranR98/Obtainium) installs and updates ProxDroid from this repo’s GitHub releases (same signing key as manual APK installs, so you can switch without reinstalling if the key matches).
+
+Open the link **on your Android device** (or paste the repo URL in Obtainium → **Add App**):
+
+[![Get it on Obtainium](https://img.shields.io/badge/Get_it_on-Obtainium-teal?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyIDJMMiAyMmgyMEwxMiAyeiIgZmlsbD0id2hpdGUiLz48L3N2Zz4=)](https://apps.obtainium.imranr.dev/redirect.html?r=obtainium://add/https://github.com/mdg-labs/proxdroid)
+
+Prebuilt APKs are attached to each release as **`proxdroid-<tag>.apk`**, where `<tag>` is `v` plus the value from the `version:` line in `pubspec.yaml` (for example `proxdroid-v1.0.0-beta.3+1.apk`). Browse assets at [Releases](https://github.com/mdg-labs/proxdroid/releases) if you prefer a direct download.
+
+### Release channels (maintainers)
 
 - **Beta:** push to the **`beta`** branch with a change to **`pubspec.yaml`**. The version must include **`-beta`**. If the Git tag `v<version>` does not exist yet, [Release APK](https://github.com/mdg-labs/proxdroid/actions/workflows/build.yml) builds a signed APK, creates the tag, and publishes a **pre-release** (release notes: commits since the previous tag).
 - **Stable:** push to **`main`** with a **`pubspec.yaml`** change. The version must **not** include `-beta`. If the tag is new, CI publishes a **draft** release (aggregate notes from beta pre-releases in that cycle); publish the draft on GitHub when ready — it becomes **latest** then.
 
 **Play Store** and **F-Droid** are planned but not available yet.
 
-Maintainers: keep `CHANGELOG.md` updated; release bodies are generated in CI as above (edit the stable draft on GitHub before publishing if needed).
+Maintainers: keep `CHANGELOG.md` updated; release bodies are generated in CI as above (edit the stable draft on GitHub before publishing if needed). See [docs/Release_Runbook.md](docs/Release_Runbook.md) and [docs/Android_release_signing.md](docs/Android_release_signing.md) for signing and workflow details.
 
 ---
 
