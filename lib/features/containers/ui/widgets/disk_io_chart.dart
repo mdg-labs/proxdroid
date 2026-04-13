@@ -10,8 +10,7 @@ import 'package:proxdroid/shared/widgets/resource_chart.dart';
 
 /// Disk read/write history for an LXC container (container detail).
 ///
-/// Series colors per §9: read = [AppColors.chartDiskRead] (amber),
-/// write = [AppColors.chartDiskWrite] (blue-grey).
+/// Read/write hues from [AppColors.chartDiskRead] / [chartDiskWrite] (shared chart palette).
 class ContainerDiskIoChart extends ConsumerWidget {
   const ContainerDiskIoChart({
     required this.node,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:proxdroid/app/theme/app_theme.dart';
 import 'package:proxdroid/core/api/api_exceptions.dart';
 import 'package:proxdroid/core/api/proxmox_api_client.dart';
 import 'package:proxdroid/core/models/server.dart';
@@ -608,6 +609,7 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
         children: [
           AppBar(
             leading: shellAppBarLeading(context),
+            titleSpacing: AppSpacing.sm,
             title: Text(_isEdit ? l10n.screenEditServer : l10n.screenAddServer),
           ),
           const Expanded(child: LoadingShimmer()),
@@ -620,6 +622,7 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
       children: [
         AppBar(
           leading: shellAppBarLeading(context),
+          titleSpacing: AppSpacing.sm,
           title: Text(_isEdit ? l10n.screenEditServer : l10n.screenAddServer),
           actions: [
             TextButton(
@@ -663,7 +666,12 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
                   topSpacing: 0,
                   header: SectionHeader(title: l10n.serverFormIdentitySection),
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.lg,
+                      0,
+                      AppSpacing.lg,
+                      AppSpacing.lg,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -672,7 +680,6 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
                           decoration: InputDecoration(
                             labelText: l10n.serverFieldName,
                             hintText: l10n.serverFieldNameHint,
-                            border: const OutlineInputBorder(),
                           ),
                           textInputAction: TextInputAction.next,
                           validator: (v) {
@@ -688,7 +695,6 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
                           decoration: InputDecoration(
                             labelText: l10n.serverFieldHost,
                             hintText: l10n.serverFieldHostHint,
-                            border: const OutlineInputBorder(),
                           ),
                           textInputAction: TextInputAction.next,
                           autocorrect: false,
@@ -699,7 +705,6 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
                           controller: _portController,
                           decoration: InputDecoration(
                             labelText: l10n.serverFieldPort,
-                            border: const OutlineInputBorder(),
                           ),
                           keyboardType: TextInputType.number,
                           textInputAction: TextInputAction.next,
@@ -718,12 +723,17 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
                     ),
                   ),
                 ),
-                const Divider(height: 1),
+                const SizedBox(height: AppSpacing.md),
                 GroupedSection(
                   topSpacing: 0,
                   header: SectionHeader(title: l10n.serverFormAuthentication),
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.lg,
+                      0,
+                      AppSpacing.lg,
+                      AppSpacing.lg,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -758,7 +768,6 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
                             decoration: InputDecoration(
                               labelText: l10n.serverFieldApiTokenId,
                               hintText: l10n.serverFieldApiTokenIdHint,
-                              border: const OutlineInputBorder(),
                               helperText:
                                   _isEdit
                                       ? l10n.serverApiTokenLeaveBlankHint
@@ -784,7 +793,6 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
                             decoration: InputDecoration(
                               labelText: l10n.serverFieldApiTokenSecret,
                               hintText: l10n.serverFieldApiTokenSecretHint,
-                              border: const OutlineInputBorder(),
                             ),
                             obscureText: true,
                             autocorrect: false,
@@ -799,6 +807,12 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
                           ),
                         ] else ...[
                           Text(
+                            l10n.serverAuthTfaUseApiTokenHint,
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: scheme.onSurfaceVariant),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
                             l10n.serverLoginComposeHint,
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(color: scheme.onSurfaceVariant),
@@ -809,7 +823,6 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
                             decoration: InputDecoration(
                               labelText: l10n.serverFieldUsername,
                               hintText: l10n.serverFieldUsernameHint,
-                              border: const OutlineInputBorder(),
                             ),
                             textInputAction: TextInputAction.next,
                             autocorrect: false,
@@ -830,7 +843,6 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
                             value: _realmDropdownValue,
                             decoration: InputDecoration(
                               labelText: l10n.serverFieldRealm,
-                              border: const OutlineInputBorder(),
                             ),
                             items: [
                               DropdownMenuItem(
@@ -858,7 +870,6 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
                               decoration: InputDecoration(
                                 labelText: l10n.serverFieldRealmCustom,
                                 hintText: l10n.serverFieldRealmCustomHint,
-                                border: const OutlineInputBorder(),
                               ),
                               textInputAction: TextInputAction.next,
                               autocorrect: false,
@@ -881,7 +892,6 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
                             controller: _passwordController,
                             decoration: InputDecoration(
                               labelText: l10n.serverFieldPassword,
-                              border: const OutlineInputBorder(),
                               helperText:
                                   _isEdit
                                       ? l10n.serverPasswordLeaveBlankHint
@@ -902,7 +912,7 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
                     ),
                   ),
                 ),
-                const Divider(height: 1),
+                const SizedBox(height: AppSpacing.md),
                 GroupedSection(
                   topSpacing: 0,
                   header: SectionHeader(title: l10n.serverFormSecuritySection),
@@ -921,36 +931,63 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
                       ),
                       if (_allowSelfSigned) ...[
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                          child: TextFormField(
-                            controller: _pinController,
-                            decoration: InputDecoration(
-                              labelText: l10n.serverTlsPinLabel,
-                              border: const OutlineInputBorder(),
-                              helperText: l10n.serverTlsPinHint,
-                            ),
-                            autocorrect: false,
-                            maxLines: 1,
+                          padding: const EdgeInsets.fromLTRB(
+                            AppSpacing.lg,
+                            0,
+                            AppSpacing.lg,
+                            AppSpacing.sm,
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                          child: OutlinedButton.icon(
-                            onPressed:
-                                _fetchingTlsPin
-                                    ? null
-                                    : _fetchTlsCertificateFingerprint,
-                            icon:
-                                _fetchingTlsPin
-                                    ? const SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                    : const Icon(Icons.fingerprint),
-                            label: Text(l10n.serverTlsPinFetch),
+                          child: Material(
+                            color: scheme.surfaceContainerHigh,
+                            borderRadius: BorderRadius.circular(12),
+                            clipBehavior: Clip.antiAlias,
+                            child: Padding(
+                              padding: const EdgeInsets.all(AppSpacing.lg),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  TextFormField(
+                                    controller: _pinController,
+                                    decoration: InputDecoration(
+                                      labelText: l10n.serverTlsPinLabel,
+                                      helperText: l10n.serverTlsPinHint,
+                                    ),
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodySmall?.copyWith(
+                                      fontFamily: 'monospace',
+                                      fontFamilyFallback: const ['monospace'],
+                                      color: scheme.onSurfaceVariant,
+                                    ),
+                                    autocorrect: false,
+                                    maxLines: 2,
+                                  ),
+                                  const SizedBox(height: AppSpacing.md),
+                                  Align(
+                                    alignment: AlignmentDirectional.centerStart,
+                                    child: FilledButton.tonalIcon(
+                                      onPressed:
+                                          _fetchingTlsPin
+                                              ? null
+                                              : _fetchTlsCertificateFingerprint,
+                                      icon:
+                                          _fetchingTlsPin
+                                              ? SizedBox(
+                                                width: 18,
+                                                height: 18,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                      color: scheme.primary,
+                                                    ),
+                                              )
+                                              : const Icon(Icons.fingerprint),
+                                      label: Text(l10n.serverTlsPinFetch),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ],

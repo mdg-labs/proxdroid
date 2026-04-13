@@ -355,22 +355,22 @@ Phases **depend** in order: **A → B → C** unlock D–G. H runs continuously 
 
 ### Phase E — VM & container surfaces
 
-- [ ] `vm_list_screen.dart`, `container_list_screen.dart`.
-- [ ] `vm_detail_screen.dart`, `container_detail_screen.dart` (include `_VmHeroHeader`, `_MetricGrid` private widgets in file).
-- [ ] `vm_create_screen.dart`, `container_create_screen.dart`.
-- [ ] `vm_edit_screen.dart`, `container_edit_screen.dart`.
-- [ ] VM + container chart widgets + status badges — §3B.
+- [x] `vm_list_screen.dart`, `container_list_screen.dart`.
+- [x] `vm_detail_screen.dart`, `container_detail_screen.dart` (hero/metric-grid replaced by AppBar identity + shared `GuestInstrumentMetricGrid`).
+- [x] `vm_create_screen.dart`, `container_create_screen.dart`.
+- [x] `vm_edit_screen.dart`, `container_edit_screen.dart`.
+- [x] VM + container chart widgets + status badges — §3B.
 
 ### Phase F — Storage
 
-- [ ] `storage_list_screen.dart`, `storage_detail_screen.dart`.
+- [x] `storage_list_screen.dart`, `storage_detail_screen.dart`.
 
 ### Phase G — Operations & admin
 
-- [ ] `task_list_screen.dart` (include bottom sheet unification), `task_detail_screen.dart`.
-- [ ] `backup_list_screen.dart`, `trigger_backup_sheet.dart`.
-- [ ] `server_list_screen.dart`, `server_editor_page.dart`, `add_server_screen.dart`, `edit_server_screen.dart`.
-- [ ] `settings_screen.dart`, `preferences_screen.dart`.
+- [x] `task_list_screen.dart` (include bottom sheet unification), `task_detail_screen.dart`.
+- [x] `backup_list_screen.dart`, `trigger_backup_sheet.dart`.
+- [x] `server_list_screen.dart`, `server_editor_page.dart`, `add_server_screen.dart`, `edit_server_screen.dart`.
+- [x] `settings_screen.dart`, `preferences_screen.dart`.
 
 ### Phase H — QA, a11y, closure
 
@@ -403,3 +403,6 @@ This file is the **source of truth** for Stitch UI refactors (not `ProxDroid_Roa
 - `2026-04-13 — Phase C: cardTheme uses surfaceContainer + zero margin; ink uses cyan-tinted splashColor / hoverColor / highlightColor / focusColor with InkRipple. InputDecorationTheme uses filled surfaceContainerHigh wells + StitchBottomInputBorder (lib/app/theme/stitch_bottom_input_border.dart) for hairline rest + primary bottom glow on focus and on focused error; SegmentedButtonTheme track = surfaceContainerHigh, selected = primaryContainer ~72% alpha, no outline. Shared widgets: tonal strips (power actions, labeled rows, list rows / dividers softened), gauges with primary → primaryContainer gradient fill, charts with softer grid/axes, network/disk second series area fill under line, disk series pinned to AppColors.chartDiskRead / chartDiskWrite, connectivity strip bottom accent → primary (gold removed from that strip), ProxmoxTagBadge ghost outline when tag fill vs #0c0e17 contrast is under 1.28 (user hex preserved). Guest config fields drop per-field OutlineInputBorder overrides so theme borders apply. §3B chart helper: not added — chart styling stays in resource_chart.dart plus existing AppColors disk hues.`
 - `2026-04-13 — Phase C (verification pass): [ResourceLineChart] resolves omitted [secondaryColor] to [AppColors.chartNetworkOut] when [metric] is network (call sites may still pass explicitly). [IconBadgeAvatar] drops box border in favor of tonal [surfaceContainerHigh] + soft primary-tinted shadow only. Full CI chain re-run: analyze + test exit 0.`
 - `2026-04-13 — Phase D: Dashboard uses three [surface_container_low] summary tiles (running VMs, total LXC, online/total nodes), a [surface_container] cluster CPU/RAM card, and a responsive node grid with 4px primary/tertiary accent + [ResourceGaugeRow] micro bars (no per-card embedded RRD). **Cluster chart data:** new [clusterAggregatedNodeRrdProvider] in [rrd_providers.dart] loads [GET /nodes/{node}/rrddata] for each **online** node (same [ChartTimeframe] as the card), merges samples **by index** (Proxmox-aligned rows): **CPU** = mean of per-node CPU samples (normalized like chart layer); **memory** = **sum** of per-node `mem` bytes per sample (cluster total RAM in use). Nodes whose RRD fetch throws are omitted (partial cluster); empty or non-plottable series shows [chartNoData]. One new ARB key: [dashboardSummaryOnlineNodes]. Node detail: dense AppBar (name + status · entity), hero panel matches dashboard node chrome + gauges, metric bento uses tonal cells without divider grid; node disk empty state uses chart-well surface.`
+- `2026-04-13 — Phase E: VM/LXC **lists** use tonal [surface_container] rows, neutral icon wells, 4px primary-tint accent strip (not status wash), [SearchBar] ghost outline; status remains on [VmStatusBadge]/[ContainerStatusBadge]. **Detail:** AppBar primary title = guest name, subtitle = status · node · ID; [GuestPowerActionIconPills] unchanged semantically; **timeframe pills above** the new **2×2** [GuestInstrumentMetricGrid] ([lib/shared/widgets/guest_instrument_metric_grid.dart]) fed by existing [vmRrdDataProvider]/[lxcRrdDataProvider] + live snapshot headlines; tags (+ LXC ostype when present) in a tonal card; charts unchanged below. **Create:** section blocks wrapped in [Card] + gradient primary submit. **Edit:** removed [Divider] chains between [GroupedSection]s, [OutlineInputBorder] dropped for theme filled fields. **§3B:** no new chart helper type—VM/container chart files got doc comment alignment with [ColorScheme]/[AppColors] only; one ARB key [guestDetailMetricGridSemantics].`
+- `2026-04-13 — Phase G: **Tasks** — guest filter uses [showPremiumModalBottomSheet] + [PremiumBottomSheet]; filter search field uses theme [InputDecoration]; list tiles + status summary strip are tonal (no hairline border on summary, soft shadow). **Task detail** — dense AppBar (title + node·UPID), log lines monospace + [onSurfaceVariant] in a [surfaceContainerHigh] well. **Backups** — job rows, expansion groups, and recent vzdump rows on [Card] + consistent padding; **trigger backup** sheet wraps form in [surfaceContainer] card, dropdowns in filled wells ([DropdownButtonHideUnderline]). **Servers** — list rows are [surfaceContainer] cards with optional 4px primary gradient accent + [shellConnectedLabel] chip when row matches [selectedServerProvider]; **editor** — all [OutlineInputBorder] overrides removed for theme wells; TLS pin block in [surfaceContainerHigh] inset with monospace-friendly pin text and [FilledButton.tonalIcon] fetch. **Settings / preferences** — [surfaceContainerLowest] scaffold behind grouped [surfaceContainer] section cards; soft internal dividers only. No router or shell changes.`
+- `2026-04-13 — Phase F: Storage **list** uses a [surface_container] hero ([storageClusterHeroTitle]) with [ResourceGaugeRow] fed by **real** sums of `used`/`total` only across pools where both are present (same pairing as per-card usage); two [surface_container_low] tiles count **healthy** (active and usage below 65% or usage unknown) vs **at risk** (inactive or usage at/above 65%, matching gauge warning/error semantics). Pool rows are Stitch-style cards (4px accent from status/usage, neutral icon well, [StatusBadge], gradient gauge via [ResourceGaugeRow]). **Node distribution:** horizontal “used by node” bars when at least **two nodes** appear in the cluster list **and** summed `used` (pools with non-null `used` ≥0) is **positive**—values are grouped sums from [allClusterStorageProvider] only (no new API). **Detail** screen aligns header + usage + metadata with the same accent + tonal surfaces; content rows use [surface_container] tiles instead of default [Card]s.`

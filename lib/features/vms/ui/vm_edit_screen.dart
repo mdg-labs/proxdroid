@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:proxdroid/app/theme/app_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:proxdroid/core/models/guest_config_indexed_line.dart';
@@ -141,7 +142,7 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
         controller: _ostype,
         decoration: InputDecoration(
           labelText: l10n.guestConfigFieldGuestOs,
-          border: const OutlineInputBorder(),
+          filled: true,
         ),
         textInputAction: TextInputAction.next,
       );
@@ -486,7 +487,7 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
                               controller: _name,
                               decoration: InputDecoration(
                                 labelText: l10n.guestConfigFieldVmName,
-                                border: const OutlineInputBorder(),
+                                filled: true,
                               ),
                               textInputAction: TextInputAction.next,
                             ),
@@ -495,7 +496,7 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
                               controller: _description,
                               decoration: InputDecoration(
                                 labelText: l10n.guestConfigFieldDescription,
-                                border: const OutlineInputBorder(),
+                                filled: true,
                               ),
                               textInputAction: TextInputAction.next,
                               maxLines: 3,
@@ -505,7 +506,7 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
                               controller: _tags,
                               decoration: InputDecoration(
                                 labelText: l10n.guestConfigFieldTags,
-                                border: const OutlineInputBorder(),
+                                filled: true,
                               ),
                               textInputAction: TextInputAction.next,
                             ),
@@ -513,9 +514,8 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
                         ),
                       ),
                     ),
-                    const Divider(height: 1),
                     GroupedSection(
-                      topSpacing: 0,
+                      topSpacing: AppSpacing.lg,
                       header: SectionHeader(
                         title: l10n.guestConfigSectionResources,
                       ),
@@ -526,16 +526,15 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
                           controller: _memory,
                           decoration: InputDecoration(
                             labelText: l10n.guestConfigFieldMemory,
-                            border: const OutlineInputBorder(),
+                            filled: true,
                           ),
                           keyboardType: TextInputType.number,
                           textInputAction: TextInputAction.next,
                         ),
                       ),
                     ),
-                    const Divider(height: 1),
                     GroupedSection(
-                      topSpacing: 0,
+                      topSpacing: AppSpacing.lg,
                       header: SectionHeader(title: l10n.guestConfigSectionCpu),
                       gapAfterHeader: 8,
                       child: Padding(
@@ -547,7 +546,7 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
                               controller: _sockets,
                               decoration: InputDecoration(
                                 labelText: l10n.guestConfigFieldSockets,
-                                border: const OutlineInputBorder(),
+                                filled: true,
                               ),
                               keyboardType: TextInputType.number,
                               textInputAction: TextInputAction.next,
@@ -557,7 +556,7 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
                               controller: _cores,
                               decoration: InputDecoration(
                                 labelText: l10n.guestConfigFieldCores,
-                                border: const OutlineInputBorder(),
+                                filled: true,
                               ),
                               keyboardType: TextInputType.number,
                               textInputAction: TextInputAction.next,
@@ -567,7 +566,7 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
                               controller: _vcpus,
                               decoration: InputDecoration(
                                 labelText: l10n.guestConfigFieldVcpus,
-                                border: const OutlineInputBorder(),
+                                filled: true,
                               ),
                               keyboardType: TextInputType.number,
                               textInputAction: TextInputAction.next,
@@ -577,7 +576,7 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
                               controller: _cpu,
                               decoration: InputDecoration(
                                 labelText: l10n.guestConfigFieldCpuType,
-                                border: const OutlineInputBorder(),
+                                filled: true,
                               ),
                               textInputAction: TextInputAction.next,
                             ),
@@ -587,9 +586,8 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
                         ),
                       ),
                     ),
-                    const Divider(height: 1),
                     GroupedSection(
-                      topSpacing: 0,
+                      topSpacing: AppSpacing.lg,
                       header: SectionHeader(
                         title: l10n.guestConfigSectionNetworks,
                       ),
@@ -688,9 +686,8 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
                         ),
                       ),
                     ),
-                    const Divider(height: 1),
                     GroupedSection(
-                      topSpacing: 0,
+                      topSpacing: AppSpacing.lg,
                       header: SectionHeader(
                         title: l10n.guestConfigSectionDisks,
                       ),
@@ -804,9 +801,8 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
                         ),
                       ),
                     ),
-                    const Divider(height: 1),
                     GroupedSection(
-                      topSpacing: 0,
+                      topSpacing: AppSpacing.lg,
                       header: SectionHeader(title: l10n.guestConfigSectionBoot),
                       gapAfterHeader: 8,
                       child: Padding(
@@ -828,7 +824,7 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
                               controller: _startup,
                               decoration: InputDecoration(
                                 labelText: l10n.guestConfigFieldStartupOrder,
-                                border: const OutlineInputBorder(),
+                                filled: true,
                               ),
                               textInputAction: TextInputAction.next,
                             ),
@@ -836,9 +832,8 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
                         ),
                       ),
                     ),
-                    const Divider(height: 1),
                     GroupedSection(
-                      topSpacing: 0,
+                      topSpacing: AppSpacing.lg,
                       header: SectionHeader(
                         title: l10n.guestConfigSectionOptions,
                       ),
@@ -849,7 +844,7 @@ class _VmEditScreenState extends ConsumerState<VmEditScreen> {
                           controller: _agent,
                           decoration: InputDecoration(
                             labelText: l10n.guestConfigFieldQemuAgent,
-                            border: const OutlineInputBorder(),
+                            filled: true,
                           ),
                           textInputAction: TextInputAction.done,
                         ),

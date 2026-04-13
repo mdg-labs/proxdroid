@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:proxdroid/app/theme/app_theme.dart';
+import 'package:proxdroid/core/models/storage.dart';
 import 'package:proxdroid/core/utils/formatters.dart';
 import 'package:proxdroid/features/servers/ui/proxmox_exception_messages.dart';
 import 'package:proxdroid/features/storage/providers/storage_providers.dart';
@@ -12,6 +15,17 @@ import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
 import 'package:proxdroid/shared/widgets/resource_gauge_row.dart';
 import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
 import 'package:proxdroid/shared/widgets/status_badge.dart';
+
+Color _storageDetailAccent(Storage s, ColorScheme scheme) {
+  if (!s.active) return scheme.tertiary;
+  final t = s.total;
+  final u = s.used;
+  if (t == null || t <= 0 || u == null || u < 0) return scheme.primary;
+  final f = (u / t).clamp(0.0, 1.0);
+  if (f >= 0.85) return scheme.error;
+  if (f >= 0.65) return scheme.tertiary;
+  return scheme.primary;
+}
 
 class StorageDetailScreen extends ConsumerWidget {
   const StorageDetailScreen({
@@ -89,82 +103,147 @@ class StorageDetailScreen extends ConsumerWidget {
                 ),
             data: (s) {
               final frac = _usageFraction(s.total, s.used);
+              final accent = _storageDetailAccent(s, scheme);
               return RefreshIndicator(
                 onRefresh: pullRefresh,
                 child: CustomScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   slivers: [
                     SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.lg,
+                        AppSpacing.md,
+                        AppSpacing.lg,
+                        0,
+                      ),
                       sliver: SliverToBoxAdapter(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            // — Premium header (T6.5 / T6.7) —
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                IconBadgeAvatar(
-                                  icon: Icons.storage_rounded,
-                                  size: 56,
-                                  iconSize: 28,
-                                  borderRadius: 14,
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              s.id,
-                                              style: tt.titleLarge,
+                            DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: scheme.surfaceContainer,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: IntrinsicHeight(
+                                child: Row(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Container(width: 4, color: accent),
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                          AppSpacing.md,
+                                          AppSpacing.md,
+                                          AppSpacing.md,
+                                          AppSpacing.md,
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                IconBadgeAvatar(
+                                                  icon: Icons.storage_rounded,
+                                                  size: 56,
+                                                  iconSize: 28,
+                                                  borderRadius: 14,
+                                                ),
+                                                const SizedBox(
+                                                  width: AppSpacing.sm,
+                                                ),
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Row(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Expanded(
+                                                            child: Text(
+                                                              s.id,
+                                                              style: tt
+                                                                  .titleLarge
+                                                                  ?.copyWith(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                          StatusBadge(
+                                                            label:
+                                                                s.active
+                                                                    ? l10n
+                                                                        .storageActive
+                                                                    : l10n
+                                                                        .storageInactive,
+                                                            variant:
+                                                                s.active
+                                                                    ? StatusBadgeVariant
+                                                                        .success
+                                                                    : StatusBadgeVariant
+                                                                        .neutral,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      const SizedBox(height: 4),
+                                                      Text(
+                                                        s.node,
+                                                        style: tt.bodySmall
+                                                            ?.copyWith(
+                                                              color:
+                                                                  scheme
+                                                                      .onSurfaceVariant,
+                                                            ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ),
-                                          StatusBadge(
-                                            label:
-                                                s.active
-                                                    ? l10n.storageActive
-                                                    : l10n.storageInactive,
-                                            variant:
-                                                s.active
-                                                    ? StatusBadgeVariant.success
-                                                    : StatusBadgeVariant
-                                                        .neutral,
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        s.node,
-                                        style: tt.bodySmall?.copyWith(
-                                          color: scheme.onSurfaceVariant,
+                                            const SizedBox(
+                                              height: AppSpacing.md,
+                                            ),
+                                            ResourceGaugeRow(
+                                              label: l10n.storageUsageSection,
+                                              value: frac,
+                                              valueSuffix:
+                                                  frac != null
+                                                      ? formatMemoryRatio(
+                                                        s.used,
+                                                        s.total,
+                                                      )
+                                                      : l10n.valueUnavailable,
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              ),
                             ),
-                            const SizedBox(height: 16),
-
-                            // — Metadata rows —
-                            Card(
-                              margin: EdgeInsets.zero,
-                              shape: RoundedRectangleBorder(
+                            const SizedBox(height: AppSpacing.md),
+                            DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: scheme.surfaceContainerHigh,
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                  16,
-                                  12,
-                                  16,
-                                  4,
+                                  AppSpacing.lg,
+                                  AppSpacing.md,
+                                  AppSpacing.lg,
+                                  AppSpacing.sm,
                                 ),
                                 child: Column(
                                   crossAxisAlignment:
@@ -195,23 +274,12 @@ class StorageDetailScreen extends ConsumerWidget {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 16),
-
-                            // — Usage gauge (T6.5: ResourceGaugeRow) —
-                            ResourceGaugeRow(
-                              label: l10n.storageUsageSection,
-                              value: frac,
-                              valueSuffix:
-                                  frac != null
-                                      ? formatMemoryRatio(s.used, s.total)
-                                      : l10n.valueUnavailable,
-                            ),
-                            const SizedBox(height: 24),
-
-                            // — Content section header —
+                            const SizedBox(height: AppSpacing.lg),
                             Text(
                               l10n.storageDetailContentTitle,
-                              style: tt.titleMedium,
+                              style: tt.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ],
                         ),
@@ -221,14 +289,14 @@ class StorageDetailScreen extends ConsumerWidget {
                       loading:
                           () => const SliverToBoxAdapter(
                             child: Padding(
-                              padding: EdgeInsets.all(16),
+                              padding: EdgeInsets.all(AppSpacing.lg),
                               child: LoadingShimmer(itemCount: 3),
                             ),
                           ),
                       error:
                           (e, _) => SliverToBoxAdapter(
                             child: Padding(
-                              padding: const EdgeInsets.all(16),
+                              padding: const EdgeInsets.all(AppSpacing.lg),
                               child: ErrorView(
                                 message: proxmoxExceptionMessage(e, l10n),
                                 onRetry: () => _refresh(ref),
@@ -240,8 +308,8 @@ class StorageDetailScreen extends ConsumerWidget {
                           return SliverToBoxAdapter(
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
-                                vertical: 24,
-                                horizontal: 16,
+                                vertical: AppSpacing.xl,
+                                horizontal: AppSpacing.lg,
                               ),
                               child: EmptyState(
                                 icon: Icons.folder_open_outlined,
@@ -251,41 +319,71 @@ class StorageDetailScreen extends ConsumerWidget {
                             ),
                           );
                         }
-                        return SliverList(
-                          delegate: SliverChildBuilderDelegate((context, i) {
-                            final c = items[i];
-                            return Card(
-                              margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                              child: ListTile(
-                                title: Text(
-                                  c.volid,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
+                        return SliverPadding(
+                          padding: const EdgeInsets.fromLTRB(
+                            AppSpacing.lg,
+                            AppSpacing.sm,
+                            AppSpacing.lg,
+                            0,
+                          ),
+                          sliver: SliverList.separated(
+                            itemCount: items.length,
+                            separatorBuilder:
+                                (_, _) => const SizedBox(height: AppSpacing.sm),
+                            itemBuilder: (context, i) {
+                              final c = items[i];
+                              return DecoratedBox(
+                                decoration: BoxDecoration(
+                                  color: scheme.surfaceContainer,
+                                  borderRadius: BorderRadius.circular(14),
                                 ),
-                                subtitle: Text(
-                                  [
-                                    if (c.vmid != null)
-                                      '${l10n.labelVmid} ${c.vmid}',
-                                    if (c.format.isNotEmpty)
-                                      '${l10n.labelFormat}: ${c.format}',
-                                    if (c.content.isNotEmpty)
-                                      '${l10n.labelContentKind}: ${c.content}',
-                                    if (c.ctime != null)
-                                      formatProxmoxUnixSeconds(c.ctime),
-                                    if (c.size != null) formatBytes(c.size),
-                                  ].where((e) => e.isNotEmpty).join(' · '),
-                                  style: tt.bodySmall?.copyWith(
-                                    color: scheme.onSurfaceVariant,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: AppSpacing.md,
+                                    vertical: AppSpacing.sm,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        c.volid,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: tt.titleSmall?.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        [
+                                          if (c.vmid != null)
+                                            '${l10n.labelVmid} ${c.vmid}',
+                                          if (c.format.isNotEmpty)
+                                            '${l10n.labelFormat}: ${c.format}',
+                                          if (c.content.isNotEmpty)
+                                            '${l10n.labelContentKind}: ${c.content}',
+                                          if (c.ctime != null)
+                                            formatProxmoxUnixSeconds(c.ctime),
+                                          if (c.size != null)
+                                            formatBytes(c.size),
+                                        ].where((e) => e.isNotEmpty).join(' · '),
+                                        style: tt.bodySmall?.copyWith(
+                                          color: scheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                isThreeLine: true,
-                              ),
-                            );
-                          }, childCount: items.length),
+                              );
+                            },
+                          ),
                         );
                       },
                     ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                    const SliverToBoxAdapter(
+                      child: SizedBox(height: AppSpacing.xl),
+                    ),
                   ],
                 ),
               );

@@ -281,178 +281,227 @@ class _ContainerCreateScreenState extends ConsumerState<ContainerCreateScreen> {
               ),
               children: [
                 GroupedSection(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      SectionHeader(title: l10n.guestCreateSectionTarget),
-                      DropdownButtonFormField<String>(
-                        // Controlled selection; `initialValue` only applies on first build.
-                        // ignore: deprecated_member_use
-                        value: resolved,
-                        decoration: InputDecoration(
-                          labelText: l10n.entityNode,
-                          filled: true,
-                        ),
-                        items:
-                            nodes
-                                .map(
-                                  (n) => DropdownMenuItem(
-                                    value: n.name,
-                                    child: Text(n.name),
-                                  ),
-                                )
-                                .toList(),
-                        onChanged:
-                            _submitting
-                                ? null
-                                : (v) {
-                                  if (v != null) {
-                                    setState(() => _selectedNode = v);
-                                  }
-                                },
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.lg,
+                        AppSpacing.md,
+                        AppSpacing.lg,
+                        AppSpacing.lg,
                       ),
-                      const SizedBox(height: AppSpacing.md),
-                      TextFormField(
-                        controller: _vmid,
-                        decoration: InputDecoration(
-                          labelText: l10n.labelCtid,
-                          filled: true,
-                        ),
-                        keyboardType: TextInputType.number,
-                        validator: (v) => _vmidValidator(v, l10n),
-                        readOnly: _submitting,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          SectionHeader(title: l10n.guestCreateSectionTarget),
+                          DropdownButtonFormField<String>(
+                            // Controlled selection; `initialValue` only applies on first build.
+                            // ignore: deprecated_member_use
+                            value: resolved,
+                            decoration: InputDecoration(
+                              labelText: l10n.entityNode,
+                              filled: true,
+                            ),
+                            items:
+                                nodes
+                                    .map(
+                                      (n) => DropdownMenuItem(
+                                        value: n.name,
+                                        child: Text(n.name),
+                                      ),
+                                    )
+                                    .toList(),
+                            onChanged:
+                                _submitting
+                                    ? null
+                                    : (v) {
+                                      if (v != null) {
+                                        setState(() => _selectedNode = v);
+                                      }
+                                    },
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          TextFormField(
+                            controller: _vmid,
+                            decoration: InputDecoration(
+                              labelText: l10n.labelCtid,
+                              filled: true,
+                            ),
+                            keyboardType: TextInputType.number,
+                            validator: (v) => _vmidValidator(v, l10n),
+                            readOnly: _submitting,
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 GroupedSection(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      SectionHeader(title: l10n.guestConfigSectionIdentity),
-                      TextFormField(
-                        controller: _hostname,
-                        decoration: InputDecoration(
-                          labelText: l10n.guestConfigFieldHostname,
-                          filled: true,
-                        ),
-                        validator: (v) => _required(v, l10n),
-                        readOnly: _submitting,
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.lg,
+                        AppSpacing.md,
+                        AppSpacing.lg,
+                        AppSpacing.lg,
                       ),
-                      const SizedBox(height: AppSpacing.md),
-                      TextFormField(
-                        controller: _password,
-                        decoration: InputDecoration(
-                          labelText: l10n.guestCreateFieldRootPassword,
-                          filled: true,
-                        ),
-                        obscureText: true,
-                        validator: (v) => _required(v, l10n),
-                        readOnly: _submitting,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          SectionHeader(title: l10n.guestConfigSectionIdentity),
+                          TextFormField(
+                            controller: _hostname,
+                            decoration: InputDecoration(
+                              labelText: l10n.guestConfigFieldHostname,
+                              filled: true,
+                            ),
+                            validator: (v) => _required(v, l10n),
+                            readOnly: _submitting,
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          TextFormField(
+                            controller: _password,
+                            decoration: InputDecoration(
+                              labelText: l10n.guestCreateFieldRootPassword,
+                              filled: true,
+                            ),
+                            obscureText: true,
+                            validator: (v) => _required(v, l10n),
+                            readOnly: _submitting,
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          SwitchListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(l10n.guestConfigFieldUnprivileged),
+                            value: _unprivileged,
+                            onChanged:
+                                _submitting
+                                    ? null
+                                    : (v) => setState(() => _unprivileged = v),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: AppSpacing.md),
-                      SwitchListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(l10n.guestConfigFieldUnprivileged),
-                        value: _unprivileged,
-                        onChanged:
-                            _submitting
-                                ? null
-                                : (v) => setState(() => _unprivileged = v),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 GroupedSection(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      SectionHeader(title: l10n.guestConfigSectionResources),
-                      TextFormField(
-                        controller: _memory,
-                        decoration: InputDecoration(
-                          labelText: l10n.guestConfigFieldMemory,
-                          filled: true,
-                        ),
-                        keyboardType: TextInputType.number,
-                        validator: (v) => _positiveInt(v, l10n),
-                        readOnly: _submitting,
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.lg,
+                        AppSpacing.md,
+                        AppSpacing.lg,
+                        AppSpacing.lg,
                       ),
-                      const SizedBox(height: AppSpacing.md),
-                      IgnorePointer(
-                        ignoring: _submitting,
-                        child: GuestStringDropdown(
-                          label: l10n.guestConfigFieldGuestOs,
-                          ids: pveLxcOstypeIds,
-                          value: _ostype,
-                          enabled: !_submitting,
-                          onChanged:
-                              (v) => setState(() {
-                                if (v != null) {
-                                  _ostype = v;
-                                }
-                              }),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 4, left: 12),
-                        child: Text(
-                          l10n.guestCreateCtOstypeHint,
-                          style: tt.bodySmall?.copyWith(
-                            color: scheme.onSurfaceVariant,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          SectionHeader(
+                            title: l10n.guestConfigSectionResources,
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      Text(l10n.guestConfigFieldRootfs, style: tt.titleSmall),
-                      const SizedBox(height: AppSpacing.sm),
-                      GuestDiskVolumeEditor(
-                        key: ValueKey<String>('rootfs-$resolved'),
-                        node: resolved,
-                        contentKind: 'rootdir',
-                        value: _rootfs,
-                        enabled: !_submitting,
-                        onChanged: (s) => setState(() => _rootfs = s),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 4, left: 12),
-                        child: Text(
-                          l10n.guestCreateFieldRootfsHint,
-                          style: tt.bodySmall?.copyWith(
-                            color: scheme.onSurfaceVariant,
+                          TextFormField(
+                            controller: _memory,
+                            decoration: InputDecoration(
+                              labelText: l10n.guestConfigFieldMemory,
+                              filled: true,
+                            ),
+                            keyboardType: TextInputType.number,
+                            validator: (v) => _positiveInt(v, l10n),
+                            readOnly: _submitting,
                           ),
-                        ),
+                          const SizedBox(height: AppSpacing.md),
+                          IgnorePointer(
+                            ignoring: _submitting,
+                            child: GuestStringDropdown(
+                              label: l10n.guestConfigFieldGuestOs,
+                              ids: pveLxcOstypeIds,
+                              value: _ostype,
+                              enabled: !_submitting,
+                              onChanged:
+                                  (v) => setState(() {
+                                    if (v != null) {
+                                      _ostype = v;
+                                    }
+                                  }),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4, left: 12),
+                            child: Text(
+                              l10n.guestCreateCtOstypeHint,
+                              style: tt.bodySmall?.copyWith(
+                                color: scheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          Text(
+                            l10n.guestConfigFieldRootfs,
+                            style: tt.titleSmall,
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          GuestDiskVolumeEditor(
+                            key: ValueKey<String>('rootfs-$resolved'),
+                            node: resolved,
+                            contentKind: 'rootdir',
+                            value: _rootfs,
+                            enabled: !_submitting,
+                            onChanged: (s) => setState(() => _rootfs = s),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4, left: 12),
+                            child: Text(
+                              l10n.guestCreateFieldRootfsHint,
+                              style: tt.bodySmall?.copyWith(
+                                color: scheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          Text(l10n.guestCreateFieldNet0, style: tt.titleSmall),
+                          const SizedBox(height: AppSpacing.sm),
+                          GuestNetLineEditor(
+                            key: ValueKey<String>('net-$resolved'),
+                            node: resolved,
+                            isQemu: false,
+                            value: _net0,
+                            enabled: !_submitting,
+                            onChanged: (s) => setState(() => _net0 = s),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: AppSpacing.md),
-                      Text(l10n.guestCreateFieldNet0, style: tt.titleSmall),
-                      const SizedBox(height: AppSpacing.sm),
-                      GuestNetLineEditor(
-                        key: ValueKey<String>('net-$resolved'),
-                        node: resolved,
-                        isQemu: false,
-                        value: _net0,
-                        enabled: !_submitting,
-                        onChanged: (s) => setState(() => _net0 = s),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xl),
-                FilledButton(
-                  onPressed: _submitting ? null : () => _submit(l10n),
-                  child:
-                      _submitting
-                          ? SizedBox(
-                            height: 22,
-                            width: 22,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: scheme.onPrimary,
-                            ),
-                          )
-                          : Text(l10n.guestCreateSubmit),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    gradient: LinearGradient(
+                      colors: [scheme.primary, scheme.primaryContainer],
+                    ),
+                  ),
+                  child: FilledButton(
+                    onPressed: _submitting ? null : () => _submit(l10n),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      foregroundColor: scheme.onPrimary,
+                      shadowColor: Colors.transparent,
+                      elevation: 0,
+                    ),
+                    child:
+                        _submitting
+                            ? SizedBox(
+                              height: 22,
+                              width: 22,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: scheme.onPrimary,
+                              ),
+                            )
+                            : Text(l10n.guestCreateSubmit),
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Text(

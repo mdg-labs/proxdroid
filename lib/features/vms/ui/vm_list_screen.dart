@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:proxdroid/app/theme/app_colors.dart';
 import 'package:proxdroid/app/theme/app_theme.dart';
 import 'package:proxdroid/core/models/vm.dart';
 import 'package:proxdroid/core/utils/formatters.dart';
@@ -71,15 +70,6 @@ class _VmListScreenState extends ConsumerState<VmListScreen> {
     }
     out.sort(_compareVm);
     return out;
-  }
-
-  Color _vmStatusAccent(VmStatus status) {
-    return switch (status) {
-      VmStatus.running => AppColors.darkStatusSuccessForeground,
-      VmStatus.paused => AppColors.darkStatusWarningForeground,
-      VmStatus.stopped => AppColors.darkStatusStoppedForeground,
-      VmStatus.unknown => AppColors.darkStatusStoppedForeground,
-    };
   }
 
   @override
@@ -210,12 +200,16 @@ class _VmListScreenState extends ConsumerState<VmListScreen> {
                           onChanged: (v) => setState(() => _searchQuery = v),
                           elevation: const WidgetStatePropertyAll(0),
                           backgroundColor: WidgetStatePropertyAll(
-                            scheme.surfaceContainerHighest,
+                            scheme.surfaceContainerHigh,
                           ),
                           shape: WidgetStatePropertyAll(
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
-                              side: BorderSide(color: scheme.outlineVariant),
+                              side: BorderSide(
+                                color: scheme.outlineVariant.withValues(
+                                  alpha: 0.28,
+                                ),
+                              ),
                             ),
                           ),
                           padding: const WidgetStatePropertyAll(
@@ -301,12 +295,10 @@ class _VmListScreenState extends ConsumerState<VmListScreen> {
                     sliver: SliverList(
                       delegate: SliverChildBuilderDelegate((context, index) {
                         final vm = filtered[index];
-                        final accent = _vmStatusAccent(vm.status);
                         return Padding(
                           padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                           child: _VmListTile(
                             vm: vm,
-                            accent: accent,
                             clusterTagHexByLabel: tagColorMap,
                             l10n: l10n,
                             scheme: scheme,
@@ -336,7 +328,6 @@ class _VmListScreenState extends ConsumerState<VmListScreen> {
 class _VmListTile extends StatelessWidget {
   const _VmListTile({
     required this.vm,
-    required this.accent,
     required this.clusterTagHexByLabel,
     required this.l10n,
     required this.scheme,
@@ -345,7 +336,6 @@ class _VmListTile extends StatelessWidget {
   });
 
   final Vm vm;
-  final Color accent;
   final Map<String, String> clusterTagHexByLabel;
   final AppLocalizations l10n;
   final ColorScheme scheme;
@@ -356,8 +346,10 @@ class _VmListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final name = vm.name.isEmpty ? '${l10n.labelVmid} ${vm.vmid}' : vm.name;
 
+    final strip = scheme.primary.withValues(alpha: 0.35);
+
     return Material(
-      color: scheme.surfaceContainerHighest,
+      color: scheme.surfaceContainer,
       borderRadius: BorderRadius.circular(14),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -366,9 +358,7 @@ class _VmListTile extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Status accent strip
-              Container(width: 3, color: accent),
-              // Leading icon
+              Container(width: 4, color: strip),
               Padding(
                 padding: const EdgeInsets.fromLTRB(
                   AppSpacing.md,
@@ -380,11 +370,15 @@ class _VmListTile extends StatelessWidget {
                   width: 38,
                   height: 38,
                   decoration: BoxDecoration(
-                    color: accent.withValues(alpha: 0.12),
+                    color: scheme.surfaceContainerHigh,
                     borderRadius: BorderRadius.circular(9),
                   ),
                   alignment: Alignment.center,
-                  child: Icon(Icons.computer_rounded, color: accent, size: 20),
+                  child: Icon(
+                    Icons.computer_rounded,
+                    color: scheme.onSurfaceVariant,
+                    size: 20,
+                  ),
                 ),
               ),
               // Text content

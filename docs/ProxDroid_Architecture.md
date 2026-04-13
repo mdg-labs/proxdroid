@@ -279,6 +279,7 @@ Default CA validation applies when `allowSelfSigned` is false (standard `IOHttpC
 2. Username/Password → POST `/access/ticket` → returns `ticket` (used as cookie `PVEAuthCookie`) + `CSRFPreventionToken` (sent as header on all mutating requests)
    - Ticket expires after **2 hours** (PVE default). The interceptor must detect a `401` response and automatically re-authenticate before retrying the original request.
    - Store ticket and CSRF token in memory only (never on disk) — re-authenticate on app restart.
+   - **TFA (2FA):** password login in the app does not complete TOTP/WebAuthn second-factor flows. The add/edit server UI directs users with TFA-enabled accounts to use **API token** authentication instead.
 
 ---
 

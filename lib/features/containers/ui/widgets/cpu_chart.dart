@@ -9,7 +9,7 @@ import 'package:proxdroid/shared/widgets/resource_chart.dart';
 
 /// CPU history for an LXC container (container detail).
 ///
-/// Series color: [ColorScheme.primary] (blue) per §9.
+/// Series color: [ColorScheme.primary] (Stitch cyan).
 class ContainerCpuChart extends ConsumerWidget {
   const ContainerCpuChart({
     required this.node,

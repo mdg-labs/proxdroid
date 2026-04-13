@@ -52,162 +52,202 @@ class SettingsScreen extends ConsumerWidget {
 
     return ShellSectionBody(
       title: Text(l10n.sectionSettings),
-      body: ListView(
-        padding: const EdgeInsets.only(bottom: 24),
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg,
-              AppSpacing.sm,
-              AppSpacing.lg,
-              AppSpacing.xl,
-            ),
-            child: Column(
-              children: [
-                Image.asset(
-                  'assets/icon/proxdroid_icon_foreground.png',
-                  width: 88,
-                  height: 88,
-                  filterQuality: FilterQuality.medium,
-                  semanticLabel: l10n.appTitle,
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  l10n.appTitle,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: -0.25,
-                    color: scheme.onSurface,
+      body: ColoredBox(
+        color: scheme.surfaceContainerLowest,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.sm,
+            AppSpacing.lg,
+            AppSpacing.xl,
+          ),
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+              child: Column(
+                children: [
+                  Image.asset(
+                    'assets/icon/proxdroid_icon_foreground.png',
+                    width: 88,
+                    height: 88,
+                    filterQuality: FilterQuality.medium,
+                    semanticLabel: l10n.appTitle,
                   ),
+                  const SizedBox(height: AppSpacing.md),
+                  Text(
+                    l10n.appTitle,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: -0.25,
+                      color: scheme.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Material(
+              color: scheme.surfaceContainer,
+              borderRadius: BorderRadius.circular(16),
+              clipBehavior: Clip.antiAlias,
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: Icon(
+                      Icons.dns_outlined,
+                      color: scheme.onSurfaceVariant,
+                    ),
+                    title: Text(l10n.sectionServers),
+                    subtitle: Text(l10n.settingsServersSubtitle),
+                    trailing: Icon(
+                      Icons.chevron_right,
+                      color: scheme.onSurfaceVariant,
+                    ),
+                    onTap: () => context.go('/servers'),
+                  ),
+                  Divider(
+                    height: 1,
+                    color: scheme.outlineVariant.withValues(alpha: 0.12),
+                  ),
+                  ListTile(
+                    leading: Icon(
+                      Icons.tune_outlined,
+                      color: scheme.onSurfaceVariant,
+                    ),
+                    title: Text(l10n.settingsPreferencesTitle),
+                    subtitle: Text(l10n.settingsPreferencesSubtitle),
+                    trailing: Icon(
+                      Icons.chevron_right,
+                      color: scheme.onSurfaceVariant,
+                    ),
+                    onTap: () => context.push('/settings/preferences'),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            GroupedSection(
+              topSpacing: 0,
+              header: SectionHeader(title: l10n.settingsTroubleshootingSection),
+              child: Material(
+                color: scheme.surfaceContainer,
+                borderRadius: BorderRadius.circular(16),
+                clipBehavior: Clip.antiAlias,
+                child: SwitchListTile(
+                  title: Text(l10n.settingsVerboseConnectionErrors),
+                  subtitle: Text(l10n.settingsVerboseConnectionErrorsSubtitle),
+                  value: ref.watch(verboseConnectionErrorsProvider),
+                  onChanged: (v) {
+                    ref
+                        .read(verboseConnectionErrorsProvider.notifier)
+                        .setEnabled(v);
+                  },
                 ),
-              ],
-            ),
-          ),
-          GroupedSection(
-            topSpacing: 0,
-            child: ListTile(
-              leading: Icon(Icons.dns_outlined, color: scheme.onSurfaceVariant),
-              title: Text(l10n.sectionServers),
-              subtitle: Text(l10n.settingsServersSubtitle),
-              trailing: Icon(
-                Icons.chevron_right,
-                color: scheme.onSurfaceVariant,
               ),
-              onTap: () => context.go('/servers'),
             ),
-          ),
-          const Divider(height: 1),
-          GroupedSection(
-            topSpacing: 0,
-            child: ListTile(
-              leading: Icon(
-                Icons.tune_outlined,
-                color: scheme.onSurfaceVariant,
-              ),
-              title: Text(l10n.settingsPreferencesTitle),
-              subtitle: Text(l10n.settingsPreferencesSubtitle),
-              trailing: Icon(
-                Icons.chevron_right,
-                color: scheme.onSurfaceVariant,
-              ),
-              onTap: () => context.push('/settings/preferences'),
-            ),
-          ),
-          const Divider(height: 1),
-          GroupedSection(
-            topSpacing: 0,
-            header: SectionHeader(title: l10n.settingsTroubleshootingSection),
-            child: SwitchListTile(
-              title: Text(l10n.settingsVerboseConnectionErrors),
-              subtitle: Text(l10n.settingsVerboseConnectionErrorsSubtitle),
-              value: ref.watch(verboseConnectionErrorsProvider),
-              onChanged: (v) {
-                ref
-                    .read(verboseConnectionErrorsProvider.notifier)
-                    .setEnabled(v);
-              },
-            ),
-          ),
-          const Divider(height: 1),
-          GroupedSection(
-            topSpacing: 0,
-            header: SectionHeader(title: l10n.settingsAboutSection),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                packageInfoAsync.when(
-                  data:
-                      (PackageInfo info) => ListTile(
-                        title: Text(l10n.settingsVersion),
-                        subtitle: Text(
-                          l10n.settingsVersionSubtitle(
-                            info.version,
-                            info.buildNumber,
+            const SizedBox(height: AppSpacing.lg),
+            GroupedSection(
+              topSpacing: 0,
+              header: SectionHeader(title: l10n.settingsAboutSection),
+              child: Material(
+                color: scheme.surfaceContainer,
+                borderRadius: BorderRadius.circular(16),
+                clipBehavior: Clip.antiAlias,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    packageInfoAsync.when(
+                      data:
+                          (PackageInfo info) => ListTile(
+                            title: Text(l10n.settingsVersion),
+                            subtitle: Text(
+                              l10n.settingsVersionSubtitle(
+                                info.version,
+                                info.buildNumber,
+                              ),
+                            ),
                           ),
-                        ),
+                      loading:
+                          () => ListTile(
+                            title: Text(l10n.settingsVersion),
+                            subtitle: Text(l10n.settingsLoading),
+                          ),
+                      error:
+                          (Object error, StackTrace stackTrace) => ListTile(
+                            title: Text(l10n.settingsVersion),
+                            subtitle: Text(l10n.settingsVersionUnavailable),
+                          ),
+                    ),
+                    Divider(
+                      height: 1,
+                      color: scheme.outlineVariant.withValues(alpha: 0.12),
+                    ),
+                    ListTile(
+                      title: Text(l10n.settingsSourceCode),
+                      subtitle: Text(_githubRepoUrl),
+                      trailing: Icon(
+                        Icons.open_in_new,
+                        color: scheme.onSurfaceVariant,
                       ),
-                  loading:
-                      () => ListTile(
-                        title: Text(l10n.settingsVersion),
-                        subtitle: Text(l10n.settingsLoading),
+                      onTap: () => _openUrl(context, _githubRepoUrl),
+                    ),
+                    Divider(
+                      height: 1,
+                      color: scheme.outlineVariant.withValues(alpha: 0.12),
+                    ),
+                    ListTile(
+                      title: Text(l10n.settingsLicenseTitle),
+                      subtitle: Text(l10n.settingsLicenseTileSubtitle),
+                      trailing: Icon(
+                        Icons.chevron_right,
+                        color: scheme.onSurfaceVariant,
                       ),
-                  error:
-                      (Object error, StackTrace stackTrace) => ListTile(
-                        title: Text(l10n.settingsVersion),
-                        subtitle: Text(l10n.settingsVersionUnavailable),
-                      ),
+                      onTap: () => _showLicenseDialog(context),
+                    ),
+                  ],
                 ),
-                ListTile(
-                  title: Text(l10n.settingsSourceCode),
-                  subtitle: Text(_githubRepoUrl),
-                  trailing: Icon(
-                    Icons.open_in_new,
-                    color: scheme.onSurfaceVariant,
-                  ),
-                  onTap: () => _openUrl(context, _githubRepoUrl),
-                ),
-                ListTile(
-                  title: Text(l10n.settingsLicenseTitle),
-                  subtitle: Text(l10n.settingsLicenseTileSubtitle),
-                  trailing: Icon(
-                    Icons.chevron_right,
-                    color: scheme.onSurfaceVariant,
-                  ),
-                  onTap: () => _showLicenseDialog(context),
-                ),
-              ],
+              ),
             ),
-          ),
-          const Divider(height: 1),
-          GroupedSection(
-            topSpacing: 0,
-            header: SectionHeader(title: l10n.settingsSupportSection),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                ListTile(
-                  title: Text(l10n.settingsSupportKofi),
-                  subtitle: Text(_kofiUrl),
-                  trailing: Icon(
-                    Icons.open_in_new,
-                    color: scheme.onSurfaceVariant,
-                  ),
-                  onTap: () => _openUrl(context, _kofiUrl),
+            const SizedBox(height: AppSpacing.lg),
+            GroupedSection(
+              topSpacing: 0,
+              header: SectionHeader(title: l10n.settingsSupportSection),
+              child: Material(
+                color: scheme.surfaceContainer,
+                borderRadius: BorderRadius.circular(16),
+                clipBehavior: Clip.antiAlias,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ListTile(
+                      title: Text(l10n.settingsSupportKofi),
+                      subtitle: Text(_kofiUrl),
+                      trailing: Icon(
+                        Icons.open_in_new,
+                        color: scheme.onSurfaceVariant,
+                      ),
+                      onTap: () => _openUrl(context, _kofiUrl),
+                    ),
+                    Divider(
+                      height: 1,
+                      color: scheme.outlineVariant.withValues(alpha: 0.12),
+                    ),
+                    ListTile(
+                      title: Text(l10n.settingsSupportGithubSponsors),
+                      subtitle: Text(_githubSponsorsUrl),
+                      trailing: Icon(
+                        Icons.open_in_new,
+                        color: scheme.onSurfaceVariant,
+                      ),
+                      onTap: () => _openUrl(context, _githubSponsorsUrl),
+                    ),
+                  ],
                 ),
-                ListTile(
-                  title: Text(l10n.settingsSupportGithubSponsors),
-                  subtitle: Text(_githubSponsorsUrl),
-                  trailing: Icon(
-                    Icons.open_in_new,
-                    color: scheme.onSurfaceVariant,
-                  ),
-                  onTap: () => _openUrl(context, _githubSponsorsUrl),
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

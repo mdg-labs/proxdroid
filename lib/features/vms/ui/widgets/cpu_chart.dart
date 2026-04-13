@@ -9,7 +9,7 @@ import 'package:proxdroid/shared/widgets/resource_chart.dart';
 
 /// CPU history for a QEMU guest (VM detail).
 ///
-/// Series color: [ColorScheme.primary] (blue) per §9.
+/// Series color: [ColorScheme.primary] (Stitch cyan).
 class VmCpuChart extends ConsumerWidget {
   const VmCpuChart({
     required this.node,

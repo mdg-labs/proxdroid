@@ -304,6 +304,10 @@
   "@serverAuthTypeUsernamePassword": {
     "description": "Segment label for username/password authentication."
   },
+  "serverAuthTfaUseApiTokenHint": "If this account has two-factor authentication (TFA) enabled, use API token sign-in instead. Create a token in the Proxmox web UI (Datacenter or your user → API Tokens).",
+  "@serverAuthTfaUseApiTokenHint": {
+    "description": "Helper under password auth: password login does not support TFA; recommend API tokens."
+  },
   "serverFormIdentitySection": "Identity",
   "@serverFormIdentitySection": {
     "description": "Section header for server name, host, and port fields."
@@ -652,6 +656,10 @@
   "@valueUnavailable": {
     "description": "Placeholder when a numeric or text value is missing."
   },
+  "guestDetailMetricGridSemantics": "CPU, memory, network, and disk activity for this guest.",
+  "@guestDetailMetricGridSemantics": {
+    "description": "Semantics label for the 2×2 guest detail metric instrument grid (VM / LXC)."
+  },
   "actionCancel": "Cancel",
   "@actionCancel": {
     "description": "Dialog button to dismiss without acting."
@@ -875,6 +883,30 @@
         "example": "pve"
       }
     }
+  },
+  "storageClusterHeroTitle": "Cluster capacity",
+  "@storageClusterHeroTitle": {
+    "description": "Title for storage list hero band (summed used/total from pools that report both)."
+  },
+  "storageClusterHeroSubtitle": "Sum of pools that report used and total",
+  "@storageClusterHeroSubtitle": {
+    "description": "Subtitle clarifying how cluster capacity numbers are aggregated."
+  },
+  "storagePoolHealthHealthyLabel": "Healthy",
+  "@storagePoolHealthHealthyLabel": {
+    "description": "Summary tile: pools that are active and below the usage warning threshold."
+  },
+  "storagePoolHealthAtRiskLabel": "At risk",
+  "@storagePoolHealthAtRiskLabel": {
+    "description": "Summary tile: inactive pools or pools at/above the usage warning threshold."
+  },
+  "storagePoolsSectionTitle": "Storage pools",
+  "@storagePoolsSectionTitle": {
+    "description": "Section header above the per-pool card list on the storage overview screen."
+  },
+  "storageNodeDistributionTitle": "Used space by node",
+  "@storageNodeDistributionTitle": {
+    "description": "Section title for horizontal bars showing summed used bytes per node."
   },
   "backupListEmptyTitle": "No backup files",
   "@backupListEmptyTitle": {

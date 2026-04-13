@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:proxdroid/app/theme/app_theme.dart';
 import 'package:proxdroid/core/models/container.dart' as px;
 import 'package:proxdroid/core/models/proxmox_guest_tag.dart';
 import 'package:proxdroid/core/models/task.dart' as pve;
@@ -84,6 +85,7 @@ class BackupListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
     final tagColorMap =
         ref.watch(proxmoxTagColorsProvider).valueOrNull ??
         const <String, String>{};
@@ -174,59 +176,71 @@ class BackupListScreen extends ConsumerWidget {
               SliverToBoxAdapter(
                 child: SectionHeader(title: l10n.backupSectionScheduledJobs),
               ),
-              SliverList(
-                delegate: SliverChildBuilderDelegate((context, i) {
-                  final j = jobs[i];
-                  return Card(
-                    margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            j.id,
-                            style: Theme.of(context).textTheme.titleSmall,
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate((context, i) {
+                    final j = jobs[i];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                j.id,
+                                style: tt.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              if (j.schedule.isNotEmpty)
+                                Text(
+                                  j.schedule,
+                                  style: tt.bodySmall?.copyWith(
+                                    color: scheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              if (j.storage.isNotEmpty)
+                                Text(
+                                  '${l10n.backupFieldStorage}: ${j.storage}',
+                                  style: tt.bodySmall?.copyWith(
+                                    color: scheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              if (j.vmids.isNotEmpty)
+                                Text(
+                                  l10n.backupJobVmids(j.vmids.join(', ')),
+                                  style: tt.bodySmall?.copyWith(
+                                    color: scheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              if (j.nextRun != null)
+                                Text(
+                                  l10n.backupJobNextRun(
+                                    formatProxmoxUnixSeconds(j.nextRun),
+                                  ),
+                                  style: tt.bodySmall?.copyWith(
+                                    color: scheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              if (j.lastRun != null)
+                                Text(
+                                  l10n.backupJobLastRun(
+                                    formatProxmoxUnixSeconds(j.lastRun),
+                                  ),
+                                  style: tt.bodySmall?.copyWith(
+                                    color: scheme.onSurfaceVariant,
+                                  ),
+                                ),
+                            ],
                           ),
-                          if (j.schedule.isNotEmpty)
-                            Text(
-                              j.schedule,
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(color: scheme.onSurfaceVariant),
-                            ),
-                          if (j.storage.isNotEmpty)
-                            Text(
-                              '${l10n.backupFieldStorage}: ${j.storage}',
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(color: scheme.onSurfaceVariant),
-                            ),
-                          if (j.vmids.isNotEmpty)
-                            Text(
-                              l10n.backupJobVmids(j.vmids.join(', ')),
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(color: scheme.onSurfaceVariant),
-                            ),
-                          if (j.nextRun != null)
-                            Text(
-                              l10n.backupJobNextRun(
-                                formatProxmoxUnixSeconds(j.nextRun),
-                              ),
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(color: scheme.onSurfaceVariant),
-                            ),
-                          if (j.lastRun != null)
-                            Text(
-                              l10n.backupJobLastRun(
-                                formatProxmoxUnixSeconds(j.lastRun),
-                              ),
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(color: scheme.onSurfaceVariant),
-                            ),
-                        ],
+                        ),
                       ),
-                    ),
-                  );
-                }, childCount: jobs.length),
+                    );
+                  }, childCount: jobs.length),
+                ),
               ),
             ],
             SliverToBoxAdapter(
@@ -235,7 +249,9 @@ class BackupListScreen extends ConsumerWidget {
             if (emptyFiles)
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                  ),
                   child: EmptyState(
                     icon: Icons.folder_off_outlined,
                     title: l10n.backupListEmptyTitle,
@@ -244,94 +260,168 @@ class BackupListScreen extends ConsumerWidget {
                 ),
               )
             else
-              SliverList(
-                delegate: SliverChildBuilderDelegate((context, i) {
-                  final vmid = sortedKeys[i];
-                  final entries = byVmid[vmid]!;
-                  final title = _guestName(vmid, vms, cts, l10n);
-                  final guestTags = _guestTagsForVmid(vmid, vms, cts);
-                  return ExpansionTile(
-                    title: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(title),
-                        if (guestTags.isNotEmpty) ...[
-                          const SizedBox(height: 6),
-                          ProxmoxTagRow(
-                            tags: guestTags,
-                            clusterTagHexByLabel: tagColorMap,
-                            density: ProxmoxTagDensity.compact,
-                            spacing: 5,
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate((context, i) {
+                    final vmid = sortedKeys[i];
+                    final entries = byVmid[vmid]!;
+                    final title = _guestName(vmid, vms, cts, l10n);
+                    final guestTags = _guestTagsForVmid(vmid, vms, cts);
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                      child: Card(
+                        clipBehavior: Clip.antiAlias,
+                        child: Theme(
+                          data: Theme.of(context).copyWith(
+                            dividerColor: Colors.transparent,
+                            splashColor: scheme.primary.withValues(alpha: 0.08),
                           ),
-                        ],
-                      ],
-                    ),
-                    subtitle: Text(
-                      l10n.entityBackup,
-                      style: TextStyle(color: scheme.onSurfaceVariant),
-                    ),
-                    children:
-                        entries.map((e) {
-                          final it = e.item;
-                          return ListTile(
-                            title: Text(
-                              it.volid,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
+                          child: ExpansionTile(
+                            tilePadding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.md,
+                              vertical: AppSpacing.xs,
                             ),
-                            subtitle: Text(
-                              [
-                                l10n.storagePoolOnNode(e.storageId, e.node),
-                                if (it.format.isNotEmpty)
-                                  '${l10n.labelFormat}: ${it.format}',
-                                if (it.ctime != null)
-                                  formatProxmoxUnixSeconds(it.ctime),
-                                if (it.size != null) formatBytes(it.size),
-                              ].join(' · '),
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(color: scheme.onSurfaceVariant),
+                            childrenPadding: const EdgeInsets.only(
+                              bottom: AppSpacing.sm,
                             ),
-                          );
-                        }).toList(),
-                  );
-                }, childCount: sortedKeys.length),
+                            title: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  title,
+                                  style: tt.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                if (guestTags.isNotEmpty) ...[
+                                  const SizedBox(height: AppSpacing.sm),
+                                  ProxmoxTagRow(
+                                    tags: guestTags,
+                                    clusterTagHexByLabel: tagColorMap,
+                                    density: ProxmoxTagDensity.compact,
+                                    spacing: 5,
+                                  ),
+                                ],
+                              ],
+                            ),
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(
+                                top: AppSpacing.xs,
+                              ),
+                              child: Text(
+                                l10n.entityBackup,
+                                style: tt.bodySmall?.copyWith(
+                                  color: scheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ),
+                            children:
+                                entries.map((e) {
+                                  final it = e.item;
+                                  return ListTile(
+                                    dense: true,
+                                    title: Text(
+                                      it.volid,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: tt.bodyMedium,
+                                    ),
+                                    subtitle: Text(
+                                      [
+                                        l10n.storagePoolOnNode(
+                                          e.storageId,
+                                          e.node,
+                                        ),
+                                        if (it.format.isNotEmpty)
+                                          '${l10n.labelFormat}: ${it.format}',
+                                        if (it.ctime != null)
+                                          formatProxmoxUnixSeconds(it.ctime),
+                                        if (it.size != null)
+                                          formatBytes(it.size),
+                                      ].join(' · '),
+                                      style: tt.bodySmall?.copyWith(
+                                        color: scheme.onSurfaceVariant,
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                          ),
+                        ),
+                      ),
+                    );
+                  }, childCount: sortedKeys.length),
+                ),
               ),
             if (vzTasks.isNotEmpty) ...[
               SliverToBoxAdapter(
                 child: SectionHeader(title: l10n.backupSectionRecentTasks),
               ),
-              SliverList(
-                delegate: SliverChildBuilderDelegate((context, i) {
-                  final t = vzTasks[i];
-                  final vmid = vmidFromProxmoxUpid(t.upid);
-                  final guest = _guestName(vmid, vms, cts, l10n);
-                  final guestTags = _guestTagsForVmid(vmid, vms, cts);
-                  return ListTile(
-                    title: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(guest),
-                        if (guestTags.isNotEmpty) ...[
-                          const SizedBox(height: 6),
-                          ProxmoxTagRow(
-                            tags: guestTags,
-                            clusterTagHexByLabel: tagColorMap,
-                            density: ProxmoxTagDensity.compact,
-                            spacing: 5,
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate((context, i) {
+                    final t = vzTasks[i];
+                    final vmid = vmidFromProxmoxUpid(t.upid);
+                    final guest = _guestName(vmid, vms, cts, l10n);
+                    final guestTags = _guestTagsForVmid(vmid, vms, cts);
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                      child: Card(
+                        margin: EdgeInsets.zero,
+                        child: InkWell(
+                          onTap:
+                              () => context.push(
+                                '/tasks/${Uri.encodeComponent(t.node)}/${Uri.encodeComponent(t.upid)}',
+                              ),
+                          borderRadius: BorderRadius.circular(12),
+                          child: Padding(
+                            padding: const EdgeInsets.all(AppSpacing.md),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        guest,
+                                        style: tt.titleSmall?.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      if (guestTags.isNotEmpty) ...[
+                                        const SizedBox(height: AppSpacing.sm),
+                                        ProxmoxTagRow(
+                                          tags: guestTags,
+                                          clusterTagHexByLabel: tagColorMap,
+                                          density: ProxmoxTagDensity.compact,
+                                          spacing: 5,
+                                        ),
+                                      ],
+                                      const SizedBox(height: AppSpacing.xs),
+                                      Text(
+                                        '${t.type} · ${_statusLine(t, l10n)}',
+                                        style: tt.bodySmall?.copyWith(
+                                          color: scheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.chevron_right,
+                                  color: scheme.outlineVariant,
+                                  size: 20,
+                                ),
+                              ],
+                            ),
                           ),
-                        ],
-                      ],
-                    ),
-                    subtitle: Text(
-                      '${t.type} · ${_statusLine(t, l10n)}',
-                      style: TextStyle(color: scheme.onSurfaceVariant),
-                    ),
-                    onTap:
-                        () => context.push(
-                          '/tasks/${Uri.encodeComponent(t.node)}/${Uri.encodeComponent(t.upid)}',
                         ),
-                  );
-                }, childCount: vzTasks.length),
+                      ),
+                    );
+                  }, childCount: vzTasks.length),
+                ),
               ),
             ],
             const SliverToBoxAdapter(child: SizedBox(height: 88)),

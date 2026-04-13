@@ -18,6 +18,7 @@ import 'package:proxdroid/shared/providers/proxmox_tag_colors_provider.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
+import 'package:proxdroid/shared/widgets/premium_modals.dart';
 import 'package:proxdroid/shared/widgets/shell_section_body.dart';
 import 'package:proxdroid/shared/widgets/proxmox_tag_widgets.dart';
 import 'package:proxdroid/shared/widgets/status_badge.dart';
@@ -231,19 +232,20 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
           (a, b) => a.value.toLowerCase().compareTo(b.value.toLowerCase()),
         );
 
-    showModalBottomSheet<void>(
+    showPremiumModalBottomSheet<void>(
       context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
       builder: (ctx) {
-        return _TaskGuestFilterSheet(
-          entries: entries,
-          selectedVmid: _guestVmidFilter,
-          l10n: l10n,
-          onSelect: (vmid) {
-            Navigator.of(ctx).pop();
-            setState(() => _guestVmidFilter = vmid);
-          },
+        return PremiumBottomSheet(
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+          child: _TaskGuestFilterSheet(
+            entries: entries,
+            selectedVmid: _guestVmidFilter,
+            l10n: l10n,
+            onSelect: (vmid) {
+              Navigator.of(ctx).pop();
+              setState(() => _guestVmidFilter = vmid);
+            },
+          ),
         );
       },
     );
@@ -580,18 +582,11 @@ class _TaskGuestFilterSheetState extends State<_TaskGuestFilterSheet> {
                 controller: _query,
                 decoration: InputDecoration(
                   hintText: widget.l10n.taskFilterByGuest,
-                  prefixIcon: const Icon(Icons.search),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: scheme.onSurfaceVariant,
+                  ),
                   isDense: true,
-                  filled: true,
-                  fillColor: scheme.surfaceContainerHighest,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: scheme.outlineVariant),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: scheme.outlineVariant),
-                  ),
                 ),
                 onChanged: (_) => setState(() {}),
               ),
@@ -731,10 +726,13 @@ class _TaskListStatusSummary extends StatelessWidget {
         decoration: BoxDecoration(
           color: scheme.surfaceContainerHigh,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: scheme.outlineVariant.withValues(alpha: 0.45),
-            width: 1,
-          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.22),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -792,7 +790,7 @@ class _TaskTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: scheme.surfaceContainerHighest,
+      color: scheme.surfaceContainer,
       borderRadius: BorderRadius.circular(12),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -822,7 +820,7 @@ class _TaskTile extends StatelessWidget {
                     Text(
                       guest,
                       style: tt.bodySmall?.copyWith(
-                        color: scheme.onSurface.withValues(alpha: 0.75),
+                        color: scheme.onSurfaceVariant,
                         fontSize: 12,
                       ),
                       maxLines: 1,

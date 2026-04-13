@@ -3,7 +3,7 @@ import 'package:proxdroid/core/models/container.dart' as px;
 import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/widgets/status_badge.dart';
 
-/// Maps [px.ContainerStatus] to [StatusBadge] (localized label + semantic colors).
+/// Maps [px.ContainerStatus] to [StatusBadge] (localized label; colors follow theme [ColorScheme] via shared badge).
 class ContainerStatusBadge extends StatelessWidget {
   const ContainerStatusBadge({required this.status, super.key});
 

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:proxdroid/app/theme/app_colors.dart';
 import 'package:proxdroid/app/theme/app_theme.dart';
 import 'package:proxdroid/core/models/resource_data_point.dart';
 import 'package:proxdroid/core/models/task.dart' as pve;
@@ -18,11 +17,11 @@ import 'package:proxdroid/features/vms/ui/widgets/cpu_chart.dart';
 import 'package:proxdroid/features/vms/ui/widgets/disk_io_chart.dart';
 import 'package:proxdroid/features/vms/ui/widgets/memory_chart.dart';
 import 'package:proxdroid/features/vms/ui/widgets/network_chart.dart';
-import 'package:proxdroid/features/vms/ui/widgets/vm_status_badge.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/providers/proxmox_tag_colors_provider.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
+import 'package:proxdroid/shared/widgets/guest_instrument_metric_grid.dart';
 import 'package:proxdroid/shared/widgets/guest_power_action_icon_pills.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
 import 'package:proxdroid/shared/widgets/premium_modals.dart';
@@ -296,12 +295,41 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
         void setChartTf(ChartTimeframe tf) =>
             ref.read(defaultChartTimeframeProvider.notifier).setTimeframe(tf);
 
+        final scheme = Theme.of(context).colorScheme;
+        final tt = Theme.of(context).textTheme;
+        final statusLabel = _vmStatusLabel(vm, l10n);
+        final appBarSubtitle =
+            '$statusLabel · ${vm.node} · ${l10n.labelVmid} ${vm.vmid}';
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             AppBar(
               leading: shellAppBarLeading(context),
-              title: Text(l10n.entityVirtualMachine),
+              titleSpacing: AppSpacing.sm,
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    title,
+                    style: tt.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    appBarSubtitle,
+                    style: tt.labelSmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                      fontSize: 11,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
               actions: [
                 IconButton(
                   tooltip: l10n.actionEditGuestConfig,
@@ -347,16 +375,6 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: const EdgeInsets.all(AppSpacing.lg),
                       children: [
-                        // ── Hero header ───────────────────────────────────
-                        _VmHeroHeader(
-                          vm: vm,
-                          title: title,
-                          l10n: l10n,
-                          clusterTagHexByLabel: tagColors,
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-
-                        // ── Power actions ────────────────────────────────
                         if (canStart || canStopOrReboot) ...[
                           GuestPowerActionIconPills(
                             l10n: l10n,
@@ -405,11 +423,6 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
                           const SizedBox(height: AppSpacing.lg),
                         ],
 
-                        // ── Metric grid ──────────────────────────────────
-                        _MetricGrid(vm: vm, l10n: l10n),
-                        const SizedBox(height: AppSpacing.lg),
-
-                        // ── Charts (shared timeframe) ───────────────────
                         ChartTimeframeSelector(
                           selected: chartTf,
                           expandToWidth: true,
@@ -417,6 +430,51 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
                           onChanged: setChartTf,
                         ),
                         const SizedBox(height: AppSpacing.lg),
+
+                        GuestInstrumentMetricGrid(
+                          node: vm.node,
+                          guestId: vm.vmid,
+                          timeframe: chartTf,
+                          isLxc: false,
+                          cpuHeadline: formatCpuPercent(vm.cpu),
+                          memoryHeadline: formatMemoryRatio(vm.mem, vm.maxMem),
+                          diskAllocationHeadline: formatMemoryRatio(
+                            vm.disk,
+                            vm.maxDisk,
+                          ),
+                          l10n: l10n,
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+
+                        if (vm.tags.isNotEmpty) ...[
+                          Material(
+                            color: scheme.surfaceContainer,
+                            borderRadius: BorderRadius.circular(14),
+                            child: Padding(
+                              padding: const EdgeInsets.all(AppSpacing.md),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    l10n.sectionGuestTags,
+                                    style: tt.labelSmall?.copyWith(
+                                      color: scheme.onSurfaceVariant,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: AppSpacing.xs),
+                                  ProxmoxTagRow(
+                                    tags: vm.tags,
+                                    clusterTagHexByLabel: tagColors,
+                                    density: ProxmoxTagDensity.comfortable,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+                        ],
+
                         VmCpuChart(
                           node: vm.node,
                           vmid: vm.vmid,
@@ -449,9 +507,9 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
                     ),
                   ),
                   if (_powerBusy) ...[
-                    const ModalBarrier(
+                    ModalBarrier(
                       dismissible: false,
-                      color: Color(0x66000000),
+                      color: scheme.scrim.withValues(alpha: 0.45),
                     ),
                     const Center(child: CircularProgressIndicator()),
                   ],
@@ -465,230 +523,9 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
   }
 }
 
-// ────────────────────────────────────────────────────────────────────────────
-// Hero header widget
-// ────────────────────────────────────────────────────────────────────────────
-
-class _VmHeroHeader extends StatelessWidget {
-  const _VmHeroHeader({
-    required this.vm,
-    required this.title,
-    required this.l10n,
-    required this.clusterTagHexByLabel,
-  });
-
-  final Vm vm;
-  final String title;
-  final AppLocalizations l10n;
-  final Map<String, String> clusterTagHexByLabel;
-
-  Color _statusColor(VmStatus status) => switch (status) {
-    VmStatus.running => AppColors.darkStatusSuccessForeground,
-    VmStatus.paused => AppColors.darkStatusWarningForeground,
-    VmStatus.stopped => AppColors.darkStatusStoppedForeground,
-    VmStatus.unknown => AppColors.darkStatusStoppedForeground,
-  };
-
-  Color _statusBg(VmStatus status) => switch (status) {
-    VmStatus.running => AppColors.darkStatusSuccessBackground,
-    VmStatus.paused => AppColors.darkStatusWarningBackground,
-    VmStatus.stopped => AppColors.darkStatusStoppedBackground,
-    VmStatus.unknown => AppColors.darkStatusStoppedBackground,
-  };
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final tt = Theme.of(context).textTheme;
-    final accent = _statusColor(vm.status);
-    final accentBg = _statusBg(vm.status);
-
-    return Container(
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
-      ),
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: accentBg,
-              borderRadius: BorderRadius.circular(13),
-            ),
-            alignment: Alignment.center,
-            child: Icon(Icons.computer_rounded, color: accent, size: 26),
-          ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w700),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${l10n.labelVmid} ${vm.vmid}  ·  ${vm.node}',
-                  style: tt.bodySmall?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                    fontSize: 12,
-                  ),
-                ),
-                if (vm.tags.isNotEmpty) ...[
-                  const SizedBox(height: 10),
-                  Text(
-                    l10n.sectionGuestTags,
-                    style: tt.labelSmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  ProxmoxTagRow(
-                    tags: vm.tags,
-                    clusterTagHexByLabel: clusterTagHexByLabel,
-                    density: ProxmoxTagDensity.comfortable,
-                  ),
-                ],
-              ],
-            ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          VmStatusBadge(status: vm.status),
-        ],
-      ),
-    );
-  }
-}
-
-// ────────────────────────────────────────────────────────────────────────────
-// 2-column metric grid
-// ────────────────────────────────────────────────────────────────────────────
-
-class _MetricGrid extends StatelessWidget {
-  const _MetricGrid({required this.vm, required this.l10n});
-
-  final Vm vm;
-  final AppLocalizations l10n;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final tt = Theme.of(context).textTheme;
-
-    final cells = [
-      (l10n.labelVmid, '${vm.vmid}'),
-      (l10n.entityNode, vm.node),
-      (l10n.metricCpu, formatCpuPercent(vm.cpu)),
-      (l10n.metricMemory, formatMemoryRatio(vm.mem, vm.maxMem)),
-      (l10n.metricDisk, formatMemoryRatio(vm.disk, vm.maxDisk)),
-      (l10n.metricUptime, formatUptimeSeconds(vm.uptime)),
-    ];
-
-    return Container(
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
-      ),
-      child: Column(
-        children: [
-          for (var row = 0; row < cells.length; row += 2) ...[
-            if (row > 0)
-              Divider(
-                height: 1,
-                thickness: 1,
-                color: scheme.outlineVariant.withValues(alpha: 0.35),
-              ),
-            IntrinsicHeight(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _MetricCell(
-                      label: cells[row].$1,
-                      value: cells[row].$2,
-                      scheme: scheme,
-                      tt: tt,
-                    ),
-                  ),
-                  VerticalDivider(
-                    width: 1,
-                    thickness: 1,
-                    color: scheme.outlineVariant.withValues(alpha: 0.35),
-                  ),
-                  if (row + 1 < cells.length)
-                    Expanded(
-                      child: _MetricCell(
-                        label: cells[row + 1].$1,
-                        value: cells[row + 1].$2,
-                        scheme: scheme,
-                        tt: tt,
-                      ),
-                    )
-                  else
-                    const Expanded(child: SizedBox()),
-                ],
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _MetricCell extends StatelessWidget {
-  const _MetricCell({
-    required this.label,
-    required this.value,
-    required this.scheme,
-    required this.tt,
-  });
-
-  final String label;
-  final String value;
-  final ColorScheme scheme;
-  final TextTheme tt;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.md,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            label,
-            style: tt.labelSmall?.copyWith(
-              color: scheme.onSurfaceVariant,
-              fontSize: 11,
-              letterSpacing: 0.2,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            value,
-            style: tt.bodyLarge?.copyWith(
-              fontWeight: FontWeight.w600,
-              height: 1.2,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ),
-    );
-  }
-}
+String _vmStatusLabel(Vm vm, AppLocalizations l10n) => switch (vm.status) {
+  VmStatus.running => l10n.statusRunning,
+  VmStatus.paused => l10n.statusPaused,
+  VmStatus.stopped => l10n.statusStopped,
+  VmStatus.unknown => l10n.statusUnknown,
+};

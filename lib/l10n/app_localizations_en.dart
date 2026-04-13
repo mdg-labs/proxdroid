@@ -235,6 +235,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get serverAuthTypeUsernamePassword => 'Password';
 
   @override
+  String get serverAuthTfaUseApiTokenHint =>
+      'If this account has two-factor authentication (TFA) enabled, use API token sign-in instead. Create a token in the Proxmox web UI (Datacenter or your user → API Tokens).';
+
+  @override
   String get serverFormIdentitySection => 'Identity';
 
   @override
@@ -501,6 +505,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get valueUnavailable => '—';
 
   @override
+  String get guestDetailMetricGridSemantics =>
+      'CPU, memory, network, and disk activity for this guest.';
+
+  @override
   String get actionCancel => 'Cancel';
 
   @override
@@ -667,6 +675,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String storagePoolOnNode(String pool, String node) {
     return '$pool · $node';
   }
+
+  @override
+  String get storageClusterHeroTitle => 'Cluster capacity';
+
+  @override
+  String get storageClusterHeroSubtitle =>
+      'Sum of pools that report used and total';
+
+  @override
+  String get storagePoolHealthHealthyLabel => 'Healthy';
+
+  @override
+  String get storagePoolHealthAtRiskLabel => 'At risk';
+
+  @override
+  String get storagePoolsSectionTitle => 'Storage pools';
+
+  @override
+  String get storageNodeDistributionTitle => 'Used space by node';
 
   @override
   String get backupListEmptyTitle => 'No backup files';

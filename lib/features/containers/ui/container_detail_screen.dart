@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:proxdroid/app/theme/app_colors.dart';
 import 'package:proxdroid/app/theme/app_theme.dart';
 import 'package:proxdroid/core/models/container.dart' as px;
 import 'package:proxdroid/core/models/resource_data_point.dart';
@@ -11,7 +10,6 @@ import 'package:proxdroid/core/utils/formatters.dart';
 import 'package:proxdroid/features/containers/data/container_repository.dart';
 import 'package:proxdroid/features/containers/providers/container_providers.dart';
 import 'package:proxdroid/features/settings/providers/settings_providers.dart';
-import 'package:proxdroid/features/containers/ui/widgets/container_status_badge.dart';
 import 'package:proxdroid/features/containers/ui/widgets/cpu_chart.dart';
 import 'package:proxdroid/features/containers/ui/widgets/disk_io_chart.dart';
 import 'package:proxdroid/features/containers/ui/widgets/memory_chart.dart';
@@ -23,6 +21,7 @@ import 'package:proxdroid/l10n/app_localizations.dart';
 import 'package:proxdroid/shared/providers/proxmox_tag_colors_provider.dart';
 import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
+import 'package:proxdroid/shared/widgets/guest_instrument_metric_grid.dart';
 import 'package:proxdroid/shared/widgets/guest_power_action_icon_pills.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
 import 'package:proxdroid/shared/widgets/premium_modals.dart';
@@ -302,12 +301,41 @@ class _ContainerDetailScreenState extends ConsumerState<ContainerDetailScreen> {
         void setChartTf(ChartTimeframe tf) =>
             ref.read(defaultChartTimeframeProvider.notifier).setTimeframe(tf);
 
+        final scheme = Theme.of(context).colorScheme;
+        final tt = Theme.of(context).textTheme;
+        final statusLabel = _containerStatusLabel(ct, l10n);
+        final appBarSubtitle =
+            '$statusLabel · ${ct.node} · ${l10n.labelCtid} ${ct.vmid}';
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             AppBar(
               leading: shellAppBarLeading(context),
-              title: Text(l10n.entityContainer),
+              titleSpacing: AppSpacing.sm,
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    title,
+                    style: tt.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    appBarSubtitle,
+                    style: tt.labelSmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                      fontSize: 11,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
               actions: [
                 IconButton(
                   tooltip: l10n.actionEditGuestConfig,
@@ -353,14 +381,6 @@ class _ContainerDetailScreenState extends ConsumerState<ContainerDetailScreen> {
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: const EdgeInsets.all(AppSpacing.lg),
                       children: [
-                        _ContainerHeroHeader(
-                          ct: ct,
-                          title: title,
-                          l10n: l10n,
-                          clusterTagHexByLabel: tagColors,
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-
                         if (canStart || canStopOrReboot) ...[
                           GuestPowerActionIconPills(
                             l10n: l10n,
@@ -409,9 +429,6 @@ class _ContainerDetailScreenState extends ConsumerState<ContainerDetailScreen> {
                           const SizedBox(height: AppSpacing.lg),
                         ],
 
-                        _ContainerMetricGrid(ct: ct, l10n: l10n),
-                        const SizedBox(height: AppSpacing.lg),
-
                         ChartTimeframeSelector(
                           selected: chartTf,
                           expandToWidth: true,
@@ -419,6 +436,74 @@ class _ContainerDetailScreenState extends ConsumerState<ContainerDetailScreen> {
                           onChanged: setChartTf,
                         ),
                         const SizedBox(height: AppSpacing.lg),
+
+                        GuestInstrumentMetricGrid(
+                          node: ct.node,
+                          guestId: ct.vmid,
+                          timeframe: chartTf,
+                          isLxc: true,
+                          cpuHeadline: formatCpuPercent(ct.cpu),
+                          memoryHeadline: formatMemoryRatio(ct.mem, ct.maxMem),
+                          diskAllocationHeadline: formatMemoryRatio(
+                            ct.disk,
+                            ct.maxDisk,
+                          ),
+                          l10n: l10n,
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+
+                        if (ct.tags.isNotEmpty ||
+                            (ct.ostype?.isNotEmpty ?? false))
+                          Material(
+                            color: scheme.surfaceContainer,
+                            borderRadius: BorderRadius.circular(14),
+                            child: Padding(
+                              padding: const EdgeInsets.all(AppSpacing.md),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (ct.tags.isNotEmpty) ...[
+                                    Text(
+                                      l10n.sectionGuestTags,
+                                      style: tt.labelSmall?.copyWith(
+                                        color: scheme.onSurfaceVariant,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: AppSpacing.xs),
+                                    ProxmoxTagRow(
+                                      tags: ct.tags,
+                                      clusterTagHexByLabel: tagColors,
+                                      density: ProxmoxTagDensity.comfortable,
+                                    ),
+                                  ],
+                                  if (ct.ostype != null &&
+                                      ct.ostype!.isNotEmpty) ...[
+                                    if (ct.tags.isNotEmpty)
+                                      const SizedBox(height: AppSpacing.sm),
+                                    Text(
+                                      l10n.labelContainerOsType,
+                                      style: tt.labelSmall?.copyWith(
+                                        color: scheme.onSurfaceVariant,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      ct.ostype!,
+                                      style: tt.bodyMedium?.copyWith(
+                                        color: scheme.onSurface,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          ),
+                        if (ct.tags.isNotEmpty ||
+                            (ct.ostype?.isNotEmpty ?? false))
+                          const SizedBox(height: AppSpacing.lg),
+
                         ContainerCpuChart(
                           node: ct.node,
                           ctid: ct.vmid,
@@ -451,9 +536,9 @@ class _ContainerDetailScreenState extends ConsumerState<ContainerDetailScreen> {
                     ),
                   ),
                   if (_powerBusy) ...[
-                    const ModalBarrier(
+                    ModalBarrier(
                       dismissible: false,
-                      color: Color(0x66000000),
+                      color: scheme.scrim.withValues(alpha: 0.45),
                     ),
                     const Center(child: CircularProgressIndicator()),
                   ],
@@ -467,221 +552,9 @@ class _ContainerDetailScreenState extends ConsumerState<ContainerDetailScreen> {
   }
 }
 
-class _ContainerHeroHeader extends StatelessWidget {
-  const _ContainerHeroHeader({
-    required this.ct,
-    required this.title,
-    required this.l10n,
-    required this.clusterTagHexByLabel,
-  });
-
-  final px.Container ct;
-  final String title;
-  final AppLocalizations l10n;
-  final Map<String, String> clusterTagHexByLabel;
-
-  Color _statusColor(px.ContainerStatus status) => switch (status) {
-    px.ContainerStatus.running => AppColors.darkStatusSuccessForeground,
-    px.ContainerStatus.stopped => AppColors.darkStatusStoppedForeground,
-    px.ContainerStatus.unknown => AppColors.darkStatusStoppedForeground,
-  };
-
-  Color _statusBg(px.ContainerStatus status) => switch (status) {
-    px.ContainerStatus.running => AppColors.darkStatusSuccessBackground,
-    px.ContainerStatus.stopped => AppColors.darkStatusStoppedBackground,
-    px.ContainerStatus.unknown => AppColors.darkStatusStoppedBackground,
-  };
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final tt = Theme.of(context).textTheme;
-    final accent = _statusColor(ct.status);
-    final accentBg = _statusBg(ct.status);
-
-    return Container(
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
-      ),
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: accentBg,
-              borderRadius: BorderRadius.circular(13),
-            ),
-            alignment: Alignment.center,
-            child: Icon(Icons.inventory_2_rounded, color: accent, size: 26),
-          ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w700),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${l10n.labelCtid} ${ct.vmid}  ·  ${ct.node}',
-                  style: tt.bodySmall?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                    fontSize: 12,
-                  ),
-                ),
-                if (ct.tags.isNotEmpty) ...[
-                  const SizedBox(height: 10),
-                  Text(
-                    l10n.sectionGuestTags,
-                    style: tt.labelSmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  ProxmoxTagRow(
-                    tags: ct.tags,
-                    clusterTagHexByLabel: clusterTagHexByLabel,
-                    density: ProxmoxTagDensity.comfortable,
-                  ),
-                ],
-              ],
-            ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          ContainerStatusBadge(status: ct.status),
-        ],
-      ),
-    );
-  }
-}
-
-class _ContainerMetricGrid extends StatelessWidget {
-  const _ContainerMetricGrid({required this.ct, required this.l10n});
-
-  final px.Container ct;
-  final AppLocalizations l10n;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final tt = Theme.of(context).textTheme;
-
-    final cells = [
-      (l10n.labelCtid, '${ct.vmid}'),
-      (l10n.entityNode, ct.node),
-      (l10n.metricCpu, formatCpuPercent(ct.cpu)),
-      (l10n.metricMemory, formatMemoryRatio(ct.mem, ct.maxMem)),
-      (l10n.metricDisk, formatMemoryRatio(ct.disk, ct.maxDisk)),
-      (l10n.metricUptime, formatUptimeSeconds(ct.uptime)),
-      (l10n.labelContainerOsType, ct.ostype ?? l10n.valueUnavailable),
-    ];
-
-    return Container(
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
-      ),
-      child: Column(
-        children: [
-          for (var row = 0; row < cells.length; row += 2) ...[
-            if (row > 0)
-              Divider(
-                height: 1,
-                thickness: 1,
-                color: scheme.outlineVariant.withValues(alpha: 0.35),
-              ),
-            IntrinsicHeight(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _ContainerMetricCell(
-                      label: cells[row].$1,
-                      value: cells[row].$2,
-                      scheme: scheme,
-                      tt: tt,
-                    ),
-                  ),
-                  VerticalDivider(
-                    width: 1,
-                    thickness: 1,
-                    color: scheme.outlineVariant.withValues(alpha: 0.35),
-                  ),
-                  if (row + 1 < cells.length)
-                    Expanded(
-                      child: _ContainerMetricCell(
-                        label: cells[row + 1].$1,
-                        value: cells[row + 1].$2,
-                        scheme: scheme,
-                        tt: tt,
-                      ),
-                    )
-                  else
-                    const Expanded(child: SizedBox()),
-                ],
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _ContainerMetricCell extends StatelessWidget {
-  const _ContainerMetricCell({
-    required this.label,
-    required this.value,
-    required this.scheme,
-    required this.tt,
-  });
-
-  final String label;
-  final String value;
-  final ColorScheme scheme;
-  final TextTheme tt;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.md,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            label,
-            style: tt.labelSmall?.copyWith(
-              color: scheme.onSurfaceVariant,
-              fontSize: 11,
-              letterSpacing: 0.2,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            value,
-            style: tt.bodyLarge?.copyWith(
-              fontWeight: FontWeight.w600,
-              height: 1.2,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ),
-    );
-  }
-}
+String _containerStatusLabel(px.Container ct, AppLocalizations l10n) =>
+    switch (ct.status) {
+      px.ContainerStatus.running => l10n.statusRunning,
+      px.ContainerStatus.stopped => l10n.statusStopped,
+      px.ContainerStatus.unknown => l10n.statusUnknown,
+    };

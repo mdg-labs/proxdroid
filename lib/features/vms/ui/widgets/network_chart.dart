@@ -10,8 +10,7 @@ import 'package:proxdroid/shared/widgets/resource_chart.dart';
 
 /// Network I/O history for a QEMU guest (VM detail).
 ///
-/// Series colors per §9: in = [ColorScheme.primary] (blue),
-/// out = [AppColors.chartNetworkOut] (muted purple-grey approximation).
+/// In = [ColorScheme.primary]; out = [AppColors.chartNetworkOut] (aligned with [ResourceLineChart]).
 class VmNetworkChart extends ConsumerWidget {
   const VmNetworkChart({
     required this.node,

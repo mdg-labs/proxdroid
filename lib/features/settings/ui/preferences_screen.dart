@@ -22,80 +22,103 @@ class PreferencesScreen extends ConsumerWidget {
 
     return ShellSectionBody(
       title: Text(l10n.preferencesScreenTitle),
-      body: ListView(
-        padding: const EdgeInsets.only(bottom: 24),
-        children: [
-          GroupedSection(
-            topSpacing: AppSpacing.lg,
-            header: SectionHeader(title: l10n.settingsAppearanceSection),
-            child: PillSegmentedButton<ThemeMode>(
-              segments: [
-                ButtonSegment<ThemeMode>(
-                  value: ThemeMode.dark,
-                  label: Text(l10n.settingsThemeDark),
-                  icon: const Icon(Icons.dark_mode_outlined),
-                ),
-                ButtonSegment<ThemeMode>(
-                  value: ThemeMode.light,
-                  label: Text(l10n.settingsThemeLight),
-                  icon: const Icon(Icons.light_mode_outlined),
-                ),
-                ButtonSegment<ThemeMode>(
-                  value: ThemeMode.system,
-                  label: Text(l10n.settingsThemeSystem),
-                  icon: const Icon(Icons.brightness_auto_outlined),
-                ),
-              ],
-              selected: {themeMode},
-              onSelectionChanged: (Set<ThemeMode> selected) {
-                final mode = selected.first;
-                ref.read(appThemeModeProvider.notifier).setThemeMode(mode);
-              },
-            ),
+      body: ColoredBox(
+        color: scheme.surfaceContainerLowest,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.md,
+            AppSpacing.lg,
+            AppSpacing.xl,
           ),
-          const Divider(height: 1),
-          GroupedSection(
-            topSpacing: 0,
-            header: SectionHeader(title: l10n.preferencesChartsSection),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                AppSpacing.sm,
-                AppSpacing.lg,
-                AppSpacing.lg,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    l10n.preferencesDefaultChartTimeframeTitle,
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: scheme.onSurface,
-                      fontWeight: FontWeight.w600,
-                    ),
+          children: [
+            GroupedSection(
+              topSpacing: 0,
+              header: SectionHeader(title: l10n.settingsAppearanceSection),
+              child: Material(
+                color: scheme.surfaceContainer,
+                borderRadius: BorderRadius.circular(16),
+                clipBehavior: Clip.antiAlias,
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: PillSegmentedButton<ThemeMode>(
+                    segments: [
+                      ButtonSegment<ThemeMode>(
+                        value: ThemeMode.dark,
+                        label: Text(l10n.settingsThemeDark),
+                        icon: const Icon(Icons.dark_mode_outlined),
+                      ),
+                      ButtonSegment<ThemeMode>(
+                        value: ThemeMode.light,
+                        label: Text(l10n.settingsThemeLight),
+                        icon: const Icon(Icons.light_mode_outlined),
+                      ),
+                      ButtonSegment<ThemeMode>(
+                        value: ThemeMode.system,
+                        label: Text(l10n.settingsThemeSystem),
+                        icon: const Icon(Icons.brightness_auto_outlined),
+                      ),
+                    ],
+                    selected: {themeMode},
+                    onSelectionChanged: (Set<ThemeMode> selected) {
+                      final mode = selected.first;
+                      ref
+                          .read(appThemeModeProvider.notifier)
+                          .setThemeMode(mode);
+                    },
                   ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    l10n.preferencesDefaultChartTimeframeSubtitle,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  ChartTimeframeSelector(
-                    selected: chartTf,
-                    expandToWidth: true,
-                    l10n: l10n,
-                    onChanged:
-                        (tf) => ref
-                            .read(defaultChartTimeframeProvider.notifier)
-                            .setTimeframe(tf),
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: AppSpacing.lg),
+            GroupedSection(
+              topSpacing: 0,
+              header: SectionHeader(title: l10n.preferencesChartsSection),
+              child: Material(
+                color: scheme.surfaceContainer,
+                borderRadius: BorderRadius.circular(16),
+                clipBehavior: Clip.antiAlias,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    AppSpacing.md,
+                    AppSpacing.lg,
+                    AppSpacing.lg,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        l10n.preferencesDefaultChartTimeframeTitle,
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: scheme.onSurface,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        l10n.preferencesDefaultChartTimeframeSubtitle,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      ChartTimeframeSelector(
+                        selected: chartTf,
+                        expandToWidth: true,
+                        l10n: l10n,
+                        onChanged:
+                            (tf) => ref
+                                .read(defaultChartTimeframeProvider.notifier)
+                                .setTimeframe(tf),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

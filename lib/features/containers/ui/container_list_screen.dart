@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:proxdroid/app/theme/app_colors.dart';
 import 'package:proxdroid/app/theme/app_theme.dart';
 import 'package:proxdroid/core/models/container.dart' as px;
 import 'package:proxdroid/core/utils/formatters.dart';
@@ -71,14 +70,6 @@ class _ContainerListScreenState extends ConsumerState<ContainerListScreen> {
 
     out.sort(_compareContainer);
     return out;
-  }
-
-  Color _containerStatusAccent(px.ContainerStatus status) {
-    return switch (status) {
-      px.ContainerStatus.running => AppColors.darkStatusSuccessForeground,
-      px.ContainerStatus.stopped => AppColors.darkStatusStoppedForeground,
-      px.ContainerStatus.unknown => AppColors.darkStatusStoppedForeground,
-    };
   }
 
   @override
@@ -210,12 +201,16 @@ class _ContainerListScreenState extends ConsumerState<ContainerListScreen> {
                           onChanged: (v) => setState(() => _searchQuery = v),
                           elevation: const WidgetStatePropertyAll(0),
                           backgroundColor: WidgetStatePropertyAll(
-                            scheme.surfaceContainerHighest,
+                            scheme.surfaceContainerHigh,
                           ),
                           shape: WidgetStatePropertyAll(
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
-                              side: BorderSide(color: scheme.outlineVariant),
+                              side: BorderSide(
+                                color: scheme.outlineVariant.withValues(
+                                  alpha: 0.28,
+                                ),
+                              ),
                             ),
                           ),
                           padding: const WidgetStatePropertyAll(
@@ -298,12 +293,10 @@ class _ContainerListScreenState extends ConsumerState<ContainerListScreen> {
                     sliver: SliverList(
                       delegate: SliverChildBuilderDelegate((context, index) {
                         final ct = filtered[index];
-                        final accent = _containerStatusAccent(ct.status);
                         return Padding(
                           padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                           child: _ContainerListTile(
                             container: ct,
-                            accent: accent,
                             clusterTagHexByLabel: tagColorMap,
                             l10n: l10n,
                             scheme: scheme,
@@ -329,7 +322,6 @@ class _ContainerListScreenState extends ConsumerState<ContainerListScreen> {
 class _ContainerListTile extends StatelessWidget {
   const _ContainerListTile({
     required this.container,
-    required this.accent,
     required this.clusterTagHexByLabel,
     required this.l10n,
     required this.scheme,
@@ -338,7 +330,6 @@ class _ContainerListTile extends StatelessWidget {
   });
 
   final px.Container container;
-  final Color accent;
   final Map<String, String> clusterTagHexByLabel;
   final AppLocalizations l10n;
   final ColorScheme scheme;
@@ -352,8 +343,10 @@ class _ContainerListTile extends StatelessWidget {
             ? '${l10n.labelCtid} ${container.vmid}'
             : container.name;
 
+    final strip = scheme.primary.withValues(alpha: 0.35);
+
     return Material(
-      color: scheme.surfaceContainerHighest,
+      color: scheme.surfaceContainer,
       borderRadius: BorderRadius.circular(14),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -362,7 +355,7 @@ class _ContainerListTile extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Container(width: 3, color: accent),
+              Container(width: 4, color: strip),
               Padding(
                 padding: const EdgeInsets.fromLTRB(
                   AppSpacing.md,
@@ -374,13 +367,13 @@ class _ContainerListTile extends StatelessWidget {
                   width: 38,
                   height: 38,
                   decoration: BoxDecoration(
-                    color: accent.withValues(alpha: 0.12),
+                    color: scheme.surfaceContainerHigh,
                     borderRadius: BorderRadius.circular(9),
                   ),
                   alignment: Alignment.center,
                   child: Icon(
                     Icons.inventory_2_rounded,
-                    color: accent,
+                    color: scheme.onSurfaceVariant,
                     size: 20,
                   ),
                 ),

@@ -526,6 +526,12 @@ abstract class AppLocalizations {
   /// **'Password'**
   String get serverAuthTypeUsernamePassword;
 
+  /// Helper under password auth: password login does not support TFA; recommend API tokens.
+  ///
+  /// In en, this message translates to:
+  /// **'If this account has two-factor authentication (TFA) enabled, use API token sign-in instead. Create a token in the Proxmox web UI (Datacenter or your user → API Tokens).'**
+  String get serverAuthTfaUseApiTokenHint;
+
   /// Section header for server name, host, and port fields.
   ///
   /// In en, this message translates to:
@@ -1006,6 +1012,12 @@ abstract class AppLocalizations {
   /// **'—'**
   String get valueUnavailable;
 
+  /// Semantics label for the 2×2 guest detail metric instrument grid (VM / LXC).
+  ///
+  /// In en, this message translates to:
+  /// **'CPU, memory, network, and disk activity for this guest.'**
+  String get guestDetailMetricGridSemantics;
+
   /// Dialog button to dismiss without acting.
   ///
   /// In en, this message translates to:
@@ -1317,6 +1329,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{pool} · {node}'**
   String storagePoolOnNode(String pool, String node);
+
+  /// Title for storage list hero band (summed used/total from pools that report both).
+  ///
+  /// In en, this message translates to:
+  /// **'Cluster capacity'**
+  String get storageClusterHeroTitle;
+
+  /// Subtitle clarifying how cluster capacity numbers are aggregated.
+  ///
+  /// In en, this message translates to:
+  /// **'Sum of pools that report used and total'**
+  String get storageClusterHeroSubtitle;
+
+  /// Summary tile: pools that are active and below the usage warning threshold.
+  ///
+  /// In en, this message translates to:
+  /// **'Healthy'**
+  String get storagePoolHealthHealthyLabel;
+
+  /// Summary tile: inactive pools or pools at/above the usage warning threshold.
+  ///
+  /// In en, this message translates to:
+  /// **'At risk'**
+  String get storagePoolHealthAtRiskLabel;
+
+  /// Section header above the per-pool card list on the storage overview screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage pools'**
+  String get storagePoolsSectionTitle;
+
+  /// Section title for horizontal bars showing summed used bytes per node.
+  ///
+  /// In en, this message translates to:
+  /// **'Used space by node'**
+  String get storageNodeDistributionTitle;
 
   /// When no backup content rows were aggregated.
   ///

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:proxdroid/app/theme/app_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:proxdroid/core/models/container.dart';
@@ -153,7 +154,7 @@ class _ContainerEditScreenState extends ConsumerState<ContainerEditScreen> {
         controller: _ostype,
         decoration: InputDecoration(
           labelText: l10n.guestConfigFieldGuestOs,
-          border: const OutlineInputBorder(),
+          filled: true,
         ),
         textInputAction: TextInputAction.next,
       );
@@ -508,7 +509,7 @@ class _ContainerEditScreenState extends ConsumerState<ContainerEditScreen> {
                               controller: _hostname,
                               decoration: InputDecoration(
                                 labelText: l10n.guestConfigFieldHostname,
-                                border: const OutlineInputBorder(),
+                                filled: true,
                               ),
                               textInputAction: TextInputAction.next,
                             ),
@@ -517,7 +518,7 @@ class _ContainerEditScreenState extends ConsumerState<ContainerEditScreen> {
                               controller: _description,
                               decoration: InputDecoration(
                                 labelText: l10n.guestConfigFieldDescription,
-                                border: const OutlineInputBorder(),
+                                filled: true,
                               ),
                               textInputAction: TextInputAction.next,
                               maxLines: 3,
@@ -527,7 +528,7 @@ class _ContainerEditScreenState extends ConsumerState<ContainerEditScreen> {
                               controller: _tags,
                               decoration: InputDecoration(
                                 labelText: l10n.guestConfigFieldTags,
-                                border: const OutlineInputBorder(),
+                                filled: true,
                               ),
                               textInputAction: TextInputAction.next,
                             ),
@@ -535,9 +536,8 @@ class _ContainerEditScreenState extends ConsumerState<ContainerEditScreen> {
                         ),
                       ),
                     ),
-                    const Divider(height: 1),
                     GroupedSection(
-                      topSpacing: 0,
+                      topSpacing: AppSpacing.lg,
                       header: SectionHeader(
                         title: l10n.guestConfigSectionResources,
                       ),
@@ -551,7 +551,7 @@ class _ContainerEditScreenState extends ConsumerState<ContainerEditScreen> {
                               controller: _memory,
                               decoration: InputDecoration(
                                 labelText: l10n.guestConfigFieldMemory,
-                                border: const OutlineInputBorder(),
+                                filled: true,
                               ),
                               keyboardType: TextInputType.number,
                               textInputAction: TextInputAction.next,
@@ -561,7 +561,7 @@ class _ContainerEditScreenState extends ConsumerState<ContainerEditScreen> {
                               controller: _swap,
                               decoration: InputDecoration(
                                 labelText: l10n.guestConfigFieldSwap,
-                                border: const OutlineInputBorder(),
+                                filled: true,
                               ),
                               keyboardType: TextInputType.number,
                               textInputAction: TextInputAction.next,
@@ -570,9 +570,8 @@ class _ContainerEditScreenState extends ConsumerState<ContainerEditScreen> {
                         ),
                       ),
                     ),
-                    const Divider(height: 1),
                     GroupedSection(
-                      topSpacing: 0,
+                      topSpacing: AppSpacing.lg,
                       header: SectionHeader(title: l10n.guestConfigSectionCpu),
                       gapAfterHeader: 8,
                       child: Padding(
@@ -584,7 +583,7 @@ class _ContainerEditScreenState extends ConsumerState<ContainerEditScreen> {
                               controller: _cores,
                               decoration: InputDecoration(
                                 labelText: l10n.guestConfigFieldCores,
-                                border: const OutlineInputBorder(),
+                                filled: true,
                               ),
                               keyboardType: TextInputType.number,
                               textInputAction: TextInputAction.next,
@@ -594,7 +593,7 @@ class _ContainerEditScreenState extends ConsumerState<ContainerEditScreen> {
                               controller: _cpulimit,
                               decoration: InputDecoration(
                                 labelText: l10n.guestConfigFieldCpuLimit,
-                                border: const OutlineInputBorder(),
+                                filled: true,
                               ),
                               keyboardType: TextInputType.number,
                               textInputAction: TextInputAction.next,
@@ -604,7 +603,7 @@ class _ContainerEditScreenState extends ConsumerState<ContainerEditScreen> {
                               controller: _cpuunits,
                               decoration: InputDecoration(
                                 labelText: l10n.guestConfigFieldCpuUnits,
-                                border: const OutlineInputBorder(),
+                                filled: true,
                               ),
                               keyboardType: TextInputType.number,
                               textInputAction: TextInputAction.next,
@@ -613,9 +612,8 @@ class _ContainerEditScreenState extends ConsumerState<ContainerEditScreen> {
                         ),
                       ),
                     ),
-                    const Divider(height: 1),
                     GroupedSection(
-                      topSpacing: 0,
+                      topSpacing: AppSpacing.lg,
                       header: SectionHeader(
                         title: l10n.guestConfigSectionNetworks,
                       ),
@@ -714,9 +712,8 @@ class _ContainerEditScreenState extends ConsumerState<ContainerEditScreen> {
                         ),
                       ),
                     ),
-                    const Divider(height: 1),
                     GroupedSection(
-                      topSpacing: 0,
+                      topSpacing: AppSpacing.lg,
                       header: SectionHeader(
                         title: l10n.guestConfigSectionMounts,
                       ),
@@ -830,9 +827,8 @@ class _ContainerEditScreenState extends ConsumerState<ContainerEditScreen> {
                         ),
                       ),
                     ),
-                    const Divider(height: 1),
                     GroupedSection(
-                      topSpacing: 0,
+                      topSpacing: AppSpacing.lg,
                       header: SectionHeader(title: l10n.guestConfigSectionBoot),
                       gapAfterHeader: 8,
                       child: Padding(
@@ -854,7 +850,7 @@ class _ContainerEditScreenState extends ConsumerState<ContainerEditScreen> {
                               controller: _startup,
                               decoration: InputDecoration(
                                 labelText: l10n.guestConfigFieldStartupOrder,
-                                border: const OutlineInputBorder(),
+                                filled: true,
                               ),
                               textInputAction: TextInputAction.next,
                             ),
@@ -862,9 +858,8 @@ class _ContainerEditScreenState extends ConsumerState<ContainerEditScreen> {
                         ),
                       ),
                     ),
-                    const Divider(height: 1),
                     GroupedSection(
-                      topSpacing: 0,
+                      topSpacing: AppSpacing.lg,
                       header: SectionHeader(
                         title: l10n.guestConfigSectionOptions,
                       ),
@@ -891,7 +886,7 @@ class _ContainerEditScreenState extends ConsumerState<ContainerEditScreen> {
                               controller: _arch,
                               decoration: InputDecoration(
                                 labelText: l10n.guestConfigFieldArchitecture,
-                                border: const OutlineInputBorder(),
+                                filled: true,
                               ),
                               textInputAction: TextInputAction.next,
                             ),
@@ -900,7 +895,7 @@ class _ContainerEditScreenState extends ConsumerState<ContainerEditScreen> {
                               controller: _features,
                               decoration: InputDecoration(
                                 labelText: l10n.guestConfigFieldFeatures,
-                                border: const OutlineInputBorder(),
+                                filled: true,
                               ),
                               textInputAction: TextInputAction.next,
                             ),
@@ -912,7 +907,7 @@ class _ContainerEditScreenState extends ConsumerState<ContainerEditScreen> {
                                   labelText: l10n.guestConfigFieldRootfs,
                                   helperText:
                                       l10n.guestConfigRootfsLockedWhileRunning,
-                                  border: const OutlineInputBorder(),
+                                  filled: true,
                                 ),
                                 readOnly: true,
                                 maxLines: 2,

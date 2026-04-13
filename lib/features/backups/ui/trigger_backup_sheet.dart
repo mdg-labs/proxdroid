@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:proxdroid/app/theme/app_theme.dart';
 import 'package:proxdroid/core/models/container.dart' as px;
 import 'package:proxdroid/core/models/proxmox_guest_tag.dart';
 import 'package:proxdroid/core/models/storage.dart';
@@ -95,13 +96,29 @@ class _TriggerBackupSheetState extends ConsumerState<TriggerBackupSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(label, style: Theme.of(context).textTheme.labelLarge),
-        const SizedBox(height: 6),
-        DropdownButton<T>(
-          isExpanded: true,
-          value: value,
-          items: items,
-          onChanged: onChanged,
+        Text(
+          label,
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Material(
+          color: Theme.of(context).colorScheme.surfaceContainerHigh,
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<T>(
+                isExpanded: true,
+                value: value,
+                borderRadius: BorderRadius.circular(12),
+                items: items,
+                onChanged: onChanged,
+              ),
+            ),
+          ),
         ),
       ],
     );
@@ -235,6 +252,8 @@ class _TriggerBackupSheetState extends ConsumerState<TriggerBackupSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final scheme = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
     final tagColorMap =
         ref.watch(proxmoxTagColorsProvider).valueOrNull ??
         const <String, String>{};
@@ -247,15 +266,18 @@ class _TriggerBackupSheetState extends ConsumerState<TriggerBackupSheet> {
     if (vmsAsync.hasError) {
       inner = Text(
         proxmoxExceptionMessage(vmsAsync.error!, l10n),
-        style: TextStyle(color: Theme.of(context).colorScheme.error),
+        style: TextStyle(color: scheme.error),
       );
     } else if (ctsAsync.hasError) {
       inner = Text(
         proxmoxExceptionMessage(ctsAsync.error!, l10n),
-        style: TextStyle(color: Theme.of(context).colorScheme.error),
+        style: TextStyle(color: scheme.error),
       );
     } else if (!vmsAsync.hasValue || !ctsAsync.hasValue) {
-      inner = const LinearProgressIndicator();
+      inner = ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: const LinearProgressIndicator(minHeight: 4),
+      );
     } else {
       final vms = vmsAsync.requireValue;
       final cts = ctsAsync.requireValue;
@@ -302,13 +324,17 @@ class _TriggerBackupSheetState extends ConsumerState<TriggerBackupSheet> {
                         _storage = null;
                       }),
             ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           storageAsync.when(
-            loading: () => const LinearProgressIndicator(),
+            loading:
+                () => ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: const LinearProgressIndicator(minHeight: 4),
+                ),
             error:
                 (e, _) => Text(
                   proxmoxExceptionMessage(e, l10n),
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                  style: TextStyle(color: scheme.error),
                 ),
             data: (all) {
               final targets = _backupStorages(all);
@@ -337,7 +363,7 @@ class _TriggerBackupSheetState extends ConsumerState<TriggerBackupSheet> {
                     onChanged:
                         _busy ? null : (s) => setState(() => _storage = s),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppSpacing.lg),
                   _labeledDropdown<_BackupCompress>(
                     label: l10n.backupFieldCompress,
                     value: _compress,
@@ -364,7 +390,7 @@ class _TriggerBackupSheetState extends ConsumerState<TriggerBackupSheet> {
                             ? null
                             : (v) => setState(() => _compress = v ?? _compress),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppSpacing.lg),
                   _labeledDropdown<_BackupMode>(
                     label: l10n.backupFieldMode,
                     value: _mode,
@@ -408,50 +434,56 @@ class _TriggerBackupSheetState extends ConsumerState<TriggerBackupSheet> {
           guests.isNotEmpty && targets.isNotEmpty && g != null && s != null;
     }
 
-    return SafeArea(
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              l10n.backupTriggerTitle,
-              style: Theme.of(context).textTheme.titleLarge,
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            l10n.backupTriggerTitle,
+            style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          Material(
+            color: scheme.surfaceContainer,
+            borderRadius: BorderRadius.circular(16),
+            clipBehavior: Clip.antiAlias,
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: inner,
             ),
-            const SizedBox(height: 16),
-            inner,
-            const SizedBox(height: 24),
-            FilledButton(
-              onPressed:
-                  !canSubmit
-                      ? null
-                      : () {
-                        final v = vmsAsync.asData?.value;
-                        final c = ctsAsync.asData?.value;
-                        final st = storageAsync.asData?.value;
-                        if (v == null || c == null || st == null) {
-                          return;
-                        }
-                        final guests = _buildGuests(v, c);
-                        final g = _effectiveGuest(guests);
-                        final targets = _backupStorages(st);
-                        final s = _effectiveStorage(targets, g);
-                        if (g == null || s == null) {
-                          return;
-                        }
-                        _submit(l10n, g, s);
-                      },
-              child:
-                  _busy
-                      ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                      : Text(l10n.backupTriggerStart),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          FilledButton(
+            onPressed:
+                !canSubmit
+                    ? null
+                    : () {
+                      final v = vmsAsync.asData?.value;
+                      final c = ctsAsync.asData?.value;
+                      final st = storageAsync.asData?.value;
+                      if (v == null || c == null || st == null) {
+                        return;
+                      }
+                      final guests = _buildGuests(v, c);
+                      final g = _effectiveGuest(guests);
+                      final targets = _backupStorages(st);
+                      final s = _effectiveStorage(targets, g);
+                      if (g == null || s == null) {
+                        return;
+                      }
+                      _submit(l10n, g, s);
+                    },
+            child:
+                _busy
+                    ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                    : Text(l10n.backupTriggerStart),
+          ),
+        ],
       ),
     );
   }

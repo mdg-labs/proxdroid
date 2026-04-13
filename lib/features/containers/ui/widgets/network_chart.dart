@@ -10,8 +10,7 @@ import 'package:proxdroid/shared/widgets/resource_chart.dart';
 
 /// Network I/O history for an LXC container (container detail).
 ///
-/// Series colors per §9: in = [ColorScheme.primary] (blue),
-/// out = [AppColors.chartNetworkOut] (muted purple-grey approximation).
+/// In = [ColorScheme.primary]; out = [AppColors.chartNetworkOut] (aligned with [ResourceLineChart]).
 class ContainerNetworkChart extends ConsumerWidget {
   const ContainerNetworkChart({
     required this.node,

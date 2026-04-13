@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Server editor (password auth): in-app guidance to use API tokens when the Proxmox account has two-factor authentication (TFA) enabled.
+
 ## [1.0.0-beta.19] - 2026-04-13
 
 ### Changed

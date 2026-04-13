@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:proxdroid/app/theme/app_theme.dart';
 import 'package:proxdroid/core/models/task.dart';
 import 'package:proxdroid/features/servers/ui/proxmox_exception_messages.dart';
 import 'package:proxdroid/features/tasks/providers/task_providers.dart';
@@ -66,6 +67,7 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
     final logAsync = ref.watch(taskLogProvider(widget.node, widget.upid));
     final taskMeta = _taskFromList(ref.watch(taskListProvider).valueOrNull);
 
@@ -74,7 +76,29 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen> {
       children: [
         AppBar(
           leading: shellAppBarLeading(context),
-          title: Text(l10n.entityTask),
+          titleSpacing: AppSpacing.sm,
+          toolbarHeight: kToolbarHeight,
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                l10n.entityTask,
+                style: tt.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text(
+                '${widget.node} · ${widget.upid}',
+                style: tt.labelSmall?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                  fontSize: 11,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
         Expanded(
           child: RefreshIndicator(
@@ -83,7 +107,7 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen> {
               loading:
                   () => ListView(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(AppSpacing.lg),
                     children: [
                       _MetadataCard(
                         l10n: l10n,
@@ -91,7 +115,7 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen> {
                         taskMeta: taskMeta,
                         upid: widget.upid,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.lg),
                       _LogCard(
                         scheme: scheme,
                         title: l10n.taskDetailLogTitle,
@@ -106,7 +130,7 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen> {
               error:
                   (e, _) => ListView(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(AppSpacing.lg),
                     children: [
                       _MetadataCard(
                         l10n: l10n,
@@ -114,7 +138,7 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen> {
                         taskMeta: taskMeta,
                         upid: widget.upid,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.lg),
                       _LogCard(
                         scheme: scheme,
                         title: l10n.taskDetailLogTitle,
@@ -147,15 +171,25 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen> {
                     scrollTwice();
                   });
                 }
-                final mono = TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: 12,
-                  color: scheme.onSurface,
-                );
+                final mono =
+                    tt.bodySmall?.copyWith(
+                      fontFamily: 'monospace',
+                      fontFamilyFallback: const ['monospace'],
+                      fontSize: 12,
+                      height: 1.35,
+                      color: scheme.onSurfaceVariant,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ) ??
+                    TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 12,
+                      height: 1.35,
+                      color: scheme.onSurfaceVariant,
+                    );
                 return ListView(
                   controller: _scrollController,
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(AppSpacing.lg),
                   children: [
                     _MetadataCard(
                       l10n: l10n,
@@ -163,7 +197,7 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen> {
                       taskMeta: taskMeta,
                       upid: widget.upid,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.lg),
                     _LogCard(
                       scheme: scheme,
                       title: l10n.taskDetailLogTitle,
@@ -171,7 +205,7 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen> {
                           lines.isEmpty
                               ? Padding(
                                 padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
+                                  vertical: AppSpacing.md,
                                 ),
                                 child: Text(
                                   l10n.taskDetailLogEmpty,
@@ -180,15 +214,25 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen> {
                                   ),
                                 ),
                               )
-                              : Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  for (final line in lines)
-                                    SelectableText(line, style: mono),
-                                ],
+                              : DecoratedBox(
+                                decoration: BoxDecoration(
+                                  color: scheme.surfaceContainerHigh,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(AppSpacing.md),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      for (final line in lines)
+                                        SelectableText(line, style: mono),
+                                    ],
+                                  ),
+                                ),
                               ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.lg),
                   ],
                 );
               },
@@ -237,7 +281,7 @@ class _MetadataCard extends StatelessWidget {
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -245,7 +289,14 @@ class _MetadataCard extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(child: Text(taskMeta!.type, style: tt.titleLarge)),
+                  Expanded(
+                    child: Text(
+                      taskMeta!.type,
+                      style: tt.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
                   const SizedBox(width: 8),
                   StatusBadge(
                     label: _statusLabel(taskMeta!.status, l10n),
@@ -253,15 +304,22 @@ class _MetadataCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.sm),
               Text(
                 '${l10n.taskDetailNodeLabel}: ${taskMeta!.node}',
-                style: tt.bodyMedium,
+                style: tt.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.md),
             ],
-            Text(l10n.taskDetailUpidLabel, style: tt.labelLarge),
-            const SizedBox(height: 4),
+            Text(
+              l10n.taskDetailUpidLabel,
+              style: tt.labelSmall?.copyWith(
+                color: scheme.onSurfaceVariant,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.6,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xs),
             SelectableText(
               upid,
               style: tt.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
@@ -292,12 +350,15 @@ class _LogCard extends StatelessWidget {
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: tt.titleMedium),
-            const SizedBox(height: 12),
+            Text(
+              title,
+              style: tt.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: AppSpacing.md),
             child,
           ],
         ),

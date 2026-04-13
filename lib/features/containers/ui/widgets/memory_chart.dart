@@ -9,7 +9,7 @@ import 'package:proxdroid/shared/widgets/resource_chart.dart';
 
 /// Memory history for an LXC container (container detail).
 ///
-/// Series color: [ColorScheme.secondary] (tan/gold) per §9.
+/// Series color: [ColorScheme.secondary] (Stitch periwinkle for RAM).
 class ContainerMemoryChart extends ConsumerWidget {
   const ContainerMemoryChart({
     required this.node,

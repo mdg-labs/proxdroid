@@ -141,6 +141,7 @@
 - [x] Build `ServerListScreen` – shows all saved servers, empty state with CTA
 - [x] Build `AddServerScreen` – form with fields: name, host, port (default 8006), auth type toggle, credentials, allow self-signed toggle
 - [x] API token credentials: **Token ID** and **Secret** as separate fields in `ServerEditorPage` (plus “Paste full token”), composed to the stored `USER@REALM!TOKENID=SECRET` value for `PVEAPIToken`
+- [x] In-app note: accounts with **TFA** should use **API token** sign-in (password path does not support second-factor completion)
 - [x] Add connection test button – calls `GET /version` (returns PVE version info) and shows success/error feedback
 - [x] Add server to list on success, show typed error message on failure
 - [x] Add swipe-to-delete on server list items with undo snackbar (destructive action)
@@ -354,7 +355,7 @@
 - [x] **Material 3 theme tokens:** `AppTheme` card / input / list tile / button / app bar (`lib/app/theme/app_theme.dart`)
 - [x] **Navigation drawer:** branding header, Infrastructure vs Operations section labels (ARB), active-server shortcut to `/servers`; no duplicate Servers row under Infrastructure (`lib/app/app_shell.dart`)
 - [x] **`ShellSectionBody`:** shared AppBar + body (+ optional FAB); adopted on Settings, Servers, VMs, Containers, Dashboard (`lib/shared/widgets/shell_section_body.dart`)
-- [x] **Dashboard & lists (Stitch Phase D, 2026-04):** three summary tiles + aggregated cluster CPU/RAM RRD card + grid of slim node cards (accent strip, gauges); VM/container rows as cards with chevron; themed progress bars
+- [x] **Dashboard & lists (Stitch Phase D, 2026-04):** three summary tiles + aggregated cluster CPU/RAM RRD card + grid of slim node cards (accent strip, gauges); VM/container rows as cards with chevron; themed progress bars. **Stitch Phase E (2026-04):** VM/LXC list tonal cards + badge status; detail AppBar = guest name, 2×2 RRD instrument tiles, timeframe pills above metrics; create section cards + gradient submit; edit grouped sections without divider chains. **Stitch Phase F (2026-04-13):** storage list hero + health tiles + optional per-node used bars (from existing pool rows); pool/detail cards match Obsidian strip + gauges. **Stitch Phase G (2026-04-13):** tasks filter on premium sheet chrome; task detail log well + dense AppBar; backups list/sheet tonal cards; server list accent + connected chip, editor theme inputs + TLS inset; settings/preferences tonal scaffold (`UI_Refactor_Stitch_Plan.md` §10 G).
 - [x] **EmptyState** tonal icon background; offline banner elevation + rounded bottom
 - [ ] Review all typography, spacing, icon usage for consistency — **ongoing**
 - [ ] Test dark and light theme on multiple screen sizes — **ongoing** (manual QA)

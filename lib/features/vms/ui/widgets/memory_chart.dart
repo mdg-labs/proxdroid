@@ -9,7 +9,7 @@ import 'package:proxdroid/shared/widgets/resource_chart.dart';
 
 /// Memory history for a QEMU guest (VM detail).
 ///
-/// Series color: [ColorScheme.secondary] (tan/gold) per §9.
+/// Series color: [ColorScheme.secondary] (Stitch periwinkle for RAM).
 class VmMemoryChart extends ConsumerWidget {
   const VmMemoryChart({
     required this.node,
