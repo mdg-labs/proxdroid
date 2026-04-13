@@ -11,9 +11,6 @@ on:
 
 permissions:
   contents: write
-  # Tag push fails with "refusing to allow a GitHub App to create or update workflow … without
-  # `workflows` permission" when the release commit touches .github/workflows (e.g. CI edits).
-  workflows: write
 
 jobs:
   release-apk:
