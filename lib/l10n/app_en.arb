@@ -16,6 +16,23 @@
   "@shellServerPillTooltip": {
     "description": "Tooltip for the connected-server pill in ShellSectionBody."
   },
+  "shellOpenNavigationMenu": "Open navigation menu",
+  "@shellOpenNavigationMenu": {
+    "description": "Tooltip and screen reader label for the shell AppBar menu icon on drawer-root routes (Phase H a11y)."
+  },
+  "shellConnectedPillSemantics": "Connected to {serverName}. Switch or manage servers.",
+  "@shellConnectedPillSemantics": {
+    "description": "Screen reader label for the connected-server pill (server name + action).",
+    "placeholders": {
+      "serverName": {
+        "type": "String"
+      }
+    }
+  },
+  "searchClearTooltip": "Clear search",
+  "@searchClearTooltip": {
+    "description": "Tooltip for the icon-only clear control in VM/container list SearchBar."
+  },
   "drawerSectionInfrastructure": "Infrastructure",
   "@drawerSectionInfrastructure": {
     "description": "Navigation drawer group label for servers, dashboard, VMs, containers, storage."

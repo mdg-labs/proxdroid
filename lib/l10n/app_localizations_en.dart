@@ -21,6 +21,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shellServerPillTooltip => 'Switch or manage servers';
 
   @override
+  String get shellOpenNavigationMenu => 'Open navigation menu';
+
+  @override
+  String shellConnectedPillSemantics(String serverName) {
+    return 'Connected to $serverName. Switch or manage servers.';
+  }
+
+  @override
+  String get searchClearTooltip => 'Clear search';
+
+  @override
   String get drawerSectionInfrastructure => 'Infrastructure';
 
   @override

@@ -69,51 +69,57 @@ class ShellSectionBody extends ConsumerWidget {
               alignment: Alignment.centerLeft,
               child: Tooltip(
                 message: l10n.shellServerPillTooltip,
-                child: Material(
-                  color: scheme.primary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(999),
-                  clipBehavior: Clip.antiAlias,
-                  child: InkWell(
-                    onTap: () => context.go('/servers'),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md,
-                        vertical: AppSpacing.xs + 2,
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.circle, size: 8, color: scheme.primary),
-                          const SizedBox(width: AppSpacing.sm),
-                          Text(
-                            l10n.shellConnectedLabel,
-                            style: tt.labelSmall?.copyWith(
-                              color: scheme.onSurfaceVariant,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.2,
-                            ),
-                          ),
-                          const SizedBox(width: AppSpacing.sm),
-                          ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxWidth: MediaQuery.sizeOf(context).width * 0.5,
-                            ),
-                            child: Text(
-                              server.name,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: tt.labelMedium?.copyWith(
-                                color: scheme.primary,
+                child: Semantics(
+                  button: true,
+                  excludeSemantics: true,
+                  label: l10n.shellConnectedPillSemantics(server.name),
+                  child: Material(
+                    color: scheme.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(999),
+                    clipBehavior: Clip.antiAlias,
+                    child: InkWell(
+                      onTap: () => context.go('/servers'),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                          vertical: AppSpacing.xs + 2,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.circle, size: 8, color: scheme.primary),
+                            const SizedBox(width: AppSpacing.sm),
+                            Text(
+                              l10n.shellConnectedLabel,
+                              style: tt.labelSmall?.copyWith(
+                                color: scheme.onSurfaceVariant,
                                 fontWeight: FontWeight.w600,
+                                letterSpacing: 0.2,
                               ),
                             ),
-                          ),
-                          Icon(
-                            Icons.chevron_right_rounded,
-                            size: 18,
-                            color: scheme.outlineVariant,
-                          ),
-                        ],
+                            const SizedBox(width: AppSpacing.sm),
+                            ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxWidth:
+                                    MediaQuery.sizeOf(context).width * 0.5,
+                              ),
+                              child: Text(
+                                server.name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: tt.labelMedium?.copyWith(
+                                  color: scheme.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            Icon(
+                              Icons.chevron_right_rounded,
+                              size: 18,
+                              color: scheme.outlineVariant,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

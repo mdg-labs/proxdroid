@@ -118,6 +118,24 @@ abstract class AppLocalizations {
   /// **'Switch or manage servers'**
   String get shellServerPillTooltip;
 
+  /// Tooltip and screen reader label for the shell AppBar menu icon on drawer-root routes (Phase H a11y).
+  ///
+  /// In en, this message translates to:
+  /// **'Open navigation menu'**
+  String get shellOpenNavigationMenu;
+
+  /// Screen reader label for the connected-server pill (server name + action).
+  ///
+  /// In en, this message translates to:
+  /// **'Connected to {serverName}. Switch or manage servers.'**
+  String shellConnectedPillSemantics(String serverName);
+
+  /// Tooltip for the icon-only clear control in VM/container list SearchBar.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get searchClearTooltip;
+
   /// Navigation drawer group label for servers, dashboard, VMs, containers, storage.
   ///
   /// In en, this message translates to:

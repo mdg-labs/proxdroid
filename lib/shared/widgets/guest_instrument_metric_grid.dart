@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show OrdinalSortKey;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:proxdroid/app/theme/app_colors.dart';
 import 'package:proxdroid/app/theme/app_theme.dart';
@@ -182,6 +183,7 @@ class _GridBody extends StatelessWidget {
             children: [
               row(
                 _InstrumentTile(
+                  traversalOrder: 0,
                   label: l10n.metricCpu,
                   headline: cpuHeadline,
                   sparkColor: scheme.primary,
@@ -189,6 +191,7 @@ class _GridBody extends StatelessWidget {
                   scheme: scheme,
                 ),
                 _InstrumentTile(
+                  traversalOrder: 1,
                   label: l10n.metricMemory,
                   headline: memoryHeadline,
                   sparkColor: scheme.secondary,
@@ -199,6 +202,7 @@ class _GridBody extends StatelessWidget {
               SizedBox(height: spacing),
               row(
                 _InstrumentTile(
+                  traversalOrder: 2,
                   label: l10n.metricNetwork,
                   headline: networkHeadline,
                   sparkColor: scheme.primary,
@@ -206,6 +210,7 @@ class _GridBody extends StatelessWidget {
                   scheme: scheme,
                 ),
                 _InstrumentTile(
+                  traversalOrder: 3,
                   label: l10n.metricDisk,
                   headline: diskHeadline,
                   sparkColor: AppColors.chartDiskRead,
@@ -223,6 +228,7 @@ class _GridBody extends StatelessWidget {
 
 class _InstrumentTile extends StatelessWidget {
   const _InstrumentTile({
+    required this.traversalOrder,
     required this.label,
     required this.headline,
     required this.sparkColor,
@@ -230,6 +236,8 @@ class _InstrumentTile extends StatelessWidget {
     required this.scheme,
   });
 
+  /// Left→right, top→bottom (Stitch plan §6).
+  final int traversalOrder;
   final String label;
   final String headline;
   final Color sparkColor;
@@ -241,6 +249,7 @@ class _InstrumentTile extends StatelessWidget {
     final tt = Theme.of(context).textTheme;
 
     return Semantics(
+      sortKey: OrdinalSortKey(traversalOrder.toDouble()),
       label: '$label, $headline',
       child: Material(
         color: scheme.surfaceContainerHigh,
@@ -268,12 +277,16 @@ class _InstrumentTile extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
+              // Scale down long metrics at elevated text scale (e.g. 1.3×) so
+              // 2×2 cells stay within tile width without clipping.
               FittedBox(
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.centerLeft,
                 child: Text(
                   headline,
                   maxLines: 1,
+                  softWrap: false,
+                  overflow: TextOverflow.visible,
                   style: tt.displaySmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     height: 1.05,

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://docs.tolgee.io/cli-schema.json",
+  "projectId": 2,
+  "apiUrl": "https://tolgee.mdg-labs.dev",
+  "format": "FLUTTER_ARB",
+  "patterns": ["./lib/**/*.dart"],
+  "strictNamespace": false,
+  "push": {
+    "filesTemplate": "./lib/l10n/app_{languageTag}.arb",
+    "languages": ["en"]
+  },
+  "pull": {
+    "path": "./lib/l10n",
+    "fileStructureTemplate": "app_{languageTag}.arb"
+  }
+}

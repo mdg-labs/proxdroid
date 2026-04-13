@@ -189,6 +189,7 @@ class _ContainerListScreenState extends ConsumerState<ContainerListScreen> {
                               _searchQuery.isNotEmpty
                                   ? [
                                     IconButton(
+                                      tooltip: l10n.searchClearTooltip,
                                       icon: const Icon(Icons.close, size: 18),
                                       onPressed:
                                           () => setState(() {
