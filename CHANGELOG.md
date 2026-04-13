@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.0-beta.21] - 2026-04-13
+## [1.0.0-beta.22] - 2026-04-13
 
 Combines **1.0.0-beta.20** and **1.0.0-beta.21** (beta.20 was not tagged on the remote; this section is the single changelog entry for that work plus the follow-up release hygiene).
 
