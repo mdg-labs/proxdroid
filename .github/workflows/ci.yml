@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main, beta]
 
+permissions:
+  contents: read
+
 jobs:
   analyze-test:
     runs-on: ubuntu-latest
