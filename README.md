@@ -41,8 +41,8 @@ Prebuilt APKs are attached to each release as **`proxdroid-<tag>.apk`**, where `
 
 ### Release channels (maintainers)
 
-- **Beta:** push to the **`beta`** branch with a change to **`pubspec.yaml`**. The version must include **`-beta`**. If the Git tag `v<version>` does not exist yet, [Release APK](https://github.com/mdg-labs/proxdroid/actions/workflows/build.yml) builds a signed APK, creates the tag, and publishes a **pre-release** (release notes: commits since the previous tag).
-- **Stable:** push to **`main`** with a **`pubspec.yaml`** change. The version must **not** include `-beta`. If the tag is new, CI publishes a **draft** release (aggregate notes from beta pre-releases in that cycle); publish the draft on GitHub when ready — it becomes **latest** then.
+- **Beta:** push to **`beta`** (or run [Release APK](https://github.com/mdg-labs/proxdroid/actions/workflows/build.yml) manually and choose **`beta`**). Every run gates on `pubspec.yaml`: the version must include **`-beta`**, and if the Git tag `v<version>` already exists on the remote, the workflow skips the build. Otherwise it builds a signed APK, creates the tag, and publishes a **pre-release** (release notes: commits since the previous tag).
+- **Stable:** push to **`main`** (or run the workflow manually and choose **`main`**). The version must **not** include `-beta`. If the tag is new, CI publishes a **draft** release (aggregate notes from beta pre-releases in that cycle); publish the draft on GitHub when ready — it becomes **latest** then.
 
 **Play Store** and **F-Droid** are planned but not available yet.
 

@@ -1,5 +1,5 @@
-# Branch-push release workflow: push to `beta` or `main` when `pubspec.yaml` changes.
-# Creates the Git tag if missing, builds a signed release APK, and publishes a GitHub Release.
+# Release workflow: on every push to `beta` or `main`, or manual run (pick branch in the form).
+# Gate compares `pubspec.yaml` version to remote tags and branch rules; build/tag/release only when needed.
 # Beta → pre-release + commits since last tag. Main → draft (latest on publish) + aggregated beta notes.
 
 name: Build release APK
@@ -7,7 +7,16 @@ name: Build release APK
 on:
   push:
     branches: [beta, main]
-    paths: [pubspec.yaml]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Branch to check out, gate, and (if needed) build/tag from
+        type: choice
+        options:
+          - beta
+          - main
+        default: beta
+        required: true
 
 permissions:
   contents: write
@@ -19,14 +28,17 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/heads/{0}', inputs.branch) || github.ref }}
 
       - name: Gate — version, branch rules, remote tag
         id: gate
+        env:
+          GATE_BRANCH: ${{ github.event_name == 'workflow_dispatch' && inputs.branch || github.ref_name }}
         run: |
           set -euo pipefail
           VERSION=$(grep '^version:' pubspec.yaml | sed 's/version:[[:space:]]*//; s/+.*//')
           TAG="v${VERSION}"
-          BRANCH="${{ github.ref_name }}"
+          BRANCH="${GATE_BRANCH}"
           SHOULD_BUILD=false
           RELEASE_KIND=""
 

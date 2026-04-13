@@ -77,7 +77,7 @@
   - `flutter gen-l10n` (validates ARB / generated localizations)
   - `flutter analyze`
   - `flutter test`
-- [x] Add workflow: `build.yml` – runs on push to **`beta`** or **`main`** when **`pubspec.yaml`** changes; creates `v<pubspec version>` if missing; publishes APK to GitHub Releases
+- [x] Add workflow: `build.yml` – runs on every push to **`beta`** or **`main`** (gate skips unless version/tag rules say build); **`workflow_dispatch`** with branch choice for manual retries; creates `v<pubspec version>` if missing; publishes APK to GitHub Releases
   - **Beta branch:** version must contain `-beta` → **pre-release** + commit log since previous tag
   - **Main branch:** version must not contain `-beta` → **draft** release (`make_latest` applies when draft is published) + aggregated beta release notes (with `git log` fallback when a beta body is empty)
   - Pin same Flutter version as `ci.yml`
@@ -407,7 +407,7 @@ Not in scope for the current **GitHub-only prerelease** path; pick up when targe
 - [ ] Submit to Play Store internal testing track first, then production
 
 ### 6.6 GitHub Release (beta + stable draft — **done** for current scope)
-- [x] **Triggers:** push to **`beta`** or **`main`** with **`pubspec.yaml`** changed — `build.yml` reads `version:`, skips if `v<version>` already exists, otherwise creates the tag, builds the **release-signed** APK (requires Actions secrets in `docs/Android_release_signing.md`; Play/AAB path still §6.5), and publishes **beta** as pre-release or **main** as draft (latest when the draft is published).
+- [x] **Triggers:** every push to **`beta`** or **`main`**, plus **workflow_dispatch** (choose `beta` or `main`) — `build.yml` reads `version:`, skips if `v<version>` already exists or branch/version rules fail, otherwise creates the tag, builds the **release-signed** APK (requires Actions secrets in `docs/Android_release_signing.md`; Play/AAB path still §6.5), and publishes **beta** as pre-release or **main** as draft (latest when the draft is published).
 - [x] **Release notes:** beta = commits since previous tag; stable draft = aggregated bodies from beta pre-releases in range (fallback: `git log` per beta tag if body empty). Maintain `[Unreleased]` in `CHANGELOG.md` during development; edit the stable draft on GitHub before publishing if needed.
 - [x] **README:** download section documents GitHub Releases, branch/version rules, and deferred Play/F-Droid; optional `build.yml` status badge
 - [x] **Prod / stable releases:** `build.yml` handles stable **`main`** pushes (non-beta `pubspec` version) as **draft** releases; maintainer publishes the draft on GitHub when ready.

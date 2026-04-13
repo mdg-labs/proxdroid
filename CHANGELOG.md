@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- GitHub Actions: `build.yml` runs on every push to `beta`/`main` (path filter removed); gate still decides build vs skip. Added **workflow_dispatch** with a branch choice for manual retries without bumping `pubspec.yaml`.
+
 ## [1.0.0-beta.22] - 2026-04-13
 
 Combines **1.0.0-beta.20** and **1.0.0-beta.21** (beta.20 was not tagged on the remote; this section is the single changelog entry for that work plus the follow-up release hygiene).

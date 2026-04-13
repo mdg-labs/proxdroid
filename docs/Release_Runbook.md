@@ -121,5 +121,5 @@ Workflow file: `ci.yml`. It runs on **every** push and pull request targeting `m
 
 | Workflow file | Role | When it triggers |
 |---------------|------|------------------|
-| `build.yml` | Gate, Android APK build, signing, tagging, GitHub Release (pre-release on `beta`, draft on `main`) | Push to `beta` or `main` with `pubspec.yaml` in the changed paths |
+| `build.yml` | Gate, Android APK build, signing, tagging, GitHub Release (pre-release on `beta`, draft on `main`) | Every push to `beta` or `main`; or **workflow_dispatch** with branch choice (`beta` / `main`) to retry without a new commit |
 | `ci.yml` | Format, codegen, analyze, tests | Every push and PR to `main` or `beta` |
