@@ -275,7 +275,7 @@ Default CA validation applies when `allowSelfSigned` is false (standard `IOHttpC
 > **Key API efficiency:** Use `GET /cluster/resources` to retrieve VMs and containers cluster-wide in one call (preferred over iterating per-node `qemu` / `lxc` lists). VMs use `?type=vm` and map rows with `type: qemu`. Containers normally use `?type=lxc`; some gateways only allow query `type` in `{ vm, storage, node, sdn }` — the client then retries with `?type=vm` and keeps rows where the resource `type` field is `lxc`.
 
 **Auth flow:**
-1. API Token → `Authorization: PVEAPIToken=USER@REALM!TOKENID=UUID` header — stateless, no expiry
+1. API Token → `Authorization: PVEAPIToken=USER@REALM!TOKENID=UUID` header — stateless, no expiry. The server editor collects **Token ID** (`USER@REALM!TOKENID`) and **Secret** in separate fields (same breakdown as the Proxmox UI), then composes the single stored/header string.
 2. Username/Password → POST `/access/ticket` → returns `ticket` (used as cookie `PVEAuthCookie`) + `CSRFPreventionToken` (sent as header on all mutating requests)
    - Ticket expires after **2 hours** (PVE default). The interceptor must detect a `401` response and automatically re-authenticate before retrying the original request.
    - Store ticket and CSRF token in memory only (never on disk) — re-authenticate on app restart.

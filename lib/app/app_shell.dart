@@ -1,3 +1,5 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -70,7 +72,6 @@ class _AppShellState extends ConsumerState<AppShell> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final scheme = Theme.of(context).colorScheme;
     final drawerSelectedIndex = _drawerIndexForLocation(widget.currentPath);
     final bottomSelectedIndex = widget.navigationShell.currentIndex;
 
@@ -80,6 +81,34 @@ class _AppShellState extends ConsumerState<AppShell> {
       loading: () => false,
       error: (_, _) => false,
     );
+
+    final destinations = <NavigationDestination>[
+      NavigationDestination(
+        icon: const Icon(Icons.dashboard_outlined),
+        selectedIcon: const Icon(Icons.dashboard_rounded),
+        label: l10n.navDashboard,
+      ),
+      NavigationDestination(
+        icon: const Icon(Icons.computer_outlined),
+        selectedIcon: const Icon(Icons.computer_rounded),
+        label: l10n.navVMs,
+      ),
+      NavigationDestination(
+        icon: const Icon(Icons.view_in_ar_outlined),
+        selectedIcon: const Icon(Icons.view_in_ar_rounded),
+        label: l10n.navContainers,
+      ),
+      NavigationDestination(
+        icon: const Icon(Icons.receipt_long_outlined),
+        selectedIcon: const Icon(Icons.receipt_long_rounded),
+        label: l10n.navTasks,
+      ),
+      NavigationDestination(
+        icon: const Icon(Icons.apps_outlined),
+        selectedIcon: const Icon(Icons.apps_rounded),
+        label: l10n.navMore,
+      ),
+    ];
 
     return Scaffold(
       key: _scaffoldKey,
@@ -99,46 +128,10 @@ class _AppShellState extends ConsumerState<AppShell> {
           Expanded(child: widget.navigationShell),
         ],
       ),
-      bottomNavigationBar: DecoratedBox(
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(
-              color: scheme.outlineVariant.withValues(alpha: 0.35),
-              width: 0.5,
-            ),
-          ),
-        ),
-        child: NavigationBar(
-          selectedIndex: bottomSelectedIndex,
-          onDestinationSelected: _onBottomNavTap,
-          destinations: <NavigationDestination>[
-            NavigationDestination(
-              icon: const Icon(Icons.dashboard_outlined),
-              selectedIcon: const Icon(Icons.dashboard_rounded),
-              label: l10n.navDashboard,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.computer_outlined),
-              selectedIcon: const Icon(Icons.computer_rounded),
-              label: l10n.navVMs,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.view_in_ar_outlined),
-              selectedIcon: const Icon(Icons.view_in_ar_rounded),
-              label: l10n.navContainers,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.receipt_long_outlined),
-              selectedIcon: const Icon(Icons.receipt_long_rounded),
-              label: l10n.navTasks,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.apps_outlined),
-              selectedIcon: const Icon(Icons.apps_rounded),
-              label: l10n.navMore,
-            ),
-          ],
-        ),
+      bottomNavigationBar: _ShellBottomNavigationBar(
+        selectedIndex: bottomSelectedIndex,
+        onDestinationSelected: _onBottomNavTap,
+        destinations: destinations,
       ),
       drawer: NavigationDrawer(
         selectedIndex: drawerSelectedIndex,
@@ -201,6 +194,90 @@ class _AppShellState extends ConsumerState<AppShell> {
   }
 }
 
+/// Obsidian-style bottom bar: backdrop blur + tinted overlay (dark), opaque
+/// surface (light). Solid [AppColors.scaffoldObsidian] tint dominates so the
+/// bar stays readable if blur is disabled or expensive on low-end GPUs.
+class _ShellBottomNavigationBar extends StatelessWidget {
+  const _ShellBottomNavigationBar({
+    required this.selectedIndex,
+    required this.onDestinationSelected,
+    required this.destinations,
+  });
+
+  final int selectedIndex;
+  final ValueChanged<int> onDestinationSelected;
+  final List<NavigationDestination> destinations;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final bar = NavigationBar(
+      selectedIndex: selectedIndex,
+      onDestinationSelected: onDestinationSelected,
+      backgroundColor: Colors.transparent,
+      destinations: destinations,
+    );
+
+    if (!isDark) {
+      return DecoratedBox(
+        decoration: BoxDecoration(
+          color: scheme.surface,
+          border: Border(
+            top: BorderSide(
+              color: scheme.outlineVariant.withValues(alpha: 0.4),
+              width: 0.5,
+            ),
+          ),
+        ),
+        child: bar,
+      );
+    }
+
+    return ClipRect(
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: AppColors.scaffoldObsidian.withValues(alpha: 0.55),
+                ),
+              ),
+            ),
+          ),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(
+                  color: scheme.primary.withValues(alpha: 0.18),
+                  width: 1,
+                ),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.38),
+                  blurRadius: 24,
+                  offset: const Offset(0, -8),
+                ),
+              ],
+            ),
+            child: NavigationBarTheme(
+              data: NavigationBarTheme.of(
+                context,
+              ).copyWith(backgroundColor: Colors.transparent),
+              child: bar,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // ────────────────────────────────────────────────────────────────────────────
 // Drawer branding header
 // ────────────────────────────────────────────────────────────────────────────
@@ -225,7 +302,7 @@ class _DrawerBrandingHeader extends ConsumerWidget {
           color: scheme.surfaceContainerHigh,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: scheme.outlineVariant.withValues(alpha: 0.4),
+            color: scheme.outlineVariant.withValues(alpha: 0.35),
           ),
         ),
         padding: const EdgeInsets.fromLTRB(
@@ -240,24 +317,31 @@ class _DrawerBrandingHeader extends ConsumerWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // App icon with premium gold ring
+                // App icon — cyan / primary ring (Stitch Obsidian; no gold ring)
                 Container(
                   padding: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
                       colors: [
-                        AppColors.premiumAccent.withValues(alpha: 0.8),
-                        AppColors.premiumAccent.withValues(alpha: 0.3),
+                        scheme.primary.withValues(alpha: 0.95),
+                        scheme.primaryContainer.withValues(alpha: 0.8),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: scheme.primary.withValues(alpha: 0.28),
+                        blurRadius: 10,
+                        spreadRadius: 0,
+                      ),
+                    ],
                   ),
                   child: CircleAvatar(
                     radius: 20,
-                    backgroundColor: scheme.primaryContainer,
-                    foregroundColor: scheme.onPrimaryContainer,
+                    backgroundColor: scheme.surfaceContainerHighest,
+                    foregroundColor: scheme.primary,
                     child: const Icon(Icons.dns_rounded, size: 20),
                   ),
                 ),
@@ -270,6 +354,7 @@ class _DrawerBrandingHeader extends ConsumerWidget {
                         l10n.appTitle,
                         style: tt.titleMedium?.copyWith(
                           fontWeight: FontWeight.w700,
+                          color: scheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 1),

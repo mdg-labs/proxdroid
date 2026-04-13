@@ -102,7 +102,7 @@ class PremiumListRow extends StatelessWidget {
           thickness: 1,
           indent: _dividerIndent,
           endIndent: 16,
-          color: scheme.outlineVariant,
+          color: scheme.outlineVariant.withValues(alpha: 0.22),
         ),
       ],
     );

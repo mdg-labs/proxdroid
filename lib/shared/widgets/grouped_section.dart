@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 /// Vertical section block: optional [header] plus [child], with §2.4 rhythm
-/// (8px grid; default 24px top gap before the block).
+/// (8px grid; default 24px top gap before the block). Separation is spacing, not
+/// boxed outlines (Stitch no-line hierarchy).
 class GroupedSection extends StatelessWidget {
   const GroupedSection({
     required this.child,

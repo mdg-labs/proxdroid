@@ -80,7 +80,6 @@ class ChartCard extends StatelessWidget {
     }
     return Card(
       margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(padding: padding, child: content),
     );
   }

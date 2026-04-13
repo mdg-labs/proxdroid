@@ -647,5 +647,180 @@ class _NodeRrdDataProviderElement
   ChartTimeframe get timeframe => (origin as NodeRrdDataProvider).timeframe;
 }
 
+String _$clusterAggregatedNodeRrdHash() =>
+    r'971423fb6f65a4e2c07974f497c0690d6d6b1c45';
+
+abstract class _$ClusterAggregatedNodeRrd
+    extends BuildlessAutoDisposeAsyncNotifier<List<ResourceDataPoint>> {
+  late final ChartTimeframe timeframe;
+
+  FutureOr<List<ResourceDataPoint>> build(ChartTimeframe timeframe);
+}
+
+/// Dashboard cluster CPU/RAM chart: one rrddata fetch per **online** node,
+/// merged with [mergeClusterNodeRrdByIndex]. Failed nodes are skipped
+/// (partial cluster). Refreshes every 60s like [NodeRrdData].
+///
+/// Copied from [ClusterAggregatedNodeRrd].
+@ProviderFor(ClusterAggregatedNodeRrd)
+const clusterAggregatedNodeRrdProvider = ClusterAggregatedNodeRrdFamily();
+
+/// Dashboard cluster CPU/RAM chart: one rrddata fetch per **online** node,
+/// merged with [mergeClusterNodeRrdByIndex]. Failed nodes are skipped
+/// (partial cluster). Refreshes every 60s like [NodeRrdData].
+///
+/// Copied from [ClusterAggregatedNodeRrd].
+class ClusterAggregatedNodeRrdFamily
+    extends Family<AsyncValue<List<ResourceDataPoint>>> {
+  /// Dashboard cluster CPU/RAM chart: one rrddata fetch per **online** node,
+  /// merged with [mergeClusterNodeRrdByIndex]. Failed nodes are skipped
+  /// (partial cluster). Refreshes every 60s like [NodeRrdData].
+  ///
+  /// Copied from [ClusterAggregatedNodeRrd].
+  const ClusterAggregatedNodeRrdFamily();
+
+  /// Dashboard cluster CPU/RAM chart: one rrddata fetch per **online** node,
+  /// merged with [mergeClusterNodeRrdByIndex]. Failed nodes are skipped
+  /// (partial cluster). Refreshes every 60s like [NodeRrdData].
+  ///
+  /// Copied from [ClusterAggregatedNodeRrd].
+  ClusterAggregatedNodeRrdProvider call(ChartTimeframe timeframe) {
+    return ClusterAggregatedNodeRrdProvider(timeframe);
+  }
+
+  @override
+  ClusterAggregatedNodeRrdProvider getProviderOverride(
+    covariant ClusterAggregatedNodeRrdProvider provider,
+  ) {
+    return call(provider.timeframe);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'clusterAggregatedNodeRrdProvider';
+}
+
+/// Dashboard cluster CPU/RAM chart: one rrddata fetch per **online** node,
+/// merged with [mergeClusterNodeRrdByIndex]. Failed nodes are skipped
+/// (partial cluster). Refreshes every 60s like [NodeRrdData].
+///
+/// Copied from [ClusterAggregatedNodeRrd].
+class ClusterAggregatedNodeRrdProvider
+    extends
+        AutoDisposeAsyncNotifierProviderImpl<
+          ClusterAggregatedNodeRrd,
+          List<ResourceDataPoint>
+        > {
+  /// Dashboard cluster CPU/RAM chart: one rrddata fetch per **online** node,
+  /// merged with [mergeClusterNodeRrdByIndex]. Failed nodes are skipped
+  /// (partial cluster). Refreshes every 60s like [NodeRrdData].
+  ///
+  /// Copied from [ClusterAggregatedNodeRrd].
+  ClusterAggregatedNodeRrdProvider(ChartTimeframe timeframe)
+    : this._internal(
+        () => ClusterAggregatedNodeRrd()..timeframe = timeframe,
+        from: clusterAggregatedNodeRrdProvider,
+        name: r'clusterAggregatedNodeRrdProvider',
+        debugGetCreateSourceHash:
+            const bool.fromEnvironment('dart.vm.product')
+                ? null
+                : _$clusterAggregatedNodeRrdHash,
+        dependencies: ClusterAggregatedNodeRrdFamily._dependencies,
+        allTransitiveDependencies:
+            ClusterAggregatedNodeRrdFamily._allTransitiveDependencies,
+        timeframe: timeframe,
+      );
+
+  ClusterAggregatedNodeRrdProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.timeframe,
+  }) : super.internal();
+
+  final ChartTimeframe timeframe;
+
+  @override
+  FutureOr<List<ResourceDataPoint>> runNotifierBuild(
+    covariant ClusterAggregatedNodeRrd notifier,
+  ) {
+    return notifier.build(timeframe);
+  }
+
+  @override
+  Override overrideWith(ClusterAggregatedNodeRrd Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: ClusterAggregatedNodeRrdProvider._internal(
+        () => create()..timeframe = timeframe,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        timeframe: timeframe,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeAsyncNotifierProviderElement<
+    ClusterAggregatedNodeRrd,
+    List<ResourceDataPoint>
+  >
+  createElement() {
+    return _ClusterAggregatedNodeRrdProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is ClusterAggregatedNodeRrdProvider &&
+        other.timeframe == timeframe;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, timeframe.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin ClusterAggregatedNodeRrdRef
+    on AutoDisposeAsyncNotifierProviderRef<List<ResourceDataPoint>> {
+  /// The parameter `timeframe` of this provider.
+  ChartTimeframe get timeframe;
+}
+
+class _ClusterAggregatedNodeRrdProviderElement
+    extends
+        AutoDisposeAsyncNotifierProviderElement<
+          ClusterAggregatedNodeRrd,
+          List<ResourceDataPoint>
+        >
+    with ClusterAggregatedNodeRrdRef {
+  _ClusterAggregatedNodeRrdProviderElement(super.provider);
+
+  @override
+  ChartTimeframe get timeframe =>
+      (origin as ClusterAggregatedNodeRrdProvider).timeframe;
+}
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

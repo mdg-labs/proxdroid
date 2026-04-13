@@ -3,12 +3,12 @@ import 'package:proxdroid/app/theme/app_colors.dart';
 
 /// Semantic display variant for [StatusBadge].
 ///
-/// - [success]  – green: VM running, task OK, node online
-/// - [running]  – blue with animated pulse dot: task in progress
-/// - [warning]  – yellow: VM paused
-/// - [error]    – red: node offline, task failed
-/// - [stopped]  – muted grey: VM stopped (powered off, not an error)
-/// - [neutral]  – grey: unknown state
+/// - [success]  – cyan-tinted “online / healthy” (Stitch primary story)
+/// - [running]  – cyan with animated pulse dot: task in progress
+/// - [warning]  – magenta tertiary: paused / attention (not amber)
+/// - [error]    – [ColorScheme.error] story: offline, task failed
+/// - [stopped]  – muted surface: powered off, not an error
+/// - [neutral]  – unknown state
 enum StatusBadgeVariant { success, running, warning, error, stopped, neutral }
 
 /// Compact status pill with semantic color and optional animated pulse dot.
@@ -85,11 +85,14 @@ class _StatusBadgeState extends State<StatusBadge>
     return DecoratedBox(
       decoration: BoxDecoration(
         color: style.background,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-          color: style.foreground.withValues(alpha: 0.22),
-          width: 0.5,
-        ),
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: style.foreground.withValues(alpha: 0.12),
+            blurRadius: 6,
+            offset: const Offset(0, 1),
+          ),
+        ],
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

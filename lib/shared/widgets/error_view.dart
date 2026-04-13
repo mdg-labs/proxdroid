@@ -22,7 +22,7 @@ class ErrorView extends StatelessWidget {
           children: [
             DecoratedBox(
               decoration: BoxDecoration(
-                color: scheme.surfaceContainerHigh,
+                color: scheme.surfaceContainer,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Padding(

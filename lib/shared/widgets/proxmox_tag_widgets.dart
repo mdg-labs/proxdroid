@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
 
+import 'package:proxdroid/app/theme/app_colors.dart';
 import 'package:proxdroid/core/models/proxmox_guest_tag.dart';
 import 'package:proxdroid/core/utils/proxmox_tag_color_resolve.dart';
 
 /// Layout density for [ProxmoxTagBadge] / [ProxmoxTagRow].
 enum ProxmoxTagDensity { compact, comfortable }
+
+/// Relative luminance contrast between two fills (WCAG-style).
+double _contrastRatio(Color a, Color b) {
+  final l1 = a.computeLuminance();
+  final l2 = b.computeLuminance();
+  final lighter = l1 > l2 ? l1 : l2;
+  final darker = l1 > l2 ? l2 : l1;
+  return (lighter + 0.05) / (darker + 0.05);
+}
 
 IconData? proxmoxTagIconData(String? iconKey) {
   if (iconKey == null || iconKey.isEmpty) return null;
@@ -47,6 +57,7 @@ class ProxmoxTagBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final bg = resolveProxmoxTagBackgroundColor(tag, clusterTagHexByLabel);
     final fg = resolveProxmoxTagForegroundColor(tag, bg);
     final icon = proxmoxTagIconData(tag.iconKey);
@@ -56,11 +67,25 @@ class ProxmoxTagBadge extends StatelessWidget {
     final hPad = compact ? 6.0 : 8.0;
     final vPad = compact ? 3.0 : 5.0;
 
+    // User hex is preserved; on Stitch obsidian canvas (#0c0e17) very dark tag
+    // fills can disappear — add a ghost outline when contrast vs canvas is low.
+    final canvas =
+        Theme.of(context).brightness == Brightness.dark
+            ? AppColors.scaffoldObsidian
+            : scheme.surface;
+    final lowEdgeContrast = _contrastRatio(bg, canvas) < 1.28;
+
     return DecoratedBox(
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: fg.withValues(alpha: 0.12)),
+        border: Border.all(
+          color:
+              lowEdgeContrast
+                  ? scheme.outlineVariant.withValues(alpha: 0.55)
+                  : fg.withValues(alpha: 0.12),
+          width: 1,
+        ),
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: hPad, vertical: vPad),

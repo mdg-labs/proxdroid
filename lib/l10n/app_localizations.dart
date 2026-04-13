@@ -106,6 +106,18 @@ abstract class AppLocalizations {
   /// **'Proxmox cluster client'**
   String get appDrawerSubtitle;
 
+  /// Short status label in the shell section header when a Proxmox server is selected (Phase B chrome).
+  ///
+  /// In en, this message translates to:
+  /// **'Connected'**
+  String get shellConnectedLabel;
+
+  /// Tooltip for the connected-server pill in ShellSectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch or manage servers'**
+  String get shellServerPillTooltip;
+
   /// Navigation drawer group label for servers, dashboard, VMs, containers, storage.
   ///
   /// In en, this message translates to:
@@ -418,17 +430,71 @@ abstract class AppLocalizations {
   /// **'Port'**
   String get serverFieldPort;
 
-  /// Label for full PVE API token value.
+  /// Label for Proxmox API token ID (USER@REALM!name).
   ///
   /// In en, this message translates to:
-  /// **'API token'**
-  String get serverFieldApiToken;
+  /// **'Token ID'**
+  String get serverFieldApiTokenId;
 
-  /// Hint format for API token.
+  /// Hint for API token ID field.
   ///
   /// In en, this message translates to:
-  /// **'USER@REALM!TOKENID=SECRET'**
-  String get serverFieldApiTokenHint;
+  /// **'e.g. root@pam!mytoken'**
+  String get serverFieldApiTokenIdHint;
+
+  /// Label for Proxmox API token secret (UUID).
+  ///
+  /// In en, this message translates to:
+  /// **'Secret'**
+  String get serverFieldApiTokenSecret;
+
+  /// Hint for API token secret field.
+  ///
+  /// In en, this message translates to:
+  /// **'UUID shown when the token was created'**
+  String get serverFieldApiTokenSecretHint;
+
+  /// Button to paste USER@REALM!NAME=SECRET from clipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste full token'**
+  String get serverApiTokenPasteFull;
+
+  /// Snackbar when paste full token could not be parsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Clipboard text did not look like USER@REALM!NAME=SECRET.'**
+  String get serverApiTokenPasteInvalid;
+
+  /// Snackbar when paste full token but clipboard has no text.
+  ///
+  /// In en, this message translates to:
+  /// **'Clipboard is empty.'**
+  String get serverApiTokenPasteClipboardEmpty;
+
+  /// Validator when token ID is empty on add.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the Token ID.'**
+  String get serverApiTokenIdErrorEmpty;
+
+  /// Validator when token ID shape is wrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Token ID must look like USER@REALM!name and must not include =.'**
+  String get serverApiTokenIdErrorInvalid;
+
+  /// Validator when secret is empty on add.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the secret.'**
+  String get serverApiTokenSecretErrorEmpty;
+
+  /// Snackbar when only one API token field is filled on edit or test.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter both Token ID and Secret, or leave both blank to keep the current token.'**
+  String get serverApiTokenErrorPartial;
 
   /// Label for Proxmox username (e.g. root@pam).
   ///
@@ -550,11 +616,11 @@ abstract class AppLocalizations {
   /// **'Enter a display name.'**
   String get serverNameErrorEmpty;
 
-  /// Validation when API token is required but empty.
+  /// Snackbar when API token test/save needs credentials but both fields are empty on add.
   ///
   /// In en, this message translates to:
-  /// **'Enter your API token.'**
-  String get serverApiTokenErrorEmpty;
+  /// **'Enter both Token ID and Secret.'**
+  String get serverApiTokenErrorBothRequired;
 
   /// Proxmox auth realm (pam, pve, ldap, …).
   ///
@@ -637,7 +703,7 @@ abstract class AppLocalizations {
   /// Hint on edit when API token optional.
   ///
   /// In en, this message translates to:
-  /// **'Leave blank to keep the current token.'**
+  /// **'Leave both fields blank to keep the current token.'**
   String get serverApiTokenLeaveBlankHint;
 
   /// Shown when edit route id does not exist.
@@ -729,6 +795,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Total containers'**
   String get dashboardSummaryTotalContainers;
+
+  /// Label for count of cluster nodes reporting online on the dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Online nodes'**
+  String get dashboardSummaryOnlineNodes;
 
   /// Empty state when cluster returns no node resources.
   ///

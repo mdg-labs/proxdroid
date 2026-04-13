@@ -44,7 +44,7 @@ class _PulsingPlaceholderState extends State<PulsingPlaceholder>
         },
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: scheme.surfaceContainer,
+            color: scheme.surfaceContainerHigh,
             borderRadius: BorderRadius.circular(16),
           ),
         ),
@@ -113,7 +113,7 @@ class _LoadingShimmerState extends State<LoadingShimmer>
             child: Container(
               height: 72,
               decoration: BoxDecoration(
-                color: scheme.surfaceContainer,
+                color: scheme.surfaceContainerHigh,
                 borderRadius: BorderRadius.circular(16),
               ),
             ),

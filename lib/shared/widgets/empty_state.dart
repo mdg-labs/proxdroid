@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:proxdroid/shared/widgets/icon_badge_avatar.dart';
 
 /// Icon, title, optional detail text, and optional action (e.g. CTA button).
+///
+/// Uses [IconBadgeAvatar] and [ThemeData.textTheme] / [ColorScheme] only — no
+/// local hardcoded chrome (Stitch Phase C).
 class EmptyState extends StatelessWidget {
   const EmptyState({
     required this.icon,

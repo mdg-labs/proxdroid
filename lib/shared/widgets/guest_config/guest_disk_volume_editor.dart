@@ -141,7 +141,7 @@ class _GuestDiskVolumeEditorState extends ConsumerState<GuestDiskVolumeEditor> {
           TextFormField(
             controller: _raw,
             enabled: widget.enabled,
-            decoration: const InputDecoration(border: OutlineInputBorder()),
+            decoration: const InputDecoration(),
             maxLines: 2,
             onChanged:
                 widget.enabled ? (t) => widget.onChanged(t.trim()) : null,
@@ -227,7 +227,6 @@ class _GuestDiskVolumeEditorState extends ConsumerState<GuestDiskVolumeEditor> {
               value: poolId,
               decoration: InputDecoration(
                 labelText: l10n.guestPickerStoragePool,
-                border: const OutlineInputBorder(),
               ),
               items:
                   pools
@@ -276,10 +275,7 @@ class _GuestDiskVolumeEditorState extends ConsumerState<GuestDiskVolumeEditor> {
               TextFormField(
                 controller: _sizeGiB,
                 enabled: widget.enabled,
-                decoration: InputDecoration(
-                  labelText: l10n.guestPickerSizeGiB,
-                  border: const OutlineInputBorder(),
-                ),
+                decoration: InputDecoration(labelText: l10n.guestPickerSizeGiB),
                 keyboardType: TextInputType.number,
                 onChanged: widget.enabled ? (_) => _emitStructured() : null,
               )
@@ -307,7 +303,6 @@ class _GuestDiskVolumeEditorState extends ConsumerState<GuestDiskVolumeEditor> {
                     value: v0,
                     decoration: InputDecoration(
                       labelText: l10n.guestPickerVolume,
-                      border: const OutlineInputBorder(),
                     ),
                     isExpanded: true,
                     items:

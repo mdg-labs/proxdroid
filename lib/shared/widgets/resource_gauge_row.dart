@@ -4,9 +4,9 @@ import 'package:proxdroid/app/theme/app_colors.dart';
 /// Label + linear gauge + optional suffix string (e.g. "4.2 GB / 8.0 GB").
 ///
 /// The gauge bar changes color semantically based on [value]:
-/// - < 65 %   → primary (blue)
-/// - 65–85 %  → warning (amber)
-/// - > 85 %   → error (red)
+/// - Below 65% → [ColorScheme.primary] (cyan)
+/// - 65–85% → Stitch tertiary / warning foreground (magenta)
+/// - Above 85% → [ColorScheme.error]
 ///
 /// Used in storage cards and any screen that needs a compact resource gauge.
 class ResourceGaugeRow extends StatelessWidget {
@@ -65,11 +65,39 @@ class ResourceGaugeRow extends StatelessWidget {
           const SizedBox(height: 6),
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: value,
-              minHeight: 5,
-              color: _gaugeColor(value!, scheme, isDark),
-              backgroundColor: scheme.surfaceContainerHighest,
+            child: SizedBox(
+              height: 6,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final v = value!.clamp(0.0, 1.0);
+                  final w = constraints.maxWidth * v;
+                  final fill = _gaugeColor(value!, scheme, isDark);
+                  return Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      ColoredBox(color: scheme.surfaceContainer),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: SizedBox(
+                          width: w.clamp(0.0, constraints.maxWidth),
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  fill,
+                                  scheme.primaryContainer.withValues(
+                                    alpha: isDark ? 0.55 : 0.85,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
           ),
         ],

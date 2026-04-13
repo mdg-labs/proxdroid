@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:proxdroid/core/api/api_exceptions.dart';
@@ -6,6 +7,7 @@ import 'package:proxdroid/core/api/proxmox_api_client.dart';
 import 'package:proxdroid/core/models/server.dart';
 import 'package:proxdroid/core/network/tls_pinning.dart';
 import 'package:proxdroid/core/storage/server_storage.dart';
+import 'package:proxdroid/core/utils/proxmox_api_token.dart';
 import 'package:proxdroid/core/utils/proxmox_login.dart';
 import 'package:proxdroid/features/servers/providers/server_providers.dart';
 import 'package:proxdroid/features/settings/providers/settings_providers.dart';
@@ -40,7 +42,8 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
   final _nameController = TextEditingController();
   final _hostController = TextEditingController();
   final _portController = TextEditingController(text: '$_kDefaultProxmoxPort');
-  final _tokenController = TextEditingController();
+  final _apiTokenIdController = TextEditingController();
+  final _apiTokenSecretController = TextEditingController();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _customRealmController = TextEditingController();
@@ -113,7 +116,8 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
     _nameController.dispose();
     _hostController.dispose();
     _portController.dispose();
-    _tokenController.dispose();
+    _apiTokenIdController.dispose();
+    _apiTokenSecretController.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
     _customRealmController.dispose();
@@ -282,6 +286,31 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
     return buildProxmoxLoginId(u, realm);
   }
 
+  Future<void> _pasteFullApiTokenFromClipboard() async {
+    final l10n = AppLocalizations.of(context)!;
+    final data = await Clipboard.getData(Clipboard.kTextPlain);
+    final text = data?.text;
+    if (text == null || text.trim().isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.serverApiTokenPasteClipboardEmpty)),
+      );
+      return;
+    }
+    final split = trySplitFullApiToken(text);
+    if (!mounted) return;
+    if (split == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.serverApiTokenPasteInvalid)));
+      return;
+    }
+    setState(() {
+      _apiTokenIdController.text = split.tokenId;
+      _apiTokenSecretController.text = split.secret;
+    });
+  }
+
   Future<void> _testConnection() async {
     final l10n = AppLocalizations.of(context)!;
     FocusScope.of(context).unfocus();
@@ -310,16 +339,35 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
     String? password;
 
     if (_authType == ServerAuthType.apiToken) {
-      final t = _tokenController.text.trim();
-      if (t.isNotEmpty) {
-        apiToken = t;
-      } else if (existingId != null) {
-        apiToken = await storage.readApiToken(existingId);
+      final id = _apiTokenIdController.text.trim();
+      final sec = _apiTokenSecretController.text.trim();
+      if (id.isEmpty && sec.isEmpty) {
+        if (existingId != null) {
+          apiToken = await storage.readApiToken(existingId);
+        }
+      } else if (isPartialApiTokenPair(id, sec)) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.serverApiTokenErrorPartial)),
+          );
+        }
+        return;
+      } else {
+        try {
+          apiToken = composeProxmoxApiTokenValue(id, sec);
+        } on ArgumentError {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(l10n.serverApiTokenIdErrorInvalid)),
+            );
+          }
+          return;
+        }
       }
       if (apiToken == null || apiToken.isEmpty) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.serverApiTokenErrorEmpty)),
+            SnackBar(content: Text(l10n.serverApiTokenErrorBothRequired)),
           );
         }
         return;
@@ -459,17 +507,41 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
     String? password;
 
     if (_authType == ServerAuthType.apiToken) {
-      final t = _tokenController.text.trim();
+      final id = _apiTokenIdController.text.trim();
+      final sec = _apiTokenSecretController.text.trim();
       if (_isEdit) {
-        apiToken = t.isEmpty ? null : t;
+        if (id.isEmpty && sec.isEmpty) {
+          apiToken = null;
+        } else if (isPartialApiTokenPair(id, sec)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.serverApiTokenErrorPartial)),
+          );
+          return;
+        } else {
+          try {
+            apiToken = composeProxmoxApiTokenValue(id, sec);
+          } on ArgumentError {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(l10n.serverApiTokenIdErrorInvalid)),
+            );
+            return;
+          }
+        }
       } else {
-        apiToken = t;
-      }
-      if (!_isEdit && (apiToken == null || apiToken.isEmpty)) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(l10n.serverApiTokenErrorEmpty)));
-        return;
+        if (id.isEmpty || sec.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.serverApiTokenErrorBothRequired)),
+          );
+          return;
+        }
+        try {
+          apiToken = composeProxmoxApiTokenValue(id, sec);
+        } on ArgumentError {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.serverApiTokenIdErrorInvalid)),
+          );
+          return;
+        }
       }
     } else {
       late final String composedLogin;
@@ -674,23 +746,53 @@ class _ServerEditorPageState extends ConsumerState<ServerEditorPage> {
                         ),
                         const SizedBox(height: 16),
                         if (_authType == ServerAuthType.apiToken) ...[
+                          Align(
+                            alignment: AlignmentDirectional.centerStart,
+                            child: TextButton(
+                              onPressed: _pasteFullApiTokenFromClipboard,
+                              child: Text(l10n.serverApiTokenPasteFull),
+                            ),
+                          ),
                           TextFormField(
-                            controller: _tokenController,
+                            controller: _apiTokenIdController,
                             decoration: InputDecoration(
-                              labelText: l10n.serverFieldApiToken,
-                              hintText: l10n.serverFieldApiTokenHint,
+                              labelText: l10n.serverFieldApiTokenId,
+                              hintText: l10n.serverFieldApiTokenIdHint,
                               border: const OutlineInputBorder(),
                               helperText:
                                   _isEdit
                                       ? l10n.serverApiTokenLeaveBlankHint
                                       : null,
                             ),
+                            autocorrect: false,
+                            textInputAction: TextInputAction.next,
+                            validator: (v) {
+                              if (_isEdit) return null;
+                              final t = v?.trim() ?? '';
+                              if (t.isEmpty) {
+                                return l10n.serverApiTokenIdErrorEmpty;
+                              }
+                              if (!isWellFormedApiTokenId(t)) {
+                                return l10n.serverApiTokenIdErrorInvalid;
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            controller: _apiTokenSecretController,
+                            decoration: InputDecoration(
+                              labelText: l10n.serverFieldApiTokenSecret,
+                              hintText: l10n.serverFieldApiTokenSecretHint,
+                              border: const OutlineInputBorder(),
+                            ),
                             obscureText: true,
                             autocorrect: false,
+                            textInputAction: TextInputAction.done,
                             validator: (v) {
                               if (_isEdit) return null;
                               if (v == null || v.trim().isEmpty) {
-                                return l10n.serverApiTokenErrorEmpty;
+                                return l10n.serverApiTokenSecretErrorEmpty;
                               }
                               return null;
                             },

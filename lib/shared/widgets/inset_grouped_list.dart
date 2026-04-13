@@ -21,7 +21,7 @@ class InsetGroupedList extends StatelessWidget {
     return Padding(
       padding: margin,
       child: Material(
-        color: scheme.surfaceContainerHighest,
+        color: scheme.surfaceContainer,
         surfaceTintColor: scheme.surfaceTint,
         borderRadius: BorderRadius.circular(radius),
         clipBehavior: Clip.antiAlias,

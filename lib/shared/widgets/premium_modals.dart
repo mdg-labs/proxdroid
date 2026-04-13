@@ -20,6 +20,7 @@ class PremiumDialog extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return AlertDialog(
+      surfaceTintColor: Colors.transparent,
       title: DefaultTextStyle(
         style: textTheme.titleLarge ?? const TextStyle(),
         child: title,
@@ -56,8 +57,8 @@ Future<T?> showPremiumDialog<T>({
 
 /// Body scaffold for modal bottom sheets (§3 / [BottomSheetThemeData]).
 ///
-/// Drag handle and top radius come from theme. Use inside
-/// [showModalBottomSheet] `builder`.
+/// Drag handle, top radius, and sheet surface color come from theme (Phase C:
+/// `surfaceContainerHigh`). Use inside [showModalBottomSheet] `builder`.
 class PremiumBottomSheet extends StatelessWidget {
   const PremiumBottomSheet({
     required this.child,

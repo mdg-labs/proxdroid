@@ -17,7 +17,7 @@ Widget _wrap(Widget widget, ThemeData theme) {
 const _placeholderChart = SizedBox(
   height: 120,
   child: DecoratedBox(
-    decoration: BoxDecoration(color: Color(0xFF2C2C2C)),
+    decoration: BoxDecoration(color: Color(0xFF222532)),
     child: Center(child: Text('chart')),
   ),
 );

@@ -33,12 +33,13 @@ class SectionHeader extends StatelessWidget {
       SectionHeaderVariant.emphasis => textTheme.titleSmall?.copyWith(
         color: scheme.primary,
         fontWeight: FontWeight.w600,
+        letterSpacing: 0.4,
       ),
       SectionHeaderVariant.muted => textTheme.labelSmall?.copyWith(
         color: scheme.onSurfaceVariant.withValues(alpha: 0.65),
         fontWeight: FontWeight.w700,
         fontSize: 10,
-        letterSpacing: 1.4,
+        letterSpacing: 1.6,
       ),
     };
 

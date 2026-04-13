@@ -24,10 +24,7 @@ class GuestStringDropdown extends StatelessWidget {
     return DropdownButtonFormField<String>(
       // ignore: deprecated_member_use
       value: effective,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-      ),
+      decoration: InputDecoration(labelText: label),
       items:
           ids
               .map((id) => DropdownMenuItem<String>(value: id, child: Text(id)))

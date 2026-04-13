@@ -15,6 +15,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appDrawerSubtitle => 'Proxmox cluster client';
 
   @override
+  String get shellConnectedLabel => 'Connected';
+
+  @override
+  String get shellServerPillTooltip => 'Switch or manage servers';
+
+  @override
   String get drawerSectionInfrastructure => 'Infrastructure';
 
   @override
@@ -177,10 +183,41 @@ class AppLocalizationsEn extends AppLocalizations {
   String get serverFieldPort => 'Port';
 
   @override
-  String get serverFieldApiToken => 'API token';
+  String get serverFieldApiTokenId => 'Token ID';
 
   @override
-  String get serverFieldApiTokenHint => 'USER@REALM!TOKENID=SECRET';
+  String get serverFieldApiTokenIdHint => 'e.g. root@pam!mytoken';
+
+  @override
+  String get serverFieldApiTokenSecret => 'Secret';
+
+  @override
+  String get serverFieldApiTokenSecretHint =>
+      'UUID shown when the token was created';
+
+  @override
+  String get serverApiTokenPasteFull => 'Paste full token';
+
+  @override
+  String get serverApiTokenPasteInvalid =>
+      'Clipboard text did not look like USER@REALM!NAME=SECRET.';
+
+  @override
+  String get serverApiTokenPasteClipboardEmpty => 'Clipboard is empty.';
+
+  @override
+  String get serverApiTokenIdErrorEmpty => 'Enter the Token ID.';
+
+  @override
+  String get serverApiTokenIdErrorInvalid =>
+      'Token ID must look like USER@REALM!name and must not include =.';
+
+  @override
+  String get serverApiTokenSecretErrorEmpty => 'Enter the secret.';
+
+  @override
+  String get serverApiTokenErrorPartial =>
+      'Enter both Token ID and Secret, or leave both blank to keep the current token.';
 
   @override
   String get serverFieldUsername => 'User name';
@@ -249,7 +286,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get serverNameErrorEmpty => 'Enter a display name.';
 
   @override
-  String get serverApiTokenErrorEmpty => 'Enter your API token.';
+  String get serverApiTokenErrorBothRequired =>
+      'Enter both Token ID and Secret.';
 
   @override
   String get serverFieldRealm => 'Realm';
@@ -294,7 +332,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get serverApiTokenLeaveBlankHint =>
-      'Leave blank to keep the current token.';
+      'Leave both fields blank to keep the current token.';
 
   @override
   String get serverNotFound => 'This server was not found.';
@@ -348,6 +386,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dashboardSummaryTotalContainers => 'Total containers';
+
+  @override
+  String get dashboardSummaryOnlineNodes => 'Online nodes';
 
   @override
   String get dashboardEmptyNodesTitle => 'No nodes';

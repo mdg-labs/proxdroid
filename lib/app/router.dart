@@ -28,6 +28,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'router.g.dart';
 
+/// Shell tab switches — 250ms fade only (Phase B leaves route tree unchanged).
 CustomTransitionPage<void> _fadeShellPage(GoRouterState state, Widget screen) {
   return CustomTransitionPage<void>(
     key: state.pageKey,

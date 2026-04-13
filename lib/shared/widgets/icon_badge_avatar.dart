@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:proxdroid/app/theme/app_colors.dart';
-
 /// Rounded icon holder for empty states and premium headers (§3).
 class IconBadgeAvatar extends StatelessWidget {
   const IconBadgeAvatar({
@@ -29,10 +27,13 @@ class IconBadgeAvatar extends StatelessWidget {
       decoration: BoxDecoration(
         color: scheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(borderRadius),
-        border: Border.all(
-          color: AppColors.premiumAccent.withValues(alpha: 0.45),
-          width: 1.5,
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: scheme.primary.withValues(alpha: 0.10),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       alignment: Alignment.center,
       child: Icon(icon, size: iconSize, color: scheme.primary),

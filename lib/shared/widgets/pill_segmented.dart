@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 /// Themed [SegmentedButton] with §2.3 stadium shape from [SegmentedButtonThemeData].
 ///
+/// Track and selected fills use global [ThemeData.segmentedButtonTheme] (Phase C
+/// Stitch: `surfaceContainerHigh` track, `primaryContainer` selection).
+///
 /// Use for settings (theme mode) and chart timeframes (§3 / §9).
 class PillSegmentedButton<T extends Object> extends StatelessWidget {
   const PillSegmentedButton({

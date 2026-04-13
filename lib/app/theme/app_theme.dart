@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
+import 'stitch_bottom_input_border.dart';
 
 /// Consistent spacing scale — use these instead of magic numbers in widgets.
 ///
@@ -16,22 +18,34 @@ abstract final class AppSpacing {
 
 /// Application [ThemeData] for dark (default) and light Material 3 themes.
 ///
-/// **Scaffold (T1.2):** Dark canvas uses [AppColors.scaffoldPureBlack] (`#000000`).
-/// If OLED banding appears on a device, switch to `#0A0A0A` here and note it.
+/// **Scaffold (Phase A / Stitch §1):** Dark canvas defaults to
+/// [AppColors.scaffoldObsidian] (`#0c0e17`) for tonal layering with
+/// `surface_container_*` tiers. [AppColors.scaffoldPureBlack] (`#000000`)
+/// remains for an **OLED true-black** variant: deeper blacks save power on OLED
+/// panels but remove visible separation from the darkest surface tokens—pick
+/// per product preference and document any switch in `AppColors` / here.
+///
+/// **Typography:** [ThemeData.textTheme] uses bundled **Space Grotesk** +
+/// **Inter** (variable TTFs under `assets/fonts/`, declared in `pubspec.yaml`)
+/// via per-style [TextStyle.copyWith] — display / headline /
+/// [TextTheme.titleLarge] use
+/// Space Grotesk; body + labels + smaller titles use Inter, matching
+/// `obsidian_flux/DESIGN.md` §3. The `google_fonts` package is listed for
+/// optional future runtime/font-subset workflows; the app does not fetch fonts
+/// over the network at startup.
 ///
 /// **Deliberate non-defaults (T1.5):**
-/// - [ColorScheme.surfaceTint] → transparent (neutral card greys on black, no
+/// - [ColorScheme.surfaceTint] → transparent on dark (neutral cards, no
 ///   primary tint wash).
 /// - [SnackBarThemeData.behavior] → floating; action text uses primary (§7.5).
 /// - Dialog / bottom sheet shapes use 24–28 logical px radius (§2.3).
 /// - [SegmentedButtonThemeData] / [ChipThemeData] use stadium radius (§2.3).
 ///
-/// **Contrast rationale (T1.7):** See [AppColors] library doc for `onSurface`,
-/// `onSurfaceVariant`, and [AppColors.premiumAccent] on true black.
+/// **Contrast:** See [AppColors] for `on_surface` / `on_surface_variant` targets.
 abstract final class AppTheme {
   static ThemeData get dark => _buildTheme(
     colorScheme: _darkColorScheme,
-    scaffoldBackground: AppColors.scaffoldPureBlack,
+    scaffoldBackground: AppColors.scaffoldObsidian,
   );
 
   static ThemeData get light => _buildTheme(
@@ -53,10 +67,12 @@ abstract final class AppTheme {
     onSecondaryContainer: AppColors.darkOnSecondaryContainer,
     tertiary: AppColors.darkTertiary,
     onTertiary: AppColors.darkOnTertiary,
+    tertiaryContainer: AppColors.darkTertiaryContainer,
+    onTertiaryContainer: AppColors.darkOnTertiaryContainer,
     surface: AppColors.darkSurface,
     onSurface: AppColors.darkOnSurface,
     onSurfaceVariant: AppColors.darkOnSurfaceVariant,
-    surfaceContainerLowest: AppColors.scaffoldPureBlack,
+    surfaceContainerLowest: AppColors.scaffoldObsidian,
     surfaceContainerLow: AppColors.darkSurfaceContainerLow,
     surfaceContainer: AppColors.darkSurfaceContainer,
     surfaceContainerHigh: AppColors.darkSurfaceContainerHigh,
@@ -84,6 +100,8 @@ abstract final class AppTheme {
     onSecondaryContainer: AppColors.lightOnSecondaryContainer,
     tertiary: AppColors.lightTertiary,
     onTertiary: AppColors.lightOnTertiary,
+    tertiaryContainer: AppColors.lightTertiaryContainer,
+    onTertiaryContainer: AppColors.lightOnTertiaryContainer,
     surface: AppColors.lightSurface,
     onSurface: AppColors.lightOnSurface,
     onSurfaceVariant: AppColors.lightOnSurfaceVariant,
@@ -100,6 +118,33 @@ abstract final class AppTheme {
     outlineVariant: AppColors.lightOutlineVariant,
   );
 
+  /// Space Grotesk for display / headline / [TextTheme.titleLarge]; Inter
+  /// for body + labels (matches Material 3 “display” vs “body” split).
+  static TextTheme _mergedTextTheme(Brightness brightness) {
+    GoogleFonts.config.allowRuntimeFetching = false;
+    final b = ThemeData(brightness: brightness, useMaterial3: true).textTheme;
+    TextStyle? sg(TextStyle? s) => s?.copyWith(fontFamily: 'Space Grotesk');
+    TextStyle? inter(TextStyle? s) => s?.copyWith(fontFamily: 'Inter');
+
+    return b.copyWith(
+      displayLarge: sg(b.displayLarge),
+      displayMedium: sg(b.displayMedium),
+      displaySmall: sg(b.displaySmall),
+      headlineLarge: sg(b.headlineLarge),
+      headlineMedium: sg(b.headlineMedium),
+      headlineSmall: sg(b.headlineSmall),
+      titleLarge: sg(b.titleLarge),
+      titleMedium: inter(b.titleMedium),
+      titleSmall: inter(b.titleSmall),
+      bodyLarge: inter(b.bodyLarge),
+      bodyMedium: inter(b.bodyMedium),
+      bodySmall: inter(b.bodySmall),
+      labelLarge: inter(b.labelLarge),
+      labelMedium: inter(b.labelMedium),
+      labelSmall: inter(b.labelSmall),
+    );
+  }
+
   static ThemeData _buildTheme({
     required ColorScheme colorScheme,
     required Color scaffoldBackground,
@@ -111,6 +156,13 @@ abstract final class AppTheme {
     const snackBarRadius = 14.0;
     const stadium = 999.0;
 
+    final brightness = colorScheme.brightness;
+    final textTheme = _mergedTextTheme(brightness);
+    final primaryTextTheme = textTheme.apply(
+      bodyColor: colorScheme.onPrimary,
+      displayColor: colorScheme.onPrimary,
+    );
+
     final cardShape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(radiusLg),
     );
@@ -119,11 +171,29 @@ abstract final class AppTheme {
       borderRadius: BorderRadius.circular(stadium),
     );
 
+    final fieldRadius = BorderRadius.circular(radiusMd);
+    StitchBottomInputBorder stitchFieldBorder({
+      required Color color,
+      required double width,
+      bool glow = false,
+    }) => StitchBottomInputBorder(
+      borderRadius: fieldRadius,
+      borderSide: BorderSide(color: color, width: width),
+      glow: glow,
+    );
+
     return ThemeData(
       useMaterial3: true,
-      brightness: colorScheme.brightness,
+      brightness: brightness,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: scaffoldBackground,
+      textTheme: textTheme,
+      primaryTextTheme: primaryTextTheme,
+      splashFactory: InkRipple.splashFactory,
+      splashColor: colorScheme.primary.withValues(alpha: 0.14),
+      hoverColor: colorScheme.primary.withValues(alpha: 0.06),
+      highlightColor: colorScheme.primary.withValues(alpha: 0.08),
+      focusColor: colorScheme.primary.withValues(alpha: 0.10),
       appBarTheme: AppBarTheme(
         centerTitle: true,
         elevation: 0,
@@ -131,6 +201,9 @@ abstract final class AppTheme {
         backgroundColor: scaffoldBackground,
         foregroundColor: colorScheme.onSurface,
         surfaceTintColor: colorScheme.surfaceTint,
+        titleTextStyle: textTheme.titleLarge?.copyWith(
+          color: colorScheme.onSurface,
+        ),
       ),
       drawerTheme: DrawerThemeData(
         backgroundColor: colorScheme.surfaceContainerLow,
@@ -146,7 +219,7 @@ abstract final class AppTheme {
         indicatorShape: pillShape,
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
-          return TextStyle(
+          return textTheme.bodyMedium!.copyWith(
             fontSize: 14,
             fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
             color:
@@ -168,17 +241,15 @@ abstract final class AppTheme {
         shadowColor: Colors.transparent,
         elevation: 0,
         height: 64,
-        indicatorColor: colorScheme.primary.withValues(alpha: 0.14),
+        indicatorColor: colorScheme.primary.withValues(alpha: 0.10),
         indicatorShape: const StadiumBorder(),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
-          return TextStyle(
+          return textTheme.labelMedium!.copyWith(
             fontSize: 11,
             fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
             color:
-                selected
-                    ? colorScheme.primary
-                    : colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                selected ? colorScheme.primary : colorScheme.onSurfaceVariant,
             letterSpacing: 0.1,
           );
         }),
@@ -187,9 +258,7 @@ abstract final class AppTheme {
           return IconThemeData(
             size: 22,
             color:
-                selected
-                    ? colorScheme.primary
-                    : colorScheme.onSurfaceVariant.withValues(alpha: 0.65),
+                selected ? colorScheme.primary : colorScheme.onSurfaceVariant,
           );
         }),
       ),
@@ -221,7 +290,9 @@ abstract final class AppTheme {
           borderRadius: BorderRadius.circular(snackBarRadius),
         ),
         backgroundColor: colorScheme.surfaceContainer,
-        contentTextStyle: TextStyle(color: colorScheme.onSurface),
+        contentTextStyle: textTheme.bodyMedium!.copyWith(
+          color: colorScheme.onSurface,
+        ),
         actionTextColor: colorScheme.primary,
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
@@ -232,8 +303,12 @@ abstract final class AppTheme {
       chipTheme: ChipThemeData(
         shape: pillShape,
         side: BorderSide(color: colorScheme.outlineVariant),
-        labelStyle: TextStyle(color: colorScheme.onSurface),
-        secondaryLabelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+        labelStyle: textTheme.bodyMedium!.copyWith(
+          color: colorScheme.onSurface,
+        ),
+        secondaryLabelStyle: textTheme.bodyMedium!.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         backgroundColor: colorScheme.surfaceContainerHighest,
         selectedColor: colorScheme.secondaryContainer,
@@ -243,32 +318,41 @@ abstract final class AppTheme {
       ),
       cardTheme: CardThemeData(
         elevation: 0,
+        margin: EdgeInsets.zero,
         shape: cardShape,
         clipBehavior: Clip.antiAlias,
-        color: colorScheme.surfaceContainerHighest,
+        color: colorScheme.surfaceContainer,
+        shadowColor: Colors.black.withValues(alpha: 0.35),
         surfaceTintColor: colorScheme.surfaceTint,
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: colorScheme.surfaceContainerHighest,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radiusMd),
+        fillColor: colorScheme.surfaceContainerHigh,
+        border: stitchFieldBorder(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+          width: 1,
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radiusMd),
-          borderSide: BorderSide(color: colorScheme.outline),
+        enabledBorder: stitchFieldBorder(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+          width: 1,
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radiusMd),
-          borderSide: BorderSide(color: colorScheme.primary, width: 2),
+        disabledBorder: stitchFieldBorder(
+          color: colorScheme.onSurface.withValues(alpha: 0.12),
+          width: 1,
         ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radiusMd),
-          borderSide: BorderSide(color: colorScheme.error),
+        focusedBorder: stitchFieldBorder(
+          color: colorScheme.primary,
+          width: 2.5,
+          glow: true,
         ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radiusMd),
-          borderSide: BorderSide(color: colorScheme.error, width: 2),
+        errorBorder: stitchFieldBorder(
+          color: colorScheme.error.withValues(alpha: 0.9),
+          width: 1,
+        ),
+        focusedErrorBorder: stitchFieldBorder(
+          color: colorScheme.error,
+          width: 2.5,
+          glow: true,
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
@@ -300,6 +384,19 @@ abstract final class AppTheme {
         style: ButtonStyle(
           shape: WidgetStatePropertyAll(pillShape),
           visualDensity: VisualDensity.compact,
+          side: const WidgetStatePropertyAll(BorderSide.none),
+          backgroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return colorScheme.primaryContainer.withValues(alpha: 0.72);
+            }
+            return colorScheme.surfaceContainerHigh;
+          }),
+          foregroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return colorScheme.onPrimaryContainer;
+            }
+            return colorScheme.onSurfaceVariant;
+          }),
         ),
       ),
     );

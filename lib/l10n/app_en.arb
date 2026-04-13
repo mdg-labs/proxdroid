@@ -8,6 +8,14 @@
   "@appDrawerSubtitle": {
     "description": "Short tagline under the app name in the navigation drawer."
   },
+  "shellConnectedLabel": "Connected",
+  "@shellConnectedLabel": {
+    "description": "Short status label in the shell section header when a Proxmox server is selected (Phase B chrome)."
+  },
+  "shellServerPillTooltip": "Switch or manage servers",
+  "@shellServerPillTooltip": {
+    "description": "Tooltip for the connected-server pill in ShellSectionBody."
+  },
   "drawerSectionInfrastructure": "Infrastructure",
   "@drawerSectionInfrastructure": {
     "description": "Navigation drawer group label for servers, dashboard, VMs, containers, storage."
@@ -232,13 +240,49 @@
   "@serverFieldPort": {
     "description": "Label for HTTPS API port."
   },
-  "serverFieldApiToken": "API token",
-  "@serverFieldApiToken": {
-    "description": "Label for full PVE API token value."
+  "serverFieldApiTokenId": "Token ID",
+  "@serverFieldApiTokenId": {
+    "description": "Label for Proxmox API token ID (USER@REALM!name)."
   },
-  "serverFieldApiTokenHint": "USER@REALM!TOKENID=SECRET",
-  "@serverFieldApiTokenHint": {
-    "description": "Hint format for API token."
+  "serverFieldApiTokenIdHint": "e.g. root@pam!mytoken",
+  "@serverFieldApiTokenIdHint": {
+    "description": "Hint for API token ID field."
+  },
+  "serverFieldApiTokenSecret": "Secret",
+  "@serverFieldApiTokenSecret": {
+    "description": "Label for Proxmox API token secret (UUID)."
+  },
+  "serverFieldApiTokenSecretHint": "UUID shown when the token was created",
+  "@serverFieldApiTokenSecretHint": {
+    "description": "Hint for API token secret field."
+  },
+  "serverApiTokenPasteFull": "Paste full token",
+  "@serverApiTokenPasteFull": {
+    "description": "Button to paste USER@REALM!NAME=SECRET from clipboard."
+  },
+  "serverApiTokenPasteInvalid": "Clipboard text did not look like USER@REALM!NAME=SECRET.",
+  "@serverApiTokenPasteInvalid": {
+    "description": "Snackbar when paste full token could not be parsed."
+  },
+  "serverApiTokenPasteClipboardEmpty": "Clipboard is empty.",
+  "@serverApiTokenPasteClipboardEmpty": {
+    "description": "Snackbar when paste full token but clipboard has no text."
+  },
+  "serverApiTokenIdErrorEmpty": "Enter the Token ID.",
+  "@serverApiTokenIdErrorEmpty": {
+    "description": "Validator when token ID is empty on add."
+  },
+  "serverApiTokenIdErrorInvalid": "Token ID must look like USER@REALM!name and must not include =.",
+  "@serverApiTokenIdErrorInvalid": {
+    "description": "Validator when token ID shape is wrong."
+  },
+  "serverApiTokenSecretErrorEmpty": "Enter the secret.",
+  "@serverApiTokenSecretErrorEmpty": {
+    "description": "Validator when secret is empty on add."
+  },
+  "serverApiTokenErrorPartial": "Enter both Token ID and Secret, or leave both blank to keep the current token.",
+  "@serverApiTokenErrorPartial": {
+    "description": "Snackbar when only one API token field is filled on edit or test."
   },
   "serverFieldUsername": "User name",
   "@serverFieldUsername": {
@@ -320,9 +364,9 @@
   "@serverNameErrorEmpty": {
     "description": "Validation when display name is empty."
   },
-  "serverApiTokenErrorEmpty": "Enter your API token.",
-  "@serverApiTokenErrorEmpty": {
-    "description": "Validation when API token is required but empty."
+  "serverApiTokenErrorBothRequired": "Enter both Token ID and Secret.",
+  "@serverApiTokenErrorBothRequired": {
+    "description": "Snackbar when API token test/save needs credentials but both fields are empty on add."
   },
   "serverFieldRealm": "Realm",
   "@serverFieldRealm": {
@@ -376,7 +420,7 @@
   "@serverPasswordLeaveBlankHint": {
     "description": "Hint on edit when password optional."
   },
-  "serverApiTokenLeaveBlankHint": "Leave blank to keep the current token.",
+  "serverApiTokenLeaveBlankHint": "Leave both fields blank to keep the current token.",
   "@serverApiTokenLeaveBlankHint": {
     "description": "Hint on edit when API token optional."
   },
@@ -457,6 +501,10 @@
   "dashboardSummaryTotalContainers": "Total containers",
   "@dashboardSummaryTotalContainers": {
     "description": "Label for total LXC container count."
+  },
+  "dashboardSummaryOnlineNodes": "Online nodes",
+  "@dashboardSummaryOnlineNodes": {
+    "description": "Label for count of cluster nodes reporting online on the dashboard."
   },
   "dashboardEmptyNodesTitle": "No nodes",
   "@dashboardEmptyNodesTitle": {

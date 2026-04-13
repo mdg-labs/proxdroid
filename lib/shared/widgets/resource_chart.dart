@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:proxdroid/app/theme/app_colors.dart';
 import 'package:proxdroid/core/models/resource_data_point.dart';
 import 'package:proxdroid/core/utils/formatters.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
@@ -146,11 +147,16 @@ class ResourceLineChart extends StatelessWidget {
         ),
       );
     }
+    final resolvedSecondary =
+        secondaryColor ??
+        (metric == ResourceChartMetric.network
+            ? AppColors.chartNetworkOut
+            : scheme.secondary);
     return _ResourceLineChartCanvas(
       data: data,
       metric: metric,
       primaryColor: primaryColor,
-      secondaryColor: secondaryColor ?? scheme.tertiary,
+      secondaryColor: resolvedSecondary,
       timeframe: timeframe,
       l10n: l10n,
       compact: compact,
@@ -184,9 +190,7 @@ class _ResourceLineChartCanvas extends StatelessWidget {
     if (lineBars.isEmpty) {
       return DecoratedBox(
         decoration: BoxDecoration(
-          border: Border.all(
-            color: scheme.outlineVariant.withValues(alpha: 0.25),
-          ),
+          color: scheme.surfaceContainerHighest.withValues(alpha: 0.35),
           borderRadius: BorderRadius.circular(8),
         ),
         child: const SizedBox.expand(),
@@ -226,13 +230,17 @@ class _ResourceLineChartCanvas extends StatelessWidget {
           horizontalInterval: (maxY - minY) / (compact ? 2 : 4),
           getDrawingHorizontalLine:
               (v) =>
-                  FlLine(color: scheme.outlineVariant.withValues(alpha: 0.3)),
+                  FlLine(color: scheme.outlineVariant.withValues(alpha: 0.22)),
         ),
         borderData: FlBorderData(
           show: true,
           border: Border(
-            bottom: BorderSide(color: scheme.outline.withValues(alpha: 0.4)),
-            left: BorderSide(color: scheme.outline.withValues(alpha: 0.4)),
+            bottom: BorderSide(
+              color: scheme.outlineVariant.withValues(alpha: 0.35),
+            ),
+            left: BorderSide(
+              color: scheme.outlineVariant.withValues(alpha: 0.35),
+            ),
           ),
         ),
         titlesData: FlTitlesData(
@@ -284,7 +292,7 @@ class _ResourceLineChartCanvas extends StatelessWidget {
           handleBuiltInTouches: true,
           touchTooltipData: LineTouchTooltipData(
             // §9: surface fill, onSurface text, 12 radius.
-            getTooltipColor: (_) => scheme.surface,
+            getTooltipColor: (_) => scheme.surfaceContainerHigh,
             tooltipRoundedRadius: 12,
             maxContentWidth: 240,
             getTooltipItems: (touchedSpots) {
@@ -385,19 +393,19 @@ class _ResourceLineChartCanvas extends StatelessWidget {
           _singleLine(
             color: secondaryColor,
             values: data.map((e) => e.netOut ?? double.nan).toList(),
-            fillBelow: false,
+            fillTopAlpha: 0.22,
           ),
         ];
       case ResourceChartMetric.diskIo:
         return [
           _singleLine(
-            color: primaryColor,
+            color: AppColors.chartDiskRead,
             values: data.map((e) => e.diskRead ?? double.nan).toList(),
           ),
           _singleLine(
-            color: secondaryColor,
+            color: AppColors.chartDiskWrite,
             values: data.map((e) => e.diskWrite ?? double.nan).toList(),
-            fillBelow: false,
+            fillTopAlpha: 0.2,
           ),
         ];
     }
@@ -414,6 +422,7 @@ class _ResourceLineChartCanvas extends StatelessWidget {
     required Color color,
     required List<double> values,
     bool fillBelow = true,
+    double fillTopAlpha = 0.35,
   }) {
     final spots = <FlSpot>[];
     for (var i = 0; i < values.length; i++) {
@@ -434,7 +443,7 @@ class _ResourceLineChartCanvas extends StatelessWidget {
         show: fillBelow && spots.isNotEmpty,
         gradient: LinearGradient(
           colors: [
-            color.withValues(alpha: 0.35),
+            color.withValues(alpha: fillTopAlpha),
             color.withValues(alpha: 0.02),
           ],
           begin: Alignment.topCenter,

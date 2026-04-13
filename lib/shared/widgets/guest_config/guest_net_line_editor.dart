@@ -96,7 +96,6 @@ class _GuestNetLineEditorState extends ConsumerState<GuestNetLineEditor> {
                   widget.isQemu
                       ? l10n.guestCreateFieldNet0
                       : l10n.guestCreateFieldNet0,
-              border: const OutlineInputBorder(),
             ),
             maxLines: 2,
             onChanged: widget.enabled ? _emitRaw : null,
@@ -147,7 +146,7 @@ class _GuestNetLineEditorState extends ConsumerState<GuestNetLineEditor> {
               TextFormField(
                 initialValue: widget.value,
                 enabled: widget.enabled,
-                decoration: InputDecoration(border: const OutlineInputBorder()),
+                decoration: const InputDecoration(),
                 onChanged: widget.enabled ? _emitRaw : null,
               ),
             ],
@@ -323,10 +322,7 @@ class _QemuStructuredState extends State<_QemuStructured> {
         DropdownButtonFormField<String>(
           // ignore: deprecated_member_use
           value: _bridge.isEmpty ? bridgeItems.first.value : _bridge,
-          decoration: InputDecoration(
-            labelText: l10n.guestPickerBridge,
-            border: const OutlineInputBorder(),
-          ),
+          decoration: InputDecoration(labelText: l10n.guestPickerBridge),
           items: bridgeItems,
           onChanged:
               widget.enabled
@@ -484,20 +480,14 @@ class _LxcStructuredState extends State<_LxcStructured> {
         TextFormField(
           controller: _name,
           enabled: widget.enabled,
-          decoration: InputDecoration(
-            labelText: l10n.guestPickerIfaceName,
-            border: const OutlineInputBorder(),
-          ),
+          decoration: InputDecoration(labelText: l10n.guestPickerIfaceName),
           onChanged: widget.enabled ? (_) => _notify() : null,
         ),
         const SizedBox(height: 12),
         DropdownButtonFormField<String>(
           // ignore: deprecated_member_use
           value: _bridge.isEmpty ? bridgeItems.first.value : _bridge,
-          decoration: InputDecoration(
-            labelText: l10n.guestPickerBridge,
-            border: const OutlineInputBorder(),
-          ),
+          decoration: InputDecoration(labelText: l10n.guestPickerBridge),
           items: bridgeItems,
           onChanged:
               widget.enabled
@@ -546,7 +536,6 @@ class _LxcStructuredState extends State<_LxcStructured> {
             decoration: InputDecoration(
               labelText: l10n.guestPickerStaticIpLabel,
               hintText: l10n.guestPickerNetStaticHint,
-              border: const OutlineInputBorder(),
             ),
             onChanged: widget.enabled ? (_) => _notify() : null,
           ),

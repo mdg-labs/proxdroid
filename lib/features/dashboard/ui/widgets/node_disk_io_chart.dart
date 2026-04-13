@@ -57,20 +57,27 @@ class NodeDiskIoChart extends ConsumerWidget {
               showTimeframeSelector: false,
             ),
         data: (points) {
+          final scheme = Theme.of(context).colorScheme;
           final hasDiskSeries =
               points.isNotEmpty &&
               points.any((p) => p.diskRead != null || p.diskWrite != null);
           if (!hasDiskSeries) {
-            return SizedBox(
-              height: 220,
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Text(
-                    l10n.chartDiskIoUnavailableOnNode,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+            return DecoratedBox(
+              decoration: BoxDecoration(
+                color: scheme.surfaceContainerHighest.withValues(alpha: 0.45),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: SizedBox(
+                height: 220,
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text(
+                      l10n.chartDiskIoUnavailableOnNode,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
                 ),

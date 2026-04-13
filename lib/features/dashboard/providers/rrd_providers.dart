@@ -5,6 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:proxdroid/core/models/resource_data_point.dart';
 import 'package:proxdroid/features/dashboard/data/rrd_repository.dart';
+import 'package:proxdroid/features/dashboard/providers/dashboard_providers.dart';
 import 'package:proxdroid/features/servers/providers/server_providers.dart';
 
 part 'rrd_providers.g.dart';
@@ -87,5 +88,104 @@ class NodeRrdData extends _$NodeRrdData {
       return const [];
     }
     return repo.getNodeRrd(node, timeframe);
+  }
+}
+
+/// Normalizes RRD CPU samples to a 0–1 style utilization (matches chart layer).
+double _normClusterCpuSample(double raw) => raw > 1.5 ? raw / 100.0 : raw;
+
+/// Merges per-node RRD lists **by sample index** (same [ChartTimeframe] and
+/// Proxmox ordering yields aligned rows). CPU = mean of available node CPU
+/// values; memory = sum of available node `mem` bytes (cluster total).
+List<ResourceDataPoint> mergeClusterNodeRrdByIndex(
+  List<List<ResourceDataPoint>> series,
+) {
+  if (series.isEmpty) {
+    return const [];
+  }
+  final nonempty = series.where((s) => s.isNotEmpty).toList();
+  if (nonempty.isEmpty) {
+    return const [];
+  }
+  var minLen = nonempty.first.length;
+  for (final s in nonempty) {
+    if (s.length < minLen) {
+      minLen = s.length;
+    }
+  }
+  if (minLen == 0) {
+    return const [];
+  }
+  final out = <ResourceDataPoint>[];
+  for (var i = 0; i < minLen; i++) {
+    var ts = nonempty.first[i].timestamp;
+    var cpuSum = 0.0;
+    var cpuCount = 0;
+    double memSum = 0;
+    var memCount = 0;
+    for (final s in nonempty) {
+      final p = s[i];
+      ts = p.timestamp;
+      final c = p.cpu;
+      if (c != null) {
+        cpuSum += _normClusterCpuSample(c);
+        cpuCount++;
+      }
+      final m = p.mem;
+      if (m != null) {
+        memSum += m;
+        memCount++;
+      }
+    }
+    out.add(
+      ResourceDataPoint(
+        timestamp: ts,
+        cpu: cpuCount > 0 ? cpuSum / cpuCount : null,
+        mem: memCount > 0 ? memSum : null,
+      ),
+    );
+  }
+  return out;
+}
+
+/// Dashboard cluster CPU/RAM chart: one rrddata fetch per **online** node,
+/// merged with [mergeClusterNodeRrdByIndex]. Failed nodes are skipped
+/// (partial cluster). Refreshes every 60s like [NodeRrdData].
+@riverpod
+class ClusterAggregatedNodeRrd extends _$ClusterAggregatedNodeRrd {
+  @override
+  Future<List<ResourceDataPoint>> build(ChartTimeframe timeframe) async {
+    final timer = Timer.periodic(const Duration(seconds: 60), (_) {
+      ref.invalidateSelf();
+    });
+    ref.onDispose(timer.cancel);
+
+    final nodes = await ref.watch(nodeListProvider.future);
+    final onlineNames =
+        nodes
+            .where((n) => (n.status ?? '').toLowerCase() == 'online')
+            .map((n) => n.name)
+            .toList();
+    if (onlineNames.isEmpty) {
+      return const [];
+    }
+
+    final repo = await ref.watch(rrdRepositoryProvider.future);
+    if (repo == null) {
+      return const [];
+    }
+
+    final series = <List<ResourceDataPoint>>[];
+    for (final name in onlineNames) {
+      try {
+        final pts = await repo.getNodeRrd(name, timeframe);
+        if (pts.isNotEmpty) {
+          series.add(pts);
+        }
+      } on Object {
+        // Skip nodes that error; remaining nodes still form a real partial series.
+      }
+    }
+    return mergeClusterNodeRrdByIndex(series);
   }
 }

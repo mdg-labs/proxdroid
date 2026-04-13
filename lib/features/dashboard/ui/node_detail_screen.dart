@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:proxdroid/app/theme/app_colors.dart';
 import 'package:proxdroid/app/theme/app_theme.dart';
 import 'package:proxdroid/core/models/container.dart' as models;
 import 'package:proxdroid/core/models/node.dart';
@@ -23,8 +22,8 @@ import 'package:proxdroid/shared/widgets/empty_state.dart';
 import 'package:proxdroid/shared/widgets/error_view.dart';
 import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
 import 'package:proxdroid/shared/widgets/resource_chart.dart';
+import 'package:proxdroid/shared/widgets/resource_gauge_row.dart';
 import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
-import 'package:proxdroid/shared/widgets/status_badge.dart';
 
 /// Merges `GET /nodes/{node}/status` into the cluster resource row for the grid.
 Node _mergedNodeForDetailGrid(Node listRow, AsyncValue<Node?> statusAsync) {
@@ -155,12 +154,38 @@ class NodeDetailScreen extends ConsumerWidget {
         final online = _nodeOnline(listNode);
         final title = listNode.name;
 
+        final scheme = Theme.of(context).colorScheme;
+        final tt = Theme.of(context).textTheme;
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             AppBar(
               leading: shellAppBarLeading(context),
-              title: Text(l10n.nodeDetailTitle),
+              titleSpacing: AppSpacing.sm,
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    title,
+                    style: tt.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    '${online ? l10n.statusOnline : l10n.statusOffline} · ${l10n.entityNode}',
+                    style: tt.labelSmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                      fontSize: 11,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
               actions: [
                 IconButton(
                   tooltip: l10n.actionBackup,
@@ -189,6 +214,7 @@ class NodeDetailScreen extends ConsumerWidget {
                   children: [
                     _NodeHeroHeader(
                       node: listNode,
+                      mergedNode: mergedNode,
                       title: title,
                       online: online,
                       l10n: l10n,
@@ -249,12 +275,14 @@ class NodeDetailScreen extends ConsumerWidget {
 class _NodeHeroHeader extends StatelessWidget {
   const _NodeHeroHeader({
     required this.node,
+    required this.mergedNode,
     required this.title,
     required this.online,
     required this.l10n,
   });
 
   final Node node;
+  final Node mergedNode;
   final String title;
   final bool online;
   final AppLocalizations l10n;
@@ -263,66 +291,94 @@ class _NodeHeroHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
-    final statusColor =
-        online
-            ? AppColors.darkStatusSuccessForeground
-            : AppColors.darkStatusStoppedForeground;
-    final statusBg =
-        online
-            ? AppColors.darkStatusSuccessBackground
-            : AppColors.darkStatusStoppedBackground;
+    final accent = online ? scheme.primary : scheme.tertiary;
+    final cpuFrac = nodeCpuFraction(mergedNode.cpu, mergedNode.maxCpu);
+    final memFrac = memoryFraction(mergedNode.mem, mergedNode.maxMem);
 
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
-        color: scheme.surfaceContainerHighest,
+        color: scheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
       ),
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: statusBg,
-              borderRadius: BorderRadius.circular(13),
-            ),
-            alignment: Alignment.center,
-            child: Icon(Icons.dns_rounded, color: statusColor, size: 26),
-          ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w700),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(width: 4, color: accent),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: scheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(13),
+                      ),
+                      child: SizedBox(
+                        width: 52,
+                        height: 52,
+                        child: Icon(
+                          Icons.dns_rounded,
+                          size: 26,
+                          color:
+                              online ? scheme.primary : scheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: tt.titleLarge?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          ResourceGaugeRow(
+                            label: l10n.metricCpu,
+                            value: cpuFrac,
+                            valueSuffix:
+                                cpuFrac != null
+                                    ? formatCpuPercent(cpuFrac)
+                                    : l10n.valueUnavailable,
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          ResourceGaugeRow(
+                            label: l10n.metricMemory,
+                            value: memFrac,
+                            valueSuffix:
+                                memFrac != null
+                                    ? formatMemoryRatio(
+                                      mergedNode.mem,
+                                      mergedNode.maxMem,
+                                    )
+                                    : l10n.valueUnavailable,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Text(
+                      formatUptimeSeconds(node.uptime),
+                      style: tt.labelSmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  l10n.entityNode,
-                  style: tt.bodySmall?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          StatusBadge(
-            label: online ? l10n.statusOnline : l10n.statusOffline,
-            variant:
-                online
-                    ? StatusBadgeVariant.success
-                    : StatusBadgeVariant.stopped,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -377,53 +433,57 @@ class _NodeMetricGrid extends StatelessWidget {
       ),
     ];
 
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
-        color: scheme.surfaceContainerHighest,
+        color: scheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
       ),
-      child: Column(
-        children: [
-          for (var row = 0; row < cells.length; row += 2) ...[
-            if (row > 0)
-              Divider(
-                height: 1,
-                thickness: 1,
-                color: scheme.outlineVariant.withValues(alpha: 0.35),
-              ),
-            IntrinsicHeight(
-              child: Row(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.sm),
+        child: Column(
+          children: [
+            for (var row = 0; row < cells.length; row += 2) ...[
+              if (row > 0) const SizedBox(height: AppSpacing.xs),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: _MetricCell(
-                      label: cells[row].$1,
-                      value: cells[row].$2,
-                      scheme: scheme,
-                      tt: tt,
-                    ),
-                  ),
-                  VerticalDivider(
-                    width: 1,
-                    thickness: 1,
-                    color: scheme.outlineVariant.withValues(alpha: 0.35),
-                  ),
-                  if (row + 1 < cells.length)
-                    Expanded(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: scheme.surfaceContainerHigh,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       child: _MetricCell(
-                        label: cells[row + 1].$1,
-                        value: cells[row + 1].$2,
+                        label: cells[row].$1,
+                        value: cells[row].$2,
                         scheme: scheme,
                         tt: tt,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  if (row + 1 < cells.length)
+                    Expanded(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: scheme.surfaceContainerHigh,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: _MetricCell(
+                          label: cells[row + 1].$1,
+                          value: cells[row + 1].$2,
+                          scheme: scheme,
+                          tt: tt,
+                        ),
                       ),
                     )
                   else
                     const Expanded(child: SizedBox()),
                 ],
               ),
-            ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

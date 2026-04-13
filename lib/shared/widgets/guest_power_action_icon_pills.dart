@@ -47,48 +47,68 @@ class GuestPowerActionIconPills extends StatelessWidget {
 
     final idle = !busy;
 
-    return Wrap(
-      spacing: AppSpacing.sm,
-      runSpacing: AppSpacing.sm,
-      children: [
-        if (canStart)
-          IconButton.filled(
-            onPressed: idle ? onStart : null,
-            tooltip: l10n.actionStart,
-            icon: const Icon(Icons.play_arrow_rounded, size: _iconSize),
-            style: IconButton.styleFrom(shape: _stadium, padding: _pillPadding),
-          ),
-        if (canStopOrReboot) ...[
-          IconButton.outlined(
-            onPressed: idle ? onStop : null,
-            tooltip: l10n.actionStop,
-            icon: const Icon(Icons.stop_rounded, size: _iconSize),
-            style: IconButton.styleFrom(
-              shape: _stadium,
-              foregroundColor: warningColor,
-              side: BorderSide(color: warningColor.withValues(alpha: 0.6)),
-              padding: _pillPadding,
-            ),
-          ),
-          IconButton.filled(
-            onPressed: idle ? onForceStop : null,
-            tooltip: l10n.actionForceStop,
-            icon: const Icon(Icons.power_settings_new_rounded, size: _iconSize),
-            style: IconButton.styleFrom(
-              shape: _stadium,
-              backgroundColor: scheme.errorContainer,
-              foregroundColor: scheme.onErrorContainer,
-              padding: _pillPadding,
-            ),
-          ),
-          IconButton.outlined(
-            onPressed: idle ? onReboot : null,
-            tooltip: l10n.actionReboot,
-            icon: const Icon(Icons.refresh_rounded, size: _iconSize),
-            style: IconButton.styleFrom(shape: _stadium, padding: _pillPadding),
-          ),
-        ],
-      ],
+    return Material(
+      color: scheme.surfaceContainerLow,
+      borderRadius: BorderRadius.circular(16),
+      clipBehavior: Clip.antiAlias,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm,
+          vertical: AppSpacing.sm,
+        ),
+        child: Wrap(
+          spacing: AppSpacing.sm,
+          runSpacing: AppSpacing.sm,
+          children: [
+            if (canStart)
+              IconButton.filled(
+                onPressed: idle ? onStart : null,
+                tooltip: l10n.actionStart,
+                icon: const Icon(Icons.play_arrow_rounded, size: _iconSize),
+                style: IconButton.styleFrom(
+                  shape: _stadium,
+                  padding: _pillPadding,
+                ),
+              ),
+            if (canStopOrReboot) ...[
+              IconButton.outlined(
+                onPressed: idle ? onStop : null,
+                tooltip: l10n.actionStop,
+                icon: const Icon(Icons.stop_rounded, size: _iconSize),
+                style: IconButton.styleFrom(
+                  shape: _stadium,
+                  foregroundColor: warningColor,
+                  side: BorderSide(color: warningColor.withValues(alpha: 0.35)),
+                  padding: _pillPadding,
+                ),
+              ),
+              IconButton.filled(
+                onPressed: idle ? onForceStop : null,
+                tooltip: l10n.actionForceStop,
+                icon: const Icon(
+                  Icons.power_settings_new_rounded,
+                  size: _iconSize,
+                ),
+                style: IconButton.styleFrom(
+                  shape: _stadium,
+                  backgroundColor: scheme.errorContainer,
+                  foregroundColor: scheme.onErrorContainer,
+                  padding: _pillPadding,
+                ),
+              ),
+              IconButton.outlined(
+                onPressed: idle ? onReboot : null,
+                tooltip: l10n.actionReboot,
+                icon: const Icon(Icons.refresh_rounded, size: _iconSize),
+                style: IconButton.styleFrom(
+                  shape: _stadium,
+                  padding: _pillPadding,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }

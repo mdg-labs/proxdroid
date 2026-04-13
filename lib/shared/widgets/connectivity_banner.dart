@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:proxdroid/app/theme/app_colors.dart';
 import 'package:proxdroid/l10n/app_localizations.dart';
 
 /// Non-dismissible offline / connectivity strip for the app shell (§4.2, §6.1).
 ///
 /// **Palette (retint vs harsh [ColorScheme.errorContainer]):**
 /// - Fill: [ColorScheme.surfaceContainerHigh] — elevated but not “error”.
-/// - Accent: [ColorScheme.tertiary] icon + [AppColors.premiumAccent] hairline
-///   bottom edge for a warm “attention” read without semantic error styling.
+/// - Accent: [ColorScheme.tertiary] icon + primary-tinted hairline bottom edge
+///   (Stitch cyan story) without semantic error styling.
 ///
 /// **Layout:** [AppShell] wraps this with [SafeArea] (`bottom: false`) and
 /// [AnimatedSize] so the strip does not cover the app bar and height changes are
@@ -37,7 +36,7 @@ class ConnectivityBanner extends StatelessWidget {
           ),
           border: Border(
             bottom: BorderSide(
-              color: AppColors.premiumAccent.withValues(alpha: 0.45),
+              color: scheme.primary.withValues(alpha: 0.35),
               width: 1,
             ),
           ),
