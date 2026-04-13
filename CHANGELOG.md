@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.0-beta.20] - 2026-04-13
+## [1.0.0-beta.21] - 2026-04-13
+
+Combines **1.0.0-beta.20** and **1.0.0-beta.21** (beta.20 was not tagged on the remote; this section is the single changelog entry for that work plus the follow-up release hygiene).
 
 ### Added
 
@@ -18,10 +20,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Server editor (password auth): in-app guidance to use API tokens when the Proxmox account has two-factor authentication (TFA) enabled.
 - Improved accessibility and UI semantics across the application.
 - Integrated Google Fonts and refined theme typography.
+- README: Android requirements, Download/Obtainium guidance (including one-tap add link), and maintainer doc links for releases and signing.
 
 ### Internal
 
-- Bump version to `1.0.0-beta.20` in `pubspec.yaml` and update `CHANGELOG.md`.
+- Bump version to `1.0.0-beta.20` and refresh `CHANGELOG.md` for that prerelease.
+- GitHub Actions: `permissions.contents: read` on the CI workflow; `permissions.workflows: write` on the release workflow so tag pushes succeed when the release commit touches `.github/workflows`.
+- Changelog updates for the 1.0.0-beta.20 release entry.
+- Bump version to `1.0.0-beta.21` in `pubspec.yaml`.
 
 ## [1.0.0-beta.19] - 2026-04-13
 
@@ -30,12 +36,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced VM and LXC configuration editor with improved UI and data handling.
 
 ## [1.0.0-beta.18] - 2026-04-11
-
-### Changed
-
-- Version bump; no user-visible changes.
-
-## [1.0.0-beta.17] - 2026-04-11
 
 ### Security
 
@@ -52,7 +52,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Internal
 
-- Bumped version to `1.0.0-beta.17+1` in `pubspec.yaml`.
 - Updated architecture documentation, configuration models, and VM/LXC config editor roadmap planning.
 
 ## [1.0.0-beta.16] - 2026-04-11
@@ -224,11 +223,10 @@ First public **beta** prerelease on GitHub Releases (APK via CI).
 - GitHub Actions: release workflow runs only on beta prerelease tags (`v*-beta*`) and
   publishes GitHub **prereleases** with the release APK.
 
-[Unreleased]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.20...HEAD
-[1.0.0-beta.20]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.19...v1.0.0-beta.20
+[Unreleased]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.21...HEAD
+[1.0.0-beta.21]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.19...v1.0.0-beta.21
 [1.0.0-beta.19]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.18...v1.0.0-beta.19
 [1.0.0-beta.18]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.16...v1.0.0-beta.18
-[1.0.0-beta.17]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.16...v1.0.0-beta.17
 [1.0.0-beta.16]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.15...v1.0.0-beta.16
 [1.0.0-beta.15]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.14...v1.0.0-beta.15
 [1.0.0-beta.14]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.13%2B1...v1.0.0-beta.14
