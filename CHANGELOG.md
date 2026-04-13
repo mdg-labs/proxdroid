@@ -7,9 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-beta.20] - 2026-04-13
+
+### Added
+
+- Language preference support with localization enhancements.
+
 ### Changed
 
 - Server editor (password auth): in-app guidance to use API tokens when the Proxmox account has two-factor authentication (TFA) enabled.
+- Improved accessibility and UI semantics across the application.
+- Integrated Google Fonts and refined theme typography.
+
+### Internal
+
+- Bump version to `1.0.0-beta.20` in `pubspec.yaml` and update `CHANGELOG.md`.
 
 ## [1.0.0-beta.19] - 2026-04-13
 
@@ -212,7 +224,8 @@ First public **beta** prerelease on GitHub Releases (APK via CI).
 - GitHub Actions: release workflow runs only on beta prerelease tags (`v*-beta*`) and
   publishes GitHub **prereleases** with the release APK.
 
-[Unreleased]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.19...HEAD
+[Unreleased]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.20...HEAD
+[1.0.0-beta.20]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.19...v1.0.0-beta.20
 [1.0.0-beta.19]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.18...v1.0.0-beta.19
 [1.0.0-beta.18]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.16...v1.0.0-beta.18
 [1.0.0-beta.17]: https://github.com/mdg-labs/proxdroid/compare/v1.0.0-beta.16...v1.0.0-beta.17
