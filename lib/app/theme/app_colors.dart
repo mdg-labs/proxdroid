@@ -23,15 +23,29 @@ abstract final class AppColors {
   /// mapped to [ColorScheme.secondary] — charts use Stitch periwinkle instead.
   static const Color premiumAccent = Color(0xFFC9A962);
 
-  /// Wayfinding / CTA accent — aligned with Stitch [darkPrimary] (cyan).
-  static const Color navigationAccent = Color(0xFF81ecff);
+  /// Launcher icon foreground (`assets/icon/proxdroid_icon_foreground.svg`).
+  static const Color brandOrange = Color(0xFFF97316);
+
+  static final ColorScheme _darkOrangeFromSeed = ColorScheme.fromSeed(
+    seedColor: brandOrange,
+    brightness: Brightness.dark,
+  );
+
+  static final ColorScheme _lightOrangeFromSeed = ColorScheme.fromSeed(
+    seedColor: brandOrange,
+    brightness: Brightness.light,
+  );
+
+  /// Wayfinding / CTA accent — matches [brandOrange] / Material [darkPrimary].
+  static Color get navigationAccent => _darkOrangeFromSeed.primary;
 
   // --- Dark (Stitch §1) ---
 
-  static const Color darkPrimary = navigationAccent;
-  static const Color darkOnPrimary = Color(0xFF005762);
-  static const Color darkPrimaryContainer = Color(0xFF00e3fd);
-  static const Color darkOnPrimaryContainer = Color(0xFF004d57);
+  static Color get darkPrimary => _darkOrangeFromSeed.primary;
+  static Color get darkOnPrimary => _darkOrangeFromSeed.onPrimary;
+  static Color get darkPrimaryContainer => _darkOrangeFromSeed.primaryContainer;
+  static Color get darkOnPrimaryContainer =>
+      _darkOrangeFromSeed.onPrimaryContainer;
 
   static const Color darkSecondary = Color(0xFF7e98ff);
   static const Color darkOnSecondary = Color(0xFF050814);
@@ -65,19 +79,19 @@ abstract final class AppColors {
   static const Color darkErrorContainer = Color(0xFF8c3030);
   static const Color darkOnErrorContainer = Color(0xFFffdad6);
 
-  /// Running / healthy / “online” — cyan primary story (not gold).
-  static const Color darkStatusSuccessBackground = Color(0xFF103545);
-  static const Color darkStatusSuccessForeground = Color(0xFF81ecff);
+  /// Running / healthy / “online” — orange primary family (not gold).
+  static const Color darkStatusSuccessBackground = Color(0xFF3D2408);
+  static const Color darkStatusSuccessForeground = brandOrange;
 
   /// Warning / paused — tertiary magenta (`DESIGN.md`), not amber.
   static const Color darkStatusWarningBackground = Color(0xFF3d2448);
   static const Color darkStatusWarningForeground = Color(0xFFfab0ff);
 
-  /// In-progress / active task — same cyan family as primary.
-  static const Color darkStatusRunningBackground = Color(0xFF103545);
-  static const Color darkStatusRunningForeground = Color(0xFF81ecff);
-  static const Color lightStatusRunningBackground = Color(0xFFDBEEFE);
-  static const Color lightStatusRunningForeground = Color(0xFF004A9B);
+  /// In-progress / active task — same orange family as primary.
+  static const Color darkStatusRunningBackground = Color(0xFF3D2408);
+  static const Color darkStatusRunningForeground = brandOrange;
+  static const Color lightStatusRunningBackground = Color(0xFFFFEDD5);
+  static const Color lightStatusRunningForeground = Color(0xFFC2410C);
 
   /// Stopped / neutral.
   static const Color darkStatusStoppedBackground = Color(0xFF171924);
@@ -99,10 +113,12 @@ abstract final class AppColors {
   static const Color lightSurfaceContainerHigh = Color(0xFFD5D5DA);
   static const Color lightSurfaceContainerHighest = Color(0xFFFFFFFF);
 
-  static const Color lightPrimary = Color(0xFF0061C8);
-  static const Color lightOnPrimary = Color(0xFFFFFFFF);
-  static const Color lightPrimaryContainer = Color(0xFFD4E4FF);
-  static const Color lightOnPrimaryContainer = Color(0xFF001D36);
+  static Color get lightPrimary => _lightOrangeFromSeed.primary;
+  static Color get lightOnPrimary => _lightOrangeFromSeed.onPrimary;
+  static Color get lightPrimaryContainer =>
+      _lightOrangeFromSeed.primaryContainer;
+  static Color get lightOnPrimaryContainer =>
+      _lightOrangeFromSeed.onPrimaryContainer;
 
   static const Color lightSecondary = Color(0xFF6B5720);
   static const Color lightOnSecondary = Color(0xFFFFFFFF);

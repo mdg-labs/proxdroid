@@ -139,6 +139,10 @@ class DashboardScreen extends ConsumerWidget {
     void setChartTf(ChartTimeframe tf) =>
         ref.read(defaultChartTimeframeProvider.notifier).setTimeframe(tf);
 
+    final nodeGridInnerWidth =
+        MediaQuery.sizeOf(context).width - AppSpacing.lg * 2;
+    final nodeGridCrossAxisCount = nodeGridInnerWidth >= 640 ? 2 : 1;
+
     return ShellSectionBody(
       title: Text(l10n.sectionDashboard),
       body: RefreshIndicator(
@@ -191,44 +195,38 @@ class DashboardScreen extends ConsumerWidget {
                 AppSpacing.lg,
                 AppSpacing.lg,
               ),
-              sliver: SliverLayoutBuilder(
-                builder: (context, constraints) {
-                  final w = constraints.crossAxisExtent;
-                  final crossAxisCount = w >= 640 ? 2 : 1;
-                  return SliverGrid(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: crossAxisCount,
-                      mainAxisSpacing: AppSpacing.md,
-                      crossAxisSpacing: AppSpacing.md,
-                      mainAxisExtent: 132,
-                    ),
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      final node = nodes[index];
-                      final online = _nodeOnline(node);
-                      final cpuFrac = nodeCpuFraction(node.cpu, node.maxCpu);
-                      final memFrac = memoryFraction(node.mem, node.maxMem);
-                      return Material(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(16),
-                        clipBehavior: Clip.antiAlias,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(16),
-                          onTap:
-                              () => context.push(
-                                '/dashboard/${Uri.encodeComponent(node.name)}',
-                              ),
-                          child: _DashboardNodeCard(
-                            node: node,
-                            online: online,
-                            cpuFrac: cpuFrac,
-                            memFrac: memFrac,
-                            l10n: l10n,
+              sliver: SliverGrid(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: nodeGridCrossAxisCount,
+                  mainAxisSpacing: AppSpacing.md,
+                  crossAxisSpacing: AppSpacing.md,
+                  mainAxisExtent: 132,
+                ),
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final node = nodes[index];
+                  final online = _nodeOnline(node);
+                  final cpuFrac = nodeCpuFraction(node.cpu, node.maxCpu);
+                  final memFrac = memoryFraction(node.mem, node.maxMem);
+                  return Material(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(16),
+                    clipBehavior: Clip.antiAlias,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap:
+                          () => context.push(
+                            '/dashboard/${Uri.encodeComponent(node.name)}',
                           ),
-                        ),
-                      );
-                    }, childCount: nodes.length),
+                      child: _DashboardNodeCard(
+                        node: node,
+                        online: online,
+                        cpuFrac: cpuFrac,
+                        memFrac: memFrac,
+                        l10n: l10n,
+                      ),
+                    ),
                   );
-                },
+                }, childCount: nodes.length),
               ),
             ),
           ],
@@ -257,39 +255,41 @@ class _SummaryTileRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          child: _SummaryTile(
-            value: '$runningVms',
-            label: l10n.dashboardSummaryRunningVms,
-            icon: Icons.play_circle_outline_rounded,
-            scheme: scheme,
-            tt: tt,
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: _SummaryTile(
+              value: '$runningVms',
+              label: l10n.dashboardSummaryRunningVms,
+              icon: Icons.play_circle_outline_rounded,
+              scheme: scheme,
+              tt: tt,
+            ),
           ),
-        ),
-        const SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: _SummaryTile(
-            value: '$lxcCount',
-            label: l10n.dashboardSummaryTotalContainers,
-            icon: Icons.inventory_2_outlined,
-            scheme: scheme,
-            tt: tt,
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: _SummaryTile(
+              value: '$lxcCount',
+              label: l10n.dashboardSummaryTotalContainers,
+              icon: Icons.inventory_2_outlined,
+              scheme: scheme,
+              tt: tt,
+            ),
           ),
-        ),
-        const SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: _SummaryTile(
-            value: '$onlineNodes/$totalNodes',
-            label: l10n.dashboardSummaryOnlineNodes,
-            icon: Icons.hub_outlined,
-            scheme: scheme,
-            tt: tt,
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: _SummaryTile(
+              value: '$onlineNodes/$totalNodes',
+              label: l10n.dashboardSummaryOnlineNodes,
+              icon: Icons.hub_outlined,
+              scheme: scheme,
+              tt: tt,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

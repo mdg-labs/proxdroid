@@ -359,6 +359,7 @@
 - [x] **EmptyState** tonal icon background; offline banner elevation + rounded bottom
 - [ ] Review all typography, spacing, icon usage for consistency — **ongoing**
 - [ ] Test dark and light theme on multiple screen sizes — **ongoing** (manual QA)
+- [x] **Accent & dashboard (2026-04-13):** `ColorScheme.primary` from launcher orange (`#F97316`); dashboard summary `IntrinsicHeight` + `MediaQuery`-based node grid; VM/LXC detail labeled power pills + compact app bar action labels (`app_colors.dart`, `dashboard_screen.dart`, `guest_power_action_icon_pills.dart`).
 
 ### 6.3 Settings Screen
 - [x] Build `SettingsScreen` with sections:

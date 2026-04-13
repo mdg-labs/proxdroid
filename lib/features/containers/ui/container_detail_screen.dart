@@ -27,6 +27,7 @@ import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
 import 'package:proxdroid/shared/widgets/premium_modals.dart';
 import 'package:proxdroid/shared/widgets/proxmox_tag_widgets.dart';
 import 'package:proxdroid/shared/widgets/resource_chart.dart';
+import 'package:proxdroid/shared/widgets/compact_labeled_app_bar_action.dart';
 import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
 
 class ContainerDetailScreen extends ConsumerStatefulWidget {
@@ -337,9 +338,11 @@ class _ContainerDetailScreenState extends ConsumerState<ContainerDetailScreen> {
                 ],
               ),
               actions: [
-                IconButton(
+                CompactLabeledAppBarAction(
+                  icon: Icons.edit_outlined,
+                  label: l10n.actionEditGuestConfig,
                   tooltip: l10n.actionEditGuestConfig,
-                  icon: const Icon(Icons.edit_outlined),
+                  maxLabelWidth: 72,
                   onPressed:
                       _powerBusy
                           ? null
@@ -347,9 +350,11 @@ class _ContainerDetailScreenState extends ConsumerState<ContainerDetailScreen> {
                             '/containers/${Uri.encodeComponent(ct.node)}/${Uri.encodeComponent(ct.vmid.toString())}/edit',
                           ),
                 ),
-                IconButton(
+                CompactLabeledAppBarAction(
+                  icon: Icons.backup_outlined,
+                  label: l10n.actionBackup,
                   tooltip: l10n.actionBackup,
-                  icon: const Icon(Icons.backup_outlined),
+                  maxLabelWidth: 56,
                   onPressed:
                       _powerBusy
                           ? null

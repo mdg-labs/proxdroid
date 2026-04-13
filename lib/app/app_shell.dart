@@ -317,7 +317,7 @@ class _DrawerBrandingHeader extends ConsumerWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // App icon — cyan / primary ring (Stitch Obsidian; no gold ring)
+                // App icon — orange / primary ring (Stitch Obsidian; no gold ring)
                 Container(
                   padding: const EdgeInsets.all(2),
                   decoration: BoxDecoration(

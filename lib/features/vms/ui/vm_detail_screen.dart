@@ -27,6 +27,7 @@ import 'package:proxdroid/shared/widgets/loading_shimmer.dart';
 import 'package:proxdroid/shared/widgets/premium_modals.dart';
 import 'package:proxdroid/shared/widgets/proxmox_tag_widgets.dart';
 import 'package:proxdroid/shared/widgets/resource_chart.dart';
+import 'package:proxdroid/shared/widgets/compact_labeled_app_bar_action.dart';
 import 'package:proxdroid/shared/widgets/shell_app_bar_leading.dart';
 
 class VmDetailScreen extends ConsumerStatefulWidget {
@@ -331,9 +332,11 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
                 ],
               ),
               actions: [
-                IconButton(
+                CompactLabeledAppBarAction(
+                  icon: Icons.edit_outlined,
+                  label: l10n.actionEditGuestConfig,
                   tooltip: l10n.actionEditGuestConfig,
-                  icon: const Icon(Icons.edit_outlined),
+                  maxLabelWidth: 72,
                   onPressed:
                       _powerBusy
                           ? null
@@ -341,9 +344,11 @@ class _VmDetailScreenState extends ConsumerState<VmDetailScreen> {
                             '/vms/${Uri.encodeComponent(vm.node)}/${Uri.encodeComponent(vm.vmid.toString())}/edit',
                           ),
                 ),
-                IconButton(
+                CompactLabeledAppBarAction(
+                  icon: Icons.backup_outlined,
+                  label: l10n.actionBackup,
                   tooltip: l10n.actionBackup,
-                  icon: const Icon(Icons.backup_outlined),
+                  maxLabelWidth: 56,
                   onPressed:
                       _powerBusy
                           ? null
